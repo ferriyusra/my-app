@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "WebFetch(domain:www.kilatkoding.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:www.ali-ch.dev)"
+    ],
+    "additionalDirectories": [
+      "/Users/ferri/Documents/dev/learning/frontend/nextjs/my-app/src"
+    ]
+  }
+}
