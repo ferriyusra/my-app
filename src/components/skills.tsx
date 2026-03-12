@@ -1,13 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { motion, useReducedMotion, useInView } from 'framer-motion';
 import { Code2, Zap, Globe, Briefcase, Layers } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
-
-const TechGlobe = dynamic(() => import('./tech-globe'), { ssr: false });
 
 type Category =
 	| 'All'
@@ -52,9 +49,9 @@ const skills = [
 	{
 		name: 'Next.js',
 		category: 'Frontend' as Category,
-		color: '#fafafa',
-		bg: '#fafafa10',
-		icon: 'https://cdn.simpleicons.org/nextdotjs/fafafa',
+		color: '#0a0a0a',
+		bg: '#0a0a0a10',
+		icon: 'https://cdn.simpleicons.org/nextdotjs/0a0a0a',
 	},
 	{
 		name: 'TailwindCSS',
@@ -74,9 +71,9 @@ const skills = [
 	{
 		name: 'Express.js',
 		category: 'Backend' as Category,
-		color: '#a1a1aa',
-		bg: '#a1a1aa10',
-		icon: 'https://cdn.simpleicons.org/express/a1a1aa',
+		color: '#525252',
+		bg: '#52525210',
+		icon: 'https://cdn.simpleicons.org/express/525252',
 	},
 	{
 		name: 'NestJS',
@@ -157,6 +154,13 @@ const skills = [
 		bg: '#FBBC0418',
 		icon: 'https://cdn.simpleicons.org/googlepubsub/FBBC04',
 	},
+	{
+		name: 'Cloud Scheduler',
+		category: 'Tools' as Category,
+		color: '#34A853',
+		bg: '#34A85318',
+		icon: 'https://cdn.simpleicons.org/googlecloud/34A853',
+	},
 	// AI Tools
 	{
 		name: 'Claude',
@@ -175,9 +179,9 @@ const skills = [
 	{
 		name: 'GitHub Copilot',
 		category: 'AI Tools' as Category,
-		color: '#a1a1aa',
-		bg: '#a1a1aa10',
-		icon: 'https://cdn.simpleicons.org/githubcopilot/a1a1aa',
+		color: '#525252',
+		bg: '#52525210',
+		icon: 'https://cdn.simpleicons.org/githubcopilot/525252',
 	},
 	{
 		name: 'Cursor',
@@ -186,25 +190,25 @@ const skills = [
 		bg: '#7c3aed18',
 		icon: 'https://cdn.simpleicons.org/cursor/7c3aed',
 	},
-	{
-		name: 'Hugging Face',
-		category: 'AI Tools' as Category,
-		color: '#FFD21E',
-		bg: '#FFD21E18',
-		icon: 'https://cdn.simpleicons.org/huggingface/FFD21E',
-	},
-	{
-		name: 'LangChain',
-		category: 'AI Tools' as Category,
-		color: '#a1a1aa',
-		bg: '#a1a1aa10',
-		icon: 'https://cdn.simpleicons.org/langchain/a1a1aa',
-	},
+	// {
+	// 	name: 'Hugging Face',
+	// 	category: 'AI Tools' as Category,
+	// 	color: '#FFD21E',
+	// 	bg: '#FFD21E18',
+	// 	icon: 'https://cdn.simpleicons.org/huggingface/FFD21E',
+	// },
+	// {
+	// 	name: 'LangChain',
+	// 	category: 'AI Tools' as Category,
+	// 	color: '#525252',
+	// 	bg: '#52525210',
+	// 	icon: 'https://cdn.simpleicons.org/langchain/525252',
+	// },
 ];
 
 // Icons shown inside the bento "Tech Stack" card
 const stackIcons = [
-	{ name: 'Next.js', icon: 'https://cdn.simpleicons.org/nextdotjs/fafafa' },
+	{ name: 'Next.js', icon: 'https://cdn.simpleicons.org/nextdotjs/0a0a0a' },
 	{ name: 'React', icon: 'https://cdn.simpleicons.org/react/0ea5e9' },
 	{ name: 'TypeScript', icon: 'https://cdn.simpleicons.org/typescript/3178C6' },
 	{ name: 'Node.js', icon: 'https://cdn.simpleicons.org/nodedotjs/16a34a' },
@@ -215,28 +219,32 @@ const stackIcons = [
 ];
 
 const CARD_BASE: React.CSSProperties = {
-	background: '#111113',
-	border: '1px solid rgba(255,255,255,0.07)',
+	background: '#ffffff',
+	border: '2px solid #0a0a0a',
 	borderRadius: 20,
-	padding: 28,
-	boxShadow: '0 0 0 1px rgba(255,255,255,0.04)',
+	boxShadow: '6px 6px 0px #0a0a0a',
+	overflow: 'hidden',
+	display: 'flex',
+	flexDirection: 'column',
+	transition: 'transform 0.2s ease, box-shadow 0.2s ease',
 };
 
-const ICON_BOX: React.CSSProperties = {
-	width: 44,
-	height: 44,
-	borderRadius: 12,
-	background: 'rgba(255,255,255,0.05)',
-	border: '1px solid rgba(255,255,255,0.08)',
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'center',
-	marginBottom: 20,
+const hoverIn = (e: React.MouseEvent<HTMLElement>) => {
+	e.currentTarget.style.transform = 'translate(-2px, -2px)';
+	e.currentTarget.style.boxShadow = '8px 8px 0px #0a0a0a';
 };
+const hoverOut = (e: React.MouseEvent<HTMLElement>) => {
+	e.currentTarget.style.transform = 'translate(0, 0)';
+	e.currentTarget.style.boxShadow = '6px 6px 0px #0a0a0a';
+};
+
 
 export default function Skills() {
 	const [active, setActive] = useState<Category>('All');
+	const [interacted, setInteracted] = useState(false);
 	const shouldReduceMotion = useReducedMotion();
+	const gridRef = useRef<HTMLDivElement>(null);
+	const gridInView = useInView(gridRef, { once: true, margin: '-80px' });
 
 	const t = (duration: number, delay: number) => ({
 		duration: shouldReduceMotion ? 0 : duration,
@@ -245,7 +253,7 @@ export default function Skills() {
 	});
 
 	return (
-		<section id='skills' style={{ background: '#09090b' }}>
+		<section id='skills' style={{ background: '#ffffff' }}>
 			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 				{/* Section label */}
 				<motion.div
@@ -256,7 +264,7 @@ export default function Skills() {
 					style={{
 						fontFamily: "'JetBrains Mono', monospace",
 						fontSize: 11,
-						color: '#7c3aed',
+						color: '#a3a3a3',
 						letterSpacing: '0.18em',
 						textTransform: 'uppercase',
 						marginBottom: 12,
@@ -272,7 +280,7 @@ export default function Skills() {
 						fontWeight: 800,
 						marginBottom: 12,
 						fontFamily: "'Inter', sans-serif",
-						color: '#fafafa',
+						color: '#0a0a0a',
 						letterSpacing: '-0.02em',
 					}}>
 					Tech{' '}
@@ -284,7 +292,7 @@ export default function Skills() {
 					viewport={{ once: true, margin: '-80px' }}
 					transition={t(0.4, 0.16)}
 					style={{
-						color: '#a1a1aa',
+						color: '#525252',
 						fontSize: 16,
 						marginBottom: 56,
 						maxWidth: 480,
@@ -298,250 +306,161 @@ export default function Skills() {
 				<div
 					style={{
 						display: 'grid',
-						gridTemplateColumns: 'repeat(3, 1fr)',
-						gridTemplateRows: 'auto auto',
-						gap: 16,
+						gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+						gap: 20,
 						marginBottom: 64,
 					}}>
-					{/* Card 1 — Clean Code First (row 1, col 1) */}
+					{/* Card 1 — Clean Code First */}
 					<motion.div
 						initial={{ opacity: 0, y: 24 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.22)}
-						style={{ ...CARD_BASE, gridColumn: '1', gridRow: '1' }}>
-						<div style={ICON_BOX}>
-							<Code2
-								size={20}
-								style={{ color: '#10b981' }}
-								aria-hidden='true'
-							/>
+						transition={t(0.5, 0.1)}
+						style={CARD_BASE}
+					onMouseEnter={hoverIn}
+					onMouseLeave={hoverOut}>
+						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
+							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
+								<Code2 size={36} style={{ color: '#10b981' }} aria-hidden='true' />
+							</div>
 						</div>
-						<h3
-							style={{
-								fontSize: 18,
-								fontWeight: 700,
-								color: '#fafafa',
-								fontFamily: "'Inter', sans-serif",
-								marginBottom: 10,
-								letterSpacing: '-0.01em',
-							}}>
-							Clean Code First
-						</h3>
-						<p
-							style={{
-								fontSize: 14,
-								color: '#a1a1aa',
-								lineHeight: 1.65,
-								fontFamily: "'Inter', sans-serif",
-								margin: 0,
-							}}>
-							Writing maintainable, scalable code with engineering excellence at
-							every layer of the stack.
-						</p>
+						<div style={{ padding: '24px 24px 28px' }}>
+							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
+								Clean Code First
+							</h3>
+							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
+								Writing maintainable, scalable code with engineering excellence at every layer of the stack.
+							</p>
+						</div>
 					</motion.div>
 
-					{/* Card 2 — Modern Tech Stack (row 1–2, col 2) — tall center card */}
+					{/* Card 2 — Modern Tech Stack */}
 					<motion.div
 						initial={{ opacity: 0, y: 24 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.3)}
-						style={{ ...CARD_BASE, gridColumn: '2', gridRow: '1 / 3' }}>
-						<div style={ICON_BOX}>
-							<Layers
-								size={20}
-								style={{ color: '#3b82f6' }}
-								aria-hidden='true'
-							/>
-						</div>
-						<h3
-							style={{
-								fontSize: 18,
-								fontWeight: 700,
-								color: '#fafafa',
-								fontFamily: "'Inter', sans-serif",
-								marginBottom: 10,
-								letterSpacing: '-0.01em',
-							}}>
-							Modern Tech Stack
-						</h3>
-						<p
-							style={{
-								fontSize: 14,
-								color: '#a1a1aa',
-								lineHeight: 1.65,
-								fontFamily: "'Inter', sans-serif",
-								marginBottom: 28,
-							}}>
-							Technologies and tools I use to build innovative solutions
-						</p>
-						{/* Icon grid */}
-						<div
-							style={{
-								display: 'grid',
-								gridTemplateColumns: 'repeat(4, 1fr)',
-								gap: 12,
-							}}>
+						transition={t(0.5, 0.18)}
+						style={CARD_BASE}
+					onMouseEnter={hoverIn}
+					onMouseLeave={hoverOut}>
+						<div style={{ background: '#f0ece8', padding: '24px 20px 20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
 							{stackIcons.map((s) => (
-								<div
-									key={s.name}
-									style={{
-										display: 'flex',
-										flexDirection: 'column',
-										alignItems: 'center',
-										gap: 8,
-									}}>
-									<div
-										style={{
-											width: 48,
-											height: 48,
-											borderRadius: 12,
-											background: 'rgba(255,255,255,0.05)',
-											border: '1px solid rgba(255,255,255,0.08)',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-										}}>
+								<div key={s.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+									<div style={{ width: 44, height: 44, borderRadius: 12, background: '#ffffff', border: '1.5px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '2px 2px 0px #0a0a0a' }}>
 										{/* eslint-disable-next-line @next/next/no-img-element */}
-										<img src={s.icon} alt={s.name} width={24} height={24} />
+										<img src={s.icon} alt={s.name} width={22} height={22} />
 									</div>
-									<span
-										style={{
-											fontSize: 10,
-											color: '#71717a',
-											fontFamily: "'JetBrains Mono', monospace",
-											textAlign: 'center',
-										}}>
-										{s.name}
-									</span>
+									<span style={{ fontSize: 9, color: '#525252', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', lineHeight: 1.2 }}>{s.name}</span>
 								</div>
 							))}
 						</div>
-					</motion.div>
-
-					{/* Card 3 — Full Stack (row 1, col 3) */}
-					<motion.div
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.38)}
-						style={{ ...CARD_BASE, gridColumn: '3', gridRow: '1' }}>
-						<div style={ICON_BOX}>
-							<Zap size={20} style={{ color: '#f59e0b' }} aria-hidden='true' />
-						</div>
-						<h3
-							style={{
-								fontSize: 18,
-								fontWeight: 700,
-								color: '#fafafa',
-								fontFamily: "'Inter', sans-serif",
-								marginBottom: 10,
-								letterSpacing: '-0.01em',
-							}}>
-							Full Stack Expertise
-						</h3>
-						<p
-							style={{
-								fontSize: 14,
-								color: '#a1a1aa',
-								lineHeight: 1.65,
-								fontFamily: "'Inter', sans-serif",
-								margin: 0,
-							}}>
-							From React frontends to Golang backends — end-to-end ownership
-							across every layer.
-						</p>
-					</motion.div>
-
-					{/* Card 4 — Remote Ready (row 2, col 1) */}
-					<motion.div
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.46)}
-						style={{ ...CARD_BASE, gridColumn: '1', gridRow: '2' }}>
-						<div style={ICON_BOX}>
-							<Globe
-								size={20}
-								style={{ color: '#0ea5e9' }}
-								aria-hidden='true'
-							/>
-						</div>
-						<h3
-							style={{
-								fontSize: 18,
-								fontWeight: 700,
-								color: '#fafafa',
-								fontFamily: "'Inter', sans-serif",
-								marginBottom: 10,
-								letterSpacing: '-0.01em',
-							}}>
-							Remote Ready
-						</h3>
-						<p
-							style={{
-								fontSize: 14,
-								color: '#a1a1aa',
-								lineHeight: 1.65,
-								fontFamily: "'Inter', sans-serif",
-								margin: 0,
-							}}>
-							Available across time zones for seamless worldwide collaboration,
-							hybrid or remote.
-						</p>
-					</motion.div>
-
-					{/* Card 5 — Ready to Build (row 2, col 3) — animated rainbow border */}
-					<motion.div
-						className='rainbow-border'
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.54)}
-						style={{ gridColumn: '3', gridRow: '2' }}>
-						<div
-							style={{
-								...CARD_BASE,
-								border: 'none',
-								boxShadow: 'none',
-								borderRadius: 20,
-								height: '100%',
-							}}>
-							<div
-								style={{
-									...ICON_BOX,
-									border: '1px solid rgba(255,255,255,0.10)',
-								}}>
-								<Briefcase
-									size={20}
-									style={{ color: '#a5b4fc' }}
-									aria-hidden='true'
-								/>
-							</div>
-							<h3
-								style={{
-									fontSize: 18,
-									fontWeight: 700,
-									color: '#fafafa',
-									fontFamily: "'Inter', sans-serif",
-									marginBottom: 10,
-									letterSpacing: '-0.01em',
-								}}>
-								Ready to Build
+						<div style={{ padding: '20px 24px 28px' }}>
+							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
+								Modern Tech Stack
 							</h3>
-							<p
-								style={{
-									fontSize: 14,
-									color: '#a1a1aa',
-									lineHeight: 1.65,
-									fontFamily: "'Inter', sans-serif",
-									margin: 0,
-								}}>
-								Open to new opportunities. Let&apos;s create something amazing
-								together.
+							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
+								Technologies and tools I use to build innovative solutions.
 							</p>
 						</div>
+					</motion.div>
+
+					{/* Card 3 — Full Stack Expertise */}
+					<motion.div
+						initial={{ opacity: 0, y: 24 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						viewport={{ once: true, margin: '-80px' }}
+						transition={t(0.5, 0.26)}
+						style={CARD_BASE}
+					onMouseEnter={hoverIn}
+					onMouseLeave={hoverOut}>
+						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
+							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
+								<Layers size={36} style={{ color: '#3b82f6' }} aria-hidden='true' />
+							</div>
+						</div>
+						<div style={{ padding: '24px 24px 28px' }}>
+							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
+								Full Stack Expertise
+							</h3>
+							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
+								From React frontends to Golang backends — end-to-end ownership across every layer.
+							</p>
+						</div>
+					</motion.div>
+
+					{/* Card 4 — Remote Ready */}
+					<motion.div
+						initial={{ opacity: 0, y: 24 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						viewport={{ once: true, margin: '-80px' }}
+						transition={t(0.5, 0.34)}
+						style={CARD_BASE}
+					onMouseEnter={hoverIn}
+					onMouseLeave={hoverOut}>
+						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
+							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
+								<Globe size={36} style={{ color: '#0ea5e9' }} aria-hidden='true' />
+							</div>
+						</div>
+						<div style={{ padding: '24px 24px 28px' }}>
+							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
+								Remote Ready
+							</h3>
+							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
+								Available across time zones for seamless worldwide collaboration, hybrid or remote.
+							</p>
+						</div>
+					</motion.div>
+
+					{/* Card 5 — Performance at Scale */}
+					<motion.div
+						initial={{ opacity: 0, y: 24 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						viewport={{ once: true, margin: '-80px' }}
+						transition={t(0.5, 0.42)}
+						style={CARD_BASE}
+					onMouseEnter={hoverIn}
+					onMouseLeave={hoverOut}>
+						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
+							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
+								<Zap size={36} style={{ color: '#f59e0b' }} aria-hidden='true' />
+							</div>
+						</div>
+						<div style={{ padding: '24px 24px 28px' }}>
+							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
+								Performance at Scale
+							</h3>
+							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
+								Optimizing APIs and services to handle high-throughput workloads reliably.
+							</p>
+						</div>
+					</motion.div>
+
+					{/* Card 6 — Get in Touch (amber CTA) */}
+					<motion.div
+						initial={{ opacity: 0, y: 24 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						viewport={{ once: true, margin: '-80px' }}
+						transition={t(0.5, 0.5)}
+						style={{ ...CARD_BASE, background: '#fbbf24', alignItems: 'center', justifyContent: 'center', padding: '40px 28px', textAlign: 'center' as const }}
+					onMouseEnter={hoverIn}
+					onMouseLeave={hoverOut}>
+						<div style={{ width: 72, height: 72, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a', marginBottom: 20 }}>
+							<Briefcase size={32} style={{ color: '#0a0a0a' }} aria-hidden='true' />
+						</div>
+						<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 12, letterSpacing: '-0.02em' }}>
+							Get in touch
+						</h3>
+						<p style={{ fontSize: 14, color: '#78350f', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", marginBottom: 24 }}>
+							Looking for a backend engineer? There&apos;s a high chance I&apos;ll be able to help!
+						</p>
+						<a
+							href='#contact'
+							style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#0a0a0a', color: '#ffffff', borderRadius: 12, textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: "'Inter', sans-serif", border: '2px solid #0a0a0a', boxShadow: '3px 3px 0px rgba(0,0,0,0.25)', transition: 'transform 0.15s ease, box-shadow 0.15s ease' }}
+							onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '4px 4px 0px rgba(0,0,0,0.25)'; }}
+							onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '3px 3px 0px rgba(0,0,0,0.25)'; }}>
+							Get in touch
+						</a>
 					</motion.div>
 				</div>
 
@@ -554,7 +473,7 @@ export default function Skills() {
 					style={{
 						fontFamily: "'JetBrains Mono', monospace",
 						fontSize: 11,
-						color: '#52525b',
+						color: '#a3a3a3',
 						letterSpacing: '0.15em',
 						textTransform: 'uppercase',
 						marginBottom: 20,
@@ -571,11 +490,11 @@ export default function Skills() {
 					transition={t(0.4, 0.1)}
 					style={{
 						fontSize: 12,
-						color: '#3f3f46',
+						color: '#a3a3a3',
 						fontFamily: "'JetBrains Mono', monospace",
 						marginBottom: 20,
 					}}>
-					drag to rotate · filter by category
+					filter by category
 				</motion.p>
 
 				{/* Category filter tabs */}
@@ -586,8 +505,8 @@ export default function Skills() {
 						flexWrap: 'wrap',
 						marginBottom: 0,
 						padding: '6px',
-						background: 'rgba(255,255,255,0.03)',
-						border: '1px solid rgba(255,255,255,0.07)',
+						background: '#f9f9f7',
+						border: '1px solid #e5e5e5',
 						borderRadius: 14,
 						width: 'fit-content',
 					}}>
@@ -596,7 +515,7 @@ export default function Skills() {
 						return (
 							<button
 								key={cat}
-								onClick={() => setActive(cat)}
+								onClick={() => { setActive(cat); setInteracted(true); }}
 								style={{
 									padding: '8px 18px',
 									borderRadius: 10,
@@ -607,19 +526,17 @@ export default function Skills() {
 									fontFamily: "'Inter', sans-serif",
 									transition:
 										'background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease',
-									background: isActive
-										? 'linear-gradient(135deg, #6366f1, #3b82f6)'
-										: 'transparent',
-									color: isActive ? '#ffffff' : '#71717a',
+									background: isActive ? '#6366f1' : 'transparent',
+									color: isActive ? '#ffffff' : '#525252',
 									boxShadow: isActive
 										? '0 4px 15px rgba(99,102,241,0.25)'
 										: 'none',
 								}}
 								onMouseEnter={(e) => {
-									if (!isActive) e.currentTarget.style.color = '#fafafa';
+									if (!isActive) e.currentTarget.style.color = '#0a0a0a';
 								}}
 								onMouseLeave={(e) => {
-									if (!isActive) e.currentTarget.style.color = '#71717a';
+									if (!isActive) e.currentTarget.style.color = '#525252';
 								}}>
 								{cat}
 							</button>
@@ -627,78 +544,66 @@ export default function Skills() {
 					})}
 				</div>
 
-				{/* 3-D Globe */}
-				<TechGlobe skills={skills} activeCategory={active} />
-
-				{/* Stats bar */}
+				{/* Skill Tags Grid */}
 				<div
+					ref={gridRef}
 					style={{
-						display: 'grid',
-						gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-						gap: 1,
-						background: 'rgba(255,255,255,0.06)',
-						border: '1px solid rgba(255,255,255,0.07)',
-						borderRadius: 16,
-						overflow: 'hidden',
+						display: 'flex',
+						flexWrap: 'wrap',
+						gap: 10,
+						padding: '32px 0 40px',
+						minHeight: 200,
 					}}>
-					{[
-						{
-							label: 'Frontend',
-							count: skills.filter((s) => s.category === 'Frontend').length,
-							color: '#10b981',
-						},
-						{
-							label: 'Backend',
-							count: skills.filter((s) => s.category === 'Backend').length,
-							color: '#7c3aed',
-						},
-						{
-							label: 'Database',
-							count: skills.filter((s) => s.category === 'Database').length,
-							color: '#3b82f6',
-						},
-						{
-							label: 'Tools',
-							count: skills.filter((s) => s.category === 'Tools').length,
-							color: '#f59e0b',
-						},
-						{
-							label: 'AI Tools',
-							count: skills.filter((s) => s.category === 'AI Tools').length,
-							color: '#D97706',
-						},
-					].map(({ label, count, color }, i) => (
-						<div
-							key={label}
-							style={{
-								padding: '20px 20px',
-								background: '#111113',
-								display: 'flex',
-								flexDirection: 'column',
-								gap: 4,
-								borderRight:
-									i < 4 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-							}}>
-							<div
+					{skills.map((skill, i) => {
+						const isMatch = active === 'All' || skill.category === active;
+						const entranceDelay = shouldReduceMotion ? 0 : (interacted ? 0 : i * 0.028);
+						return (
+							<motion.div
+								key={skill.name}
+								initial={{ opacity: 0, y: 12, scale: 0.92 }}
+								animate={gridInView ? {
+									opacity: isMatch ? 1 : 0.18,
+									y: 0,
+									scale: isMatch ? 1 : 0.93,
+								} : { opacity: 0, y: 12, scale: 0.92 }}
+								whileHover={isMatch ? { x: -1, y: -1 } : {}}
+								transition={{
+									opacity: { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
+									y:       { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
+									scale:   { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
+									x:       { duration: 0.15, ease: EASE },
+								}}
 								style={{
-									fontSize: 26,
-									fontWeight: 800,
-									fontFamily: "'Inter', sans-serif",
-									color,
+									display: 'inline-flex',
+									alignItems: 'center',
+									gap: 8,
+									padding: '10px 16px',
+									background: '#ffffff',
+									border: '1.5px solid #0a0a0a',
+									borderRadius: 12,
+									boxShadow: '2px 2px 0px #0a0a0a',
+									transition: 'box-shadow 0.2s ease',
+									cursor: 'default',
+								}}
+								onMouseEnter={(e) => {
+									if (isMatch) e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+								}}
+								onMouseLeave={(e) => {
+									e.currentTarget.style.boxShadow = '2px 2px 0px #0a0a0a';
 								}}>
-								{count}
-							</div>
-							<div
-								style={{
-									fontSize: 11,
-									color: '#52525b',
-									fontFamily: "'JetBrains Mono', monospace",
-								}}>
-								{label.toLowerCase()} tools
-							</div>
-						</div>
-					))}
+								{/* eslint-disable-next-line @next/next/no-img-element */}
+								<img src={skill.icon} alt={skill.name} width={18} height={18} />
+								<span style={{ fontSize: 13, fontWeight: 600, color: '#0a0a0a', fontFamily: "'Inter', sans-serif" }}>
+									{skill.name}
+								</span>
+								<span style={{ fontSize: 10, fontWeight: 600, color: skill.color, fontFamily: "'JetBrains Mono', monospace", background: skill.bg, padding: '2px 6px', borderRadius: 4 }}>
+									{skill.category}
+								</span>
+							</motion.div>
+						);
+					})}
 				</div>
+
 			</div>
 		</section>
 	);

@@ -72,12 +72,12 @@ export default function TechGlobe({ skills, activeCategory }: Props) {
     s.globe     = globe;
     scene.add(globe);
 
-    // Core sphere
+    // Core sphere — light gray
     const sphere = new THREE.Mesh(
       new THREE.SphereGeometry(1, 64, 64),
       new THREE.MeshPhongMaterial({
-        color:       0x07070f,
-        emissive:    0x0d0d1a,
+        color:       0xf0f0f0,
+        emissive:    0xe8e8f0,
         shininess:   18,
         transparent: true,
         opacity:     0.95,
@@ -85,36 +85,36 @@ export default function TechGlobe({ skills, activeCategory }: Props) {
     );
     globe.add(sphere);
 
-    // Latitude / longitude lines
+    // Latitude / longitude lines — light wireframe
     const wire = new THREE.Mesh(
       new THREE.SphereGeometry(1.002, 28, 20),
       new THREE.MeshBasicMaterial({
-        color:       0x6366f1,
+        color:       0xe5e5e5,
         wireframe:   true,
         transparent: true,
-        opacity:     0.07,
+        opacity:     0.5,
       }),
     );
     globe.add(wire);
 
-    // Atmospheric glow (outer ring)
+    // Atmospheric glow (outer ring) — subtle light blue tint
     const atmo = new THREE.Mesh(
       new THREE.SphereGeometry(1.18, 32, 32),
       new THREE.MeshBasicMaterial({
-        color:       0x818cf8,
+        color:       0xc7d2fe,
         transparent: true,
-        opacity:     0.04,
+        opacity:     0.06,
         side:        THREE.BackSide,
       }),
     );
     scene.add(atmo);
 
     // Lights
-    scene.add(new THREE.AmbientLight(0xffffff, 0.25));
-    const key = new THREE.DirectionalLight(0x818cf8, 1.4);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const key = new THREE.DirectionalLight(0xffffff, 1.0);
     key.position.set(3, 4, 3);
     scene.add(key);
-    const fill = new THREE.PointLight(0x6366f1, 0.6, 12);
+    const fill = new THREE.PointLight(0x6366f1, 0.4, 12);
     fill.position.set(-3, -2, 2);
     scene.add(fill);
 
@@ -152,17 +152,18 @@ export default function TechGlobe({ skills, activeCategory }: Props) {
         position:absolute;
         display:inline-flex;align-items:center;gap:5px;
         padding:4px 9px;
-        background:rgba(13,13,18,0.88);
-        border:1px solid ${skill.color}50;
+        background:rgba(255,255,255,0.9);
+        border:1px solid #e5e5e5;
         border-radius:7px;
         font-size:11px;font-weight:600;
-        color:${skill.color};
+        color:#0a0a0a;
         font-family:'Inter',sans-serif;
         white-space:nowrap;
         transform:translate(-50%,-50%);
         pointer-events:none;
         transition:opacity 0.18s,transform 0.18s;
         backdrop-filter:blur(4px);
+        box-shadow:0 1px 3px rgba(0,0,0,0.08);
       `;
       el.innerHTML = `<img src="${skill.icon}" width="13" height="13" alt="" />${skill.name}`;
       labDiv.appendChild(el);
@@ -262,8 +263,8 @@ export default function TechGlobe({ skills, activeCategory }: Props) {
       const skill = skills.find(s => s.name === name);
       if (!skill) return;
       const match = activeCategory === 'All' || skill.category === activeCategory;
-      el.style.filter  = match ? 'none'               : 'brightness(0.25) saturate(0.2)';
-      el.style.borderColor = match ? `${skill.color}50` : 'rgba(255,255,255,0.06)';
+      el.style.filter  = match ? 'none'               : 'brightness(1.05) saturate(0.2) opacity(0.35)';
+      el.style.borderColor = match ? '#e5e5e5' : '#f0f0f0';
     });
   }, [activeCategory, skills]);
 

@@ -14,8 +14,8 @@ const greetings = [
 ];
 
 const GEO_SIZES = [180, 300, 420, 540];
-const TYPING_SPEED = 55; // ms per character
-const CYCLE_DELAY = 3400; // ms before switching language
+const TYPING_SPEED = 55;
+const CYCLE_DELAY = 3400;
 
 export default function Hero() {
 	const [index, setIndex] = useState(0);
@@ -68,7 +68,8 @@ export default function Hero() {
 				justifyContent: 'center',
 				position: 'relative',
 				overflow: 'hidden',
-				background: '#09090b',
+				background:
+					'linear-gradient(160deg, #f0ece8 0%, #f9f7f5 60%, #ffffff 100%)',
 				paddingTop: 80,
 			}}>
 			{/* ── Geometric rotating rings ─────────────────────── */}
@@ -88,7 +89,7 @@ export default function Hero() {
 						position: 'absolute',
 						width: size,
 						height: size,
-						border: `1px solid rgba(99,102,241,${0.15 - i * 0.028})`,
+						border: `1.5px solid rgba(10,10,10,${0.12 - i * 0.02})`,
 						borderRadius: 28,
 						rotate: 45,
 						pointerEvents: 'none',
@@ -96,7 +97,7 @@ export default function Hero() {
 				/>
 			))}
 
-			{/* Radial purple ambient glow */}
+			{/* Radial ambient glow */}
 			<div
 				aria-hidden='true'
 				style={{
@@ -105,7 +106,7 @@ export default function Hero() {
 					height: 700,
 					borderRadius: '50%',
 					background:
-						'radial-gradient(circle, rgba(99,102,241,0.07) 0%, transparent 65%)',
+						'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 65%)',
 					pointerEvents: 'none',
 				}}
 			/>
@@ -120,6 +121,65 @@ export default function Hero() {
 					maxWidth: 760,
 					width: '100%',
 				}}>
+				{/* Availability badge */}
+				<motion.div
+					initial={{ opacity: 0, y: -8 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.4, ease: EASE, delay: 0 }}
+					style={{
+						display: 'inline-flex',
+						alignItems: 'center',
+						gap: 8,
+						padding: '7px 16px',
+						background: '#ffffff',
+						border: '1.5px solid #0a0a0a',
+						borderRadius: 100,
+						boxShadow: '3px 3px 0px #0a0a0a',
+						marginBottom: 32,
+						cursor: 'default',
+					}}>
+					{/* Pulsing green dot */}
+					<span
+						style={{
+							position: 'relative',
+							display: 'inline-flex',
+							width: 8,
+							height: 8,
+						}}>
+						<motion.span
+							animate={
+								shouldReduceMotion ? {} : { scale: [1, 2], opacity: [0.6, 0] }
+							}
+							transition={{ duration: 1.4, repeat: Infinity, ease: 'easeOut' }}
+							style={{
+								position: 'absolute',
+								inset: 0,
+								borderRadius: '50%',
+								background: '#22c55e',
+							}}
+						/>
+						<span
+							style={{
+								width: 8,
+								height: 8,
+								borderRadius: '50%',
+								background: '#22c55e',
+								display: 'block',
+							}}
+						/>
+					</span>
+					<span
+						style={{
+							fontSize: 12,
+							fontWeight: 700,
+							color: '#0a0a0a',
+							fontFamily: "'Inter', sans-serif",
+							letterSpacing: '-0.01em',
+						}}>
+						Open to opportunities
+					</span>
+				</motion.div>
+
 				{/* Typing greeting */}
 				<div
 					style={{
@@ -138,7 +198,7 @@ export default function Hero() {
 							letterSpacing: '-0.03em',
 							lineHeight: 1.1,
 							margin: 0,
-							color: '#a5b4fc',
+							color: '#0a0a0a',
 							wordBreak: 'keep-all',
 							overflowWrap: 'break-word',
 						}}>
@@ -151,7 +211,7 @@ export default function Hero() {
 								display: 'inline-block',
 								width: '0.08em',
 								height: '0.85em',
-								background: 'linear-gradient(135deg, #a5b4fc, #6366f1)',
+								background: '#6366f1',
 								borderRadius: 2,
 								marginLeft: '0.06em',
 								verticalAlign: 'middle',
@@ -184,7 +244,7 @@ export default function Hero() {
 								height: 6,
 								minWidth: i === index ? 22 : 6,
 								borderRadius: 3,
-								background: i === index ? '#6366f1' : 'rgba(255,255,255,0.12)',
+								background: i === index ? '#6366f1' : '#d4d4d4',
 								border: 'none',
 								cursor: 'pointer',
 								padding: 0,
@@ -204,12 +264,12 @@ export default function Hero() {
 					style={{
 						fontSize: 'clamp(18px, 3vw, 24px)',
 						fontWeight: 700,
-						color: '#fafafa',
+						color: '#0a0a0a',
 						fontFamily: "'Inter', sans-serif",
 						marginBottom: 16,
 						letterSpacing: '-0.02em',
 					}}>
-					Backend With Former Learning Full Stack Engineer
+					Backend-Focused Full Stack Engineer
 				</motion.p>
 
 				{/* Tagline */}
@@ -219,7 +279,7 @@ export default function Hero() {
 					transition={{ duration: 0.5, ease: EASE, delay: 0.25 }}
 					style={{
 						fontSize: 16,
-						color: '#a1a1aa',
+						color: '#525252',
 						lineHeight: 1.75,
 						maxWidth: 500,
 						margin: '0 auto 44px',
@@ -240,60 +300,64 @@ export default function Hero() {
 						justifyContent: 'center',
 						flexWrap: 'wrap',
 					}}>
+					{/* Primary — Download CV */}
 					<a
-						href='/resume.pdf'
+						href='https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I'
+					download
 						style={{
 							display: 'inline-flex',
 							alignItems: 'center',
 							gap: 8,
-							padding: '13px 28px',
+							padding: '14px 28px',
 							background: '#6366f1',
+							border: '2px solid #0a0a0a',
 							borderRadius: 12,
-							color: 'white',
+							color: '#ffffff',
 							fontSize: 15,
 							fontWeight: 700,
 							textDecoration: 'none',
 							fontFamily: "'Inter', sans-serif",
-							transition: 'background 0.2s ease, transform 0.2s ease',
+							boxShadow: '3px 3px 0px #0a0a0a',
+							transition: 'all 0.2s ease',
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.background = '#4f46e5';
-							if (!shouldReduceMotion)
-								e.currentTarget.style.transform = 'translateY(-2px)';
+							e.currentTarget.style.transform = 'translate(-1px, -1px)';
+							e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.background = '#6366f1';
-							e.currentTarget.style.transform = 'translateY(0)';
+							e.currentTarget.style.transform = 'translate(0, 0)';
+							e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
 						}}>
 						<Download size={16} aria-hidden='true' />
 						Download CV
 					</a>
 
+					{/* Secondary — Let's Build Together */}
 					<a
 						href='#contact'
 						style={{
 							display: 'inline-flex',
 							alignItems: 'center',
 							gap: 8,
-							padding: '13px 28px',
-							background: 'transparent',
-							border: '1.5px solid rgba(255,255,255,0.15)',
+							padding: '14px 28px',
+							background: '#ffffff',
+							border: '2px solid #0a0a0a',
 							borderRadius: 12,
-							color: '#fafafa',
+							color: '#0a0a0a',
 							fontSize: 15,
 							fontWeight: 700,
 							textDecoration: 'none',
 							fontFamily: "'Inter', sans-serif",
-							transition: 'border-color 0.2s ease, transform 0.2s ease',
+							boxShadow: '3px 3px 0px #0a0a0a',
+							transition: 'all 0.2s ease',
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.borderColor = 'rgba(255,255,255,0.45)';
-							if (!shouldReduceMotion)
-								e.currentTarget.style.transform = 'translateY(-2px)';
+							e.currentTarget.style.transform = 'translate(-1px, -1px)';
+							e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-							e.currentTarget.style.transform = 'translateY(0)';
+							e.currentTarget.style.transform = 'translate(0, 0)';
+							e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
 						}}>
 						<ArrowRight size={16} aria-hidden='true' />
 						Let&apos;s Build Together
@@ -315,7 +379,7 @@ export default function Hero() {
 					<span
 						style={{
 							fontSize: 11,
-							color: '#52525b',
+							color: '#a3a3a3',
 							fontFamily: "'JetBrains Mono', monospace",
 							letterSpacing: '0.12em',
 							textTransform: 'uppercase',
@@ -328,12 +392,13 @@ export default function Hero() {
 						style={{
 							width: 26,
 							height: 42,
-							border: '1.5px solid rgba(255,255,255,0.10)',
+							border: '1.5px solid #0a0a0a',
 							borderRadius: 13,
 							display: 'flex',
 							alignItems: 'flex-start',
 							justifyContent: 'center',
 							padding: 5,
+							background: 'rgba(255,255,255,0.6)',
 						}}>
 						<motion.div
 							animate={

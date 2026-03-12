@@ -139,23 +139,19 @@ function Badge({ label }: { label: 'Present' | 'Previous Role' }) {
 				fontSize: 12,
 				fontWeight: 700,
 				fontFamily: "'Inter', sans-serif",
-				background: isPresent
-					? 'linear-gradient(135deg, #3b82f6, #6366f1)'
-					: 'linear-gradient(135deg, #f59e0b, #f97316)',
-				color: '#fff',
+				background: isPresent ? '#6366f1' : '#f4f4f5',
+				color: isPresent ? '#fff' : '#52525b',
 				whiteSpace: 'nowrap' as const,
-				boxShadow: isPresent
-					? '0 2px 12px rgba(99,102,241,0.40)'
-					: '0 2px 12px rgba(245,158,11,0.35)',
+				boxShadow: isPresent ? '0 2px 12px rgba(99,102,241,0.25)' : 'none',
+				border: isPresent ? 'none' : '1px solid #e4e4e7',
 			}}>
 			<span
 				style={{
 					width: 6,
 					height: 6,
 					borderRadius: '50%',
-					background: 'rgba(255,255,255,0.75)',
+					background: isPresent ? 'rgba(255,255,255,0.75)' : '#a1a1aa',
 					display: 'inline-block',
-					boxShadow: '0 0 4px rgba(255,255,255,0.5)',
 				}}
 			/>
 			{label}
@@ -167,164 +163,94 @@ function Card({ exp }: { exp: Exp }) {
 	return (
 		<div
 			style={{
-				background: '#111113',
-				border: '1px solid rgba(255,255,255,0.07)',
+				background: '#ffffff',
+				border: '2px solid #0a0a0a',
 				borderRadius: 20,
-				padding: '24px 28px 28px',
-				boxShadow: '0 0 0 1px rgba(255,255,255,0.04)',
-				transition:
-					'border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
+				boxShadow: '6px 6px 0px #0a0a0a',
+				overflow: 'hidden',
+				transition: 'transform 0.2s ease, box-shadow 0.2s ease',
 			}}
 			onMouseEnter={(e) => {
-				e.currentTarget.style.borderColor = 'rgba(255,255,255,0.13)';
-				e.currentTarget.style.boxShadow = `0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px ${exp.color}22`;
-				e.currentTarget.style.transform = 'translateY(-3px)';
+				e.currentTarget.style.transform = 'translate(-2px, -2px)';
+				e.currentTarget.style.boxShadow = '8px 8px 0px #0a0a0a';
 			}}
 			onMouseLeave={(e) => {
-				e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-				e.currentTarget.style.boxShadow = '0 0 0 1px rgba(255,255,255,0.04)';
-				e.currentTarget.style.transform = 'translateY(0)';
+				e.currentTarget.style.transform = 'translate(0, 0)';
+				e.currentTarget.style.boxShadow = '6px 6px 0px #0a0a0a';
 			}}>
-			{/* Badge */}
-			<div style={{ marginBottom: 16 }}>
-				<Badge label={exp.badge} />
-			</div>
 
-			{/* Role title */}
-			<h3
-				style={{
-					fontSize: 'clamp(19px, 2.2vw, 24px)',
-					fontWeight: 800,
-					fontFamily: "'Inter', sans-serif",
-					letterSpacing: '-0.02em',
-					lineHeight: 1.25,
-					marginBottom: 12,
-					color: exp.color,
-				}}>
-				{exp.role}
-			</h3>
-
-			{/* Company */}
-			<div
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					gap: 5,
-					marginBottom: 4,
-				}}>
-				<MapPin
-					size={12}
-					style={{ color: exp.color, flexShrink: 0 }}
-					aria-hidden='true'
-				/>
-				<span
-					style={{
-						fontSize: 14,
-						fontWeight: 700,
-						color: exp.color,
-						fontFamily: "'Inter', sans-serif",
-					}}>
-					{exp.company}
-				</span>
-			</div>
-			<div
-				style={{
-					fontSize: 12,
-					color: '#52525b',
-					fontFamily: "'JetBrains Mono', monospace",
-					marginBottom: 18,
-					letterSpacing: '0.01em',
-				}}>
-				{exp.location} · {exp.period}
-			</div>
-
-			{/* Description */}
-			<p
-				style={{
-					color: '#a1a1aa',
-					fontSize: 14,
-					lineHeight: 1.7,
-					fontFamily: "'Inter', sans-serif",
-					marginBottom: 22,
-				}}>
-				{exp.description}
-			</p>
-
-			{/* Key achievements */}
-			<div style={{ marginBottom: 22 }}>
-				<div
-					style={{
-						display: 'flex',
-						alignItems: 'center',
-						gap: 7,
-						marginBottom: 12,
-					}}>
-					<Trophy size={13} style={{ color: exp.glow }} aria-hidden='true' />
-					<span
-						style={{
-							fontSize: 13,
-							fontWeight: 700,
-							color: '#e4e4e7',
-							fontFamily: "'Inter', sans-serif",
-						}}>
-						Key Achievements
+			{/* ── Illustration header ── */}
+			<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 140, gap: 16 }}>
+				<div style={{ width: 72, height: 72, borderRadius: 18, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a', flexShrink: 0 }}>
+					<span style={{ fontSize: 20, fontWeight: 800, fontFamily: "'Inter', sans-serif", color: exp.color, letterSpacing: '-0.02em' }}>
+						{exp.initial}
 					</span>
 				</div>
-				<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-					{exp.achievements.map((a, j) => (
-						<div
-							key={j}
-							style={{
-								display: 'flex',
-								alignItems: 'flex-start',
-								gap: 10,
-								padding: '10px 14px',
-								background: 'rgba(255,255,255,0.025)',
-								border: '1px solid rgba(255,255,255,0.055)',
-								borderRadius: 10,
-							}}>
-							<div
-								style={{
-									width: 7,
-									height: 7,
-									borderRadius: '50%',
-									background: exp.color,
-									flexShrink: 0,
-									marginTop: 5,
-									boxShadow: `0 0 8px ${exp.color}70`,
-								}}
-							/>
-							<span
-								style={{
-									fontSize: 13,
-									color: '#a1a1aa',
-									lineHeight: 1.55,
-									fontFamily: "'Inter', sans-serif",
-								}}>
-								{a}
-							</span>
-						</div>
+				<div>
+					<Badge label={exp.badge} />
+				</div>
+			</div>
+
+			{/* ── Content ── */}
+			<div style={{ padding: '24px 28px 28px' }}>
+				{/* Role title */}
+				<h3
+					style={{
+						fontSize: 'clamp(18px, 2.2vw, 22px)',
+						fontWeight: 800,
+						fontFamily: "'Inter', sans-serif",
+						letterSpacing: '-0.02em',
+						lineHeight: 1.25,
+						marginBottom: 10,
+						color: exp.color,
+					}}>
+					{exp.role}
+				</h3>
+
+				{/* Company */}
+				<div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+					<MapPin size={12} style={{ color: exp.color, flexShrink: 0 }} aria-hidden='true' />
+					<span style={{ fontSize: 14, fontWeight: 700, color: '#0a0a0a', fontFamily: "'Inter', sans-serif" }}>
+						{exp.company}
+					</span>
+				</div>
+				<div style={{ fontSize: 12, color: '#a3a3a3', fontFamily: "'JetBrains Mono', monospace", marginBottom: 18, letterSpacing: '0.01em' }}>
+					{exp.location} · {exp.period}
+				</div>
+
+				{/* Description */}
+				<p style={{ color: '#525252', fontSize: 14, lineHeight: 1.7, fontFamily: "'Inter', sans-serif", marginBottom: 22 }}>
+					{exp.description}
+				</p>
+
+				{/* Key achievements */}
+				<div style={{ marginBottom: 22 }}>
+					<div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+						<Trophy size={13} style={{ color: exp.glow }} aria-hidden='true' />
+						<span style={{ fontSize: 13, fontWeight: 700, color: '#0a0a0a', fontFamily: "'Inter', sans-serif" }}>
+							Key Achievements
+						</span>
+					</div>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+						{exp.achievements.map((a, j) => (
+							<div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', background: '#f9f9f7', border: '1px solid #e5e5e5', borderRadius: 10 }}>
+								<div style={{ width: 7, height: 7, borderRadius: '50%', background: exp.color, flexShrink: 0, marginTop: 5, boxShadow: `0 0 8px ${exp.color}40` }} />
+								<span style={{ fontSize: 13, color: '#525252', lineHeight: 1.55, fontFamily: "'Inter', sans-serif" }}>
+									{a}
+								</span>
+							</div>
+						))}
+					</div>
+				</div>
+
+				{/* Tech tags */}
+				<div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+					{exp.tech.map((t) => (
+						<span key={t} style={{ padding: '3px 10px', background: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: 100, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#52525b' }}>
+							{t}
+						</span>
 					))}
 				</div>
-			</div>
-
-			{/* Tech tags */}
-			<div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-				{exp.tech.map((t) => (
-					<span
-						key={t}
-						style={{
-							padding: '3px 10px',
-							background: `${exp.color}14`,
-							border: `1px solid ${exp.color}28`,
-							borderRadius: 100,
-							fontSize: 11,
-							fontFamily: "'JetBrains Mono', monospace",
-							color: exp.color,
-						}}>
-						{t}
-					</span>
-				))}
 			</div>
 		</div>
 	);
@@ -350,15 +276,15 @@ function TimelineDot({
 				delay: shouldReduceMotion ? 0 : delay,
 			}}
 			style={{
-				width: 50,
-				height: 50,
+				width: 52,
+				height: 52,
 				borderRadius: '50%',
-				background: '#0d0d10',
-				border: `2px solid ${exp.color}`,
+				background: '#ffffff',
+				border: `2px solid #0a0a0a`,
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
-				boxShadow: `0 0 0 5px ${exp.color}14, 0 0 24px ${exp.color}30`,
+				boxShadow: `4px 4px 0px #0a0a0a`,
 				position: 'relative',
 				zIndex: 1,
 				flexShrink: 0,
@@ -366,10 +292,10 @@ function TimelineDot({
 			}}>
 			<span
 				style={{
-					fontSize: 11,
+					fontSize: 12,
 					fontWeight: 800,
 					fontFamily: "'Inter', sans-serif",
-					color: exp.glow,
+					color: exp.color,
 					letterSpacing: '-0.01em',
 				}}>
 				{exp.initial}
@@ -382,7 +308,7 @@ export default function Experience() {
 	const shouldReduceMotion = useReducedMotion();
 
 	return (
-		<section id='experience' style={{ background: '#09090b' }}>
+		<section id='experience' style={{ background: '#f0ece8' }}>
 			<div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
 				{/* Header */}
 				<motion.div
@@ -393,7 +319,7 @@ export default function Experience() {
 					style={{
 						fontFamily: "'JetBrains Mono', monospace",
 						fontSize: 11,
-						color: '#f59e0b',
+						color: '#a3a3a3',
 						letterSpacing: '0.18em',
 						textTransform: 'uppercase',
 						marginBottom: 12,
@@ -414,7 +340,7 @@ export default function Experience() {
 						fontWeight: 800,
 						marginBottom: 64,
 						fontFamily: "'Inter', sans-serif",
-						color: '#fafafa',
+						color: '#0a0a0a',
 						letterSpacing: '-0.02em',
 					}}>
 					Where I&apos;ve{' '}
@@ -441,9 +367,7 @@ export default function Experience() {
 							top: 0,
 							bottom: 0,
 							width: 2,
-							background:
-								'linear-gradient(to bottom, #6366f1 0%, #10b981 50%, #f59e0b 100%)',
-							opacity: 0.18,
+							background: '#0a0a0a',
 							pointerEvents: 'none',
 							transformOrigin: 'top',
 						}}
