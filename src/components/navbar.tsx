@@ -1,23 +1,29 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Menu, X, Mail } from 'lucide-react';
 
 const navLinks = [
-  { href: '#hero',       label: 'Home',       id: 'hero' },
-  { href: '#about',      label: 'About',      id: 'about' },
-  { href: '#skills',     label: 'Skills',     id: 'skills' },
-  { href: '#experience', label: 'Experience', id: 'experience' },
-  { href: '#projects',   label: 'Projects',   id: 'projects' },
-  { href: '#contact',    label: 'Contact',    id: 'contact' },
+  { href: '#hero',       label: 'Home',       id: 'hero',       page: false },
+  { href: '#about',      label: 'About',      id: 'about',      page: false },
+  { href: '#skills',     label: 'Skills',     id: 'skills',     page: false },
+  { href: '#experience', label: 'Experience', id: 'experience', page: false },
+  { href: '#projects',   label: 'Projects',   id: 'projects',   page: false },
+  { href: '#contact',    label: 'Contact',    id: 'contact',    page: false },
+  { href: '/articles',   label: 'Articles',   id: 'articles',   page: true  },
 ];
 
 const MD = 768; // breakpoint in px
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [menuOpen,      setMenuOpen]      = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [hovered,       setHovered]       = useState<string | null>(null);
   const [isMobile,      setIsMobile]      = useState(false);
+
+  const isHomePage = pathname === '/';
 
   // Detect mobile breakpoint + close menu on resize to desktop
   useEffect(() => {
@@ -31,10 +37,11 @@ export default function Navbar() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Active section via scroll — pick the last section whose top <= navbar bottom
+  // Active section via scroll — only on home page
   useEffect(() => {
-    const OFFSET = 88; // navbar height + buffer
-    const ids = navLinks.map((l) => l.id);
+    if (!isHomePage) return;
+    const OFFSET = 88;
+    const ids = navLinks.filter((l) => !l.page).map((l) => l.id);
 
     const update = () => {
       let current = ids[0];
@@ -49,7 +56,7 @@ export default function Navbar() {
     update();
     window.addEventListener('scroll', update, { passive: true });
     return () => window.removeEventListener('scroll', update);
-  }, []);
+  }, [isHomePage]);
 
   return (
     <>
@@ -94,28 +101,43 @@ export default function Navbar() {
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
               {navLinks.map((link) => {
-                const active = activeSection === link.id;
+                const resolvedHref = !link.page && !isHomePage
+                  ? `/${link.href}`
+                  : link.href;
+                const active = link.page
+                  ? pathname === link.href
+                  : isHomePage && activeSection === link.id;
                 const hover  = hovered === link.id;
-                return (
-                  <a
+                const linkStyle: React.CSSProperties = {
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '8px 14px',
+                  borderRadius: 100,
+                  textDecoration: 'none',
+                  fontSize: 14,
+                  fontWeight: active ? 700 : 500,
+                  fontFamily: "'Inter', sans-serif",
+                  color:      active ? '#ffffff' : hover ? '#0a0a0a' : '#525252',
+                  background: active ? '#0a0a0a' : hover ? 'rgba(0,0,0,0.05)' : 'transparent',
+                  transition: 'background 0.18s ease, color 0.18s ease',
+                  whiteSpace: 'nowrap',
+                };
+                return link.page ? (
+                  <Link
                     key={link.id}
-                    href={link.href}
+                    href={resolvedHref}
                     onMouseEnter={() => setHovered(link.id)}
                     onMouseLeave={() => setHovered(null)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      padding: '8px 14px',
-                      borderRadius: 100,
-                      textDecoration: 'none',
-                      fontSize: 14,
-                      fontWeight: active ? 700 : 500,
-                      fontFamily: "'Inter', sans-serif",
-                      color:      active ? '#ffffff' : hover ? '#0a0a0a' : '#525252',
-                      background: active ? '#0a0a0a' : hover ? 'rgba(0,0,0,0.05)' : 'transparent',
-                      transition: 'background 0.18s ease, color 0.18s ease',
-                      whiteSpace: 'nowrap',
-                    }}>
+                    style={linkStyle}>
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.id}
+                    href={resolvedHref}
+                    onMouseEnter={() => setHovered(link.id)}
+                    onMouseLeave={() => setHovered(null)}
+                    style={linkStyle}>
                     {link.label}
                   </a>
                 );
@@ -124,7 +146,7 @@ export default function Navbar() {
 
             {/* Mail CTA */}
             <a
-              href='#contact'
+              href={isHomePage ? '#contact' : '/#contact'}
               aria-label='Contact'
               style={{
                 width: 40, height: 40,
@@ -189,30 +211,44 @@ export default function Navbar() {
             boxSizing: 'border-box',
           }}>
           {navLinks.map((link) => {
-            const active = activeSection === link.id;
-            return (
+            const resolvedHref = !link.page && !isHomePage
+              ? `/${link.href}`
+              : link.href;
+            const active = link.page
+              ? pathname === link.href
+              : isHomePage && activeSection === link.id;
+            const mobileStyle: React.CSSProperties = {
+              display: 'flex', alignItems: 'center',
+              padding: '11px 16px',
+              borderRadius: 12,
+              color:      active ? '#ffffff' : '#525252',
+              background: active ? '#0a0a0a' : 'transparent',
+              textDecoration: 'none',
+              fontSize: 15, fontWeight: active ? 700 : 500,
+              fontFamily: "'Inter', sans-serif",
+              transition: 'background 0.18s ease, color 0.18s ease',
+            };
+            return link.page ? (
+              <Link
+                key={link.id}
+                href={resolvedHref}
+                onClick={() => setMenuOpen(false)}
+                style={mobileStyle}>
+                {link.label}
+              </Link>
+            ) : (
               <a
                 key={link.id}
-                href={link.href}
+                href={resolvedHref}
                 onClick={() => setMenuOpen(false)}
-                style={{
-                  display: 'flex', alignItems: 'center',
-                  padding: '11px 16px',
-                  borderRadius: 12,
-                  color:      active ? '#ffffff' : '#525252',
-                  background: active ? '#0a0a0a' : 'transparent',
-                  textDecoration: 'none',
-                  fontSize: 15, fontWeight: active ? 700 : 500,
-                  fontFamily: "'Inter', sans-serif",
-                  transition: 'background 0.18s ease, color 0.18s ease',
-                }}>
+                style={mobileStyle}>
                 {link.label}
               </a>
             );
           })}
 
           <a
-            href='#contact'
+            href={isHomePage ? '#contact' : '/#contact'}
             onClick={() => setMenuOpen(false)}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
