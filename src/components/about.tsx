@@ -108,7 +108,7 @@ export default function About() {
 		<section
 			id='about'
 			aria-labelledby='about-heading'
-			style={{ background: '#f9f9f7' }}>
+			style={{ background: '#f0ece8' }}>
 			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 				{/* Section label */}
 				<motion.div

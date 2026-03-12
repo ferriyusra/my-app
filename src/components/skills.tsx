@@ -253,7 +253,7 @@ export default function Skills() {
 	});
 
 	return (
-		<section id='skills' style={{ background: '#ffffff' }}>
+		<section id='skills' style={{ background: '#f0ece8' }}>
 			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 				{/* Section label */}
 				<motion.div
@@ -442,107 +442,109 @@ export default function Skills() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.5)}
-						style={{ ...CARD_BASE, background: '#fbbf24', alignItems: 'center', justifyContent: 'center', padding: '40px 28px', textAlign: 'center' as const }}
+						style={{ ...CARD_BASE, background: '#fbbf24', alignItems: 'center', justifyContent: 'center', padding: '40px 28px', textAlign: 'center' as const, position: 'relative', overflow: 'hidden' }}
 					onMouseEnter={hoverIn}
 					onMouseLeave={hoverOut}>
-						<div style={{ width: 72, height: 72, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a', marginBottom: 20 }}>
-							<Briefcase size={32} style={{ color: '#0a0a0a' }} aria-hidden='true' />
+						{/* Pulsing light glow */}
+						<motion.div
+							aria-hidden='true'
+							animate={shouldReduceMotion ? {} : {
+								opacity: [0.3, 0.65, 0.3],
+								scale:   [1, 1.3, 1],
+							}}
+							transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+							style={{
+								position: 'absolute',
+								top: '10%',
+								left: '50%',
+								transform: 'translateX(-50%)',
+								width: 220,
+								height: 220,
+								borderRadius: '50%',
+								background: 'radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)',
+								pointerEvents: 'none',
+							}}
+						/>
+						{/* Content */}
+						<div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+							<div style={{ width: 72, height: 72, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a', marginBottom: 20 }}>
+								<Briefcase size={32} style={{ color: '#0a0a0a' }} aria-hidden='true' />
+							</div>
+							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 12, letterSpacing: '-0.02em' }}>
+								Get in touch
+							</h3>
+							<p style={{ fontSize: 14, color: '#78350f', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", marginBottom: 24 }}>
+								Looking for a backend engineer? There&apos;s a high chance I&apos;ll be able to help!
+							</p>
+							<a
+								href='#contact'
+								style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#0a0a0a', color: '#ffffff', borderRadius: 12, textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: "'Inter', sans-serif", border: '2px solid #0a0a0a', boxShadow: '3px 3px 0px rgba(0,0,0,0.25)', transition: 'transform 0.15s ease, box-shadow 0.15s ease' }}
+								onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '4px 4px 0px rgba(0,0,0,0.25)'; }}
+								onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '3px 3px 0px rgba(0,0,0,0.25)'; }}>
+								Get in touch
+							</a>
 						</div>
-						<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 12, letterSpacing: '-0.02em' }}>
-							Get in touch
-						</h3>
-						<p style={{ fontSize: 14, color: '#78350f', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", marginBottom: 24 }}>
-							Looking for a backend engineer? There&apos;s a high chance I&apos;ll be able to help!
-						</p>
-						<a
-							href='#contact'
-							style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#0a0a0a', color: '#ffffff', borderRadius: 12, textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: "'Inter', sans-serif", border: '2px solid #0a0a0a', boxShadow: '3px 3px 0px rgba(0,0,0,0.25)', transition: 'transform 0.15s ease, box-shadow 0.15s ease' }}
-							onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '4px 4px 0px rgba(0,0,0,0.25)'; }}
-							onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '3px 3px 0px rgba(0,0,0,0.25)'; }}>
-							Get in touch
-						</a>
 					</motion.div>
 				</div>
 
-				{/* ── Tech Globe ───────────────────────────────────── */}
+				{/* ── Filter header row ───────────────────────────── */}
 				<motion.div
 					initial={{ opacity: 0, y: 10 }}
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true, margin: '-80px' }}
 					transition={t(0.35, 0)}
 					style={{
-						fontFamily: "'JetBrains Mono', monospace",
-						fontSize: 11,
-						color: '#a3a3a3',
-						letterSpacing: '0.15em',
-						textTransform: 'uppercase',
-						marginBottom: 20,
-						fontWeight: 600,
-					}}>
-					{'all technologies'}
-				</motion.div>
-
-				{/* Hint */}
-				<motion.p
-					initial={{ opacity: 0 }}
-					whileInView={{ opacity: 1 }}
-					viewport={{ once: true, margin: '-80px' }}
-					transition={t(0.4, 0.1)}
-					style={{
-						fontSize: 12,
-						color: '#a3a3a3',
-						fontFamily: "'JetBrains Mono', monospace",
-						marginBottom: 20,
-					}}>
-					filter by category
-				</motion.p>
-
-				{/* Category filter tabs */}
-				<div
-					style={{
 						display: 'flex',
-						gap: 6,
+						alignItems: 'center',
+						justifyContent: 'space-between',
 						flexWrap: 'wrap',
-						marginBottom: 0,
-						padding: '6px',
-						background: '#f9f9f7',
-						border: '1px solid #e5e5e5',
-						borderRadius: 14,
-						width: 'fit-content',
+						gap: 16,
+						marginBottom: 28,
 					}}>
-					{categories.map((cat) => {
-						const isActive = active === cat;
-						return (
-							<button
-								key={cat}
-								onClick={() => { setActive(cat); setInteracted(true); }}
-								style={{
-									padding: '8px 18px',
-									borderRadius: 10,
-									border: 'none',
-									cursor: 'pointer',
-									fontSize: 13,
-									fontWeight: 600,
-									fontFamily: "'Inter', sans-serif",
-									transition:
-										'background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease',
-									background: isActive ? '#6366f1' : 'transparent',
-									color: isActive ? '#ffffff' : '#525252',
-									boxShadow: isActive
-										? '0 4px 15px rgba(99,102,241,0.25)'
-										: 'none',
-								}}
-								onMouseEnter={(e) => {
-									if (!isActive) e.currentTarget.style.color = '#0a0a0a';
-								}}
-								onMouseLeave={(e) => {
-									if (!isActive) e.currentTarget.style.color = '#525252';
-								}}>
-								{cat}
-							</button>
-						);
-					})}
-				</div>
+					{/* Left label */}
+					<div>
+						<p style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#a3a3a3', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600, margin: '0 0 4px' }}>
+							all technologies
+						</p>
+						<p style={{ fontSize: 13, fontFamily: "'Inter', sans-serif", color: '#525252', margin: 0 }}>
+							Filter by category to explore the stack
+						</p>
+					</div>
+
+					{/* Right: Paperfolio chip filters */}
+					<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+						{categories.map((cat) => {
+							const isActive = active === cat;
+							return (
+								<button
+									key={cat}
+									onClick={() => { setActive(cat); setInteracted(true); }}
+									style={{
+										padding: '8px 18px',
+										borderRadius: 10,
+										border: '1.5px solid #0a0a0a',
+										cursor: 'pointer',
+										fontSize: 13,
+										fontWeight: 600,
+										fontFamily: "'Inter', sans-serif",
+										transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+										background: isActive ? '#6366f1' : '#ffffff',
+										color: isActive ? '#ffffff' : '#0a0a0a',
+										boxShadow: isActive ? '3px 3px 0px #0a0a0a' : '2px 2px 0px #0a0a0a',
+										transform: isActive ? 'translate(-1px,-1px)' : 'translate(0,0)',
+									}}
+									onMouseEnter={(e) => {
+										if (!isActive) { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a'; }
+									}}
+									onMouseLeave={(e) => {
+										if (!isActive) { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #0a0a0a'; }
+									}}>
+									{cat}
+								</button>
+							);
+						})}
+					</div>
+				</motion.div>
 
 				{/* Skill Tags Grid */}
 				<div

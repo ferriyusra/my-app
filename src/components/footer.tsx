@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Mail, Github, Linkedin, Twitter, Send, ArrowUpRight } from 'lucide-react';
+import {
+	Mail,
+	Github,
+	Linkedin,
+	Twitter,
+	Send,
+	ArrowUpRight,
+} from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -10,16 +17,19 @@ const navLinks = [
 	{ label: 'Home', href: '#' },
 	{ label: 'About', href: '#about' },
 	{ label: 'Skills', href: '#skills' },
-	{ label: 'Experience', href: '#experience' },
 	{ label: 'Projects', href: '#projects' },
+	{ label: 'Experience', href: '#experience' },
 	{ label: 'Contact', href: '#contact' },
 ];
 
 const socials = [
 	{ icon: Github, href: 'https://github.com/ferriyusra', label: 'GitHub' },
-	{ icon: Linkedin, href: 'https://linkedin.com/in/ferriyusra', label: 'LinkedIn' },
-	{ icon: Twitter, href: 'https://twitter.com/ferriyusra_dev', label: 'Twitter' },
-	{ icon: Mail, href: 'mailto:ferriyusra@gmail.com', label: 'Email' },
+	{
+		icon: Linkedin,
+		href: 'https://linkedin.com/in/ferriyusra',
+		label: 'LinkedIn',
+	},
+	{ icon: Mail, href: 'mailto:feriyusra1616@gmail.com', label: 'Email' },
 ];
 
 export default function Footer() {
@@ -55,7 +65,7 @@ export default function Footer() {
 							alignItems: 'center',
 							gap: 24,
 							flexWrap: 'wrap',
-							marginBottom: -1, /* visually bridge into dark footer */
+							marginBottom: -1 /* visually bridge into dark footer */,
 						}}>
 						{/* Icon */}
 						<div
@@ -75,10 +85,23 @@ export default function Footer() {
 
 						{/* Text */}
 						<div style={{ flex: '1 1 180px' }}>
-							<div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, fontSize: 18, color: '#0a0a0a', letterSpacing: '-0.01em' }}>
+							<div
+								style={{
+									fontFamily: "'Inter', sans-serif",
+									fontWeight: 800,
+									fontSize: 18,
+									color: '#0a0a0a',
+									letterSpacing: '-0.01em',
+								}}>
 								Subscribe to my newsletter
 							</div>
-							<div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: '#525252', marginTop: 3 }}>
+							<div
+								style={{
+									fontFamily: "'Inter', sans-serif",
+									fontSize: 13,
+									color: '#525252',
+									marginTop: 3,
+								}}>
 								Get updates on new projects and articles.
 							</div>
 						</div>
@@ -86,7 +109,12 @@ export default function Footer() {
 						{/* Form */}
 						<form
 							onSubmit={handleSubscribe}
-							style={{ display: 'flex', gap: 10, flex: '1 1 320px', maxWidth: 440 }}>
+							style={{
+								display: 'flex',
+								gap: 10,
+								flex: '1 1 320px',
+								maxWidth: 440,
+							}}>
 							<input
 								type='email'
 								value={email}
@@ -124,7 +152,13 @@ export default function Footer() {
 									alignItems: 'center',
 									gap: 6,
 								}}>
-								{subscribed ? 'Subscribed!' : <><Send size={14} /> Subscribe</>}
+								{subscribed ? (
+									'Subscribed!'
+								) : (
+									<>
+										<Send size={14} /> Subscribe
+									</>
+								)}
 							</button>
 						</form>
 					</motion.div>
@@ -132,20 +166,32 @@ export default function Footer() {
 			</div>
 
 			{/* ── Dark footer body ── */}
-			<div style={{ background: '#0a0a0a', marginTop: 48, paddingTop: 64, paddingBottom: 40 }}>
+			<div
+				style={{
+					background: '#0a0a0a',
+					marginTop: 48,
+					paddingTop: 64,
+					paddingBottom: 40,
+				}}>
 				<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 					{/* 3-column grid */}
 					<div
 						style={{
 							display: 'grid',
-							gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))',
+							gridTemplateColumns:
+								'repeat(auto-fit, minmax(min(220px, 100%), 1fr))',
 							gap: 48,
 							marginBottom: 56,
 						}}>
-
 						{/* Col 1: Brand */}
 						<div>
-							<div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									gap: 10,
+									marginBottom: 16,
+								}}>
 								<div
 									style={{
 										width: 36,
@@ -156,14 +202,38 @@ export default function Footer() {
 										alignItems: 'center',
 										justifyContent: 'center',
 									}}>
-									<span style={{ color: '#fff', fontSize: 14, fontWeight: 800, fontFamily: "'Inter', sans-serif" }}>FY</span>
+									<span
+										style={{
+											color: '#fff',
+											fontSize: 14,
+											fontWeight: 800,
+											fontFamily: "'Inter', sans-serif",
+										}}>
+										FY
+									</span>
 								</div>
-								<span style={{ color: '#ffffff', fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: '-0.01em' }}>
+								<span
+									style={{
+										color: '#ffffff',
+										fontFamily: "'Inter', sans-serif",
+										fontWeight: 700,
+										fontSize: 16,
+										letterSpacing: '-0.01em',
+									}}>
 									Ferri Yusra
 								</span>
 							</div>
-							<p style={{ color: '#71717a', fontSize: 14, fontFamily: "'Inter', sans-serif", lineHeight: 1.7, marginBottom: 24, maxWidth: 240 }}>
-								Backend engineer building scalable systems in Go & Node.js. Based in Jakarta, Indonesia.
+							<p
+								style={{
+									color: '#71717a',
+									fontSize: 14,
+									fontFamily: "'Inter', sans-serif",
+									lineHeight: 1.7,
+									marginBottom: 24,
+									maxWidth: 240,
+								}}>
+								Backend engineer building scalable systems in Go & Node.js.
+								Based in Tangerang, Indonesia
 							</p>
 							{/* Social icons */}
 							<div style={{ display: 'flex', gap: 10 }}>
@@ -183,7 +253,8 @@ export default function Footer() {
 											justifyContent: 'center',
 											color: '#71717a',
 											textDecoration: 'none',
-											transition: 'border-color 0.2s ease, color 0.2s ease, background 0.2s ease',
+											transition:
+												'border-color 0.2s ease, color 0.2s ease, background 0.2s ease',
 										}}
 										onMouseEnter={(e) => {
 											e.currentTarget.style.borderColor = '#6366f1';
@@ -203,10 +274,26 @@ export default function Footer() {
 
 						{/* Col 2: Navigation */}
 						<div>
-							<div style={{ color: '#ffffff', fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 14, marginBottom: 20, letterSpacing: '-0.01em' }}>
+							<div
+								style={{
+									color: '#ffffff',
+									fontFamily: "'Inter', sans-serif",
+									fontWeight: 700,
+									fontSize: 14,
+									marginBottom: 20,
+									letterSpacing: '-0.01em',
+								}}>
 								Navigation
 							</div>
-							<ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
+							<ul
+								style={{
+									listStyle: 'none',
+									padding: 0,
+									margin: 0,
+									display: 'flex',
+									flexDirection: 'column',
+									gap: 12,
+								}}>
 								{navLinks.map(({ label, href }) => (
 									<li key={label}>
 										<a
@@ -221,8 +308,12 @@ export default function Footer() {
 												alignItems: 'center',
 												gap: 4,
 											}}
-											onMouseEnter={(e) => { e.currentTarget.style.color = '#ffffff'; }}
-											onMouseLeave={(e) => { e.currentTarget.style.color = '#71717a'; }}>
+											onMouseEnter={(e) => {
+												e.currentTarget.style.color = '#ffffff';
+											}}
+											onMouseLeave={(e) => {
+												e.currentTarget.style.color = '#71717a';
+											}}>
 											{label}
 										</a>
 									</li>
@@ -232,14 +323,35 @@ export default function Footer() {
 
 						{/* Col 3: Contact */}
 						<div>
-							<div style={{ color: '#ffffff', fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 14, marginBottom: 20, letterSpacing: '-0.01em' }}>
+							<div
+								style={{
+									color: '#ffffff',
+									fontFamily: "'Inter', sans-serif",
+									fontWeight: 700,
+									fontSize: 14,
+									marginBottom: 20,
+									letterSpacing: '-0.01em',
+								}}>
 								Contact us
 							</div>
-							<div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+							<div
+								style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 								{[
-									{ icon: Mail, text: 'ferriyusra@gmail.com', href: 'mailto:ferriyusra@gmail.com' },
-									{ icon: Linkedin, text: 'linkedin.com/in/ferriyusra', href: 'https://linkedin.com/in/ferriyusra' },
-									{ icon: Github, text: 'github.com/ferriyusra', href: 'https://github.com/ferriyusra' },
+									{
+										icon: Mail,
+										text: 'feriyusra1616@gmail.com',
+										href: 'mailto:feriyusra1616@gmail.com',
+									},
+									{
+										icon: Linkedin,
+										text: 'linkedin.com/in/ferriyusra',
+										href: 'https://linkedin.com/in/ferriyusra',
+									},
+									{
+										icon: Github,
+										text: 'github.com/ferriyusra',
+										href: 'https://github.com/ferriyusra',
+									},
 								].map(({ icon: Icon, text, href }) => (
 									<a
 										key={text}
@@ -254,18 +366,23 @@ export default function Footer() {
 											fontFamily: "'Inter', sans-serif",
 											transition: 'color 0.2s ease',
 										}}
-										onMouseEnter={(e) => { e.currentTarget.style.color = '#ffffff'; }}
-										onMouseLeave={(e) => { e.currentTarget.style.color = '#71717a'; }}>
-										<div style={{
-											width: 32,
-											height: 32,
-											borderRadius: '50%',
-											border: '1.5px solid #3f3f46',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											flexShrink: 0,
+										onMouseEnter={(e) => {
+											e.currentTarget.style.color = '#ffffff';
+										}}
+										onMouseLeave={(e) => {
+											e.currentTarget.style.color = '#71717a';
 										}}>
+										<div
+											style={{
+												width: 32,
+												height: 32,
+												borderRadius: '50%',
+												border: '1.5px solid #3f3f46',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												flexShrink: 0,
+											}}>
 											<Icon size={14} />
 										</div>
 										{text}
@@ -277,42 +394,69 @@ export default function Footer() {
 							<a
 								href='#contact'
 								style={{
-									display: 'inline-flex',
+									display: 'flex',
 									alignItems: 'center',
-									gap: 6,
+									justifyContent: 'center',
+									gap: 8,
 									marginTop: 28,
-									padding: '10px 18px',
+									padding: '14px 24px',
 									background: '#6366f1',
 									color: '#ffffff',
-									border: '2px solid #0a0a0a',
-									borderRadius: 10,
+									border: '2px solid rgba(255,255,255,0.3)',
+									borderRadius: 14,
 									textDecoration: 'none',
-									fontSize: 13,
+									fontSize: 15,
 									fontWeight: 700,
 									fontFamily: "'Inter', sans-serif",
-									boxShadow: '3px 3px 0px #0a0a0a',
+									boxShadow: '3px 3px 0px rgba(255,255,255,0.15)',
 									transition: 'all 0.2s ease',
+									width: '100%',
+									boxSizing: 'border-box' as const,
 								}}
 								onMouseEnter={(e) => {
 									e.currentTarget.style.transform = 'translate(-1px, -1px)';
-									e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
+									e.currentTarget.style.boxShadow =
+										'4px 4px 0px rgba(255,255,255,0.15)';
 								}}
 								onMouseLeave={(e) => {
 									e.currentTarget.style.transform = 'translate(0, 0)';
-									e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+									e.currentTarget.style.boxShadow =
+										'3px 3px 0px rgba(255,255,255,0.15)';
 								}}>
-								Hire Me <ArrowUpRight size={14} />
+								<Send size={15} /> Hire Me
 							</a>
 						</div>
 					</div>
 
 					{/* Divider + copyright */}
-					<div style={{ borderTop: '1px solid #1f1f1f', paddingTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-						<p style={{ color: '#3f3f46', fontSize: 13, fontFamily: "'JetBrains Mono', monospace", margin: 0 }}>
-							&copy; {new Date().getFullYear()} Ferri Yusra. All rights reserved.
+					<div
+						style={{
+							borderTop: '1px solid #1f1f1f',
+							paddingTop: 24,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'space-between',
+							flexWrap: 'wrap',
+							gap: 12,
+						}}>
+						<p
+							style={{
+								color: '#3f3f46',
+								fontSize: 13,
+								fontFamily: "'JetBrains Mono', monospace",
+								margin: 0,
+							}}>
+							&copy; {new Date().getFullYear()} Ferri Yusra. All rights
+							reserved.
 						</p>
-						<p style={{ color: '#3f3f46', fontSize: 13, fontFamily: "'JetBrains Mono', monospace", margin: 0 }}>
-							{'</>'} built with Next.js
+						<p
+							style={{
+								color: '#3f3f46',
+								fontSize: 13,
+								fontFamily: "'JetBrains Mono', monospace",
+								margin: 0,
+							}}>
+							{'</>'} built with Claude Code and Skill.sh :D
 						</p>
 					</div>
 				</div>

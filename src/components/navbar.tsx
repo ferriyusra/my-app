@@ -31,21 +31,24 @@ export default function Navbar() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Active section via IntersectionObserver
+  // Active section via scroll — pick the last section whose top <= navbar bottom
   useEffect(() => {
+    const OFFSET = 88; // navbar height + buffer
     const ids = navLinks.map((l) => l.id);
-    const observers: IntersectionObserver[] = [];
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActiveSection(id); },
-        { rootMargin: '-40% 0px -55% 0px', threshold: 0 },
-      );
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
+
+    const update = () => {
+      let current = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= OFFSET) current = id;
+      }
+      setActiveSection(current);
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
   }, []);
 
   return (

@@ -18,8 +18,8 @@ const contacts = [
 	{
 		icon: Mail,
 		label: 'Email',
-		value: 'ferriyusra@gmail.com',
-		href: 'mailto:ferriyusra@gmail.com',
+		value: 'feriyusra1616@gmail.com',
+		href: 'mailto:feriyusra1616@gmail.com',
 	},
 	{
 		icon: Github,
@@ -43,7 +43,12 @@ const CARD: React.CSSProperties = {
 };
 
 export default function Contact() {
-	const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+	const [form, setForm] = useState({
+		name: '',
+		email: '',
+		subject: '',
+		message: '',
+	});
 	const [sent, setSent] = useState(false);
 	const shouldReduceMotion = useReducedMotion();
 
@@ -81,11 +86,11 @@ export default function Contact() {
 				<div
 					style={{
 						display: 'grid',
-						gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+						gridTemplateColumns:
+							'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
 						gap: 48,
 						alignItems: 'start',
 					}}>
-
 					{/* ── Left: heading + info ── */}
 					<div>
 						<motion.div
@@ -154,8 +159,13 @@ export default function Contact() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.5, 0.24)}
-							style={{ ...CARD, padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-
+							style={{
+								...CARD,
+								padding: '24px 28px',
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 18,
+							}}>
 							{contacts.map(({ icon: Icon, label, value, href }, i) => (
 								<motion.a
 									key={label}
@@ -170,7 +180,8 @@ export default function Contact() {
 										gap: 14,
 										textDecoration: 'none',
 										padding: '10px 0',
-										borderBottom: i < contacts.length - 1 ? '1px solid #f0f0f0' : 'none',
+										borderBottom:
+											i < contacts.length - 1 ? '1px solid #f0f0f0' : 'none',
 									}}>
 									<div
 										style={{
@@ -188,10 +199,24 @@ export default function Contact() {
 										<Icon size={16} />
 									</div>
 									<div>
-										<div style={{ fontSize: 11, color: '#a3a3a3', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 2 }}>
+										<div
+											style={{
+												fontSize: 11,
+												color: '#a3a3a3',
+												fontFamily: "'JetBrains Mono', monospace",
+												letterSpacing: '0.1em',
+												textTransform: 'uppercase',
+												marginBottom: 2,
+											}}>
 											{label}
 										</div>
-										<div style={{ fontSize: 13, color: '#0a0a0a', fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>
+										<div
+											style={{
+												fontSize: 13,
+												color: '#0a0a0a',
+												fontWeight: 600,
+												fontFamily: "'Inter', sans-serif",
+											}}>
 											{value}
 										</div>
 									</div>
@@ -207,51 +232,113 @@ export default function Contact() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.55, 0.2)}
 						style={{ ...CARD, padding: 36 }}>
-
-						<h3 style={{ fontSize: 20, fontWeight: 700, marginBottom: 28, fontFamily: "'Inter', sans-serif", color: '#0a0a0a', letterSpacing: '-0.01em' }}>
+						<h3
+							style={{
+								fontSize: 20,
+								fontWeight: 700,
+								marginBottom: 28,
+								fontFamily: "'Inter', sans-serif",
+								color: '#0a0a0a',
+								letterSpacing: '-0.01em',
+							}}>
 							Send a message
 						</h3>
 
-						<form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-
+						<form
+							onSubmit={handleSubmit}
+							style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 							{/* Name + Email row */}
-							<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(160px, 100%), 1fr))', gap: 14 }}>
+							<div
+								style={{
+									display: 'grid',
+									gridTemplateColumns:
+										'repeat(auto-fit, minmax(min(160px, 100%), 1fr))',
+									gap: 14,
+								}}>
 								{/* Name */}
 								<div>
-									<label style={{ fontSize: 13, fontWeight: 600, color: '#0a0a0a', display: 'block', marginBottom: 7, fontFamily: "'Inter', sans-serif" }}>
+									<label
+										style={{
+											fontSize: 13,
+											fontWeight: 600,
+											color: '#0a0a0a',
+											display: 'block',
+											marginBottom: 7,
+											fontFamily: "'Inter', sans-serif",
+										}}>
 										Name
 									</label>
 									<div style={{ position: 'relative' }}>
-										<User size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#a3a3a3', pointerEvents: 'none' }} />
+										<User
+											size={15}
+											style={{
+												position: 'absolute',
+												left: 13,
+												top: '50%',
+												transform: 'translateY(-50%)',
+												color: '#a3a3a3',
+												pointerEvents: 'none',
+											}}
+										/>
 										<input
 											type='text'
 											value={form.name}
-											onChange={(e) => setForm({ ...form, name: e.target.value })}
+											onChange={(e) =>
+												setForm({ ...form, name: e.target.value })
+											}
 											placeholder='John Carter'
 											required
 											style={inputBase}
-											onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-											onBlur={(e) => (e.currentTarget.style.borderColor = '#d4d4d4')}
+											onFocus={(e) =>
+												(e.currentTarget.style.borderColor = '#6366f1')
+											}
+											onBlur={(e) =>
+												(e.currentTarget.style.borderColor = '#d4d4d4')
+											}
 										/>
 									</div>
 								</div>
 
 								{/* Email */}
 								<div>
-									<label style={{ fontSize: 13, fontWeight: 600, color: '#0a0a0a', display: 'block', marginBottom: 7, fontFamily: "'Inter', sans-serif" }}>
+									<label
+										style={{
+											fontSize: 13,
+											fontWeight: 600,
+											color: '#0a0a0a',
+											display: 'block',
+											marginBottom: 7,
+											fontFamily: "'Inter', sans-serif",
+										}}>
 										Email
 									</label>
 									<div style={{ position: 'relative' }}>
-										<AtSign size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#a3a3a3', pointerEvents: 'none' }} />
+										<AtSign
+											size={15}
+											style={{
+												position: 'absolute',
+												left: 13,
+												top: '50%',
+												transform: 'translateY(-50%)',
+												color: '#a3a3a3',
+												pointerEvents: 'none',
+											}}
+										/>
 										<input
 											type='email'
 											value={form.email}
-											onChange={(e) => setForm({ ...form, email: e.target.value })}
+											onChange={(e) =>
+												setForm({ ...form, email: e.target.value })
+											}
 											placeholder='contact@email.com'
 											required
 											style={inputBase}
-											onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-											onBlur={(e) => (e.currentTarget.style.borderColor = '#d4d4d4')}
+											onFocus={(e) =>
+												(e.currentTarget.style.borderColor = '#6366f1')
+											}
+											onBlur={(e) =>
+												(e.currentTarget.style.borderColor = '#d4d4d4')
+											}
 										/>
 									</div>
 								</div>
@@ -259,37 +346,79 @@ export default function Contact() {
 
 							{/* Subject */}
 							<div>
-								<label style={{ fontSize: 13, fontWeight: 600, color: '#0a0a0a', display: 'block', marginBottom: 7, fontFamily: "'Inter', sans-serif" }}>
+								<label
+									style={{
+										fontSize: 13,
+										fontWeight: 600,
+										color: '#0a0a0a',
+										display: 'block',
+										marginBottom: 7,
+										fontFamily: "'Inter', sans-serif",
+									}}>
 									Subject
 								</label>
 								<div style={{ position: 'relative' }}>
-									<MessageSquare size={15} style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', color: '#a3a3a3', pointerEvents: 'none' }} />
+									<MessageSquare
+										size={15}
+										style={{
+											position: 'absolute',
+											left: 13,
+											top: '50%',
+											transform: 'translateY(-50%)',
+											color: '#a3a3a3',
+											pointerEvents: 'none',
+										}}
+									/>
 									<input
 										type='text'
 										value={form.subject}
-										onChange={(e) => setForm({ ...form, subject: e.target.value })}
+										onChange={(e) =>
+											setForm({ ...form, subject: e.target.value })
+										}
 										placeholder='Project inquiry...'
 										style={inputBase}
-										onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-										onBlur={(e) => (e.currentTarget.style.borderColor = '#d4d4d4')}
+										onFocus={(e) =>
+											(e.currentTarget.style.borderColor = '#6366f1')
+										}
+										onBlur={(e) =>
+											(e.currentTarget.style.borderColor = '#d4d4d4')
+										}
 									/>
 								</div>
 							</div>
 
 							{/* Message */}
 							<div>
-								<label style={{ fontSize: 13, fontWeight: 600, color: '#0a0a0a', display: 'block', marginBottom: 7, fontFamily: "'Inter', sans-serif" }}>
+								<label
+									style={{
+										fontSize: 13,
+										fontWeight: 600,
+										color: '#0a0a0a',
+										display: 'block',
+										marginBottom: 7,
+										fontFamily: "'Inter', sans-serif",
+									}}>
 									Message
 								</label>
 								<textarea
 									value={form.message}
-									onChange={(e) => setForm({ ...form, message: e.target.value })}
+									onChange={(e) =>
+										setForm({ ...form, message: e.target.value })
+									}
 									placeholder='Please write your message...'
 									rows={5}
 									required
-									style={{ ...inputBase, padding: '12px 14px', resize: 'vertical' }}
-									onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-									onBlur={(e) => (e.currentTarget.style.borderColor = '#d4d4d4')}
+									style={{
+										...inputBase,
+										padding: '12px 14px',
+										resize: 'vertical',
+									}}
+									onFocus={(e) =>
+										(e.currentTarget.style.borderColor = '#6366f1')
+									}
+									onBlur={(e) =>
+										(e.currentTarget.style.borderColor = '#d4d4d4')
+									}
 								/>
 							</div>
 
@@ -326,9 +455,13 @@ export default function Contact() {
 									}
 								}}>
 								{sent ? (
-									<><CheckCircle size={16} /> Message Sent!</>
+									<>
+										<CheckCircle size={16} /> Message Sent!
+									</>
 								) : (
-									<><Send size={16} /> Send Message</>
+									<>
+										<Send size={16} /> Send Message
+									</>
 								)}
 							</button>
 						</form>

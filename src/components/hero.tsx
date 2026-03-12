@@ -269,7 +269,7 @@ export default function Hero() {
 						marginBottom: 16,
 						letterSpacing: '-0.02em',
 					}}>
-					Backend-Focused Full Stack Engineer
+					Currently Focused Full Stack Engineer Becase AI :D
 				</motion.p>
 
 				{/* Tagline */}
@@ -303,7 +303,7 @@ export default function Hero() {
 					{/* Primary — Download CV */}
 					<a
 						href='https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I'
-					download
+						download
 						style={{
 							display: 'inline-flex',
 							alignItems: 'center',
