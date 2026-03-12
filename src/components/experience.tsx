@@ -1,254 +1,507 @@
 'use client';
 
+import { motion, useReducedMotion } from 'framer-motion';
+import { MapPin, Trophy } from 'lucide-react';
+
+const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+
 const experiences = [
 	{
-		role: 'Senior Full Stack Engineer',
-		company: 'TechCorp Inc.',
-		period: '2022 — Present',
-		location: 'Tangerang, Indonesia (Hybrid / Remote)',
+		role: 'Backend Engineer',
+		company: 'PT. Teknologi Pamadya Analitika (Meditap)',
+		period: 'July 2025 — Present',
+		badge: 'Present' as const,
+		location: 'Jakarta, Indonesia',
+		color: '#6366f1',
+		glow: '#818cf8',
+		initial: 'MT',
+		description:
+			'Designed and developed backend systems for finance-related platforms using Go (Gin Framework) and PostgreSQL, supporting finance operations and data-driven decision-making. Managed KrakenD API Gateway and Keycloak IAM for secure API routing, authentication, and RBAC.',
+		achievements: [
+			'Enabled the Finance Team to manage and monitor data for ~160 ASO entities, supporting billing and payment collection workflows.',
+			'Implemented event-driven automation via Google Pub/Sub and Cloud Scheduler, improving service reliability and operational efficiency.',
+			'Contributed to internal CMS tools with React and Material UI, streamlining workflows for non-technical stakeholders.',
+		],
+		tech: [
+			'Go',
+			'TypeScript',
+			'React',
+			'PostgreSQL',
+			'MS SQL Server',
+			'Redis',
+			'Pub/Sub',
+			'Cloud Scheduler',
+			'KrakenD',
+			'Keycloak',
+		],
+	},
+	{
+		role: 'Backend Engineer',
+		company: 'INA Digital (Peruri Digital Security)',
+		period: 'January 2024 — March 2025',
+		badge: 'Previous Role' as const,
+		location: 'Jakarta, Indonesia',
 		color: '#10b981',
+		glow: '#34d399',
+		initial: 'ID',
 		description:
-			'Lead engineer on the core platform team. Architected and shipped the new multi-tenant SaaS infrastructure serving 10k+ customers.',
+			'Backend Engineer at GovTech Health, responsible for end-to-end development of health data products. Built API services for SATUSEHAT Data Product handling 20,000–40,000 requests/month and collaborated with BI team to deliver web-based dashboard solutions.',
 		achievements: [
-			'Reduced API response times by 60% through query optimization and caching',
-			'Led migration from monolith to microservices, reducing deploy time from 45min to 4min',
-			'Mentored 4 junior engineers, 3 of whom were promoted within 18 months',
+			'Migrated multiple Tableau dashboards into native API-driven solutions, reducing Tableau dependency and improving load performance.',
+			'Delivered major dashboard revamps including Monitoring Implementasi SATUSEHAT, Penyakit Tidak Menular, and Pemantauan Aliran Data.',
+			'Built and optimized backend services using NestJS and Go with clean architecture, integrating BigQuery, MongoDB, and Redis for caching.',
 		],
-		tech: ['Next.js', 'Node.js', 'PostgreSQL', 'Redis', 'AWS', 'Docker'],
+		tech: [
+			'Go',
+			'Node.js',
+			'NestJS',
+			'PostgreSQL',
+			'BigQuery',
+			'MongoDB',
+			'Redis',
+			'Docker',
+			'GCS',
+			'Datadog',
+		],
 	},
 	{
-		role: 'Full Stack Engineer',
-		company: 'StartupXYZ',
-		period: '2020 — 2022',
-		location: 'New York, NY',
-		color: '#7c3aed',
-		description:
-			'Early engineer (employee #8) at a Series A fintech startup. Built core product features from 0 to 1.',
-		achievements: [
-			'Built real-time transaction processing system handling $2M/day',
-			'Implemented PCI-DSS compliant payment flows with Stripe Connect',
-			'Grew engineering team from 2 to 12 engineers as technical hiring lead',
-		],
-		tech: ['React', 'Python', 'Django', 'PostgreSQL', 'Stripe', 'GCP'],
-	},
-	{
-		role: 'Frontend Engineer',
-		company: 'Digital Agency Co.',
-		period: '2019 — 2020',
-		location: 'Austin, TX',
+		role: 'Backend Engineer',
+		company: 'Health Technology Transformation & Digitalization Team',
+		period: 'July 2023 — December 2023',
+		badge: 'Previous Role' as const,
+		location: 'Jakarta, Indonesia',
 		color: '#3b82f6',
+		glow: '#60a5fa',
+		initial: 'HT',
 		description:
-			'Built performant marketing sites and web apps for Fortune 500 clients.',
+			'Owned end-to-end backend development for multiple data-driven products, collaborating with product managers, data analysts, and frontend engineers to design interactive web-based dashboards.',
 		achievements: [
-			'Delivered 15+ client projects on time and budget',
-			'Improved average Lighthouse score across projects from 62 to 94',
-			'Created component library used across all agency projects',
+			'Delivered key dashboard migrations including Gerakan Anak Sehat, Covid-19 Vaksin, Morbiditas Pasien, and Monitoring Implementasi SATUSEHAT.',
+			'Designed scalable API services using Go and TypeScript (Next.js) integrating PostgreSQL, BigQuery, and MongoDB for high-performance data visualization.',
+			'Backend APIs handled 15,000–30,000 requests/month while reducing Tableau licensing costs.',
 		],
-		tech: ['React', 'Vue.js', 'WordPress', 'GSAP', 'Figma'],
+		tech: [
+			'Go',
+			'Node.js',
+			'TypeScript',
+			'Next.js',
+			'PostgreSQL',
+			'BigQuery',
+			'MongoDB',
+			'Redis',
+			'Docker',
+			'Datadog',
+		],
+	},
+	{
+		role: 'Software Engineer Backend',
+		company: 'PT Moladin Digital Indonesia',
+		period: 'March 2022 — February 2023',
+		badge: 'Previous Role' as const,
+		location: 'Jakarta, Indonesia',
+		color: '#f59e0b',
+		glow: '#fbbf24',
+		initial: 'MD',
+		description:
+			'Built end-to-end backend API services across multiple core product lines including Crash Program, Referral Program, Survey Program, and Academy Program, supporting 5,000–16,000 active users.',
+		achievements: [
+			'Integrated Apache Kafka for event-driven message publishing, enabling scalable async processing and improved system decoupling.',
+			'Improved test coverage with unit tests using Mocha, Chai, and Jest for Express-based services, reducing production incidents.',
+			'Actively participated in peer code reviews, upholding engineering standards and reducing technical debt across backend services.',
+		],
+		tech: [
+			'Go',
+			'Node.js',
+			'Express.js',
+			'MySQL',
+			'PostgreSQL',
+			'MongoDB',
+			'Kafka',
+			'Sentry',
+			'Jest',
+			'Mocha',
+		],
 	},
 ];
 
-export default function Experience() {
+type Exp = (typeof experiences)[number];
+
+function Badge({ label }: { label: 'Present' | 'Previous Role' }) {
+	const isPresent = label === 'Present';
 	return (
-		<section id='experience' style={{ background: '#09090b' }}>
-			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+		<span
+			style={{
+				display: 'inline-flex',
+				alignItems: 'center',
+				gap: 6,
+				padding: '5px 14px',
+				borderRadius: 100,
+				fontSize: 12,
+				fontWeight: 700,
+				fontFamily: "'Inter', sans-serif",
+				background: isPresent
+					? 'linear-gradient(135deg, #3b82f6, #6366f1)'
+					: 'linear-gradient(135deg, #f59e0b, #f97316)',
+				color: '#fff',
+				whiteSpace: 'nowrap' as const,
+				boxShadow: isPresent
+					? '0 2px 12px rgba(99,102,241,0.40)'
+					: '0 2px 12px rgba(245,158,11,0.35)',
+			}}>
+			<span
+				style={{
+					width: 6,
+					height: 6,
+					borderRadius: '50%',
+					background: 'rgba(255,255,255,0.75)',
+					display: 'inline-block',
+					boxShadow: '0 0 4px rgba(255,255,255,0.5)',
+				}}
+			/>
+			{label}
+		</span>
+	);
+}
+
+function Card({ exp }: { exp: Exp }) {
+	return (
+		<div
+			style={{
+				background: '#111113',
+				border: '1px solid rgba(255,255,255,0.07)',
+				borderRadius: 20,
+				padding: '24px 28px 28px',
+				boxShadow: '0 0 0 1px rgba(255,255,255,0.04)',
+				transition:
+					'border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
+			}}
+			onMouseEnter={(e) => {
+				e.currentTarget.style.borderColor = 'rgba(255,255,255,0.13)';
+				e.currentTarget.style.boxShadow = `0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px ${exp.color}22`;
+				e.currentTarget.style.transform = 'translateY(-3px)';
+			}}
+			onMouseLeave={(e) => {
+				e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
+				e.currentTarget.style.boxShadow = '0 0 0 1px rgba(255,255,255,0.04)';
+				e.currentTarget.style.transform = 'translateY(0)';
+			}}>
+			{/* Badge */}
+			<div style={{ marginBottom: 16 }}>
+				<Badge label={exp.badge} />
+			</div>
+
+			{/* Role title */}
+			<h3
+				style={{
+					fontSize: 'clamp(19px, 2.2vw, 24px)',
+					fontWeight: 800,
+					fontFamily: "'Inter', sans-serif",
+					letterSpacing: '-0.02em',
+					lineHeight: 1.25,
+					marginBottom: 12,
+					color: exp.color,
+				}}>
+				{exp.role}
+			</h3>
+
+			{/* Company */}
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					gap: 5,
+					marginBottom: 4,
+				}}>
+				<MapPin
+					size={12}
+					style={{ color: exp.color, flexShrink: 0 }}
+					aria-hidden='true'
+				/>
+				<span
+					style={{
+						fontSize: 14,
+						fontWeight: 700,
+						color: exp.color,
+						fontFamily: "'Inter', sans-serif",
+					}}>
+					{exp.company}
+				</span>
+			</div>
+			<div
+				style={{
+					fontSize: 12,
+					color: '#52525b',
+					fontFamily: "'JetBrains Mono', monospace",
+					marginBottom: 18,
+					letterSpacing: '0.01em',
+				}}>
+				{exp.location} · {exp.period}
+			</div>
+
+			{/* Description */}
+			<p
+				style={{
+					color: '#a1a1aa',
+					fontSize: 14,
+					lineHeight: 1.7,
+					fontFamily: "'Inter', sans-serif",
+					marginBottom: 22,
+				}}>
+				{exp.description}
+			</p>
+
+			{/* Key achievements */}
+			<div style={{ marginBottom: 22 }}>
 				<div
 					style={{
-						fontFamily: "'JetBrains Mono', monospace",
-						fontSize: 12,
-						color: '#f59e0b',
-						letterSpacing: '0.15em',
-						textTransform: 'uppercase',
-						marginBottom: 16,
+						display: 'flex',
+						alignItems: 'center',
+						gap: 7,
+						marginBottom: 12,
 					}}>
-					// 04. experience
+					<Trophy size={13} style={{ color: exp.glow }} aria-hidden='true' />
+					<span
+						style={{
+							fontSize: 13,
+							fontWeight: 700,
+							color: '#e4e4e7',
+							fontFamily: "'Inter', sans-serif",
+						}}>
+						Key Achievements
+					</span>
 				</div>
-				<h2
+				<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+					{exp.achievements.map((a, j) => (
+						<div
+							key={j}
+							style={{
+								display: 'flex',
+								alignItems: 'flex-start',
+								gap: 10,
+								padding: '10px 14px',
+								background: 'rgba(255,255,255,0.025)',
+								border: '1px solid rgba(255,255,255,0.055)',
+								borderRadius: 10,
+							}}>
+							<div
+								style={{
+									width: 7,
+									height: 7,
+									borderRadius: '50%',
+									background: exp.color,
+									flexShrink: 0,
+									marginTop: 5,
+									boxShadow: `0 0 8px ${exp.color}70`,
+								}}
+							/>
+							<span
+								style={{
+									fontSize: 13,
+									color: '#a1a1aa',
+									lineHeight: 1.55,
+									fontFamily: "'Inter', sans-serif",
+								}}>
+								{a}
+							</span>
+						</div>
+					))}
+				</div>
+			</div>
+
+			{/* Tech tags */}
+			<div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+				{exp.tech.map((t) => (
+					<span
+						key={t}
+						style={{
+							padding: '3px 10px',
+							background: `${exp.color}14`,
+							border: `1px solid ${exp.color}28`,
+							borderRadius: 100,
+							fontSize: 11,
+							fontFamily: "'JetBrains Mono', monospace",
+							color: exp.color,
+						}}>
+						{t}
+					</span>
+				))}
+			</div>
+		</div>
+	);
+}
+
+function TimelineDot({
+	exp,
+	delay,
+	shouldReduceMotion,
+}: {
+	exp: Exp;
+	delay: number;
+	shouldReduceMotion: boolean | null;
+}) {
+	return (
+		<motion.div
+			initial={{ opacity: 0, scale: 0.5 }}
+			whileInView={{ opacity: 1, scale: 1 }}
+			viewport={{ once: true, margin: '-80px' }}
+			transition={{
+				duration: shouldReduceMotion ? 0 : 0.4,
+				ease: EASE,
+				delay: shouldReduceMotion ? 0 : delay,
+			}}
+			style={{
+				width: 50,
+				height: 50,
+				borderRadius: '50%',
+				background: '#0d0d10',
+				border: `2px solid ${exp.color}`,
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				boxShadow: `0 0 0 5px ${exp.color}14, 0 0 24px ${exp.color}30`,
+				position: 'relative',
+				zIndex: 1,
+				flexShrink: 0,
+				marginTop: 20,
+			}}>
+			<span
+				style={{
+					fontSize: 11,
+					fontWeight: 800,
+					fontFamily: "'Inter', sans-serif",
+					color: exp.glow,
+					letterSpacing: '-0.01em',
+				}}>
+				{exp.initial}
+			</span>
+		</motion.div>
+	);
+}
+
+export default function Experience() {
+	const shouldReduceMotion = useReducedMotion();
+
+	return (
+		<section id='experience' style={{ background: '#09090b' }}>
+			<div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
+				{/* Header */}
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, margin: '-80px' }}
+					transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: EASE }}
+					style={{
+						fontFamily: "'JetBrains Mono', monospace",
+						fontSize: 11,
+						color: '#f59e0b',
+						letterSpacing: '0.18em',
+						textTransform: 'uppercase',
+						marginBottom: 12,
+						fontWeight: 600,
+					}}></motion.div>
+
+				<motion.h2
+					initial={{ opacity: 0, y: 18 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, margin: '-80px' }}
+					transition={{
+						duration: shouldReduceMotion ? 0 : 0.45,
+						ease: EASE,
+						delay: shouldReduceMotion ? 0 : 0.08,
+					}}
 					style={{
 						fontSize: 'clamp(28px, 5vw, 48px)',
 						fontWeight: 800,
-						marginBottom: 48,
+						marginBottom: 64,
 						fontFamily: "'Inter', sans-serif",
 						color: '#fafafa',
 						letterSpacing: '-0.02em',
 					}}>
 					Where I&apos;ve{' '}
-					<span
-						style={{
-							background: 'linear-gradient(135deg, #10b981, #3b82f6)',
-							WebkitBackgroundClip: 'text',
-							WebkitTextFillColor: 'transparent',
-							backgroundClip: 'text',
-						}}>
-						Worked
-					</span>
-				</h2>
+					<span style={{ color: '#6366f1' }}>Worked</span>
+				</motion.h2>
 
+				{/* Timeline container */}
 				<div style={{ position: 'relative' }}>
-					<div
+					{/* Vertical center line (desktop) */}
+					<motion.div
+						aria-hidden='true'
+						initial={{ scaleY: 0, opacity: 0 }}
+						whileInView={{ scaleY: 1, opacity: 1 }}
+						viewport={{ once: true, margin: '-80px' }}
+						transition={{
+							duration: shouldReduceMotion ? 0 : 1.2,
+							ease: EASE,
+							delay: shouldReduceMotion ? 0 : 0.2,
+						}}
 						style={{
 							position: 'absolute',
-							left: 20,
-							top: 8,
-							bottom: 8,
+							left: '50%',
+							transform: 'translateX(-50%)',
+							top: 0,
+							bottom: 0,
 							width: 2,
 							background:
-								'linear-gradient(to bottom, #10b981, #7c3aed, #3b82f6)',
-							opacity: 0.4,
+								'linear-gradient(to bottom, #6366f1 0%, #10b981 50%, #f59e0b 100%)',
+							opacity: 0.18,
+							pointerEvents: 'none',
+							transformOrigin: 'top',
 						}}
 					/>
-					<div
-						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							gap: 32,
-							paddingLeft: 56,
-						}}>
-						{experiences.map((exp, i) => (
-							<div key={i} style={{ position: 'relative' }}>
-								<div
-									style={{
-										position: 'absolute',
-										left: -44,
-										top: 24,
-										width: 12,
-										height: 12,
-										borderRadius: '50%',
-										background: exp.color,
-										boxShadow: `0 0 0 3px ${exp.color}25`,
-									}}
-								/>
-								<div
-									style={{
-										background: '#111113',
-										border: '1px solid rgba(255,255,255,0.07)',
-										borderRadius: 16,
-										padding: 28,
-										boxShadow: '0 0 0 1px rgba(255,255,255,0.05)',
-										transition: 'all 0.2s ease',
-									}}
-									onMouseEnter={(e) => {
-										e.currentTarget.style.transform = 'translateY(-2px)';
-										e.currentTarget.style.borderColor = 'rgba(255,255,255,0.14)';
-										e.currentTarget.style.boxShadow = '0 16px 48px rgba(0,0,0,0.4)';
-									}}
-									onMouseLeave={(e) => {
-										e.currentTarget.style.transform = 'translateY(0)';
-										e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
-										e.currentTarget.style.boxShadow = '0 0 0 1px rgba(255,255,255,0.05)';
-									}}>
-									<div
-										style={{
-											display: 'flex',
-											flexWrap: 'wrap',
-											justifyContent: 'space-between',
-											gap: 8,
-											marginBottom: 4,
-										}}>
-										<div>
-											<h3
-												style={{
-													fontSize: 18,
-													fontWeight: 700,
-													fontFamily: "'Inter', sans-serif",
-													marginBottom: 4,
-													color: '#fafafa',
-												}}>
-												{exp.role}
-											</h3>
-											<div
-												style={{
-													display: 'flex',
-													alignItems: 'center',
-													gap: 8,
-												}}>
-												<span
-													style={{
-														color: exp.color,
-														fontWeight: 600,
-														fontSize: 14,
-														fontFamily: "'Inter', sans-serif",
-													}}>
-													{exp.company}
-												</span>
-												<span style={{ color: '#27272a' }}>·</span>
-												<span
-													style={{
-														color: '#52525b',
-														fontSize: 13,
-														fontFamily: "'Inter', sans-serif",
-													}}>
-													{exp.location}
-												</span>
-											</div>
-										</div>
-										<span
-											style={{
-												padding: '4px 12px',
-												background: `${exp.color}15`,
-												border: `1px solid ${exp.color}30`,
-												borderRadius: 100,
-												fontSize: 12,
-												fontFamily: "'JetBrains Mono', monospace",
-												color: exp.color,
-												height: 'fit-content',
+
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+						{experiences.map((exp, i) => {
+							const isLeft = i % 2 === 0;
+							const delay = shouldReduceMotion ? 0 : 0.15 + i * 0.1;
+							return (
+								<div key={i} className='exp-row'>
+									{/* Left slot: card for even, spacer for odd */}
+									{isLeft ? (
+										<motion.div
+											className='exp-slot-left'
+											initial={{ opacity: 0, x: -32 }}
+											whileInView={{ opacity: 1, x: 0 }}
+											viewport={{ once: true, margin: '-80px' }}
+											transition={{
+												duration: shouldReduceMotion ? 0 : 0.55,
+												ease: EASE,
+												delay,
 											}}>
-											{exp.period}
-										</span>
+											<Card exp={exp} />
+										</motion.div>
+									) : (
+										<div className='exp-slot-spacer' />
+									)}
+
+									{/* Center: timeline dot */}
+									<div className='exp-slot-mid'>
+										<TimelineDot
+											exp={exp}
+											delay={delay + 0.1}
+											shouldReduceMotion={shouldReduceMotion}
+										/>
 									</div>
-									<p
-										style={{
-											color: '#a1a1aa',
-											fontSize: 14,
-											lineHeight: 1.7,
-											margin: '16px 0',
-											fontFamily: "'Inter', sans-serif",
-										}}>
-										{exp.description}
-									</p>
-									<ul
-										style={{
-											margin: '0 0 16px',
-											paddingLeft: 20,
-											display: 'flex',
-											flexDirection: 'column',
-											gap: 6,
-										}}>
-										{exp.achievements.map((a, j) => (
-											<li
-												key={j}
-												style={{
-													color: '#a1a1aa',
-													fontSize: 13,
-													lineHeight: 1.6,
-													fontFamily: "'Inter', sans-serif",
-												}}>
-												<span style={{ color: exp.color, fontWeight: 600 }}>
-													{a.split(' ')[0]}
-												</span>{' '}
-												{a.split(' ').slice(1).join(' ')}
-											</li>
-										))}
-									</ul>
-									<div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-										{exp.tech.map((t) => (
-											<span
-												key={t}
-												style={{
-													padding: '3px 10px',
-													background: 'rgba(255,255,255,0.06)',
-													borderRadius: 100,
-													fontSize: 11,
-													fontFamily: "'JetBrains Mono', monospace",
-													color: '#71717a',
-												}}>
-												{t}
-											</span>
-										))}
-									</div>
+
+									{/* Right slot: spacer for even, card for odd */}
+									{!isLeft ? (
+										<motion.div
+											className='exp-slot-right'
+											initial={{ opacity: 0, x: 32 }}
+											whileInView={{ opacity: 1, x: 0 }}
+											viewport={{ once: true, margin: '-80px' }}
+											transition={{
+												duration: shouldReduceMotion ? 0 : 0.55,
+												ease: EASE,
+												delay,
+											}}>
+											<Card exp={exp} />
+										</motion.div>
+									) : (
+										<div className='exp-slot-spacer' />
+									)}
 								</div>
-							</div>
-						))}
+							);
+						})}
 					</div>
 				</div>
 			</div>

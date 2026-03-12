@@ -1,6 +1,16 @@
+'use client';
+
+import { motion, useReducedMotion } from 'framer-motion';
+
 export default function Footer() {
+	const shouldReduceMotion = useReducedMotion();
+
 	return (
-		<footer
+		<motion.footer
+			initial={{ opacity: 0, y: 16 }}
+			whileInView={{ opacity: 1, y: 0 }}
+			viewport={{ once: true, margin: '-40px' }}
+			transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: [0.25, 0.1, 0.25, 1] }}
 			style={{
 				borderTop: '1px solid rgba(255,255,255,0.07)',
 				padding: '32px 24px',
@@ -28,6 +38,6 @@ export default function Footer() {
 					&copy; {new Date().getFullYear()} Ferri Yusra. All rights reserved.
 				</p>
 			</div>
-		</footer>
+		</motion.footer>
 	);
 }

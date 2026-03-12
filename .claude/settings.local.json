@@ -5,7 +5,21 @@
       "Bash(npm run:*)",
       "WebFetch(domain:www.kilatkoding.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:www.ali-ch.dev)"
+      "WebFetch(domain:www.ali-ch.dev)",
+      "Bash(npx tsc:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/amazonwebservices/FF9900\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/amazonaws/FF9900\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/openai/10a37f\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/chatgpt/10a37f\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/docker/2496ED\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/go/00ADD8\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/cursor/7c3aed\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/anthropic/D97706\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/aws/FF9900\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.simpleicons.org/amazon/FF9900\")",
+      "Bash(curl -sL \"https://cdn.simpleicons.org/amazonaws/FF9900\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/openai/openai-original.svg\")"
     ],
     "additionalDirectories": [
       "/Users/ferri/Documents/dev/learning/frontend/nextjs/my-app/src"
