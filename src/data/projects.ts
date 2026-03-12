@@ -152,7 +152,7 @@ export const projects: Project[] = [
 		images: ['/projects/as/as-1.png'],
 		tech: ['Python', 'Implement Algorithm TF-IDF', 'Implement Algorithm Naive Bayes Classifier'],
 		github: 'https://github.com/ferriyusra/Analisis-Sentimen-Naive-Bayes/issues/1',
-		demo: ' https://www.researchgate.net/publication/368490963_Application_of_the_Naive_Bayes_Classifier_Algorithm_to_Analyze_Sentiment_for_the_Covid-19_Vaccine_on_Twitter_in_Jakarta',
+		demo: null,
 		featured: true,
 		color: '#7c3aed',
 		initial: 'AS',
