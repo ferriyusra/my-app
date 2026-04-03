@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import { MapPin, Trophy } from 'lucide-react';
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
@@ -160,8 +161,14 @@ function Badge({ label }: { label: 'Present' | 'Previous Role' }) {
 }
 
 function Card({ exp }: { exp: Exp }) {
+	const cardRef = useRef<HTMLDivElement>(null);
+	const isInView = useInView(cardRef, { once: true, margin: '-60px' });
+	const shouldReduceMotion = useReducedMotion();
+
 	return (
 		<div
+			ref={cardRef}
+			className="card"
 			style={{
 				background: '#ffffff',
 				border: '2px solid #0a0a0a',
@@ -233,22 +240,40 @@ function Card({ exp }: { exp: Exp }) {
 					</div>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 						{exp.achievements.map((a, j) => (
-							<div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', background: '#f9f9f7', border: '1px solid #e5e5e5', borderRadius: 10 }}>
+							<motion.div
+								key={j}
+								initial={{ opacity: 0, x: -16 }}
+								animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
+								transition={{
+									duration: shouldReduceMotion ? 0 : 0.4,
+									ease: EASE,
+									delay: shouldReduceMotion ? 0 : 0.3 + j * 0.1,
+								}}
+								style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', background: '#f9f9f7', border: '1px solid #e5e5e5', borderRadius: 10 }}>
 								<div style={{ width: 7, height: 7, borderRadius: '50%', background: exp.color, flexShrink: 0, marginTop: 5, boxShadow: `0 0 8px ${exp.color}40` }} />
 								<span style={{ fontSize: 13, color: '#525252', lineHeight: 1.55, fontFamily: "'Inter', sans-serif" }}>
 									{a}
 								</span>
-							</div>
+							</motion.div>
 						))}
 					</div>
 				</div>
 
 				{/* Tech tags */}
 				<div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-					{exp.tech.map((t) => (
-						<span key={t} style={{ padding: '3px 10px', background: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: 100, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#52525b' }}>
+					{exp.tech.map((t, k) => (
+						<motion.span
+							key={t}
+							initial={{ opacity: 0, scale: 0.8 }}
+							animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+							transition={{
+								duration: shouldReduceMotion ? 0 : 0.3,
+								ease: EASE,
+								delay: shouldReduceMotion ? 0 : 0.5 + k * 0.04,
+							}}
+							style={{ padding: '3px 10px', background: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: 100, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#52525b' }}>
 							{t}
-						</span>
+						</motion.span>
 					))}
 				</div>
 			</div>

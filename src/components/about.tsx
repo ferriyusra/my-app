@@ -159,6 +159,7 @@ export default function About() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.12)}
+						className="card"
 						style={{
 							background: '#ffffff',
 							border: '2px solid #0a0a0a',
@@ -456,6 +457,7 @@ export default function About() {
 										...SPRING,
 										delay: shouldReduceMotion ? 0 : 0.18 + i * 0.05,
 									}}
+									className="card"
 									style={{
 										background: '#ffffff',
 										border: '2px solid #0a0a0a',
@@ -525,6 +527,7 @@ export default function About() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.5, 0.5)}
+							className="card"
 							style={{
 								background: '#ffffff',
 								border: '2px solid #0a0a0a',
@@ -610,9 +613,17 @@ export default function About() {
 										'API Design',
 										'Performance',
 										'Observability',
-									].map((tag) => (
-										<span
+									].map((tag, i) => (
+										<motion.span
 											key={tag}
+											initial={{ opacity: 0, scale: 0.8, y: 8 }}
+											whileInView={{ opacity: 1, scale: 1, y: 0 }}
+											viewport={{ once: true }}
+											transition={{
+												duration: shouldReduceMotion ? 0 : 0.35,
+												ease: EASE,
+												delay: shouldReduceMotion ? 0 : 0.6 + i * 0.07,
+											}}
 											style={{
 												fontSize: 11,
 												padding: '4px 10px',
@@ -624,7 +635,7 @@ export default function About() {
 												letterSpacing: '0.04em',
 											}}>
 											{tag}
-										</span>
+										</motion.span>
 									))}
 								</div>
 							</div>

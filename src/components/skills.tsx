@@ -316,7 +316,7 @@ export default function Skills() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.1)}
-						style={CARD_BASE}
+						className="card" style={CARD_BASE}
 					onMouseEnter={hoverIn}
 					onMouseLeave={hoverOut}>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
@@ -340,7 +340,7 @@ export default function Skills() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.18)}
-						style={CARD_BASE}
+						className="card" style={CARD_BASE}
 					onMouseEnter={hoverIn}
 					onMouseLeave={hoverOut}>
 						<div style={{ background: '#f0ece8', padding: '24px 20px 20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
@@ -370,7 +370,7 @@ export default function Skills() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.26)}
-						style={CARD_BASE}
+						className="card" style={CARD_BASE}
 					onMouseEnter={hoverIn}
 					onMouseLeave={hoverOut}>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
@@ -394,7 +394,7 @@ export default function Skills() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.34)}
-						style={CARD_BASE}
+						className="card" style={CARD_BASE}
 					onMouseEnter={hoverIn}
 					onMouseLeave={hoverOut}>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
@@ -418,7 +418,7 @@ export default function Skills() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.42)}
-						style={CARD_BASE}
+						className="card" style={CARD_BASE}
 					onMouseEnter={hoverIn}
 					onMouseLeave={hoverOut}>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
@@ -442,7 +442,7 @@ export default function Skills() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.5)}
-						style={{ ...CARD_BASE, background: '#fbbf24', alignItems: 'center', justifyContent: 'center', padding: '40px 28px', textAlign: 'center' as const, position: 'relative', overflow: 'hidden' }}
+						className="card card-accent" style={{ ...CARD_BASE, background: '#fbbf24', alignItems: 'center', justifyContent: 'center', padding: '40px 28px', textAlign: 'center' as const, position: 'relative', overflow: 'hidden' }}
 					onMouseEnter={hoverIn}
 					onMouseLeave={hoverOut}>
 						{/* Pulsing light glow */}

@@ -55,6 +55,7 @@ export default function Footer() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-40px' }}
 						transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: EASE }}
+						className="card"
 						style={{
 							background: '#ffffff',
 							border: '2px solid #0a0a0a',

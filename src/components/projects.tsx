@@ -1,5 +1,6 @@
 'use client';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import { Github, ExternalLink, Star } from 'lucide-react';
 import { projects } from '@/data/projects';
 
@@ -29,6 +30,29 @@ const hoverOut = (e: React.MouseEvent<HTMLElement>) => {
 	e.currentTarget.style.transform = 'translate(0, 0)';
 	e.currentTarget.style.boxShadow = '6px 6px 0px #0a0a0a';
 };
+
+function StaggerTags({ tags, style: tagStyle, shouldReduceMotion }: { tags: string[]; style: React.CSSProperties; shouldReduceMotion: boolean | null }) {
+	const ref = useRef<HTMLDivElement>(null);
+	const isInView = useInView(ref, { once: true, margin: '-40px' });
+	return (
+		<div ref={ref} style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+			{tags.map((tech, k) => (
+				<motion.span
+					key={tech}
+					initial={{ opacity: 0, scale: 0.8, y: 6 }}
+					animate={isInView ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.8, y: 6 }}
+					transition={{
+						duration: shouldReduceMotion ? 0 : 0.3,
+						ease: EASE,
+						delay: shouldReduceMotion ? 0 : k * 0.05,
+					}}
+					style={tagStyle}>
+					{tech}
+				</motion.span>
+			))}
+		</div>
+	);
+}
 
 export default function Projects() {
 	const shouldReduceMotion = useReducedMotion();
@@ -90,7 +114,7 @@ export default function Projects() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.5, 0.14 + i * 0.1)}
-							style={CARD_BASE}
+							className="card" style={CARD_BASE}
 							onMouseEnter={hoverIn}
 							onMouseLeave={hoverOut}>
 
@@ -151,9 +175,11 @@ export default function Projects() {
 								<p style={{ color: '#525252', fontSize: 14, lineHeight: 1.7, marginBottom: 18, fontFamily: "'Inter', sans-serif" }}>
 									{project.description}
 								</p>
-								<div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 22 }}>
-									{project.tech.map((tech) => (
-										<span key={tech} style={{
+								<div style={{ marginBottom: 22 }}>
+									<StaggerTags
+										tags={project.tech}
+										shouldReduceMotion={shouldReduceMotion}
+										style={{
 											padding: '3px 10px',
 											background: '#f0ece8',
 											border: '1.5px solid #0a0a0a',
@@ -162,10 +188,8 @@ export default function Projects() {
 											fontFamily: "'JetBrains Mono', monospace",
 											color: '#0a0a0a',
 											boxShadow: '1px 1px 0px #0a0a0a',
-										}}>
-											{tech}
-										</span>
-									))}
+										}}
+									/>
 								</div>
 								{(project.github || project.demo) && (
 									<div style={{ display: 'flex', gap: 10, marginTop: 'auto' }}>
@@ -228,7 +252,7 @@ export default function Projects() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.45, 0.1 + i * 0.09)}
-							style={CARD_BASE}
+							className="card" style={CARD_BASE}
 							onMouseEnter={hoverIn}
 							onMouseLeave={hoverOut}>
 
@@ -292,22 +316,20 @@ export default function Projects() {
 								<p style={{ color: '#525252', fontSize: 13, lineHeight: 1.65, marginBottom: 16, fontFamily: "'Inter', sans-serif" }}>
 									{project.description}
 								</p>
-								<div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-									{project.tech.slice(0, 3).map((tech) => (
-										<span key={tech} style={{
-											padding: '2px 9px',
-											background: '#f0ece8',
-											border: '1.5px solid #0a0a0a',
-											borderRadius: 100,
-											fontSize: 11,
-											fontFamily: "'JetBrains Mono', monospace",
-											color: '#0a0a0a',
-											boxShadow: '1px 1px 0px #0a0a0a',
-										}}>
-											{tech}
-										</span>
-									))}
-								</div>
+								<StaggerTags
+									tags={project.tech.slice(0, 3)}
+									shouldReduceMotion={shouldReduceMotion}
+									style={{
+										padding: '2px 9px',
+										background: '#f0ece8',
+										border: '1.5px solid #0a0a0a',
+										borderRadius: 100,
+										fontSize: 11,
+										fontFamily: "'JetBrains Mono', monospace",
+										color: '#0a0a0a',
+										boxShadow: '1px 1px 0px #0a0a0a',
+									}}
+								/>
 							</div>
 						</motion.div>
 					))}

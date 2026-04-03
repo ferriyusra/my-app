@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { motion, useReducedMotion, useInView } from 'framer-motion';
 import {
 	Mail,
 	Github,
@@ -58,11 +58,22 @@ export default function Contact() {
 		delay: shouldReduceMotion ? 0 : delay,
 	});
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setSent(true);
-		setTimeout(() => setSent(false), 3000);
-		setForm({ name: '', email: '', subject: '', message: '' });
+		try {
+			const res = await fetch('/api/contact', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(form),
+			});
+			if (res.ok) {
+				setSent(true);
+				setForm({ name: '', email: '', subject: '', message: '' });
+				setTimeout(() => setSent(false), 3000);
+			}
+		} catch {
+			// Network error - silently handle
+		}
 	};
 
 	const inputBase: React.CSSProperties = {
@@ -159,6 +170,7 @@ export default function Contact() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.5, 0.24)}
+							className="card"
 							style={{
 								...CARD,
 								padding: '24px 28px',
@@ -231,6 +243,7 @@ export default function Contact() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.55, 0.2)}
+						className="card"
 						style={{ ...CARD, padding: 36 }}>
 						<h3
 							style={{
@@ -244,11 +257,52 @@ export default function Contact() {
 							Send a message
 						</h3>
 
+						<FormFields
+							form={form}
+							setForm={setForm}
+							sent={sent}
+							handleSubmit={handleSubmit}
+							inputBase={inputBase}
+							shouldReduceMotion={shouldReduceMotion}
+							t={t}
+						/>
+					</motion.div>
+				</div>
+			</div>
+		</section>
+	);
+}
+
+function FormFields({
+	form,
+	setForm,
+	sent,
+	handleSubmit,
+	inputBase,
+	shouldReduceMotion,
+	t,
+}: {
+	form: { name: string; email: string; subject: string; message: string };
+	setForm: (f: { name: string; email: string; subject: string; message: string }) => void;
+	sent: boolean;
+	handleSubmit: (e: React.FormEvent) => void;
+	inputBase: React.CSSProperties;
+	shouldReduceMotion: boolean | null;
+	t: (duration: number, delay: number) => { duration: number; ease: [number, number, number, number]; delay: number };
+}) {
+	const formRef = useRef<HTMLFormElement>(null);
+	const isInView = useInView(formRef, { once: true, margin: '-60px' });
+
+	return (
 						<form
+							ref={formRef}
 							onSubmit={handleSubmit}
 							style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
 							{/* Name + Email row */}
-							<div
+							<motion.div
+								initial={{ opacity: 0, y: 16 }}
+								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+								transition={t(0.4, 0.1)}
 								style={{
 									display: 'grid',
 									gridTemplateColumns:
@@ -342,10 +396,13 @@ export default function Contact() {
 										/>
 									</div>
 								</div>
-							</div>
+							</motion.div>
 
 							{/* Subject */}
-							<div>
+							<motion.div
+								initial={{ opacity: 0, y: 16 }}
+								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+								transition={t(0.4, 0.2)}>
 								<label
 									style={{
 										fontSize: 13,
@@ -385,10 +442,13 @@ export default function Contact() {
 										}
 									/>
 								</div>
-							</div>
+							</motion.div>
 
 							{/* Message */}
-							<div>
+							<motion.div
+								initial={{ opacity: 0, y: 16 }}
+								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+								transition={t(0.4, 0.3)}>
 								<label
 									style={{
 										fontSize: 13,
@@ -420,54 +480,56 @@ export default function Contact() {
 										(e.currentTarget.style.borderColor = '#d4d4d4')
 									}
 								/>
-							</div>
+							</motion.div>
 
 							{/* Submit */}
-							<button
-								type='submit'
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									gap: 8,
-									padding: '14px 24px',
-									background: sent ? '#f4f4f5' : '#6366f1',
-									border: sent ? '1.5px solid #d4d4d4' : '2px solid #0a0a0a',
-									borderRadius: 12,
-									color: sent ? '#525252' : 'white',
-									fontSize: 15,
-									fontWeight: 700,
-									cursor: 'pointer',
-									fontFamily: "'Inter', sans-serif",
-									transition: 'all 0.2s ease',
-									boxShadow: sent ? 'none' : '3px 3px 0px #0a0a0a',
-								}}
-								onMouseEnter={(e) => {
-									if (!sent) {
-										e.currentTarget.style.transform = 'translate(-1px, -1px)';
-										e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
-									}
-								}}
-								onMouseLeave={(e) => {
-									if (!sent) {
-										e.currentTarget.style.transform = 'translate(0, 0)';
-										e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
-									}
-								}}>
-								{sent ? (
-									<>
-										<CheckCircle size={16} /> Message Sent!
-									</>
-								) : (
-									<>
-										<Send size={16} /> Send Message
-									</>
-								)}
-							</button>
+							<motion.div
+								initial={{ opacity: 0, y: 16 }}
+								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+								transition={t(0.4, 0.4)}>
+								<button
+									type='submit'
+									style={{
+										width: '100%',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										gap: 8,
+										padding: '14px 24px',
+										background: sent ? '#f4f4f5' : '#6366f1',
+										border: sent ? '1.5px solid #d4d4d4' : '2px solid #0a0a0a',
+										borderRadius: 12,
+										color: sent ? '#525252' : 'white',
+										fontSize: 15,
+										fontWeight: 700,
+										cursor: 'pointer',
+										fontFamily: "'Inter', sans-serif",
+										transition: 'all 0.2s ease',
+										boxShadow: sent ? 'none' : '3px 3px 0px #0a0a0a',
+									}}
+									onMouseEnter={(e) => {
+										if (!sent) {
+											e.currentTarget.style.transform = 'translate(-1px, -1px)';
+											e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
+										}
+									}}
+									onMouseLeave={(e) => {
+										if (!sent) {
+											e.currentTarget.style.transform = 'translate(0, 0)';
+											e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+										}
+									}}>
+									{sent ? (
+										<>
+											<CheckCircle size={16} /> Message Sent!
+										</>
+									) : (
+										<>
+											<Send size={16} /> Send Message
+										</>
+									)}
+								</button>
+							</motion.div>
 						</form>
-					</motion.div>
-				</div>
-			</div>
-		</section>
 	);
 }
