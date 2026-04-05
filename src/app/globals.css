@@ -132,6 +132,46 @@ section { padding: 96px 0; }
 }
 
 /* ═══════════════════════════════════════════════
+   GSAP HORIZONTAL SCROLL PROJECTS
+   ═══════════════════════════════════════════════ */
+
+/* Desktop: 100vh pinned layout */
+@media (min-width: 768px) {
+  .projects-inner {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 80px 0 40px;
+  }
+  .projects-track-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    min-height: 0;
+  }
+}
+
+/* Mobile: normal vertical flow */
+@media (max-width: 767px) {
+  .projects-inner {
+    height: auto !important;
+  }
+  .projects-track {
+    flex-direction: column !important;
+    padding: 0 24px !important;
+    gap: 20px !important;
+  }
+  .project-card {
+    width: 100% !important;
+  }
+  .projects-counter,
+  .projects-progress {
+    display: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════
    SVG WAVE DIVIDERS
    ═══════════════════════════════════════════════ */
 .wave-divider { position: relative; z-index: 1; }

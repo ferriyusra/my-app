@@ -3,6 +3,12 @@
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { MapPin, Trophy } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import TextReveal from '@/components/text-reveal';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -322,35 +328,46 @@ function TimelineDot({
 
 export default function Experience() {
 	const shouldReduceMotion = useReducedMotion();
+	const lineRef = useRef<HTMLDivElement>(null);
+	const timelineRef = useRef<HTMLDivElement>(null);
+
+	useGSAP(
+		() => {
+			const line = lineRef.current;
+			const container = timelineRef.current;
+			if (!line || !container) return;
+
+			if (shouldReduceMotion) {
+				gsap.set(line, { scaleY: 1, opacity: 1 });
+				return;
+			}
+
+			gsap.set(line, { scaleY: 0, opacity: 1 });
+
+			gsap.to(line, {
+				scaleY: 1,
+				ease: 'none',
+				scrollTrigger: {
+					trigger: container,
+					start: 'top 60%',
+					end: 'bottom 80%',
+					scrub: 0.5,
+				},
+			});
+		},
+		{ scope: timelineRef, dependencies: [shouldReduceMotion] },
+	);
 
 	return (
 		<section id='experience' style={{ background: '#f0ece8' }}>
 			<div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
 				{/* Header */}
-				<motion.div
-					initial={{ opacity: 0, y: 10 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: '-80px' }}
-					transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: EASE }}
-					style={{
-						fontFamily: "'JetBrains Mono', monospace",
-						fontSize: 11,
-						color: '#a3a3a3',
-						letterSpacing: '0.18em',
-						textTransform: 'uppercase',
-						marginBottom: 12,
-						fontWeight: 600,
-					}}></motion.div>
-
-				<motion.h2
-					initial={{ opacity: 0, y: 18 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: '-80px' }}
-					transition={{
-						duration: shouldReduceMotion ? 0 : 0.45,
-						ease: EASE,
-						delay: shouldReduceMotion ? 0 : 0.08,
-					}}
+				<TextReveal
+					parts={[
+						{ text: "Where I've " },
+						{ text: 'Worked', color: '#6366f1' },
+					]}
+					as='h2'
 					style={{
 						fontSize: 'clamp(28px, 5vw, 48px)',
 						fontWeight: 800,
@@ -358,34 +375,25 @@ export default function Experience() {
 						fontFamily: "'Inter', sans-serif",
 						color: '#0a0a0a',
 						letterSpacing: '-0.02em',
-					}}>
-					Where I&apos;ve{' '}
-					<span style={{ color: '#6366f1' }}>Worked</span>
-				</motion.h2>
+					}}
+				/>
 
 				{/* Timeline container */}
-				<div style={{ position: 'relative' }}>
-					{/* Vertical center line (desktop) */}
-					<motion.div
+				<div ref={timelineRef} style={{ position: 'relative' }}>
+					{/* Vertical center line — GSAP scroll-linked draw */}
+					<div
+						ref={lineRef}
 						aria-hidden='true'
-						initial={{ scaleY: 0, opacity: 0 }}
-						whileInView={{ scaleY: 1, opacity: 1 }}
-						viewport={{ once: true, margin: '-80px' }}
-						transition={{
-							duration: shouldReduceMotion ? 0 : 1.2,
-							ease: EASE,
-							delay: shouldReduceMotion ? 0 : 0.2,
-						}}
 						style={{
 							position: 'absolute',
 							left: '50%',
-							transform: 'translateX(-50%)',
 							top: 0,
 							bottom: 0,
 							width: 2,
 							background: '#0a0a0a',
 							pointerEvents: 'none',
 							transformOrigin: 'top',
+							transform: 'translateX(-50%) scaleY(0)',
 						}}
 					/>
 

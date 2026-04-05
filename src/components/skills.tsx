@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import { Code2, Zap, Globe, Briefcase, Layers } from 'lucide-react';
+import TextReveal from '@/components/text-reveal';
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -260,11 +261,12 @@ export default function Skills() {
 						marginBottom: 12,
 						fontWeight: 600,
 					}}></motion.div>
-				<motion.h2
-					initial={{ opacity: 0, y: 18 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: '-80px' }}
-					transition={t(0.45, 0.08)}
+				<TextReveal
+					parts={[
+						{ text: 'Tech ' },
+						{ text: 'Stack', color: '#6366f1' },
+					]}
+					as='h2'
 					style={{
 						fontSize: 'clamp(28px, 5vw, 48px)',
 						fontWeight: 800,
@@ -272,10 +274,8 @@ export default function Skills() {
 						fontFamily: "'Inter', sans-serif",
 						color: '#0a0a0a',
 						letterSpacing: '-0.02em',
-					}}>
-					Tech{' '}
-					<span style={{ color: '#6366f1' }}>Stack</span>
-				</motion.h2>
+					}}
+				/>
 				<motion.p
 					initial={{ opacity: 0, y: 14 }}
 					whileInView={{ opacity: 1, y: 0 }}

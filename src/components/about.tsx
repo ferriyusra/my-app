@@ -19,6 +19,7 @@ import {
 	Building2,
 	Activity,
 } from 'lucide-react';
+import TextReveal from '@/components/text-reveal';
 
 function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
 	const ref = useRef<HTMLSpanElement>(null);
@@ -128,12 +129,13 @@ export default function About() {
 				/>
 
 				{/* Heading */}
-				<motion.h2
+				<TextReveal
 					id='about-heading'
-					initial={{ opacity: 0, y: 18 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: '-80px' }}
-					transition={t(0.45, 0.08)}
+					parts={[
+						{ text: 'Who I ' },
+						{ text: 'Am', color: '#6366f1' },
+					]}
+					as='h2'
 					style={{
 						fontSize: 'clamp(28px, 5vw, 48px)',
 						fontWeight: 800,
@@ -141,9 +143,8 @@ export default function About() {
 						fontFamily: "'Inter', sans-serif",
 						color: '#0a0a0a',
 						letterSpacing: '-0.02em',
-					}}>
-					Who I <span style={{ color: '#6366f1' }}>Am</span>
-				</motion.h2>
+					}}
+				/>
 
 				<div
 					style={{

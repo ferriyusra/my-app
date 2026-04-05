@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Download } from 'lucide-react';
+import MagneticButton from '@/components/magnetic-button';
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -301,67 +302,67 @@ export default function Hero() {
 						flexWrap: 'wrap',
 					}}>
 					{/* Primary — Download CV */}
-					<a
-						href='https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I'
-						download
-						style={{
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: 8,
-							padding: '14px 28px',
-							background: '#6366f1',
-							border: '2px solid #0a0a0a',
-							borderRadius: 12,
-							color: '#ffffff',
-							fontSize: 15,
-							fontWeight: 700,
-							textDecoration: 'none',
-							fontFamily: "'Inter', sans-serif",
-							boxShadow: '3px 3px 0px #0a0a0a',
-							transition: 'all 0.2s ease',
-						}}
-						onMouseEnter={(e) => {
-							e.currentTarget.style.transform = 'translate(-1px, -1px)';
-							e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
-						}}
-						onMouseLeave={(e) => {
-							e.currentTarget.style.transform = 'translate(0, 0)';
-							e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
-						}}>
-						<Download size={16} aria-hidden='true' />
-						Download CV
-					</a>
+					<MagneticButton strength={0.3}>
+						<a
+							href='https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I'
+							download
+							style={{
+								display: 'inline-flex',
+								alignItems: 'center',
+								gap: 8,
+								padding: '14px 28px',
+								background: '#6366f1',
+								border: '2px solid #0a0a0a',
+								borderRadius: 12,
+								color: '#ffffff',
+								fontSize: 15,
+								fontWeight: 700,
+								textDecoration: 'none',
+								fontFamily: "'Inter', sans-serif",
+								boxShadow: '3px 3px 0px #0a0a0a',
+								transition: 'all 0.2s ease',
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+							}}>
+							<Download size={16} aria-hidden='true' />
+							Download CV
+						</a>
+					</MagneticButton>
 
 					{/* Secondary — Let's Build Together */}
-					<a
-						href='#contact'
-						style={{
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: 8,
-							padding: '14px 28px',
-							background: '#ffffff',
-							border: '2px solid #0a0a0a',
-							borderRadius: 12,
-							color: '#0a0a0a',
-							fontSize: 15,
-							fontWeight: 700,
-							textDecoration: 'none',
-							fontFamily: "'Inter', sans-serif",
-							boxShadow: '3px 3px 0px #0a0a0a',
-							transition: 'all 0.2s ease',
-						}}
-						onMouseEnter={(e) => {
-							e.currentTarget.style.transform = 'translate(-1px, -1px)';
-							e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
-						}}
-						onMouseLeave={(e) => {
-							e.currentTarget.style.transform = 'translate(0, 0)';
-							e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
-						}}>
-						<ArrowRight size={16} aria-hidden='true' />
-						Let&apos;s Build Together
-					</a>
+					<MagneticButton strength={0.3}>
+						<a
+							href='#contact'
+							style={{
+								display: 'inline-flex',
+								alignItems: 'center',
+								gap: 8,
+								padding: '14px 28px',
+								background: '#ffffff',
+								border: '2px solid #0a0a0a',
+								borderRadius: 12,
+								color: '#0a0a0a',
+								fontSize: 15,
+								fontWeight: 700,
+								textDecoration: 'none',
+								fontFamily: "'Inter', sans-serif",
+								boxShadow: '3px 3px 0px #0a0a0a',
+								transition: 'all 0.2s ease',
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+							}}>
+							<ArrowRight size={16} aria-hidden='true' />
+							Let&apos;s Build Together
+						</a>
+					</MagneticButton>
 				</motion.div>
 
 				{/* Scroll indicator */}
