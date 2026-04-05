@@ -132,6 +132,101 @@ section { padding: 96px 0; }
 }
 
 /* ═══════════════════════════════════════════════
+   SVG WAVE DIVIDERS
+   ═══════════════════════════════════════════════ */
+.wave-divider { position: relative; z-index: 1; }
+.wave-divider:not(.wave-a-to-footer) svg { filter: drop-shadow(0 -2px 4px rgba(0,0,0,0.06)); }
+
+.wave-hero-to-a { background: #f9f7f5; }
+.wave-hero-to-a path { fill: #f0ece8; }
+
+.wave-a-to-b { background: #f0ece8; }
+.wave-a-to-b path { fill: #faf9f7; }
+
+.wave-b-to-a { background: #faf9f7; }
+.wave-b-to-a path { fill: #f0ece8; }
+
+.wave-a-to-footer { background: #f0ece8; }
+.wave-a-to-footer path { fill: #f0ece8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wave-divider { opacity: 1 !important; transform: none !important; }
+}
+
+/* ═══════════════════════════════════════════════
+   3D CARD TILT
+   ═══════════════════════════════════════════════ */
+.card {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  transform: perspective(800px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transition: transform 0.15s ease-out, box-shadow 0.2s ease !important;
+  will-change: transform;
+}
+
+.card:hover {
+  box-shadow: 8px 8px 0px #0a0a0a !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transform: none !important;
+    will-change: auto;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   CUSTOM CURSOR
+   ═══════════════════════════════════════════════ */
+html.custom-cursor-active,
+html.custom-cursor-active * {
+  cursor: none !important;
+}
+
+/* Ring grows on interactive elements */
+.cursor-ring.cursor-hover {
+  width: 56px !important;
+  height: 56px !important;
+  top: -28px !important;
+  left: -28px !important;
+  border-color: rgba(99,102,241,0.4) !important;
+  background: rgba(99,102,241,0.06) !important;
+}
+
+/* Ring expands large on project cards */
+.cursor-ring.cursor-expanded {
+  width: 80px !important;
+  height: 80px !important;
+  top: -40px !important;
+  left: -40px !important;
+  border-color: rgba(99,102,241,0.6) !important;
+  background: rgba(99,102,241,0.12) !important;
+}
+
+/* Click feedback */
+.cursor-ring.cursor-click {
+  width: 32px !important;
+  height: 32px !important;
+  top: -16px !important;
+  left: -16px !important;
+  border-color: #6366f1 !important;
+  background: rgba(99,102,241,0.15) !important;
+}
+
+/* "View" label appears on project cards */
+.cursor-label.cursor-label-visible {
+  opacity: 1 !important;
+}
+
+@media (pointer: coarse) {
+  .cursor-ring, .cursor-label, .cursor-label + div { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-ring { transition: none !important; }
+}
+
+/* ═══════════════════════════════════════════════
    DARK MODE
    ═══════════════════════════════════════════════ */
 html[data-theme="dark"] { color-scheme: dark; }
@@ -147,10 +242,27 @@ html[data-theme="dark"] .dot-grid {
   background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px) !important;
 }
 
-/* Sections */
+/* Sections — alternating dark backgrounds */
 html[data-theme="dark"] section {
   background: #121212 !important;
 }
+html[data-theme="dark"] #skills,
+html[data-theme="dark"] #projects {
+  background: #0e0e0e !important;
+}
+
+/* Wave dividers — dark mode */
+html[data-theme="dark"] .wave-hero-to-a { background: #121212 !important; }
+html[data-theme="dark"] .wave-hero-to-a path { fill: #121212; }
+
+html[data-theme="dark"] .wave-a-to-b { background: #121212 !important; }
+html[data-theme="dark"] .wave-a-to-b path { fill: #0e0e0e; }
+
+html[data-theme="dark"] .wave-b-to-a { background: #0e0e0e !important; }
+html[data-theme="dark"] .wave-b-to-a path { fill: #121212; }
+
+html[data-theme="dark"] .wave-a-to-footer { background: #121212 !important; }
+html[data-theme="dark"] .wave-a-to-footer path { fill: #0a0a0a; }
 
 /* Hero gradient */
 html[data-theme="dark"] #hero {
@@ -172,8 +284,22 @@ html[data-theme="dark"] .card.card-accent {
   border-color: #2a2a2a !important;
   box-shadow: 4px 4px 0px #000 !important;
 }
-html[data-theme="dark"] .card > div:first-child {
+html[data-theme="dark"] .card:not(.card-accent):hover {
+  box-shadow: 6px 6px 0px #000 !important;
+}
+html[data-theme="dark"] .card.card-accent:hover {
+  box-shadow: 6px 6px 0px #000 !important;
+}
+html[data-theme="dark"] .card:not(.card-accent) > div:first-child {
   background: #161616 !important;
+}
+
+/* Keep accent card text dark on colored background */
+html[data-theme="dark"] .card.card-accent h3 {
+  color: #0a0a0a !important;
+}
+html[data-theme="dark"] .card.card-accent p {
+  color: #78350f !important;
 }
 
 /* Typography */

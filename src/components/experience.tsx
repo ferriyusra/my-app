@@ -175,15 +175,6 @@ function Card({ exp }: { exp: Exp }) {
 				borderRadius: 20,
 				boxShadow: '6px 6px 0px #0a0a0a',
 				overflow: 'hidden',
-				transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-			}}
-			onMouseEnter={(e) => {
-				e.currentTarget.style.transform = 'translate(-2px, -2px)';
-				e.currentTarget.style.boxShadow = '8px 8px 0px #0a0a0a';
-			}}
-			onMouseLeave={(e) => {
-				e.currentTarget.style.transform = 'translate(0, 0)';
-				e.currentTarget.style.boxShadow = '6px 6px 0px #0a0a0a';
 			}}>
 
 			{/* ── Illustration header ── */}

@@ -19,16 +19,6 @@ const CARD_BASE: React.CSSProperties = {
 	overflow: 'hidden',
 	display: 'flex',
 	flexDirection: 'column',
-	transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-};
-
-const hoverIn = (e: React.MouseEvent<HTMLElement>) => {
-	e.currentTarget.style.transform = 'translate(-2px, -2px)';
-	e.currentTarget.style.boxShadow = '8px 8px 0px #0a0a0a';
-};
-const hoverOut = (e: React.MouseEvent<HTMLElement>) => {
-	e.currentTarget.style.transform = 'translate(0, 0)';
-	e.currentTarget.style.boxShadow = '6px 6px 0px #0a0a0a';
 };
 
 function StaggerTags({ tags, style: tagStyle, shouldReduceMotion }: { tags: string[]; style: React.CSSProperties; shouldReduceMotion: boolean | null }) {
@@ -66,7 +56,7 @@ export default function Projects() {
 	});
 
 	return (
-		<section id='projects' style={{ background: '#f0ece8' }}>
+		<section id='projects' style={{ background: '#faf9f7' }}>
 			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 				<motion.div
 					initial={{ opacity: 0, y: 10 }}
@@ -114,9 +104,7 @@ export default function Projects() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.5, 0.14 + i * 0.1)}
-							className="card" style={CARD_BASE}
-							onMouseEnter={hoverIn}
-							onMouseLeave={hoverOut}>
+							className="card" data-cursor="view" style={CARD_BASE}>
 
 							{/* Illustration header — image */}
 							<div style={{ position: 'relative', height: 200, overflow: 'hidden', background: '#f0ece8' }}>
@@ -216,7 +204,7 @@ export default function Projects() {
 											<a href={project.demo} style={{
 												display: 'inline-flex', alignItems: 'center', gap: 6,
 												padding: '8px 16px',
-												background: project.color,
+												background: '#6366f1',
 												border: '1.5px solid #0a0a0a',
 												borderRadius: 10,
 												fontSize: 13, fontWeight: 700,
@@ -252,9 +240,7 @@ export default function Projects() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.45, 0.1 + i * 0.09)}
-							className="card" style={CARD_BASE}
-							onMouseEnter={hoverIn}
-							onMouseLeave={hoverOut}>
+							className="card" data-cursor="view" style={CARD_BASE}>
 
 							{/* Illustration header */}
 							<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', minHeight: 120, padding: '20px 24px' }}>
@@ -282,7 +268,7 @@ export default function Projects() {
 												</a>
 											)}
 											{project.demo && (
-												<a href={project.demo} style={{ width: 32, height: 32, borderRadius: 8, background: project.color, border: '1.5px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', textDecoration: 'none', boxShadow: '2px 2px 0px #0a0a0a', transition: 'all 0.2s ease' }}
+												<a href={project.demo} style={{ width: 32, height: 32, borderRadius: 8, background: '#6366f1', border: '1.5px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', textDecoration: 'none', boxShadow: '2px 2px 0px #0a0a0a', transition: 'all 0.2s ease' }}
 													onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a'; }}
 													onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #0a0a0a'; }}>
 													<ExternalLink size={14} />

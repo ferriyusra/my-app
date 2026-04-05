@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import ScrollProgress from '@/components/scroll-progress';
+import TiltEffect from '@/components/tilt-effect';
+import CustomCursor from '@/components/custom-cursor';
 
 export const metadata: Metadata = {
 	title: 'Ferri Yusra — Full Stack Engineer',
@@ -43,6 +45,8 @@ export default function RootLayout({
 			<body className='antialiased'>
 				<ThemeProvider>
 					<ScrollProgress />
+					<TiltEffect />
+					<CustomCursor />
 					{children}
 				</ThemeProvider>
 			</body>

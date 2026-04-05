@@ -226,16 +226,6 @@ const CARD_BASE: React.CSSProperties = {
 	overflow: 'hidden',
 	display: 'flex',
 	flexDirection: 'column',
-	transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-};
-
-const hoverIn = (e: React.MouseEvent<HTMLElement>) => {
-	e.currentTarget.style.transform = 'translate(-2px, -2px)';
-	e.currentTarget.style.boxShadow = '8px 8px 0px #0a0a0a';
-};
-const hoverOut = (e: React.MouseEvent<HTMLElement>) => {
-	e.currentTarget.style.transform = 'translate(0, 0)';
-	e.currentTarget.style.boxShadow = '6px 6px 0px #0a0a0a';
 };
 
 
@@ -253,7 +243,7 @@ export default function Skills() {
 	});
 
 	return (
-		<section id='skills' style={{ background: '#f0ece8' }}>
+		<section id='skills' style={{ background: '#faf9f7' }}>
 			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 				{/* Section label */}
 				<motion.div
@@ -317,8 +307,7 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.1)}
 						className="card" style={CARD_BASE}
-					onMouseEnter={hoverIn}
-					onMouseLeave={hoverOut}>
+>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
 							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
 								<Code2 size={36} style={{ color: '#10b981' }} aria-hidden='true' />
@@ -341,8 +330,7 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.18)}
 						className="card" style={CARD_BASE}
-					onMouseEnter={hoverIn}
-					onMouseLeave={hoverOut}>
+>
 						<div style={{ background: '#f0ece8', padding: '24px 20px 20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
 							{stackIcons.map((s) => (
 								<div key={s.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
@@ -371,8 +359,7 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.26)}
 						className="card" style={CARD_BASE}
-					onMouseEnter={hoverIn}
-					onMouseLeave={hoverOut}>
+>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
 							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
 								<Layers size={36} style={{ color: '#3b82f6' }} aria-hidden='true' />
@@ -395,8 +382,7 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.34)}
 						className="card" style={CARD_BASE}
-					onMouseEnter={hoverIn}
-					onMouseLeave={hoverOut}>
+>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
 							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
 								<Globe size={36} style={{ color: '#0ea5e9' }} aria-hidden='true' />
@@ -419,8 +405,7 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.42)}
 						className="card" style={CARD_BASE}
-					onMouseEnter={hoverIn}
-					onMouseLeave={hoverOut}>
+>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
 							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
 								<Zap size={36} style={{ color: '#f59e0b' }} aria-hidden='true' />
@@ -443,8 +428,7 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.5)}
 						className="card card-accent" style={{ ...CARD_BASE, background: '#fbbf24', alignItems: 'center', justifyContent: 'center', padding: '40px 28px', textAlign: 'center' as const, position: 'relative', overflow: 'hidden' }}
-					onMouseEnter={hoverIn}
-					onMouseLeave={hoverOut}>
+>
 						{/* Pulsing light glow */}
 						<motion.div
 							aria-hidden='true'

@@ -269,7 +269,7 @@ export default function Hero() {
 						marginBottom: 16,
 						letterSpacing: '-0.02em',
 					}}>
-					Currently Focused Full Stack Engineer Because AI Overpower :D
+					Currently Focused Learning Full Stack Engineer and Improve to DSA and System Design
 				</motion.p>
 
 				{/* Tagline */}
