@@ -1,6 +1,13 @@
 'use client';
 
+import { useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
+
+gsap.registerPlugin(ScrollTrigger, MorphSVGPlugin);
 
 const WAVES = [
 	'M0,40 C320,70 640,10 960,40 C1120,55 1280,30 1440,45 L1440,80 L0,80 Z',
@@ -20,9 +27,35 @@ export default function WaveDivider({
 	flip = false,
 }: WaveDividerProps) {
 	const shouldReduceMotion = useReducedMotion();
+	const dividerRef = useRef<HTMLDivElement>(null);
+	const pathRef = useRef<SVGPathElement>(null);
+
+	// MorphSVG — morph wave shape as user scrolls past
+	useGSAP(
+		() => {
+			if (shouldReduceMotion) return;
+			const path = pathRef.current;
+			if (!path) return;
+
+			const nextWave = WAVES[(variant + 1) % WAVES.length];
+
+			gsap.to(path, {
+				morphSVG: nextWave,
+				ease: 'none',
+				scrollTrigger: {
+					trigger: dividerRef.current,
+					start: 'top bottom',
+					end: 'bottom top',
+					scrub: 1,
+				},
+			});
+		},
+		{ scope: dividerRef, dependencies: [shouldReduceMotion, variant] },
+	);
 
 	return (
 		<motion.div
+			ref={dividerRef}
 			className={`wave-divider wave-${type}`}
 			aria-hidden='true'
 			initial={shouldReduceMotion ? false : { scaleY: 0, opacity: 0 }}
@@ -48,7 +81,7 @@ export default function WaveDivider({
 					display: 'block',
 					transform: flip ? 'scaleY(-1)' : undefined,
 				}}>
-				<path d={WAVES[variant % WAVES.length]} />
+				<path ref={pathRef} d={WAVES[variant % WAVES.length]} />
 			</svg>
 		</motion.div>
 	);

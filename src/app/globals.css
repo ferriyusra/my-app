@@ -27,7 +27,6 @@
 * { box-sizing: border-box; }
 
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 80px;
 }
 
@@ -132,43 +131,25 @@ section { padding: 96px 0; }
 }
 
 /* ═══════════════════════════════════════════════
-   GSAP HORIZONTAL SCROLL PROJECTS
+   MASONRY / BENTO GRID — PROJECTS
    ═══════════════════════════════════════════════ */
 
-/* Desktop: 100vh pinned layout */
-@media (min-width: 768px) {
-  .projects-inner {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 80px 0 40px;
-  }
-  .projects-track-wrapper {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    min-height: 0;
-  }
+.bento-grid {
+  column-count: 3;
+  column-gap: 20px;
 }
 
-/* Mobile: normal vertical flow */
-@media (max-width: 767px) {
-  .projects-inner {
-    height: auto !important;
-  }
-  .projects-track {
-    flex-direction: column !important;
-    padding: 0 24px !important;
-    gap: 20px !important;
-  }
-  .project-card {
-    width: 100% !important;
-  }
-  .projects-counter,
-  .projects-progress {
-    display: none !important;
-  }
+.bento-grid > * {
+  break-inside: avoid;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1024px) {
+  .bento-grid { column-count: 2; }
+}
+
+@media (max-width: 640px) {
+  .bento-grid { column-count: 1; }
 }
 
 /* ═══════════════════════════════════════════════

@@ -1,8 +1,15 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Download } from 'lucide-react';
 import MagneticButton from '@/components/magnetic-button';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+
+gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -15,16 +22,16 @@ const greetings = [
 ];
 
 const GEO_SIZES = [180, 300, 420, 540];
-const TYPING_SPEED = 55;
 const CYCLE_DELAY = 3400;
 
 export default function Hero() {
 	const [index, setIndex] = useState(0);
-	const [displayed, setDisplayed] = useState('');
-	const [typing, setTyping] = useState(true);
 	const shouldReduceMotion = useReducedMotion();
+	const textRef = useRef<HTMLSpanElement>(null);
+	const heroRef = useRef<HTMLElement>(null);
+	const scrambleTweenRef = useRef<gsap.core.Tween | null>(null);
 
-	// Auto-cycle
+	// Auto-cycle greetings
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setIndex((i) => (i + 1) % greetings.length);
@@ -32,35 +39,65 @@ export default function Hero() {
 		return () => clearInterval(timer);
 	}, []);
 
-	// Typing effect — reruns whenever index changes
+	// GSAP ScrambleText — replaces the old typing effect
 	useEffect(() => {
-		const text = greetings[index].text;
+		const el = textRef.current;
+		if (!el) return;
 
 		if (shouldReduceMotion) {
-			setDisplayed(text);
-			setTyping(false);
+			el.textContent = greetings[index].text;
 			return;
 		}
 
-		setDisplayed('');
-		setTyping(true);
-		let i = 0;
-		const timer = setInterval(() => {
-			i++;
-			setDisplayed(text.slice(0, i));
-			if (i >= text.length) {
-				clearInterval(timer);
-				setTyping(false);
-			}
-		}, TYPING_SPEED);
-		return () => clearInterval(timer);
+		scrambleTweenRef.current?.kill();
+		scrambleTweenRef.current = gsap.to(el, {
+			duration: 1.2,
+			scrambleText: {
+				text: greetings[index].text,
+				chars: '!<>-_\\/[]{}—=+*^?#01',
+				speed: 0.5,
+			},
+		});
 	}, [index, shouldReduceMotion]);
+
+	// GSAP: ring rotation + scroll parallax
+	useGSAP(
+		() => {
+			if (shouldReduceMotion === null || shouldReduceMotion) return;
+
+			GEO_SIZES.forEach((_, i) => {
+				const el = `.hero-ring-${i}`;
+
+				// Continuous rotation
+				gsap.to(el, {
+					rotation: i % 2 === 0 ? 360 : -360,
+					duration: 18 + i * 6,
+					repeat: -1,
+					ease: 'none',
+				});
+
+				// Parallax — rings drift up at different speeds as user scrolls
+				gsap.to(el, {
+					y: -(60 + i * 50),
+					ease: 'none',
+					scrollTrigger: {
+						trigger: heroRef.current,
+						start: 'top top',
+						end: 'bottom top',
+						scrub: true,
+					},
+				});
+			});
+		},
+		{ scope: heroRef, dependencies: [shouldReduceMotion] },
+	);
 
 	const current = greetings[index];
 
 	return (
 		<section
 			id='hero'
+			ref={heroRef}
 			style={{
 				minHeight: '100vh',
 				display: 'flex',
@@ -73,27 +110,20 @@ export default function Hero() {
 					'linear-gradient(160deg, #f0ece8 0%, #f9f7f5 60%, #ffffff 100%)',
 				paddingTop: 80,
 			}}>
-			{/* ── Geometric rotating rings ─────────────────────── */}
+			{/* ── Geometric rings — GSAP rotation + parallax ── */}
 			{GEO_SIZES.map((size, i) => (
-				<motion.div
+				<div
 					key={size}
+					className={`hero-ring-${i}`}
 					aria-hidden='true'
-					animate={
-						shouldReduceMotion ? {} : { rotate: i % 2 === 0 ? 360 : -360 }
-					}
-					transition={{
-						duration: 18 + i * 6,
-						repeat: Infinity,
-						ease: 'linear',
-					}}
 					style={{
 						position: 'absolute',
 						width: size,
 						height: size,
 						border: `1.5px solid rgba(10,10,10,${0.12 - i * 0.02})`,
 						borderRadius: 28,
-						rotate: 45,
 						pointerEvents: 'none',
+						willChange: 'transform',
 					}}
 				/>
 			))}
@@ -112,7 +142,7 @@ export default function Hero() {
 				}}
 			/>
 
-			{/* ── Content ──────────────────────────────────────── */}
+			{/* ── Content ── */}
 			<div
 				style={{
 					textAlign: 'center',
@@ -139,7 +169,6 @@ export default function Hero() {
 						marginBottom: 32,
 						cursor: 'default',
 					}}>
-					{/* Pulsing green dot */}
 					<span
 						style={{
 							position: 'relative',
@@ -149,9 +178,15 @@ export default function Hero() {
 						}}>
 						<motion.span
 							animate={
-								shouldReduceMotion ? {} : { scale: [1, 2], opacity: [0.6, 0] }
+								shouldReduceMotion
+									? {}
+									: { scale: [1, 2], opacity: [0.6, 0] }
 							}
-							transition={{ duration: 1.4, repeat: Infinity, ease: 'easeOut' }}
+							transition={{
+								duration: 1.4,
+								repeat: Infinity,
+								ease: 'easeOut',
+							}}
 							style={{
 								position: 'absolute',
 								inset: 0,
@@ -181,7 +216,7 @@ export default function Hero() {
 					</span>
 				</motion.div>
 
-				{/* Typing greeting */}
+				{/* Greeting — GSAP ScrambleText */}
 				<div
 					style={{
 						minHeight: 'clamp(56px, 12vw, 112px)',
@@ -203,11 +238,10 @@ export default function Hero() {
 							wordBreak: 'keep-all',
 							overflowWrap: 'break-word',
 						}}>
-						{displayed}
-						{/* Blinking cursor */}
+						<span ref={textRef}>{greetings[0].text}</span>
 						<span
 							aria-hidden='true'
-							className={typing ? 'cursor-blink' : 'cursor-hidden'}
+							className='cursor-blink'
 							style={{
 								display: 'inline-block',
 								width: '0.08em',
@@ -270,7 +304,8 @@ export default function Hero() {
 						marginBottom: 16,
 						letterSpacing: '-0.02em',
 					}}>
-					Currently Focused Learning Full Stack Engineer and Improve to DSA and System Design
+					Currently Focused Learning Full Stack Engineer and Improve to
+					DSA and System Design
 				</motion.p>
 
 				{/* Tagline */}
@@ -286,8 +321,8 @@ export default function Hero() {
 						margin: '0 auto 44px',
 						fontFamily: "'Inter', sans-serif",
 					}}>
-					Building production-grade web applications with React, Node.js, and
-					Golang. Fast, clean, and people love to use.
+					Building production-grade web applications with React,
+					Node.js, and Golang. Fast, clean, and people love to use.
 				</motion.p>
 
 				{/* CTA buttons */}
@@ -301,7 +336,6 @@ export default function Hero() {
 						justifyContent: 'center',
 						flexWrap: 'wrap',
 					}}>
-					{/* Primary — Download CV */}
 					<MagneticButton strength={0.3}>
 						<a
 							href='https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I'
@@ -323,17 +357,18 @@ export default function Hero() {
 								transition: 'all 0.2s ease',
 							}}
 							onMouseEnter={(e) => {
-								e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
+								e.currentTarget.style.boxShadow =
+									'4px 4px 0px #0a0a0a';
 							}}
 							onMouseLeave={(e) => {
-								e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+								e.currentTarget.style.boxShadow =
+									'3px 3px 0px #0a0a0a';
 							}}>
 							<Download size={16} aria-hidden='true' />
 							Download CV
 						</a>
 					</MagneticButton>
 
-					{/* Secondary — Let's Build Together */}
 					<MagneticButton strength={0.3}>
 						<a
 							href='#contact'
@@ -354,10 +389,12 @@ export default function Hero() {
 								transition: 'all 0.2s ease',
 							}}
 							onMouseEnter={(e) => {
-								e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
+								e.currentTarget.style.boxShadow =
+									'4px 4px 0px #0a0a0a';
 							}}
 							onMouseLeave={(e) => {
-								e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+								e.currentTarget.style.boxShadow =
+									'3px 3px 0px #0a0a0a';
 							}}>
 							<ArrowRight size={16} aria-hidden='true' />
 							Let&apos;s Build Together
@@ -369,7 +406,10 @@ export default function Hero() {
 				<motion.div
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
-					transition={{ delay: shouldReduceMotion ? 0 : 1.1, duration: 0.6 }}
+					transition={{
+						delay: shouldReduceMotion ? 0 : 1.1,
+						duration: 0.6,
+					}}
 					style={{
 						marginTop: 72,
 						display: 'flex',
@@ -387,8 +427,6 @@ export default function Hero() {
 						}}>
 						Scroll to explore
 					</span>
-
-					{/* Mouse scroll widget */}
 					<div
 						style={{
 							width: 26,

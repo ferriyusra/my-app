@@ -1,9 +1,13 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import { Code2, Zap, Globe, Briefcase, Layers } from 'lucide-react';
 import TextReveal from '@/components/text-reveal';
+import gsap from 'gsap';
+import { Flip } from 'gsap/all';
+
+gsap.registerPlugin(Flip);
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -230,12 +234,55 @@ const CARD_BASE: React.CSSProperties = {
 };
 
 
+/* ── Bento icon hover — GSAP powered ─────────────── */
+function handleBentoEnter(e: React.MouseEvent) {
+	const icon = (e.currentTarget as HTMLElement).querySelector('.bento-icon');
+	if (icon) gsap.to(icon, { scale: 1.18, rotate: 8, duration: 0.4, ease: 'back.out(2)' });
+}
+function handleBentoLeave(e: React.MouseEvent) {
+	const icon = (e.currentTarget as HTMLElement).querySelector('.bento-icon');
+	if (icon) gsap.to(icon, { scale: 1, rotate: 0, duration: 0.3, ease: 'power2.out' });
+}
+
 export default function Skills() {
 	const [active, setActive] = useState<Category>('All');
 	const [interacted, setInteracted] = useState(false);
 	const shouldReduceMotion = useReducedMotion();
 	const gridRef = useRef<HTMLDivElement>(null);
 	const gridInView = useInView(gridRef, { once: true, margin: '-80px' });
+	const flipStateRef = useRef<ReturnType<typeof Flip.getState> | null>(null);
+
+	const handleFilter = (cat: Category) => {
+		flipStateRef.current = Flip.getState('.skill-tag');
+		setActive(cat);
+		setInteracted(true);
+	};
+
+	// Flip animation after React re-renders
+	useLayoutEffect(() => {
+		if (!flipStateRef.current || shouldReduceMotion) {
+			flipStateRef.current = null;
+			return;
+		}
+
+		Flip.from(flipStateRef.current, {
+			duration: 0.5,
+			ease: 'power2.inOut',
+			stagger: 0.02,
+			absolute: true,
+			scale: true,
+			onEnter: (elements: Element[]) =>
+				gsap.fromTo(
+					elements,
+					{ opacity: 0, scale: 0.8 },
+					{ opacity: 1, scale: 1, duration: 0.4, stagger: 0.02 },
+				),
+			onLeave: (elements: Element[]) =>
+				gsap.to(elements, { opacity: 0, scale: 0.8, duration: 0.3 }),
+		});
+
+		flipStateRef.current = null;
+	}, [active, shouldReduceMotion]);
 
 	const t = (duration: number, delay: number) => ({
 		duration: shouldReduceMotion ? 0 : duration,
@@ -307,9 +354,10 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.1)}
 						className="card" style={CARD_BASE}
->
+						onMouseEnter={handleBentoEnter}
+						onMouseLeave={handleBentoLeave}>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
-							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
+							<div className="bento-icon" style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
 								<Code2 size={36} style={{ color: '#10b981' }} aria-hidden='true' />
 							</div>
 						</div>
@@ -330,7 +378,8 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.18)}
 						className="card" style={CARD_BASE}
->
+						onMouseEnter={handleBentoEnter}
+						onMouseLeave={handleBentoLeave}>
 						<div style={{ background: '#f0ece8', padding: '24px 20px 20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
 							{stackIcons.map((s) => (
 								<div key={s.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
@@ -359,9 +408,10 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.26)}
 						className="card" style={CARD_BASE}
->
+						onMouseEnter={handleBentoEnter}
+						onMouseLeave={handleBentoLeave}>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
-							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
+							<div className="bento-icon" style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
 								<Layers size={36} style={{ color: '#3b82f6' }} aria-hidden='true' />
 							</div>
 						</div>
@@ -382,9 +432,10 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.34)}
 						className="card" style={CARD_BASE}
->
+						onMouseEnter={handleBentoEnter}
+						onMouseLeave={handleBentoLeave}>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
-							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
+							<div className="bento-icon" style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
 								<Globe size={36} style={{ color: '#0ea5e9' }} aria-hidden='true' />
 							</div>
 						</div>
@@ -405,9 +456,10 @@ export default function Skills() {
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.42)}
 						className="card" style={CARD_BASE}
->
+						onMouseEnter={handleBentoEnter}
+						onMouseLeave={handleBentoLeave}>
 						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
-							<div style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
+							<div className="bento-icon" style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
 								<Zap size={36} style={{ color: '#f59e0b' }} aria-hidden='true' />
 							</div>
 						</div>
@@ -502,7 +554,7 @@ export default function Skills() {
 							return (
 								<button
 									key={cat}
-									onClick={() => { setActive(cat); setInteracted(true); }}
+									onClick={() => handleFilter(cat)}
 									style={{
 										padding: '8px 18px',
 										borderRadius: 10,
@@ -530,7 +582,7 @@ export default function Skills() {
 					</div>
 				</motion.div>
 
-				{/* Skill Tags Grid */}
+				{/* Skill Tags Grid — GSAP Flip */}
 				<div
 					ref={gridRef}
 					style={{
@@ -540,24 +592,25 @@ export default function Skills() {
 						padding: '32px 0 40px',
 						minHeight: 200,
 					}}>
-					{skills.map((skill, i) => {
-						const isMatch = active === 'All' || skill.category === active;
-						const entranceDelay = shouldReduceMotion ? 0 : (interacted ? 0 : i * 0.028);
+					{(active === 'All' ? skills : skills.filter((s) => s.category === active)).map((skill, i) => {
+						const entranceDelay = shouldReduceMotion ? 0 : interacted ? 0 : i * 0.028;
 						return (
 							<motion.div
 								key={skill.name}
+								data-flip-id={skill.name}
+								className='skill-tag'
 								initial={{ opacity: 0, y: 12, scale: 0.92 }}
-								animate={gridInView ? {
-									opacity: isMatch ? 1 : 0.18,
-									y: 0,
-									scale: isMatch ? 1 : 0.93,
-								} : { opacity: 0, y: 12, scale: 0.92 }}
-								whileHover={isMatch ? { x: -1, y: -1 } : {}}
+								animate={
+									gridInView
+										? { opacity: 1, y: 0, scale: 1 }
+										: { opacity: 0, y: 12, scale: 0.92 }
+								}
+								whileHover={{ x: -1, y: -1 }}
 								transition={{
 									opacity: { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
-									y:       { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
-									scale:   { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
-									x:       { duration: 0.15, ease: EASE },
+									y: { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
+									scale: { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
+									x: { duration: 0.15, ease: EASE },
 								}}
 								style={{
 									display: 'inline-flex',
@@ -572,7 +625,7 @@ export default function Skills() {
 									cursor: 'default',
 								}}
 								onMouseEnter={(e) => {
-									if (isMatch) e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+									e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
 								}}
 								onMouseLeave={(e) => {
 									e.currentTarget.style.boxShadow = '2px 2px 0px #0a0a0a';

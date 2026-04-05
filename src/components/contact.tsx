@@ -11,6 +11,7 @@ import {
 	MessageSquare,
 	AtSign,
 } from 'lucide-react';
+import gsap from 'gsap';
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -344,10 +345,10 @@ function FormFields({
 											required
 											style={inputBase}
 											onFocus={(e) =>
-												(e.currentTarget.style.borderColor = '#6366f1')
+												gsap.to(e.currentTarget, { borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.12)', duration: 0.3, ease: 'power2.out' })
 											}
 											onBlur={(e) =>
-												(e.currentTarget.style.borderColor = '#d4d4d4')
+												gsap.to(e.currentTarget, { borderColor: '#d4d4d4', boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.25, ease: 'power2.in' })
 											}
 										/>
 									</div>
@@ -388,10 +389,10 @@ function FormFields({
 											required
 											style={inputBase}
 											onFocus={(e) =>
-												(e.currentTarget.style.borderColor = '#6366f1')
+												gsap.to(e.currentTarget, { borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.12)', duration: 0.3, ease: 'power2.out' })
 											}
 											onBlur={(e) =>
-												(e.currentTarget.style.borderColor = '#d4d4d4')
+												gsap.to(e.currentTarget, { borderColor: '#d4d4d4', boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.25, ease: 'power2.in' })
 											}
 										/>
 									</div>
@@ -435,10 +436,10 @@ function FormFields({
 										placeholder='Project inquiry...'
 										style={inputBase}
 										onFocus={(e) =>
-											(e.currentTarget.style.borderColor = '#6366f1')
+											gsap.to(e.currentTarget, { borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.12)', duration: 0.3, ease: 'power2.out' })
 										}
 										onBlur={(e) =>
-											(e.currentTarget.style.borderColor = '#d4d4d4')
+											gsap.to(e.currentTarget, { borderColor: '#d4d4d4', boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.25, ease: 'power2.in' })
 										}
 									/>
 								</div>
@@ -474,10 +475,10 @@ function FormFields({
 										resize: 'vertical',
 									}}
 									onFocus={(e) =>
-										(e.currentTarget.style.borderColor = '#6366f1')
+										gsap.to(e.currentTarget, { borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.12)', duration: 0.3, ease: 'power2.out' })
 									}
 									onBlur={(e) =>
-										(e.currentTarget.style.borderColor = '#d4d4d4')
+										gsap.to(e.currentTarget, { borderColor: '#d4d4d4', boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.25, ease: 'power2.in' })
 									}
 								/>
 							</motion.div>

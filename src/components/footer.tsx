@@ -1,15 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
 	Mail,
 	Github,
 	Linkedin,
-	Twitter,
 	Send,
-	ArrowUpRight,
 } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
@@ -36,6 +39,27 @@ export default function Footer() {
 	const [email, setEmail] = useState('');
 	const [subscribed, setSubscribed] = useState(false);
 	const shouldReduceMotion = useReducedMotion();
+	const footerBodyRef = useRef<HTMLDivElement>(null);
+
+	useGSAP(
+		() => {
+			if (shouldReduceMotion) return;
+
+			gsap.from('.footer-col', {
+				y: 40,
+				opacity: 0,
+				duration: 0.6,
+				stagger: 0.15,
+				ease: 'power2.out',
+				scrollTrigger: {
+					trigger: footerBodyRef.current,
+					start: 'top 85%',
+					toggleActions: 'play none none none',
+				},
+			});
+		},
+		{ scope: footerBodyRef, dependencies: [shouldReduceMotion] },
+	);
 
 	const handleSubscribe = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -168,6 +192,7 @@ export default function Footer() {
 
 			{/* ── Dark footer body ── */}
 			<div
+				ref={footerBodyRef}
 				style={{
 					background: '#0a0a0a',
 					marginTop: 48,
@@ -185,7 +210,7 @@ export default function Footer() {
 							marginBottom: 56,
 						}}>
 						{/* Col 1: Brand */}
-						<div>
+						<div className='footer-col'>
 							<div
 								style={{
 									display: 'flex',
@@ -274,7 +299,7 @@ export default function Footer() {
 						</div>
 
 						{/* Col 2: Navigation */}
-						<div>
+						<div className='footer-col'>
 							<div
 								style={{
 									color: '#ffffff',
@@ -323,7 +348,7 @@ export default function Footer() {
 						</div>
 
 						{/* Col 3: Contact */}
-						<div>
+						<div className='footer-col'>
 							<div
 								style={{
 									color: '#ffffff',

@@ -1,9 +1,10 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Menu, X, Mail, Sun, Moon } from 'lucide-react';
 import { useTheme } from './theme-provider';
+import gsap from 'gsap';
 
 const navLinks = [
 	{ href: '#hero', label: 'Home', id: 'hero', page: false },
@@ -27,6 +28,8 @@ export default function Navbar() {
 	const [hovered, setHovered] = useState<string | null>(null);
 	const [isMobile, setIsMobile] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
+	const pillRef = useRef<HTMLDivElement>(null);
+	const linksRef = useRef<HTMLDivElement>(null);
 
 	const isHomePage = pathname === '/';
 
@@ -58,6 +61,30 @@ export default function Navbar() {
 		window.addEventListener('scroll', update, { passive: true });
 		return () => window.removeEventListener('scroll', update);
 	}, [isHomePage]);
+
+	// GSAP: Slide pill to active nav link
+	useEffect(() => {
+		if (!isHomePage || isMobile) return;
+		const pill = pillRef.current;
+		const container = linksRef.current;
+		if (!pill || !container) return;
+
+		const activeLink = container.querySelector(
+			`[data-nav="${activeSection}"]`,
+		) as HTMLElement;
+		if (!activeLink) return;
+
+		const containerRect = container.getBoundingClientRect();
+		const linkRect = activeLink.getBoundingClientRect();
+
+		gsap.to(pill, {
+			x: linkRect.left - containerRect.left,
+			width: linkRect.width,
+			opacity: 1,
+			duration: 0.4,
+			ease: 'power3.out',
+		});
+	}, [activeSection, isHomePage, isMobile]);
 
 	// Scroll detection for blur effect
 	useEffect(() => {
@@ -136,7 +163,23 @@ export default function Navbar() {
 				{!isMobile && (
 					<>
 						<div
-							style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+							ref={linksRef}
+							style={{ display: 'flex', alignItems: 'center', gap: 0, position: 'relative' }}>
+							{/* Sliding active pill */}
+							<div
+								ref={pillRef}
+								style={{
+									position: 'absolute',
+									top: 0,
+									left: 0,
+									height: '100%',
+									borderRadius: 100,
+									background: isDark ? '#333' : '#0a0a0a',
+									opacity: 0,
+									pointerEvents: 'none',
+									zIndex: 0,
+								}}
+							/>
 							{navLinks.map((link) => {
 								const resolvedHref =
 									!link.page && !isHomePage
@@ -155,28 +198,27 @@ export default function Navbar() {
 									fontSize: 14,
 									fontWeight: active ? 700 : 500,
 									fontFamily: "'Inter', sans-serif",
+									position: 'relative',
+									zIndex: 1,
 									color: active
 										? '#ffffff'
 										: hover
 											? textHoverColor
 											: textColor,
-									background: active
+									background: hover && !active
 										? isDark
-											? '#333'
-											: '#0a0a0a'
-										: hover
-											? isDark
-												? 'rgba(255,255,255,0.05)'
-												: 'rgba(0,0,0,0.05)'
-											: 'transparent',
+											? 'rgba(255,255,255,0.05)'
+											: 'rgba(0,0,0,0.05)'
+										: 'transparent',
 									transition:
-										'background 0.18s ease, color 0.18s ease',
+										'color 0.18s ease, background 0.18s ease',
 									whiteSpace: 'nowrap',
 								};
 								return link.page ? (
 									<Link
 										key={link.id}
 										href={resolvedHref}
+										data-nav={link.id}
 										onMouseEnter={() => setHovered(link.id)}
 										onMouseLeave={() => setHovered(null)}
 										style={linkStyle}>
@@ -186,6 +228,7 @@ export default function Navbar() {
 									<a
 										key={link.id}
 										href={resolvedHref}
+										data-nav={link.id}
 										onMouseEnter={() => setHovered(link.id)}
 										onMouseLeave={() => setHovered(null)}
 										style={linkStyle}>

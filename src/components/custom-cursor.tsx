@@ -1,85 +1,98 @@
 'use client';
-import { useEffect, useRef, useState, useCallback } from 'react';
+
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
 
 export default function CustomCursor() {
 	const dotRef = useRef<HTMLDivElement>(null);
 	const ringRef = useRef<HTMLDivElement>(null);
 	const labelRef = useRef<HTMLDivElement>(null);
-	const pos = useRef({ x: -100, y: -100 });
-	const target = useRef({ x: -100, y: -100 });
-	const raf = useRef<number>(0);
 	const [visible, setVisible] = useState(false);
 
-	const lerp = (a: number, b: number, n: number) => a + (a - b) * -n;
-
-	const animate = useCallback(() => {
-		pos.current.x = lerp(pos.current.x, target.current.x, 0.15);
-		pos.current.y = lerp(pos.current.y, target.current.y, 0.15);
-
-		if (dotRef.current) {
-			dotRef.current.style.transform = `translate(${target.current.x}px, ${target.current.y}px)`;
+	useEffect(() => {
+		if (window.matchMedia('(pointer: fine)').matches) {
+			setVisible(true);
 		}
-		if (ringRef.current) {
-			ringRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px)`;
-		}
-		if (labelRef.current) {
-			labelRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px)`;
-		}
-
-		raf.current = requestAnimationFrame(animate);
 	}, []);
 
 	useEffect(() => {
-		// Only show on devices with a fine pointer (no touch)
-		const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
-		if (!hasFinePointer) return;
+		if (!visible) return;
 
-		setVisible(true);
+		const dot = dotRef.current;
+		const ring = ringRef.current;
+		const label = labelRef.current;
+		if (!dot || !ring || !label) return;
+
 		document.documentElement.classList.add('custom-cursor-active');
 
+		// GSAP quickTo — GPU-accelerated, buttery smooth
+		const dotX = gsap.quickTo(dot, 'x', {
+			duration: 0.12,
+			ease: 'power3',
+		});
+		const dotY = gsap.quickTo(dot, 'y', {
+			duration: 0.12,
+			ease: 'power3',
+		});
+		const ringX = gsap.quickTo(ring, 'x', {
+			duration: 0.45,
+			ease: 'power3',
+		});
+		const ringY = gsap.quickTo(ring, 'y', {
+			duration: 0.45,
+			ease: 'power3',
+		});
+		const labelX = gsap.quickTo(label, 'x', {
+			duration: 0.4,
+			ease: 'power3',
+		});
+		const labelY = gsap.quickTo(label, 'y', {
+			duration: 0.4,
+			ease: 'power3',
+		});
+
 		const onMouseMove = (e: MouseEvent) => {
-			target.current = { x: e.clientX, y: e.clientY };
+			dotX(e.clientX);
+			dotY(e.clientY);
+			ringX(e.clientX);
+			ringY(e.clientY);
+			labelX(e.clientX);
+			labelY(e.clientY);
 		};
 
 		const onMouseOver = (e: MouseEvent) => {
 			const el = e.target as HTMLElement;
-
-			// Check for project card
-			const projectCard = el.closest('[data-cursor="view"]');
-			if (projectCard) {
-				ringRef.current?.classList.add('cursor-expanded');
-				labelRef.current?.classList.add('cursor-label-visible');
+			if (el.closest('[data-cursor="view"]')) {
+				ring.classList.add('cursor-expanded');
+				label.classList.add('cursor-label-visible');
 				return;
 			}
-
-			// Check for interactive elements
-			const interactive = el.closest('a, button, [role="button"], input, textarea, select, [data-cursor="interactive"]');
-			if (interactive) {
-				ringRef.current?.classList.add('cursor-hover');
-				return;
+			if (
+				el.closest(
+					'a, button, [role="button"], input, textarea, select, [data-cursor="interactive"]',
+				)
+			) {
+				ring.classList.add('cursor-hover');
 			}
 		};
 
 		const onMouseOut = (e: MouseEvent) => {
 			const el = e.target as HTMLElement;
-			const projectCard = el.closest('[data-cursor="view"]');
-			const interactive = el.closest('a, button, [role="button"], input, textarea, select, [data-cursor="interactive"]');
-
-			if (projectCard) {
-				ringRef.current?.classList.remove('cursor-expanded');
-				labelRef.current?.classList.remove('cursor-label-visible');
+			if (el.closest('[data-cursor="view"]')) {
+				ring.classList.remove('cursor-expanded');
+				label.classList.remove('cursor-label-visible');
 			}
-			if (interactive) {
-				ringRef.current?.classList.remove('cursor-hover');
+			if (
+				el.closest(
+					'a, button, [role="button"], input, textarea, select, [data-cursor="interactive"]',
+				)
+			) {
+				ring.classList.remove('cursor-hover');
 			}
 		};
 
-		const onMouseDown = () => {
-			ringRef.current?.classList.add('cursor-click');
-		};
-		const onMouseUp = () => {
-			ringRef.current?.classList.remove('cursor-click');
-		};
+		const onMouseDown = () => ring.classList.add('cursor-click');
+		const onMouseUp = () => ring.classList.remove('cursor-click');
 
 		window.addEventListener('mousemove', onMouseMove);
 		document.addEventListener('mouseover', onMouseOver);
@@ -87,24 +100,21 @@ export default function CustomCursor() {
 		document.addEventListener('mousedown', onMouseDown);
 		document.addEventListener('mouseup', onMouseUp);
 
-		raf.current = requestAnimationFrame(animate);
-
 		return () => {
 			window.removeEventListener('mousemove', onMouseMove);
 			document.removeEventListener('mouseover', onMouseOver);
 			document.removeEventListener('mouseout', onMouseOut);
 			document.removeEventListener('mousedown', onMouseDown);
 			document.removeEventListener('mouseup', onMouseUp);
-			cancelAnimationFrame(raf.current);
+			gsap.killTweensOf([dot, ring, label]);
 			document.documentElement.classList.remove('custom-cursor-active');
 		};
-	}, [animate]);
+	}, [visible]);
 
 	if (!visible) return null;
 
 	return (
 		<>
-			{/* Inner dot */}
 			<div
 				ref={dotRef}
 				style={{
@@ -120,10 +130,9 @@ export default function CustomCursor() {
 					willChange: 'transform',
 				}}
 			/>
-			{/* Outer ring */}
 			<div
 				ref={ringRef}
-				className="cursor-ring"
+				className='cursor-ring'
 				style={{
 					position: 'fixed',
 					top: -20,
@@ -135,13 +144,14 @@ export default function CustomCursor() {
 					pointerEvents: 'none',
 					zIndex: 99998,
 					willChange: 'transform',
-					transition: 'width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease, border-color 0.3s ease, background 0.3s ease, opacity 0.3s ease',
+					transition:
+						'width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease, border-color 0.3s ease, background 0.3s ease, opacity 0.3s ease',
 				}}
 			/>
 			{/* "View" label */}
 			<div
 				ref={labelRef}
-				className="cursor-label"
+				className='cursor-label'
 				style={{
 					position: 'fixed',
 					top: -10,
@@ -151,8 +161,7 @@ export default function CustomCursor() {
 					opacity: 0,
 					willChange: 'transform',
 					transition: 'opacity 0.3s ease',
-				}}
-			>
+				}}>
 				<span
 					style={{
 						display: 'block',
@@ -164,8 +173,7 @@ export default function CustomCursor() {
 						textTransform: 'uppercase',
 						whiteSpace: 'nowrap',
 						textAlign: 'center',
-					}}
-				>
+					}}>
 					View
 				</span>
 			</div>

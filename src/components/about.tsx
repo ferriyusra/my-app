@@ -1,14 +1,7 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import {
-	motion,
-	useMotionValue,
-	useTransform,
-	animate,
-	useInView,
-	useReducedMotion,
-} from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
 	MapPin,
 	Calendar,
@@ -20,29 +13,45 @@ import {
 	Activity,
 } from 'lucide-react';
 import TextReveal from '@/components/text-reveal';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 function CountUp({ to, suffix = '' }: { to: number; suffix?: string }) {
-	const ref = useRef<HTMLSpanElement>(null);
-	const motionVal = useMotionValue(0);
-	const rounded = useTransform(motionVal, (v) => Math.round(v));
-	const isInView = useInView(ref, { once: true, margin: '-80px' });
+	const wrapRef = useRef<HTMLSpanElement>(null);
+	const numRef = useRef<HTMLSpanElement>(null);
 	const shouldReduceMotion = useReducedMotion();
 
-	useEffect(() => {
-		if (isInView) {
-			if (shouldReduceMotion) {
-				motionVal.set(to);
-			} else {
-				animate(motionVal, to, { duration: 1.4, ease: [0.25, 0.1, 0.25, 1] });
-			}
-		}
-	}, [isInView, motionVal, to, shouldReduceMotion]);
+	useGSAP(
+		() => {
+			const numEl = numRef.current;
+			if (!numEl) return;
+
+			const obj = { val: 0 };
+			gsap.to(obj, {
+				val: to,
+				duration: shouldReduceMotion ? 0 : 1.8,
+				ease: 'power2.out',
+				scrollTrigger: {
+					trigger: wrapRef.current,
+					start: 'top 85%',
+					toggleActions: 'play none none none',
+				},
+				onUpdate: () => {
+					numEl.textContent = Math.round(obj.val).toString();
+				},
+			});
+		},
+		{ scope: wrapRef },
+	);
 
 	return (
 		<span
-			ref={ref}
+			ref={wrapRef}
 			style={{ display: 'inline', fontVariantNumeric: 'tabular-nums' }}>
-			<motion.span>{rounded}</motion.span>
+			<span ref={numRef}>0</span>
 			{suffix}
 		</span>
 	);
@@ -399,11 +408,11 @@ export default function About() {
 											fontFamily: "'JetBrains Mono', monospace",
 											fontWeight: 600,
 										}}>
-										Availble from April 2026
+										Available from April 2026
 									</span>
 								</div>
 								<a
-									href='/https://drive.google.com/file/d/1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I/view?usp=sharing'
+									href='https://drive.google.com/file/d/1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I/view?usp=sharing'
 									style={{
 										display: 'inline-flex',
 										alignItems: 'center',

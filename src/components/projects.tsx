@@ -31,6 +31,7 @@ const HEADING_STYLE: React.CSSProperties = {
 	fontFamily: "'Inter', sans-serif",
 	color: '#0a0a0a',
 	letterSpacing: '-0.02em',
+	marginBottom: 48,
 };
 
 /* ── Generated Placeholder ────────────────────────── */
@@ -47,7 +48,6 @@ function CoverPlaceholder({ project }: { project: Project }) {
 				justifyContent: 'center',
 				gap: 14,
 			}}>
-			{/* Large initial badge */}
 			<div
 				style={{
 					width: 72,
@@ -71,7 +71,6 @@ function CoverPlaceholder({ project }: { project: Project }) {
 					{project.initial}
 				</span>
 			</div>
-			{/* Mini tech pills */}
 			<div
 				style={{
 					display: 'flex',
@@ -100,18 +99,17 @@ function CoverPlaceholder({ project }: { project: Project }) {
 	);
 }
 
-/* ── Project Card ─────────────────────────────────── */
-function ProjectCard({ project }: { project: Project }) {
+/* ── Bento Card ───────────────────────────────────── */
+function BentoCard({ project }: { project: Project }) {
 	const badge = TYPE_BADGE[project.type];
 	const [imgError, setImgError] = useState(false);
+	const isFeatured = project.featured;
 
 	return (
 		<div
 			className='project-card card'
 			data-cursor='view'
 			style={{
-				width: 420,
-				flexShrink: 0,
 				background: '#ffffff',
 				border: '2px solid #0a0a0a',
 				borderRadius: 20,
@@ -120,15 +118,15 @@ function ProjectCard({ project }: { project: Project }) {
 				display: 'flex',
 				flexDirection: 'column',
 			}}>
-			{/* Cover image */}
+			{/* Cover */}
 			<div
 				style={{
 					position: 'relative',
-					height: 200,
+					height: isFeatured ? 260 : 180,
 					overflow: 'hidden',
 					background: '#f0ece8',
 				}}>
-				{imgError ? (
+				{!project.cover || imgError ? (
 					<CoverPlaceholder project={project} />
 				) : (
 					/* eslint-disable-next-line @next/next/no-img-element */
@@ -161,7 +159,7 @@ function ProjectCard({ project }: { project: Project }) {
 					}}>
 					{badge.label}
 				</div>
-				{project.featured && (
+				{isFeatured && (
 					<div
 						style={{
 							position: 'absolute',
@@ -199,7 +197,7 @@ function ProjectCard({ project }: { project: Project }) {
 					}}>
 					<h3
 						style={{
-							fontSize: 18,
+							fontSize: isFeatured ? 20 : 17,
 							fontWeight: 800,
 							fontFamily: "'Inter', sans-serif",
 							color: '#0a0a0a',
@@ -234,7 +232,7 @@ function ProjectCard({ project }: { project: Project }) {
 						marginBottom: 16,
 						fontFamily: "'Inter', sans-serif",
 						display: '-webkit-box',
-						WebkitLineClamp: 3,
+						WebkitLineClamp: isFeatured ? 4 : 2,
 						WebkitBoxOrient: 'vertical',
 						overflow: 'hidden',
 					}}>
@@ -249,7 +247,7 @@ function ProjectCard({ project }: { project: Project }) {
 						gap: 6,
 						marginBottom: 18,
 					}}>
-					{project.tech.slice(0, 4).map((t) => (
+					{project.tech.slice(0, isFeatured ? 5 : 3).map((t) => (
 						<span
 							key={t}
 							style={{
@@ -290,12 +288,15 @@ function ProjectCard({ project }: { project: Project }) {
 									transition: 'all 0.2s ease',
 								}}
 								onMouseEnter={(e) => {
-									e.currentTarget.style.transform = 'translate(-1px,-1px)';
-									e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+									e.currentTarget.style.transform =
+										'translate(-1px,-1px)';
+									e.currentTarget.style.boxShadow =
+										'3px 3px 0px #0a0a0a';
 								}}
 								onMouseLeave={(e) => {
 									e.currentTarget.style.transform = 'translate(0,0)';
-									e.currentTarget.style.boxShadow = '2px 2px 0px #0a0a0a';
+									e.currentTarget.style.boxShadow =
+										'2px 2px 0px #0a0a0a';
 								}}>
 								<Github size={14} /> Code
 							</a>
@@ -320,12 +321,15 @@ function ProjectCard({ project }: { project: Project }) {
 									transition: 'all 0.2s ease',
 								}}
 								onMouseEnter={(e) => {
-									e.currentTarget.style.transform = 'translate(-1px,-1px)';
-									e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+									e.currentTarget.style.transform =
+										'translate(-1px,-1px)';
+									e.currentTarget.style.boxShadow =
+										'3px 3px 0px #0a0a0a';
 								}}
 								onMouseLeave={(e) => {
 									e.currentTarget.style.transform = 'translate(0,0)';
-									e.currentTarget.style.boxShadow = '2px 2px 0px #0a0a0a';
+									e.currentTarget.style.boxShadow =
+										'2px 2px 0px #0a0a0a';
 								}}>
 								<ExternalLink size={14} /> Live Demo
 							</a>
@@ -337,78 +341,32 @@ function ProjectCard({ project }: { project: Project }) {
 	);
 }
 
-/* ── Projects Section ─────────────────────────────── */
+/* ── Projects Section — Bento Grid ────────────────── */
 export default function Projects() {
 	const sectionRef = useRef<HTMLElement>(null);
-	const trackRef = useRef<HTMLDivElement>(null);
-	const progressRef = useRef<HTMLDivElement>(null);
-	const counterRef = useRef<HTMLSpanElement>(null);
 
+	// GSAP staggered entrance
 	useGSAP(
 		() => {
-			const mm = gsap.matchMedia();
+			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+				return;
 
-			mm.add('(min-width: 768px)', () => {
-				const track = trackRef.current;
-				const section = sectionRef.current;
-				if (!track || !section) return;
-
-				const scrollDistance =
-					track.scrollWidth - section.offsetWidth + 48;
-
-				const scrollTween = gsap.to(track, {
-					x: -scrollDistance,
-					ease: 'none',
-					scrollTrigger: {
-						trigger: section,
-						pin: true,
-						scrub: 1,
-						end: () => `+=${scrollDistance}`,
-						invalidateOnRefresh: true,
-						onUpdate: (self) => {
-							if (progressRef.current) {
-								progressRef.current.style.width = `${self.progress * 100}%`;
-							}
-							if (counterRef.current) {
-								const idx = Math.min(
-									Math.floor(self.progress * projects.length),
-									projects.length - 1,
-								);
-								counterRef.current.textContent = String(idx + 1).padStart(
-									2,
-									'0',
-								);
-							}
-						},
-					},
-				});
-
-				// Card entrance animations within horizontal scroll
-				gsap.utils
-					.toArray<HTMLElement>('.project-card')
-					.forEach((card) => {
-						gsap.fromTo(
-							card,
-							{ opacity: 0.2, y: 40 },
-							{
-								opacity: 1,
-								y: 0,
-								scrollTrigger: {
-									trigger: card,
-									containerAnimation: scrollTween,
-									start: 'left 95%',
-									end: 'left 65%',
-									scrub: true,
-								},
-							},
-						);
-					});
+			gsap.from('.project-card', {
+				y: 60,
+				opacity: 0,
+				duration: 0.7,
+				stagger: 0.1,
+				ease: 'power2.out',
+				scrollTrigger: {
+					trigger: sectionRef.current,
+					start: 'top 70%',
+					toggleActions: 'play none none none',
+				},
 			});
 		},
 		{ scope: sectionRef },
 	);
 
-	// Order: featured first, then others
 	const ordered = [
 		...projects.filter((p) => p.featured),
 		...projects.filter((p) => !p.featured),
@@ -418,94 +376,22 @@ export default function Projects() {
 		<section
 			id='projects'
 			ref={sectionRef}
-			style={{ background: '#faf9f7', overflow: 'hidden' }}>
-			<div className='projects-inner'>
-				{/* Header */}
-				<div
-					className='projects-header'
-					style={{
-						maxWidth: 1200,
-						margin: '0 auto',
-						padding: '0 24px',
-						display: 'flex',
-						justifyContent: 'space-between',
-						alignItems: 'flex-end',
-						flexWrap: 'wrap',
-						gap: 16,
-						marginBottom: 40,
-					}}>
-					<div>
-						<TextReveal
-							parts={[
-								{ text: "Things I've " },
-								{ text: 'Built', color: '#6366f1' },
-							]}
-							as='h2'
-							style={HEADING_STYLE}
-						/>
-					</div>
+			style={{ background: '#faf9f7' }}>
+			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+				<TextReveal
+					parts={[
+						{ text: "Things I've " },
+						{ text: 'Built', color: '#6366f1' },
+					]}
+					as='h2'
+					style={HEADING_STYLE}
+				/>
 
-					{/* Counter — desktop only */}
-					<div
-						className='projects-counter'
-						style={{
-							fontFamily: "'JetBrains Mono', monospace",
-							fontSize: 14,
-							color: '#a3a3a3',
-							fontWeight: 600,
-							letterSpacing: '0.05em',
-						}}>
-						<span ref={counterRef} style={{ color: '#6366f1', fontSize: 28, fontWeight: 800 }}>
-							01
-						</span>{' '}
-						/ {String(projects.length).padStart(2, '0')}
-					</div>
-				</div>
-
-				{/* Track wrapper — fills remaining vertical space, centers cards */}
-				<div className='projects-track-wrapper'>
-					<div
-						ref={trackRef}
-						className='projects-track'
-						style={{
-							display: 'flex',
-							gap: 28,
-							paddingLeft:
-								'max(24px, calc((100vw - 1200px) / 2 + 24px))',
-							paddingRight: 200,
-							alignItems: 'stretch',
-						}}>
-						{ordered.map((project) => (
-							<ProjectCard key={project.id} project={project} />
-						))}
-					</div>
-				</div>
-
-				{/* Progress bar — desktop only */}
-				<div
-					className='projects-progress'
-					style={{
-						maxWidth: 1200,
-						margin: '32px auto 0',
-						padding: '0 24px',
-					}}>
-					<div
-						style={{
-							height: 3,
-							background: '#e5e5e5',
-							borderRadius: 2,
-							overflow: 'hidden',
-						}}>
-						<div
-							ref={progressRef}
-							style={{
-								height: '100%',
-								width: '0%',
-								background: '#6366f1',
-								borderRadius: 2,
-							}}
-						/>
-					</div>
+				{/* Bento Grid */}
+				<div className='bento-grid'>
+					{ordered.map((project) => (
+						<BentoCard key={project.id} project={project} />
+					))}
 				</div>
 			</div>
 		</section>

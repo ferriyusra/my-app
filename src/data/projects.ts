@@ -55,8 +55,8 @@ export const projects: Project[] = [
 		name: 'HRIS App',
 		description:
 			'A full-stack HRIS (Human Resource Information System) that centralizes employee management, attendance tracking (clock-in/out with auto status detection), leave request & approval workflows, payroll processing with payslip generation, and online salary disbursement via Midtrans. Features real-time dashboards powered by Supabase Realtime, role-based access control, dual-layer validation, dark mode, and an employee self-service portal.',
-		cover: '/projects/hris/hris-1.png',
-		images: ['/projects/hris/hris-1.png'],
+		cover: '',
+		images: [],
 		tech: [
 			'Next.js 15',
 			'React 19',
@@ -83,7 +83,7 @@ export const projects: Project[] = [
 		name: 'Acara',
 		description:
 			'Learning to fullstack development using MERN Stack.',
-		cover: '/projects/acara/ac-1.webp',
+		cover: '',
 		images: [
 			'/projects/acara/ac-1.webp',
 			'/projects/acara/ac-2.webp',
@@ -120,7 +120,7 @@ export const projects: Project[] = [
 		name: 'Tracer Study',
 		description:
 			'Create website for tracing the student after graduate to tracking data by using quisionare and give them information about job vaccanies and redirect to the third party job portal to easly apply.',
-		cover: '/projects/layanan-karir/lk-1.webp',
+		cover: '',
 		images: [
 			'/projects/layanan-karir/lk-1.webp',
 			'/projects/layanan-karir/lk-2.webp',
@@ -140,7 +140,7 @@ export const projects: Project[] = [
 		name: 'Mini Crowdfounding',
 		description:
 			'Create Mini Crowdfunding Website for implementation MERN Stack to implement after finish course MERN Stack.',
-		cover: '/projects/crowdfounding/cf-1.webp',
+		cover: '',
 		images: [
 			'/projects/crowdfounding/cf-1.webp',
 			'/projects/crowdfounding/cf-2.webp',
@@ -160,11 +160,11 @@ export const projects: Project[] = [
 		name: 'GIS Platform',
 		description:
 			'Create the web application to integrate GIS to the web app using minimum library map, and showing the data base on lang and lat coordinate.',
-		cover: '/projects/gis/gis-1.webp',
+		cover: '',
 		images: ['/projects/gis/gis-1.webp'],
 		tech: ['PHP', 'Codeigniter 3', 'Leaflet', 'MySQL'],
-		github: 'https://github.com',
-		demo: 'https://example.com',
+		github: null,
+		demo: null,
 		featured: false,
 		color: '#7c3aed',
 		initial: 'GI',
