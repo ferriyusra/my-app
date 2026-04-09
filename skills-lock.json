@@ -6,6 +6,16 @@
       "sourceType": "github",
       "computedHash": "932ef23b5d0a0aa4a89e51a9bde1217fb987d35fe2c1d5fe51c3090938ac4bd8"
     },
+    "gsap-core": {
+      "source": "greensock/gsap-skills",
+      "sourceType": "github",
+      "computedHash": "c4a01101d9e1aafbf4b49f75d74f9349790d8741981ba0237c990093863035a6"
+    },
+    "gsap-react": {
+      "source": "greensock/gsap-skills",
+      "sourceType": "github",
+      "computedHash": "7d3b52822681a4158e371f895c58fb7030ecaf33f585a534b7162f9e92c5d893"
+    },
     "nextjs-best-practices": {
       "source": "sickn33/antigravity-awesome-skills",
       "sourceType": "github",
