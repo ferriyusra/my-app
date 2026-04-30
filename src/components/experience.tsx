@@ -138,7 +138,7 @@ const experiences = [
 	{
 		role: 'Software Engineer Backend',
 		company: 'PT Jojonomic Prima Indonesia',
-		period: 'TBD — please confirm',
+		period: 'October 2021 — January 2022',
 		badge: 'Previous Role' as const,
 		location: 'Jakarta, Indonesia',
 		color: '#ec4899',
