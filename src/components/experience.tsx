@@ -23,11 +23,13 @@ const experiences = [
 		glow: '#818cf8',
 		initial: 'MT',
 		description:
-			'Designed and developed backend systems for finance-related platforms using Go (Gin Framework) and PostgreSQL, supporting finance operations and data-driven decision-making. Managed KrakenD API Gateway and Keycloak IAM for secure API routing, authentication, and RBAC.',
+			'Designed and developed backend systems for finance-related platforms using Go (Gin Framework) and PostgreSQL, delivering core services (ASO Database, ASO Notification Below Threshold) that replaced manual spreadsheet-based tracking and became the single source of truth for finance operations.',
 		achievements: [
-			'Enabled the Finance Team to manage and monitor data for ~160 ASO entities, supporting billing and payment collection workflows.',
-			'Implemented event-driven automation via Google Pub/Sub and Cloud Scheduler, improving service reliability and operational efficiency.',
-			'Contributed to internal CMS tools with React and Material UI, streamlining workflows for non-technical stakeholders.',
+			'Built and maintained RESTful API services powering financial workflows for ~160 ASO entities, enabling the Finance Team to manage and monitor structured, real-time data used directly for billing and payment collection.',
+			'Automated threshold-based financial notifications and scheduled billing processes with an event-driven architecture using Google Pub/Sub and Cloud Scheduler, eliminating recurring manual monitoring tasks previously done by the Finance Team.',
+			'Configured and managed KrakenD API Gateway and Keycloak IAM with role-based access control across multiple internal services and user roles, centralizing access management and reducing security-misconfiguration risk.',
+			'Developed internal CMS tools using React and Material UI, giving non-technical stakeholders direct visibility into financial data and streamlining workflows that previously required engineering support.',
+			'Accelerated feature delivery and improved code consistency by integrating AI-assisted coding and review tools (Anthropic Claude) into daily refactoring, documentation, and implementation workflows — ~20–30% productivity gain on routine engineering tasks.',
 		],
 		tech: [
 			'Go',
@@ -52,11 +54,13 @@ const experiences = [
 		glow: '#34d399',
 		initial: 'ID',
 		description:
-			'Backend Engineer at GovTech Health, responsible for end-to-end development of health data products. Built API services for SATUSEHAT Data Product handling 20,000–40,000 requests/month and collaborated with BI team to deliver web-based dashboard solutions.',
+			"Primary backend engineer on multiple health data products under SATUSEHAT — Indonesia's national health data interoperability platform — collaborating with Product Managers, Technical Program Managers, and cross-functional stakeholders to deliver backend systems supporting national-scale health data initiatives.",
 		achievements: [
-			'Migrated multiple Tableau dashboards into native API-driven solutions, reducing Tableau dependency and improving load performance.',
-			'Delivered major dashboard revamps including Monitoring Implementasi SATUSEHAT, Penyakit Tidak Menular, and Pemantauan Aliran Data.',
-			'Built and optimized backend services using NestJS and Go with clean architecture, integrating BigQuery, MongoDB, and Redis for caching.',
+			'Maintained and extended API services for the SATUSEHAT Data Product in Node.js (NestJS) and PostgreSQL, developing new endpoints and improvements to ensure reliable data exchange and support evolving requirements for nationwide health data integration.',
+			'Built dedicated API layers in Go (Gin Framework) integrating PostgreSQL, Google BigQuery, MongoDB, and Redis caching to power web-based dashboards for the Business Intelligence team, enabling near real-time access to large-scale health datasets.',
+			"Continued the migration of legacy Tableau dashboards into fully native, API-driven solutions by developing the backend services that replaced Tableau's data layer, further reducing third-party licensing costs and improving dashboard performance.",
+			'Developed and maintained backend services in Go and Node.js powering native dashboards — including Penyakit Tidak Menular and Pemantauan Aliran Data SATUSEHAT — working alongside frontend engineers to deliver dashboards used by stakeholders to monitor and analyze national health data flows.',
+			"Implemented Datadog monitoring for backend services following the company's observability standards, enabling API performance and error-rate tracking to support proactive issue detection.",
 		],
 		tech: [
 			'Go',
@@ -81,11 +85,12 @@ const experiences = [
 		glow: '#60a5fa',
 		initial: 'HT',
 		description:
-			'Owned end-to-end backend development for multiple data-driven products, collaborating with product managers, data analysts, and frontend engineers to design interactive web-based dashboards.',
+			'Primary backend engineer on multiple data-driven products under the Health Technology Transformation initiative, collaborating with Product Managers, Data Analysts, and frontend engineers to deliver internal web-based dashboard solutions for operational teams.',
 		achievements: [
-			'Delivered key dashboard migrations including Gerakan Anak Sehat, Covid-19 Vaksin, Morbiditas Pasien, and Monitoring Implementasi SATUSEHAT.',
-			'Designed scalable API services using Go and TypeScript (Next.js) integrating PostgreSQL, BigQuery, and MongoDB for high-performance data visualization.',
-			'Backend APIs handled 15,000–30,000 requests/month while reducing Tableau licensing costs.',
+			'Designed and developed scalable API services in Go (Gin Framework) integrating PostgreSQL, Google BigQuery, and MongoDB to power interactive dashboards used by analysts and operational stakeholders, complemented by a Next.js API endpoint built to proxy requests to an external data source.',
+			"Contributed to the initial migration of legacy Tableau dashboards into fully native, in-house dashboard solutions by developing the backend services that replaced Tableau's data layer — reducing Tableau dependency, lowering licensing costs, and improving performance and long-term maintainability.",
+			'Developed and maintained backend services for key dashboard deliveries — including Gerakan Anak Sehat, Covid-19 Vaksin, Morbiditas Pasien, Kualitas Internet Survey & Monitoring, and the initial release of Monitoring Implementasi SATUSEHAT — working alongside frontend engineers to deliver dashboards used by Ministry of Health stakeholders.',
+			"Implemented Datadog monitoring for backend services following the company's observability standards, enabling API performance and error-rate tracking to support proactive issue detection.",
 		],
 		tech: [
 			'Go',
@@ -110,11 +115,12 @@ const experiences = [
 		glow: '#fbbf24',
 		initial: 'MD',
 		description:
-			'Built end-to-end backend API services across multiple core product lines including Crash Program, Referral Program, Survey Program, and Academy Program, supporting 5,000–16,000 active users.',
+			'Implemented backend systems alongside Engineering Managers and Senior Software Engineers, translating technical designs and product requirements into reliable and scalable engineering solutions across multiple product lines.',
 		achievements: [
-			'Integrated Apache Kafka for event-driven message publishing, enabling scalable async processing and improved system decoupling.',
-			'Improved test coverage with unit tests using Mocha, Chai, and Jest for Express-based services, reducing production incidents.',
-			'Actively participated in peer code reviews, upholding engineering standards and reducing technical debt across backend services.',
+			'Contributed to backend API services across multiple core product lines — including Crash Program, Referral Program, Survey Program, Academy Program, Banner Program, Second Inspection Program, and Open Production Issue Tools — using Node.js (Express.js) and Go with MySQL, PostgreSQL, and MongoDB integrations to support diverse business and operational workflows.',
+			'Improved system reliability and maintainability by increasing test coverage and implementing unit tests using Mocha, Chai, and Jest for Express-based services, helping reduce regressions across backend services.',
+			'Built Kafka producers and consumers leveraging the existing Apache Kafka infrastructure to enable event-driven, asynchronous processing across backend services and improve system decoupling.',
+			'Served on weekly on-call rotation, performing bug triage, troubleshooting, and root-cause analysis across backend services to maintain production stability and resolve incidents promptly.',
 		],
 		tech: [
 			'Go',
@@ -128,6 +134,23 @@ const experiences = [
 			'Jest',
 			'Mocha',
 		],
+	},
+	{
+		role: 'Software Engineer Backend',
+		company: 'PT Jojonomic Prima Indonesia',
+		period: 'TBD — please confirm',
+		badge: 'Previous Role' as const,
+		location: 'Jakarta, Indonesia',
+		color: '#ec4899',
+		glow: '#f472b6',
+		initial: 'JN',
+		description:
+			'Implemented backend systems alongside System Analysts based on technical designs and business processes defined by the Product Team, contributing to backend development for banking-related web applications.',
+		achievements: [
+			'Developed RESTful API services using PHP (Lumen framework) with MySQL for data persistence, supporting core application workflows.',
+			'Contributed minor Go-based features during system integration tasks, gaining early hands-on experience with Go that supported later backend development in subsequent roles.',
+		],
+		tech: ['PHP', 'Lumen', 'MySQL', 'Go'],
 	},
 ];
 
