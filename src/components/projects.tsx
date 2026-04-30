@@ -122,7 +122,7 @@ function BentoCard({ project }: { project: Project }) {
 			<div
 				style={{
 					position: 'relative',
-					height: isFeatured ? 260 : 180,
+					height: 200,
 					overflow: 'hidden',
 					background: '#f0ece8',
 				}}>
@@ -197,7 +197,7 @@ function BentoCard({ project }: { project: Project }) {
 					}}>
 					<h3
 						style={{
-							fontSize: isFeatured ? 20 : 17,
+							fontSize: 17,
 							fontWeight: 800,
 							fontFamily: "'Inter', sans-serif",
 							color: '#0a0a0a',
@@ -232,7 +232,7 @@ function BentoCard({ project }: { project: Project }) {
 						marginBottom: 16,
 						fontFamily: "'Inter', sans-serif",
 						display: '-webkit-box',
-						WebkitLineClamp: isFeatured ? 4 : 2,
+						WebkitLineClamp: 3,
 						WebkitBoxOrient: 'vertical',
 						overflow: 'hidden',
 					}}>
@@ -247,7 +247,7 @@ function BentoCard({ project }: { project: Project }) {
 						gap: 6,
 						marginBottom: 18,
 					}}>
-					{project.tech.slice(0, isFeatured ? 5 : 3).map((t) => (
+					{project.tech.slice(0, 4).map((t) => (
 						<span
 							key={t}
 							style={{
@@ -376,7 +376,7 @@ export default function Projects() {
 		<section
 			id='projects'
 			ref={sectionRef}
-			style={{ background: '#faf9f7' }}>
+			style={{ background: '#faf9f7', padding: '96px 0' }}>
 			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
 				<TextReveal
 					parts={[

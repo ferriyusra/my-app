@@ -4,7 +4,6 @@ import { ThemeProvider } from '@/components/theme-provider';
 import ScrollProgress from '@/components/scroll-progress';
 import TiltEffect from '@/components/tilt-effect';
 import CustomCursor from '@/components/custom-cursor';
-import SmoothScrollWrapper from '@/components/smooth-scroll';
 
 export const metadata: Metadata = {
 	title: 'Ferri Yusra — Full Stack Engineer',
@@ -48,9 +47,7 @@ export default function RootLayout({
 					<ScrollProgress />
 					<TiltEffect />
 					<CustomCursor />
-					<SmoothScrollWrapper>
-						{children}
-					</SmoothScrollWrapper>
+					{children}
 				</ThemeProvider>
 			</body>
 		</html>
