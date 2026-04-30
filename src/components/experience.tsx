@@ -136,7 +136,7 @@ const experiences = [
 		],
 	},
 	{
-		role: 'Software Engineer Backend',
+		role: 'Backend Engineer',
 		company: 'PT Jojonomic Indonesia',
 		period: 'October 2021 — January 2022',
 		badge: 'Previous Role' as const,
