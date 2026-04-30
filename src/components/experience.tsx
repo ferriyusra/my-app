@@ -137,7 +137,7 @@ const experiences = [
 	},
 	{
 		role: 'Software Engineer Backend',
-		company: 'PT Jojonomic Prima Indonesia',
+		company: 'PT Jojonomic Indonesia',
 		period: 'October 2021 — January 2022',
 		badge: 'Previous Role' as const,
 		location: 'Jakarta, Indonesia',
@@ -197,7 +197,7 @@ function Card({ exp }: { exp: Exp }) {
 	return (
 		<div
 			ref={cardRef}
-			className="card"
+			className='card'
 			style={{
 				background: '#ffffff',
 				border: '2px solid #0a0a0a',
@@ -205,11 +205,37 @@ function Card({ exp }: { exp: Exp }) {
 				boxShadow: '6px 6px 0px #0a0a0a',
 				overflow: 'hidden',
 			}}>
-
 			{/* ── Illustration header ── */}
-			<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 140, gap: 16 }}>
-				<div style={{ width: 72, height: 72, borderRadius: 18, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a', flexShrink: 0 }}>
-					<span style={{ fontSize: 20, fontWeight: 800, fontFamily: "'Inter', sans-serif", color: exp.color, letterSpacing: '-0.02em' }}>
+			<div
+				style={{
+					background: '#f0ece8',
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					minHeight: 140,
+					gap: 16,
+				}}>
+				<div
+					style={{
+						width: 72,
+						height: 72,
+						borderRadius: 18,
+						background: '#ffffff',
+						border: '2px solid #0a0a0a',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						boxShadow: '4px 4px 0px #0a0a0a',
+						flexShrink: 0,
+					}}>
+					<span
+						style={{
+							fontSize: 20,
+							fontWeight: 800,
+							fontFamily: "'Inter', sans-serif",
+							color: exp.color,
+							letterSpacing: '-0.02em',
+						}}>
 						{exp.initial}
 					</span>
 				</div>
@@ -235,26 +261,68 @@ function Card({ exp }: { exp: Exp }) {
 				</h3>
 
 				{/* Company */}
-				<div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-					<MapPin size={12} style={{ color: exp.color, flexShrink: 0 }} aria-hidden='true' />
-					<span style={{ fontSize: 14, fontWeight: 700, color: '#0a0a0a', fontFamily: "'Inter', sans-serif" }}>
+				<div
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: 5,
+						marginBottom: 4,
+					}}>
+					<MapPin
+						size={12}
+						style={{ color: exp.color, flexShrink: 0 }}
+						aria-hidden='true'
+					/>
+					<span
+						style={{
+							fontSize: 14,
+							fontWeight: 700,
+							color: '#0a0a0a',
+							fontFamily: "'Inter', sans-serif",
+						}}>
 						{exp.company}
 					</span>
 				</div>
-				<div style={{ fontSize: 12, color: '#a3a3a3', fontFamily: "'JetBrains Mono', monospace", marginBottom: 18, letterSpacing: '0.01em' }}>
+				<div
+					style={{
+						fontSize: 12,
+						color: '#a3a3a3',
+						fontFamily: "'JetBrains Mono', monospace",
+						marginBottom: 18,
+						letterSpacing: '0.01em',
+					}}>
 					{exp.location} · {exp.period}
 				</div>
 
 				{/* Description */}
-				<p style={{ color: '#525252', fontSize: 14, lineHeight: 1.7, fontFamily: "'Inter', sans-serif", marginBottom: 22 }}>
+				<p
+					style={{
+						color: '#525252',
+						fontSize: 14,
+						lineHeight: 1.7,
+						fontFamily: "'Inter', sans-serif",
+						marginBottom: 22,
+					}}>
 					{exp.description}
 				</p>
 
 				{/* Key achievements */}
 				<div style={{ marginBottom: 22 }}>
-					<div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							gap: 7,
+							marginBottom: 12,
+						}}>
 						<Trophy size={13} style={{ color: exp.glow }} aria-hidden='true' />
-						<span style={{ fontSize: 13, fontWeight: 700, color: '#0a0a0a', fontFamily: "'Inter', sans-serif" }}>
+						<span
+							style={{
+								fontSize: 13,
+								fontWeight: 700,
+								color: '#0a0a0a',
+								fontFamily: "'Inter', sans-serif",
+							}}>
 							Key Achievements
 						</span>
 					</div>
@@ -263,15 +331,41 @@ function Card({ exp }: { exp: Exp }) {
 							<motion.div
 								key={j}
 								initial={{ opacity: 0, x: -16 }}
-								animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
+								animate={
+									isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }
+								}
 								transition={{
 									duration: shouldReduceMotion ? 0 : 0.4,
 									ease: EASE,
 									delay: shouldReduceMotion ? 0 : 0.3 + j * 0.1,
 								}}
-								style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 14px', background: '#f9f9f7', border: '1px solid #e5e5e5', borderRadius: 10 }}>
-								<div style={{ width: 7, height: 7, borderRadius: '50%', background: exp.color, flexShrink: 0, marginTop: 5, boxShadow: `0 0 8px ${exp.color}40` }} />
-								<span style={{ fontSize: 13, color: '#525252', lineHeight: 1.55, fontFamily: "'Inter', sans-serif" }}>
+								style={{
+									display: 'flex',
+									alignItems: 'flex-start',
+									gap: 10,
+									padding: '10px 14px',
+									background: '#f9f9f7',
+									border: '1px solid #e5e5e5',
+									borderRadius: 10,
+								}}>
+								<div
+									style={{
+										width: 7,
+										height: 7,
+										borderRadius: '50%',
+										background: exp.color,
+										flexShrink: 0,
+										marginTop: 5,
+										boxShadow: `0 0 8px ${exp.color}40`,
+									}}
+								/>
+								<span
+									style={{
+										fontSize: 13,
+										color: '#525252',
+										lineHeight: 1.55,
+										fontFamily: "'Inter', sans-serif",
+									}}>
 									{a}
 								</span>
 							</motion.div>
@@ -285,13 +379,23 @@ function Card({ exp }: { exp: Exp }) {
 						<motion.span
 							key={t}
 							initial={{ opacity: 0, scale: 0.8 }}
-							animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+							animate={
+								isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }
+							}
 							transition={{
 								duration: shouldReduceMotion ? 0 : 0.3,
 								ease: EASE,
 								delay: shouldReduceMotion ? 0 : 0.5 + k * 0.04,
 							}}
-							style={{ padding: '3px 10px', background: '#f4f4f5', border: '1px solid #e4e4e7', borderRadius: 100, fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#52525b' }}>
+							style={{
+								padding: '3px 10px',
+								background: '#f4f4f5',
+								border: '1px solid #e4e4e7',
+								borderRadius: 100,
+								fontSize: 11,
+								fontFamily: "'JetBrains Mono', monospace",
+								color: '#52525b',
+							}}>
 							{t}
 						</motion.span>
 					))}
