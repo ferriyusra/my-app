@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, useReducedMotion, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { MapPin, Trophy } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { MapPin, Trophy, ChevronDown } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -11,12 +11,14 @@ import TextReveal from '@/components/text-reveal';
 gsap.registerPlugin(ScrollTrigger);
 
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+const COLLAPSED_COUNT = 2;
 
 const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'PT. Teknologi Pamadya Analitika (Meditap)',
 		period: 'July 2025 — Present',
+		startISO: '2025-07',
 		badge: 'Present' as const,
 		location: 'Jakarta, Indonesia',
 		color: '#6366f1',
@@ -48,6 +50,7 @@ const experiences = [
 		role: 'Backend Engineer',
 		company: 'INA Digital (Peruri Digital Security)',
 		period: 'January 2024 — March 2025',
+		startISO: '2024-01',
 		badge: 'Previous Role' as const,
 		location: 'Jakarta, Indonesia',
 		color: '#10b981',
@@ -79,6 +82,7 @@ const experiences = [
 		role: 'Backend Engineer',
 		company: 'Health Technology Transformation & Digitalization Team',
 		period: 'July 2023 — December 2023',
+		startISO: '2023-07',
 		badge: 'Previous Role' as const,
 		location: 'Jakarta, Indonesia',
 		color: '#3b82f6',
@@ -109,6 +113,7 @@ const experiences = [
 		role: 'Software Engineer Backend',
 		company: 'PT Moladin Digital Indonesia',
 		period: 'March 2022 — February 2023',
+		startISO: '2022-03',
 		badge: 'Previous Role' as const,
 		location: 'Jakarta, Indonesia',
 		color: '#f59e0b',
@@ -139,6 +144,7 @@ const experiences = [
 		role: 'Backend Engineer',
 		company: 'PT Jojonomic Indonesia',
 		period: 'October 2021 — January 2022',
+		startISO: '2021-10',
 		badge: 'Previous Role' as const,
 		location: 'Jakarta, Indonesia',
 		color: '#ec4899',
@@ -168,19 +174,20 @@ function Badge({ label }: { label: 'Present' | 'Previous Role' }) {
 				borderRadius: 100,
 				fontSize: 12,
 				fontWeight: 700,
-				fontFamily: "'Inter', sans-serif",
+				fontFamily: 'var(--font-sans)',
 				background: isPresent ? '#6366f1' : '#f4f4f5',
-				color: isPresent ? '#fff' : '#52525b',
+				color: isPresent ? '#fff' : '#3f3f46',
 				whiteSpace: 'nowrap' as const,
 				boxShadow: isPresent ? '0 2px 12px rgba(99,102,241,0.25)' : 'none',
-				border: isPresent ? 'none' : '1px solid #e4e4e7',
+				border: isPresent ? 'none' : '1px solid #d4d4d8',
 			}}>
 			<span
+				className={isPresent ? 'present-dot' : ''}
 				style={{
 					width: 6,
 					height: 6,
 					borderRadius: '50%',
-					background: isPresent ? 'rgba(255,255,255,0.75)' : '#a1a1aa',
+					background: isPresent ? '#ffffff' : '#71717a',
 					display: 'inline-block',
 				}}
 			/>
@@ -193,11 +200,19 @@ function Card({ exp }: { exp: Exp }) {
 	const cardRef = useRef<HTMLDivElement>(null);
 	const isInView = useInView(cardRef, { once: true, margin: '-60px' });
 	const shouldReduceMotion = useReducedMotion();
+	const [expanded, setExpanded] = useState(false);
+
+	const collapsible = exp.achievements.length > COLLAPSED_COUNT;
+	const visible = expanded
+		? exp.achievements
+		: exp.achievements.slice(0, COLLAPSED_COUNT);
+	const hiddenCount = exp.achievements.length - COLLAPSED_COUNT;
 
 	return (
-		<div
+		<article
 			ref={cardRef}
-			className='card'
+			className='exp-card'
+			aria-label={`${exp.role} at ${exp.company}`}
 			style={{
 				background: '#ffffff',
 				border: '2px solid #0a0a0a',
@@ -206,70 +221,93 @@ function Card({ exp }: { exp: Exp }) {
 				overflow: 'hidden',
 			}}>
 			{/* ── Illustration header ── */}
-			<div
+			<header
 				style={{
 					background: '#f0ece8',
 					display: 'flex',
 					alignItems: 'center',
-					justifyContent: 'center',
-					minHeight: 140,
-					gap: 16,
+					justifyContent: 'space-between',
+					gap: 12,
+					padding: '20px 24px',
+					minHeight: 120,
+					borderBottom: '2px solid #0a0a0a',
 				}}>
-				<div
-					style={{
-						width: 72,
-						height: 72,
-						borderRadius: 18,
-						background: '#ffffff',
-						border: '2px solid #0a0a0a',
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						boxShadow: '4px 4px 0px #0a0a0a',
-						flexShrink: 0,
-					}}>
-					<span
+				<div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+					<div
+						aria-hidden='true'
 						style={{
-							fontSize: 20,
-							fontWeight: 800,
-							fontFamily: "'Inter', sans-serif",
-							color: exp.color,
-							letterSpacing: '-0.02em',
+							width: 56,
+							height: 56,
+							borderRadius: 14,
+							background: '#ffffff',
+							border: '2px solid #0a0a0a',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							boxShadow: '3px 3px 0px #0a0a0a',
+							flexShrink: 0,
 						}}>
-						{exp.initial}
-					</span>
-				</div>
-				<div>
+						<span
+							style={{
+								fontSize: 17,
+								fontWeight: 800,
+								fontFamily: 'var(--font-sans)',
+								color: exp.color,
+								letterSpacing: '-0.02em',
+							}}>
+							{exp.initial}
+						</span>
+					</div>
 					<Badge label={exp.badge} />
 				</div>
-			</div>
+
+				{/* Period chip — top-right for fast scanning */}
+				<time
+					dateTime={exp.startISO}
+					style={{
+						fontSize: 11,
+						fontFamily: 'var(--font-mono)',
+						color: '#3f3f46',
+						background: '#ffffff',
+						border: '1.5px solid #0a0a0a',
+						padding: '5px 10px',
+						borderRadius: 8,
+						fontVariantNumeric: 'tabular-nums',
+						letterSpacing: '0.01em',
+						whiteSpace: 'nowrap',
+						flexShrink: 0,
+					}}>
+					{exp.period}
+				</time>
+			</header>
 
 			{/* ── Content ── */}
 			<div style={{ padding: '24px 28px 28px' }}>
 				{/* Role title */}
 				<h3
 					style={{
-						fontSize: 'clamp(18px, 2.2vw, 22px)',
+						fontSize: 'clamp(20px, 2.4vw, 24px)',
 						fontWeight: 800,
-						fontFamily: "'Inter', sans-serif",
+						fontFamily: 'var(--font-sans)',
 						letterSpacing: '-0.02em',
-						lineHeight: 1.25,
-						marginBottom: 10,
+						lineHeight: 1.2,
+						marginBottom: 8,
 						color: exp.color,
 					}}>
 					{exp.role}
 				</h3>
 
-				{/* Company */}
+				{/* Company + location */}
 				<div
 					style={{
 						display: 'flex',
 						alignItems: 'center',
-						gap: 5,
+						gap: 6,
 						marginBottom: 4,
+						flexWrap: 'wrap',
 					}}>
 					<MapPin
-						size={12}
+						size={13}
 						style={{ color: exp.color, flexShrink: 0 }}
 						aria-hidden='true'
 					/>
@@ -278,7 +316,7 @@ function Card({ exp }: { exp: Exp }) {
 							fontSize: 14,
 							fontWeight: 700,
 							color: '#0a0a0a',
-							fontFamily: "'Inter', sans-serif",
+							fontFamily: 'var(--font-sans)',
 						}}>
 						{exp.company}
 					</span>
@@ -286,28 +324,28 @@ function Card({ exp }: { exp: Exp }) {
 				<div
 					style={{
 						fontSize: 12,
-						color: '#a3a3a3',
-						fontFamily: "'JetBrains Mono', monospace",
+						color: '#71717a',
+						fontFamily: 'var(--font-mono)',
 						marginBottom: 18,
 						letterSpacing: '0.01em',
 					}}>
-					{exp.location} · {exp.period}
+					{exp.location}
 				</div>
 
 				{/* Description */}
 				<p
 					style={{
-						color: '#525252',
+						color: '#3f3f46',
 						fontSize: 14,
-						lineHeight: 1.7,
-						fontFamily: "'Inter', sans-serif",
+						lineHeight: 1.65,
+						fontFamily: 'var(--font-sans)',
 						marginBottom: 22,
 					}}>
 					{exp.description}
 				</p>
 
 				{/* Key achievements */}
-				<div style={{ marginBottom: 22 }}>
+				<div style={{ marginBottom: collapsible ? 14 : 22 }}>
 					<div
 						style={{
 							display: 'flex',
@@ -315,20 +353,28 @@ function Card({ exp }: { exp: Exp }) {
 							gap: 7,
 							marginBottom: 12,
 						}}>
-						<Trophy size={13} style={{ color: exp.glow }} aria-hidden='true' />
+						<Trophy size={14} style={{ color: exp.glow }} aria-hidden='true' />
 						<span
 							style={{
 								fontSize: 13,
 								fontWeight: 700,
 								color: '#0a0a0a',
-								fontFamily: "'Inter', sans-serif",
+								fontFamily: 'var(--font-sans)',
 							}}>
 							Key Achievements
 						</span>
 					</div>
-					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-						{exp.achievements.map((a, j) => (
-							<motion.div
+					<ul
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							gap: 8,
+							listStyle: 'none',
+							padding: 0,
+							margin: 0,
+						}}>
+						{visible.map((a, j) => (
+							<motion.li
 								key={j}
 								initial={{ opacity: 0, x: -16 }}
 								animate={
@@ -345,10 +391,11 @@ function Card({ exp }: { exp: Exp }) {
 									gap: 10,
 									padding: '10px 14px',
 									background: '#f9f9f7',
-									border: '1px solid #e5e5e5',
+									border: '1px solid #e4e4e7',
 									borderRadius: 10,
 								}}>
-								<div
+								<span
+									aria-hidden='true'
 									style={{
 										width: 7,
 										height: 7,
@@ -362,25 +409,72 @@ function Card({ exp }: { exp: Exp }) {
 								<span
 									style={{
 										fontSize: 13,
-										color: '#525252',
+										color: '#3f3f46',
 										lineHeight: 1.55,
-										fontFamily: "'Inter', sans-serif",
+										fontFamily: 'var(--font-sans)',
 									}}>
 									{a}
 								</span>
-							</motion.div>
+							</motion.li>
 						))}
-					</div>
+					</ul>
 				</div>
 
+				{/* Expand toggle */}
+				{collapsible && (
+					<button
+						type='button'
+						className='exp-toggle'
+						onClick={() => setExpanded((v) => !v)}
+						aria-expanded={expanded}
+						aria-label={
+							expanded
+								? 'Show fewer achievements'
+								: `Show ${hiddenCount} more achievements`
+						}
+						style={{
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: 6,
+							padding: '8px 12px',
+							marginBottom: 18,
+							background: 'transparent',
+							border: '1.5px solid #0a0a0a',
+							borderRadius: 8,
+							fontSize: 12,
+							fontWeight: 700,
+							fontFamily: 'var(--font-sans)',
+							color: '#0a0a0a',
+							letterSpacing: '0.01em',
+						}}>
+						{expanded ? 'Show less' : `Show ${hiddenCount} more`}
+						<ChevronDown
+							size={14}
+							aria-hidden='true'
+							style={{
+								transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+								transition: shouldReduceMotion
+									? 'none'
+									: 'transform 0.2s ease',
+							}}
+						/>
+					</button>
+				)}
+
 				{/* Tech tags */}
-				<div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+				<div
+					role='list'
+					aria-label='Technologies used'
+					style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
 					{exp.tech.map((t, k) => (
 						<motion.span
 							key={t}
+							role='listitem'
 							initial={{ opacity: 0, scale: 0.8 }}
 							animate={
-								isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }
+								isInView
+									? { opacity: 1, scale: 1 }
+									: { opacity: 0, scale: 0.8 }
 							}
 							transition={{
 								duration: shouldReduceMotion ? 0 : 0.3,
@@ -390,18 +484,18 @@ function Card({ exp }: { exp: Exp }) {
 							style={{
 								padding: '3px 10px',
 								background: '#f4f4f5',
-								border: '1px solid #e4e4e7',
+								border: '1px solid #d4d4d8',
 								borderRadius: 100,
 								fontSize: 11,
-								fontFamily: "'JetBrains Mono', monospace",
-								color: '#52525b',
+								fontFamily: 'var(--font-mono)',
+								color: '#3f3f46',
 							}}>
 							{t}
 						</motion.span>
 					))}
 				</div>
 			</div>
-		</div>
+		</article>
 	);
 }
 
@@ -416,6 +510,7 @@ function TimelineDot({
 }) {
 	return (
 		<motion.div
+			aria-hidden='true'
 			initial={{ opacity: 0, scale: 0.5 }}
 			whileInView={{ opacity: 1, scale: 1 }}
 			viewport={{ once: true, margin: '-80px' }}
@@ -443,7 +538,7 @@ function TimelineDot({
 				style={{
 					fontSize: 12,
 					fontWeight: 800,
-					fontFamily: "'Inter', sans-serif",
+					fontFamily: 'var(--font-sans)',
 					color: exp.color,
 					letterSpacing: '-0.01em',
 				}}>
@@ -499,7 +594,7 @@ export default function Experience() {
 						fontSize: 'clamp(28px, 5vw, 48px)',
 						fontWeight: 800,
 						marginBottom: 64,
-						fontFamily: "'Inter', sans-serif",
+						fontFamily: 'var(--font-sans)',
 						color: '#0a0a0a',
 						letterSpacing: '-0.02em',
 					}}
@@ -524,12 +619,21 @@ export default function Experience() {
 						}}
 					/>
 
-					<div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+					<ol
+						aria-label='Work experience, most recent first'
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							gap: 48,
+							listStyle: 'none',
+							padding: 0,
+							margin: 0,
+						}}>
 						{experiences.map((exp, i) => {
 							const isLeft = i % 2 === 0;
 							const delay = shouldReduceMotion ? 0 : 0.15 + i * 0.1;
 							return (
-								<div key={i} className='exp-row'>
+								<li key={i} className='exp-row'>
 									{/* Left slot: card for even, spacer for odd */}
 									{isLeft ? (
 										<motion.div
@@ -574,10 +678,10 @@ export default function Experience() {
 									) : (
 										<div className='exp-slot-spacer' />
 									)}
-								</div>
+								</li>
 							);
 						})}
-					</div>
+					</ol>
 				</div>
 			</div>
 		</section>
