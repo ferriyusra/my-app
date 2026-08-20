@@ -21,6 +21,16 @@ export const profile = {
 	proof:
 		"Four years in Go and Node.js. Previously backend for SATUSEHAT, Indonesia's national health data platform; currently building finance infrastructure at Meditap.",
 
+	/** Names carry more weight above the fold than a list of technologies. */
+	previously: 'SATUSEHAT · Peruri · Moladin',
+
+	/**
+	 * Path to a portrait in `public/`, e.g. '/ferri.jpg'. Leave null and the
+	 * hero stays a single typographic column; set it and the hero becomes two
+	 * columns with the portrait beside the statement.
+	 */
+	portrait: null as string | null,
+
 	tagline:
 		'4+ years building production APIs and event-driven systems across fintech, GovTech health, and automotive. Currently going deeper on system design and DSA.',
 

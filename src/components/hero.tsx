@@ -3,38 +3,44 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Download } from 'lucide-react';
 import { profile } from '@/data/profile';
-import { BORDER, CONTAINER, EASE, FONT, MONO, RADIUS, SANS } from '@/lib/theme';
+import {
+	CONTAINER,
+	DISPLAY,
+	EASE,
+	FONT,
+	MONO,
+	RADIUS,
+	SANS,
+} from '@/lib/theme';
 
 const CTA_BASE: React.CSSProperties = {
 	display: 'inline-flex',
 	alignItems: 'center',
 	gap: 8,
-	padding: '14px 28px',
-	border: `${BORDER.hard} solid var(--line)`,
+	padding: '13px 26px',
+	border: `1px solid var(--line)`,
 	borderRadius: RADIUS.md,
 	fontSize: FONT.base,
-	fontWeight: 700,
+	fontWeight: 600,
 	textDecoration: 'none',
 	fontFamily: SANS,
-	boxShadow: 'var(--sh-1-hi)',
+	boxShadow: 'var(--sh-1)',
 	transition: 'box-shadow 0.2s ease, transform 0.2s ease',
 };
 
 function lift(e: React.MouseEvent<HTMLElement>) {
-	e.currentTarget.style.transform = 'translate(-1px, -1px)';
-	e.currentTarget.style.boxShadow = 'var(--sh-2)';
+	e.currentTarget.style.transform = 'translateY(-1px)';
+	e.currentTarget.style.boxShadow = 'var(--sh-2-hi)';
 }
 function drop(e: React.MouseEvent<HTMLElement>) {
-	e.currentTarget.style.transform = 'translate(0, 0)';
-	e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
+	e.currentTarget.style.transform = 'translateY(0)';
+	e.currentTarget.style.boxShadow = 'var(--sh-1)';
 }
 
 export default function Hero() {
 	const shouldReduceMotion = useReducedMotion();
+	const hasPortrait = Boolean(profile.portrait);
 
-	/* One entrance, staggered by index. The hero previously ran a scramble
-	   tween, a five-language carousel, four rotating rings and a parallax
-	   scrub — all competing for attention with the actual message. */
 	const step = (i: number) => ({
 		initial: { opacity: 0, y: shouldReduceMotion ? 0 : 12 },
 		animate: { opacity: 1, y: 0 },
@@ -49,139 +55,172 @@ export default function Hero() {
 		<section
 			id='hero'
 			style={{
-				minHeight: '100svh',
+				/* Deliberately short of a full viewport: at 100svh the first
+				   Experience entry sat entirely below the fold, so a visitor
+				   skimming the page saw no evidence at all before scrolling. */
+				minHeight: '78svh',
 				display: 'flex',
 				alignItems: 'center',
 				position: 'relative',
-				overflow: 'hidden',
 				background: 'var(--hero-bg)',
-				paddingTop: 120,
-				paddingBottom: 80,
+				paddingTop: 128,
+				paddingBottom: 72,
 			}}>
 			<div style={{ ...CONTAINER, width: '100%' }}>
-				<div style={{ maxWidth: 780 }}>
-					{/* Eyebrow */}
-					<motion.div
-						{...step(0)}
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: 14,
-							flexWrap: 'wrap',
-							marginBottom: 24,
-						}}>
-						<span
+				<div className='hero-grid' data-portrait={hasPortrait}>
+					<div style={{ maxWidth: hasPortrait ? 'none' : 820 }}>
+						{/* Eyebrow — the navbar wordmark already carries the name. */}
+						<motion.div
+							{...step(0)}
 							style={{
-								fontFamily: MONO,
-								fontSize: FONT.micro,
-								fontWeight: 600,
-								letterSpacing: '0.18em',
-								textTransform: 'uppercase',
-								color: 'var(--ink-muted)',
-							}}>
-							{profile.name} — {profile.location}
-						</span>
-						<span
-							style={{
-								display: 'inline-flex',
+								display: 'flex',
 								alignItems: 'center',
-								gap: 7,
-								padding: '5px 12px',
-								background: 'var(--accent-soft)',
-								border: `1px solid var(--accent-ring)`,
-								borderRadius: RADIUS.full,
+								gap: 14,
+								flexWrap: 'wrap',
+								marginBottom: 22,
+							}}>
+							<span
+								style={{
+									fontFamily: MONO,
+									fontSize: FONT.micro,
+									fontWeight: 600,
+									letterSpacing: '0.18em',
+									textTransform: 'uppercase',
+									color: 'var(--ink-muted)',
+								}}>
+								{profile.role} · {profile.location}
+							</span>
+							<span
+								style={{
+									display: 'inline-flex',
+									alignItems: 'center',
+									gap: 7,
+									padding: '5px 12px',
+									background: 'var(--accent-soft)',
+									border: `1px solid var(--accent-ring)`,
+									borderRadius: RADIUS.full,
+									fontFamily: MONO,
+									fontSize: FONT.micro,
+									fontWeight: 600,
+									color: 'var(--accent)',
+								}}>
+								<span
+									aria-hidden='true'
+									style={{
+										width: 6,
+										height: 6,
+										borderRadius: '50%',
+										background: 'var(--accent)',
+									}}
+								/>
+								{profile.availability}
+							</span>
+						</motion.div>
+
+						{/* Set in the display serif, matching every section heading.
+						    It was the one piece of display type still in Inter 800. */}
+						<motion.h1
+							{...step(1)}
+							style={{
+								fontSize: 'clamp(38px, 6.4vw, 68px)',
+								fontWeight: 400,
+								fontFamily: DISPLAY,
+								letterSpacing: '-0.02em',
+								lineHeight: 1.05,
+								margin: '0 0 22px',
+								color: 'var(--ink)',
+								maxWidth: '19ch',
+							}}>
+							{profile.headline}
+						</motion.h1>
+
+						<motion.p
+							{...step(2)}
+							style={{
+								fontSize: 'clamp(16px, 1.6vw, 19px)',
+								color: 'var(--ink-secondary)',
+								lineHeight: 1.7,
+								maxWidth: '58ch',
+								margin: '0 0 36px',
+								fontFamily: SANS,
+							}}>
+							{profile.proof}
+						</motion.p>
+
+						<motion.div
+							{...step(3)}
+							style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+							<a
+								href='#contact'
+								style={{
+									...CTA_BASE,
+									background: 'var(--accent)',
+									borderColor: 'var(--accent)',
+									color: 'var(--accent-ink)',
+								}}
+								onMouseEnter={lift}
+								onMouseLeave={drop}>
+								Get in touch
+								<ArrowRight size={16} aria-hidden='true' />
+							</a>
+
+							<a
+								href={profile.cvDownload}
+								download
+								style={{
+									...CTA_BASE,
+									background: 'var(--surface)',
+									color: 'var(--ink)',
+								}}
+								onMouseEnter={lift}
+								onMouseLeave={drop}>
+								<Download size={16} aria-hidden='true' />
+								Download CV
+							</a>
+						</motion.div>
+
+						{/* Recognisable names do more above the fold than a stack list —
+						    the stack is already in the paragraph above and in Skills. */}
+						<motion.p
+							{...step(4)}
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								gap: 12,
+								marginTop: 40,
+								marginBottom: 0,
 								fontFamily: MONO,
-								fontSize: FONT.micro,
-								fontWeight: 600,
-								color: 'var(--accent)',
+								fontSize: FONT.sm,
+								color: 'var(--ink-muted)',
+								letterSpacing: '0.02em',
 							}}>
 							<span
 								aria-hidden='true'
 								style={{
-									width: 6,
-									height: 6,
-									borderRadius: '50%',
-									background: 'var(--accent)',
+									width: 24,
+									height: 1,
+									background: 'var(--line-strong)',
+									opacity: 0.35,
+									flexShrink: 0,
 								}}
 							/>
-							{profile.availability}
-						</span>
-					</motion.div>
+							Previously — {profile.previously}
+						</motion.p>
+					</div>
 
-					{/* The statement carries the page — left-aligned, not centred. */}
-					<motion.h1
-						{...step(1)}
-						style={{
-							fontSize: 'clamp(34px, 6vw, 62px)',
-							fontWeight: 800,
-							fontFamily: SANS,
-							letterSpacing: '-0.035em',
-							lineHeight: 1.08,
-							margin: '0 0 24px',
-							color: 'var(--ink)',
-							/* Caps line length so the statement breaks well at any size */
-							maxWidth: '20ch',
-						}}>
-						{profile.headline}
-					</motion.h1>
-
-					<motion.p
-						{...step(2)}
-						style={{
-							fontSize: 'clamp(16px, 1.6vw, 19px)',
-							color: 'var(--ink-secondary)',
-							lineHeight: 1.7,
-							maxWidth: '62ch',
-							margin: '0 0 40px',
-							fontFamily: SANS,
-						}}>
-						{profile.proof}
-					</motion.p>
-
-					{/* CTAs */}
-					<motion.div
-						{...step(3)}
-						style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-						<a
-							href='#contact'
-							style={{
-								...CTA_BASE,
-								background: 'var(--accent)',
-								color: 'var(--accent-ink)',
-							}}
-							onMouseEnter={lift}
-							onMouseLeave={drop}>
-							Get in touch
-							<ArrowRight size={16} aria-hidden='true' />
-						</a>
-
-						<a
-							href={profile.cvDownload}
-							download
-							style={{
-								...CTA_BASE,
-								background: 'var(--surface)',
-								color: 'var(--ink)',
-							}}
-							onMouseEnter={lift}
-							onMouseLeave={drop}>
-							<Download size={16} aria-hidden='true' />
-							Download CV
-						</a>
-					</motion.div>
-
-					{/* Primary stack, stated plainly rather than as a "Tech Stack" card */}
-					<motion.p
-						{...step(4)}
-						style={{
-							marginTop: 40,
-							fontFamily: MONO,
-							fontSize: FONT.sm,
-							color: 'var(--ink-muted)',
-							letterSpacing: '0.02em',
-						}}>
-						Go · Node.js · PostgreSQL · Google Cloud
-					</motion.p>
+					{/* Portrait renders only once profile.portrait is set. */}
+					{profile.portrait && (
+						<motion.div
+							{...step(2)}
+							style={{ justifySelf: 'center' }}>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={profile.portrait}
+								alt={`${profile.name}, ${profile.role}`}
+								className='hero-portrait'
+							/>
+						</motion.div>
+					)}
 				</div>
 			</div>
 		</section>

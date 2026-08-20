@@ -16,7 +16,7 @@
   --bg: #faf7f2;
   --section-a: #f1ece3;
   --section-b: #faf7f2;
-  --hero-bg: #f1ece3;
+  --hero-bg: #faf7f2;   /* lighter than --section-a so Experience has an edge */
 
   --surface: #fffefb;
   --surface-header: #f4efe6;
@@ -80,7 +80,7 @@ html[data-theme="dark"] {
   --bg: #14120f;
   --section-a: #1a1714;
   --section-b: #14120f;
-  --hero-bg: #1a1714;
+  --hero-bg: #14120f;
 
   --surface: #201c18;
   --surface-header: #1a1714;
@@ -188,6 +188,35 @@ section { padding: 96px 0; }
 
 /* Brand icons that are near-black lose contrast on dark surfaces */
 html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
+
+/* ═══════════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════════ */
+
+.hero-grid {
+  display: grid;
+  gap: 48px;
+  align-items: center;
+}
+
+/* Two columns only when there is a portrait and room for it. */
+@media (min-width: 900px) {
+  .hero-grid[data-portrait='true'] {
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 64px;
+  }
+}
+
+.hero-portrait {
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-3);
+  display: block;
+}
 
 /* ═══════════════════════════════════════════════
    NAVBAR — editorial top bar
