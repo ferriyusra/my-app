@@ -9,11 +9,10 @@ import {
 	Mail,
 	MapPin,
 } from 'lucide-react';
-import Meter from '@/components/ui/meter';
 import ThemeToggle from './theme-toggle';
 import { profile, yearsOfExperience } from '@/data/profile';
 import { experiences, tenureLabel } from '@/data/experience';
-import { MAX_YEARS, SKILL_CATEGORIES, skills } from '@/data/skills';
+import { SKILL_CATEGORIES, skills } from '@/data/skills';
 import { projects } from '@/data/projects';
 
 /**
@@ -143,16 +142,7 @@ export default function PortfolioDocument() {
 								.filter((s) => s.category === c.key)
 								.sort((a, b) => b.years - a.years)
 								.map((s) => (
-									<li key={s.name}>
-										<span>{s.name}</span>
-										<Meter
-											value={s.years}
-											max={MAX_YEARS}
-											unit='years of hands-on use'
-											label={s.name}
-										/>
-										<em>{s.years} yr</em>
-									</li>
+									<li key={s.name}>{s.name}</li>
 								))}
 						</ul>
 					</div>

@@ -324,22 +324,6 @@ html[data-theme='dark'] .icon-adaptive { filter: invert(1) brightness(1.7); }
 .field::placeholder { color: var(--ink-disabled); }
 .field:disabled { opacity: 0.5; }
 
-/* A read-only progress meter. */
-.meter {
-  display: block;
-  height: 4px;
-  border-radius: 99px;
-  background: var(--line-soft);
-  overflow: hidden;
-}
-.meter-fill {
-  display: block;
-  height: 100%;
-  border-radius: 99px;
-  background: var(--accent-fill);
-  transition: width var(--dur-slow) var(--ease-decel);
-}
-
 /* Segmented control, as Settings uses for two-way choices. */
 .seg {
   display: inline-flex;
@@ -2277,7 +2261,7 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 .sk-list { list-style: none; margin: 0; padding: 6px 8px; display: grid; gap: 1px; }
 .sk-row {
   display: grid;
-  grid-template-columns: 24px 1fr 110px 48px;
+  grid-template-columns: 24px 1fr;
   align-items: center;
   gap: 14px;
   padding: 9px 8px;
@@ -2297,12 +2281,6 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 }
 .sk-name { display: flex; flex-direction: column; font-size: 13px; font-weight: 600; min-width: 0; }
 .sk-name small { font-weight: 400; font-size: 11px; color: var(--ink-muted); }
-.sk-years { font-size: 12px; color: var(--ink-muted); text-align: right; font-variant-numeric: tabular-nums; }
-@media (max-width: 720px) {
-  .sk-row { grid-template-columns: 24px 1fr 44px; }
-  .sk-row .meter { display: none; }
-}
-
 /* ═══════════════════════════════════════════════════════════
    EXPERIENCE
    ═══════════════════════════════════════════════════════════ */
@@ -3381,15 +3359,22 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 
 .mb-skill-group { margin-bottom: 18px; }
 .mb-skill-group h3 { margin-bottom: 8px; font-size: 13px; }
-.mb-skill-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
-.mb-skill-group li {
-  display: grid;
-  grid-template-columns: 1fr 90px 40px;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
+.mb-skill-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
-.mb-skill-group em { font-style: normal; font-size: 12px; color: var(--ink-muted); text-align: right; }
+.mb-skill-group li {
+  padding: 4px 11px;
+  border: 1px solid var(--line-subtle);
+  border-radius: 99px;
+  background: var(--surface-subtle);
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+}
 
 .mb-projects { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
 .mb-projects li { display: flex; gap: 12px; }

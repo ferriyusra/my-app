@@ -1,9 +1,9 @@
 /**
  * The tech stack, grouped the way the Skills window presents it.
  *
- * `years` is hands-on use derived from the dates in `experience.ts`, not a
- * self-scored percentage — a bar that measures something real is worth
- * drawing, and one that measures confidence is not.
+ * `years` is hands-on use derived from the dates in `experience.ts`. Nothing
+ * displays it any more — it orders each category so the tools reached for
+ * most sit at the top, which is the only ranking here that means anything.
  *
  * `icon` points at a brand mark in `public/icons`. Where no mark ships, the
  * card falls back to a lettered plate rather than a broken image.
@@ -81,6 +81,3 @@ export const skills: Skill[] = [
 	{ name: 'GitHub Copilot', category: 'AI Tools', icon: '/icons/githubcopilot.svg', adaptive: true, years: 2, note: 'In-editor completion' },
 	{ name: 'Cursor', category: 'AI Tools', icon: '/icons/cursor.svg', years: 1, note: 'Multi-file edits' },
 ];
-
-/** The longest tenure on the list sets a full bar. */
-export const MAX_YEARS = Math.max(...skills.map((s) => s.years));

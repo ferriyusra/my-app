@@ -12,9 +12,7 @@ import {
 	type LucideIcon,
 } from 'lucide-react';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
-import Meter from '@/components/ui/meter';
 import {
-	MAX_YEARS,
 	SKILL_CATEGORIES,
 	skills,
 	type Skill,
@@ -92,15 +90,6 @@ function SkillGroup({
 							{s.name}
 							<small>{s.note}</small>
 						</span>
-						<Meter
-							value={s.years}
-							max={MAX_YEARS}
-							unit='years of hands-on use'
-							label={s.name}
-						/>
-						<span className='sk-years'>
-							{s.years} {s.years === 1 ? 'yr' : 'yrs'}
-						</span>
 					</li>
 				))}
 			</ul>
@@ -134,7 +123,7 @@ export default function SkillsApp() {
 			onSelect={setPage}
 			navLabel='Skill categories'
 			title={page === 'all' ? 'Skills' : page}
-			subtitle={`${shown} tools · bars show years of hands-on use, not a self-scored percentage`}>
+			subtitle={`${shown} tools, most-used first`}>
 			{groups.map((g) => (
 				<SkillGroup
 					key={g.key}
