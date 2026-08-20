@@ -97,6 +97,17 @@ window's taskbar button (`[data-app-id]`), so it drops into the taskbar and
 grows back out without a second set of coordinates. Minimised windows stay
 mounted — and `inert` — because unmounting would make both halves impossible.
 
+### The desktop cat
+
+[src/components/desktop/cat/](src/components/desktop/cat/) follows the same
+rule as the window frame: **position never touches React**. A transform
+written sixty times a second through state would re-render the shell's whole
+context tree; only the cat's mood is state, and that changes every few
+seconds. Feeding arrives as a counter on the shell context and is answered
+inside the animation loop rather than an effect — which also lets the cat,
+the only thing that knows where it is standing, decide where the bowl goes
+under `prefers-reduced-motion`.
+
 ### Startup
 
 [src/components/desktop/boot-screen.tsx](src/components/desktop/boot-screen.tsx)

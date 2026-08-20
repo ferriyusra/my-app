@@ -79,6 +79,13 @@ type ShellCtx = {
 	play: (name: SoundName) => void;
 	wallpaper: WallpaperId;
 	setWallpaper: (w: WallpaperId) => void;
+
+	/** The desktop cat. Off is one switch away, and remembered. */
+	catOn: boolean;
+	setCatOn: (on: boolean) => void;
+	/** Bumped whenever something puts food down; the cat watches the count. */
+	feedTick: number;
+	feedCat: () => void;
 	accent: AccentId;
 	setAccent: (a: AccentId) => void;
 
@@ -116,6 +123,7 @@ const KEY = {
 	wallpaper: 'shell:wallpaper',
 	accent: 'shell:accent',
 	pinned: 'shell:pinned',
+	cat: 'shell:cat',
 	/* Session, not local: the boot sequence should play once per visit, not
 	   once per machine, and not on every in-session reload. */
 	booted: 'shell:booted',
@@ -256,6 +264,11 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 	const [accent, setAccentState] = useState<AccentId>(() =>
 		read(KEY.accent, 'blue', ACCENT_IDS),
 	);
+	const [catOn, setCatOnState] = useState(
+		() => read(KEY.cat, 'on', ['on', 'off'] as const) === 'on',
+	);
+	const [feedTick, setFeedTick] = useState(0);
+
 
 	/* Dimming is one custom property on <html>; the overlay that reads it sits
 	   above the whole shell, so windows dim with the wallpaper as they would. */
@@ -320,6 +333,13 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 		setWallpaperState(w);
 		persist(KEY.wallpaper, w);
 	}, []);
+
+	const setCatOn = useCallback((on: boolean) => {
+		setCatOnState(on);
+		persist(KEY.cat, on ? 'on' : 'off');
+	}, []);
+
+	const feedCat = useCallback(() => setFeedTick((n) => n + 1), []);
 
 	const setAccent = useCallback((a: AccentId) => {
 		setAccentState(a);
@@ -399,6 +419,10 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			setWallpaper,
 			accent,
 			setAccent,
+			catOn,
+			setCatOn,
+			feedTick,
+			feedCat,
 
 			booted,
 			finishBoot,
@@ -438,6 +462,10 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			setWallpaper,
 			accent,
 			setAccent,
+			catOn,
+			setCatOn,
+			feedTick,
+			feedCat,
 			booted,
 			finishBoot,
 			replayBoot,

@@ -26,6 +26,7 @@ Open <http://localhost:3000>.
 | Start | Search across apps and links, pinned grid, all-apps list, Recommended from this session, power menu — sleep blanks the screen, restart replays the startup sequence, shut down leaves a way back |
 | Apps | About (System Properties), File Explorer (Projects), Skills, Experience, Mail (Contact), Settings, Browser, VS Code, Recycle Bin |
 | Personalisation | Light / dark, six accents, four wallpapers, brightness and volume — all persisted, all changing the running shell |
+| Desktop cat | Wanders the floor above the taskbar, sits, grooms and naps on its own. Click to pet it; put food down from the desktop menu or Settings and it will come and eat. Off in one switch, and remembered |
 
 Every wallpaper is drawn in CSS and every system sound is synthesised with the
 Web Audio API, so the shell ships zero image and zero audio bytes.

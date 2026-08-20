@@ -13,6 +13,8 @@ import {
 	PinOff,
 	RefreshCw,
 	Settings as SettingsGlyph,
+	Cat,
+	Fish,
 } from 'lucide-react';
 import { WindowProvider, useWindows } from '@/context/window-context';
 import { ShellProvider, useShell } from '@/context/shell-context';
@@ -28,6 +30,7 @@ import NotificationCenter, { Toast } from '@/components/taskbar/notification-cen
 import StartMenu from '@/components/start-menu/start-menu';
 import ContextMenu, { type MenuEntry } from '@/components/ui/context-menu';
 import DesktopIcons from './desktop-icons';
+import DesktopCat from './cat/desktop-cat';
 import type { AppId } from '@/types/windows';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
@@ -95,6 +98,9 @@ function Shell() {
 		togglePin,
 		power,
 		booted,
+		catOn,
+		setCatOn,
+		feedCat,
 	} = useShell();
 	const icons = useDesktopIcons();
 	const [menu, setMenu] = useState<{
@@ -162,6 +168,29 @@ function Shell() {
 			},
 			{
 				kind: 'item',
+				label: 'Desktop cat',
+				Icon: Cat,
+				submenu: [
+					{
+						kind: 'item',
+						label: 'Feed the cat',
+						Icon: Fish,
+						disabled: !catOn,
+						onSelect: feedCat,
+					},
+					{ kind: 'separator' },
+					{
+						kind: 'item',
+						label: catOn ? 'Send it home' : 'Let it in',
+						Icon: Cat,
+						checked: catOn,
+						onSelect: () => setCatOn(!catOn),
+					},
+				],
+			},
+			{ kind: 'separator' },
+			{
+				kind: 'item',
 				label: 'Refresh',
 				Icon: RefreshCw,
 				shortcut: 'F5',
@@ -195,7 +224,7 @@ function Shell() {
 				onSelect: () => launch('about'),
 			},
 		],
-		[icons, launch, notify],
+		[icons, launch, notify, catOn, setCatOn, feedCat],
 	);
 
 	const iconMenu = useCallback(
@@ -438,6 +467,7 @@ function Shell() {
 			/>
 
 			<WindowLayer />
+			<DesktopCat />
 			<AnimatePresence>
 				<SnapAssist key='snap-assist' />
 			</AnimatePresence>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import {
+	Cat,
 	Info,
 	Monitor,
 	Moon,
@@ -45,6 +46,9 @@ export default function SettingsApp() {
 		setAccent,
 		wallpaper,
 		setWallpaper,
+		catOn,
+		setCatOn,
+		feedCat,
 		sound,
 		setSound,
 		volume,
@@ -137,6 +141,23 @@ export default function SettingsApp() {
 
 			{page === 'system' && (
 				<>
+					<SettingCard Icon={Cat} title='Desktop cat'>
+						<ToggleSwitch
+							checked={catOn}
+							onChange={setCatOn}
+							label='Let a cat wander the desktop'
+							description='It naps, grooms and comes when there is food. Click to pet it.'
+						/>
+						{catOn && (
+							<button
+								type='button'
+								className='fl-btn fl-btn-standard st-feed'
+								onClick={feedCat}>
+								<Cat size={15} aria-hidden='true' /> Put food down
+							</button>
+						)}
+					</SettingCard>
+
 					<SettingCard Icon={Volume2} title='Sound'>
 						<ToggleSwitch
 							checked={sound}

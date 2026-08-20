@@ -1404,6 +1404,229 @@ input[type='range']::-moz-range-thumb {
 .toast-close:hover { background: var(--subtle-hover); }
 
 /* ═══════════════════════════════════════════════════════════
+   DESKTOP CAT
+   Walks the floor above the taskbar. The wrapper is moved by
+   a transform written from the animation loop; everything
+   that wags, blinks or twitches is keyframed here off the
+   `data-mode` the state machine sets.
+   ═══════════════════════════════════════════════════════════ */
+
+.cat {
+  position: absolute;
+  left: 0;
+  /* The drawing leaves 3px under the paws, so the box sits that much lower
+     and the cat stands on the taskbar rather than hovering over it. */
+  bottom: calc(var(--taskbar-h) - 3px);
+  z-index: 8000;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+  /* The loop writes translate3d here every frame. */
+  will-change: transform;
+  --cat-fur: #e8975a;
+  --cat-fur-dark: #c2703a;
+  --cat-cream: #fdf1e3;
+  --cat-pink: #f0a9a9;
+}
+.cat:focus-visible { outline: 2px solid #fff; outline-offset: 2px; box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.4); }
+.cat-art { display: block; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.28)); }
+/* Facing is written to the DOM by the loop, so turning costs no render. */
+.cat[data-facing='-1'] .cat-art { transform: scaleX(-1); }
+
+.cat-leg { fill: var(--cat-fur); }
+.cat-legs-back .cat-leg { fill: var(--cat-fur-dark); }
+
+/* ── Walking ── */
+.cat[data-mode='walk'] .cat-leg,
+.cat[data-mode='toFood'] .cat-leg {
+  animation: cat-step 0.52s ease-in-out infinite;
+  transform-origin: 50% 12%;
+}
+/* Heading for food is a trot, so the stride shortens to match. */
+.cat[data-mode='toFood'] .cat-leg { animation-duration: 0.28s; }
+.cat[data-mode='toFood'] .cat-body,
+.cat[data-mode='toFood'] .cat-head,
+.cat[data-mode='toFood'] .cat-stripes { animation-duration: 0.28s; }
+.cat[data-mode='walk'] .cat-leg-b,
+.cat[data-mode='walk'] .cat-leg-c,
+.cat[data-mode='toFood'] .cat-leg-b,
+.cat[data-mode='toFood'] .cat-leg-c { animation-delay: -0.26s; }
+@keyframes cat-step {
+  0%, 100% { transform: rotate(15deg); }
+  50% { transform: rotate(-15deg); }
+}
+/* A small bob keeps the walk from looking like a slide. */
+.cat[data-mode='walk'] .cat-body,
+.cat[data-mode='walk'] .cat-head,
+.cat[data-mode='walk'] .cat-stripes,
+.cat[data-mode='toFood'] .cat-body,
+.cat[data-mode='toFood'] .cat-head,
+.cat[data-mode='toFood'] .cat-stripes {
+  animation: cat-bob 0.52s ease-in-out infinite;
+}
+@keyframes cat-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.1px); }
+}
+
+/* ── Tail ── */
+.cat-tail {
+  transform-origin: 14px 28px;
+  animation: cat-tail 2.6s ease-in-out infinite;
+}
+.cat[data-mode='walk'] .cat-tail,
+.cat[data-mode='toFood'] .cat-tail { animation-duration: 1.1s; }
+.cat[data-mode='pet'] .cat-tail { animation-duration: 0.7s; }
+.cat[data-mode='sleep'] .cat-tail { animation-duration: 5s; }
+@keyframes cat-tail {
+  0%, 100% { transform: rotate(-7deg); }
+  50% { transform: rotate(12deg); }
+}
+
+/* ── Eyes ── */
+.cat-eyes-shut { opacity: 0; }
+.cat[data-mode='sleep'] .cat-eyes-open,
+.cat[data-mode='pet'] .cat-eyes-open,
+.cat[data-mode='groom'] .cat-eyes-open { opacity: 0; }
+.cat[data-mode='sleep'] .cat-eyes-shut,
+.cat[data-mode='pet'] .cat-eyes-shut,
+.cat[data-mode='groom'] .cat-eyes-shut { opacity: 1; }
+/* An occasional blink, so an idle cat is never quite still. */
+.cat[data-mode='sit'] .cat-eyes-open,
+.cat[data-mode='walk'] .cat-eyes-open {
+  animation: cat-blink 5.5s step-end infinite;
+  transform-origin: 50% 16.6px;
+}
+@keyframes cat-blink {
+  0%, 96%, 100% { transform: scaleY(1); }
+  98% { transform: scaleY(0.1); }
+}
+
+/* ── Sitting, grooming, sleeping ── */
+.cat[data-mode='sit'] .cat-legs-back,
+.cat[data-mode='sleep'] .cat-legs-back,
+.cat[data-mode='groom'] .cat-legs-back { opacity: 0; }
+.cat[data-mode='sit'] .cat-body,
+.cat[data-mode='sleep'] .cat-body,
+.cat[data-mode='groom'] .cat-body { transform: translateY(3px); }
+
+.cat[data-mode='groom'] .cat-head {
+  animation: cat-groom 0.9s ease-in-out infinite;
+  transform-origin: 49px 22px;
+}
+@keyframes cat-groom {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-13deg) translateY(3px); }
+}
+
+.cat[data-mode='sleep'] .cat-head,
+.cat[data-mode='sleep'] .cat-stripes {
+  animation: cat-breathe 3.4s ease-in-out infinite;
+}
+@keyframes cat-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(1.4px); }
+}
+
+/* ── Eating ── */
+.cat[data-mode='eat'] .cat-head {
+  animation: cat-nibble 0.42s ease-in-out infinite;
+  transform-origin: 44px 20px;
+}
+@keyframes cat-nibble {
+  0%, 100% { transform: rotate(4deg) translateY(4px); }
+  50% { transform: rotate(10deg) translateY(8px); }
+}
+
+/* ── Ears twitch when petted ── */
+.cat[data-mode='pet'] .cat-ear-l { animation: cat-ear 0.6s ease-in-out infinite; transform-origin: 45px 11px; }
+.cat[data-mode='pet'] .cat-ear-r { animation: cat-ear 0.6s ease-in-out infinite 0.12s; transform-origin: 54px 11px; }
+@keyframes cat-ear {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-9deg); }
+}
+
+/* ── Hearts and sleep marks ── */
+.cat-hearts, .cat-zzz {
+  position: absolute;
+  left: 46px;
+  top: -6px;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+}
+.cat-hearts i {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #f2607d;
+  transform: rotate(-45deg);
+  opacity: 0;
+  animation: cat-heart 2.2s ease-out forwards;
+}
+.cat-hearts i::before,
+.cat-hearts i::after {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 99px;
+  background: inherit;
+}
+.cat-hearts i::before { top: -4.5px; left: 0; }
+.cat-hearts i::after { top: 0; left: 4.5px; }
+.cat-hearts i:nth-child(2) { left: 13px; animation-delay: 0.35s; }
+.cat-hearts i:nth-child(3) { left: 24px; animation-delay: 0.7s; }
+@keyframes cat-heart {
+  0% { opacity: 0; transform: rotate(-45deg) translateY(4px) scale(0.5); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(-45deg) translateY(-26px) scale(1); }
+}
+
+.cat-zzz i {
+  position: absolute;
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  font-style: normal;
+  color: var(--desk-label);
+  text-shadow: var(--desk-label-shadow);
+  opacity: 0;
+  animation: cat-zzz 3s ease-out infinite;
+}
+.cat-zzz i:nth-child(2) { left: 10px; font-size: 11px; animation-delay: 1s; }
+.cat-zzz i:nth-child(3) { left: 19px; font-size: 9px; animation-delay: 2s; }
+@keyframes cat-zzz {
+  0% { opacity: 0; transform: translateY(6px) scale(0.7); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-22px) scale(1.1); }
+}
+
+/* ── The bowl ── */
+.cat-food {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--taskbar-h) - 1px);
+  z-index: 7990;
+  line-height: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+  animation: cat-food-in 0.3s var(--ease-decel);
+}
+@keyframes cat-food-in {
+  from { opacity: 0; transform-origin: 50% 100%; }
+}
+
+.st-feed { margin-top: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-art *, .cat-hearts i, .cat-zzz i, .cat-food { animation: none !important; }
+  .cat-hearts i { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    SNAP ASSIST
    The panel Windows drops into the half a snap left free.
    ═══════════════════════════════════════════════════════════ */
