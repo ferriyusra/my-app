@@ -141,7 +141,7 @@ export default function ArticlesPage() {
 							maxWidth: 380,
 							margin: '0 auto 36px',
 						}}>
-						I&apos;m working on writing about backend engineering, Go, system
+						I’m working on writing about backend engineering, Go, system
 						design, and lessons learned in production. Stay tuned!
 					</p>
 
@@ -269,7 +269,7 @@ export default function ArticlesPage() {
 								}}>
 								<CheckCircle size={15} color='#ffffff' />
 							</span>
-							<span>Got it! I&apos;ll let you know when Articles launches.</span>
+							<span>Got it! I’ll let you know when Articles launches.</span>
 						</motion.div>
 					)}
 				</AnimatePresence>

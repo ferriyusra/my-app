@@ -175,7 +175,7 @@ export default function Contact() {
 								letterSpacing: '-0.03em',
 								lineHeight: 1.1,
 							}}>
-							Let&apos;s{' '}
+							Let’s{' '}
 							<span
 								style={{
 									background: 'var(--accent)',
@@ -201,7 +201,7 @@ export default function Contact() {
 								lineHeight: 1.75,
 								fontFamily: SANS,
 							}}>
-							I&apos;m open to new opportunities — whether it&apos;s a project, a
+							I’m open to new opportunities — whether it’s a project, a
 							question, or just want to say hi. My inbox is always open.
 						</motion.p>
 
@@ -509,7 +509,7 @@ function ContactForm({
 					{status === 'sent' && (
 						<>
 							<CheckCircle size={14} aria-hidden='true' />
-							Thanks — I&apos;ll get back to you shortly.
+							Thanks — I’ll get back to you shortly.
 						</>
 					)}
 					{status === 'error' && (

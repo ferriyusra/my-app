@@ -77,7 +77,7 @@ export default function Hero() {
 								alignItems: 'center',
 								gap: 14,
 								flexWrap: 'wrap',
-								marginBottom: 22,
+								marginBottom: 30,
 							}}>
 							<span
 								style={{
@@ -96,8 +96,9 @@ export default function Hero() {
 									alignItems: 'center',
 									gap: 7,
 									padding: '5px 12px',
-									background: 'var(--accent-soft)',
-									border: `1px solid var(--accent-ring)`,
+									background:
+										'color-mix(in srgb, var(--accent) 11%, var(--surface))',
+									border: `1px solid color-mix(in srgb, var(--accent) 34%, transparent)`,
 									borderRadius: RADIUS.full,
 									fontFamily: MONO,
 									fontSize: FONT.micro,
@@ -127,9 +128,13 @@ export default function Hero() {
 								fontFamily: DISPLAY,
 								letterSpacing: '-0.02em',
 								lineHeight: 1.05,
-								margin: '0 0 22px',
+								margin: '0 0 26px',
 								color: 'var(--ink)',
-								maxWidth: '19ch',
+								/* Even out the rag instead of leaving a short last line,
+								   and never auto-hyphenate a display face. */
+								textWrap: 'balance',
+								hyphens: 'none',
+								maxWidth: '17ch',
 							}}>
 							{profile.headline}
 						</motion.h1>
@@ -187,7 +192,7 @@ export default function Hero() {
 								display: 'flex',
 								alignItems: 'center',
 								gap: 12,
-								marginTop: 40,
+								marginTop: 48,
 								marginBottom: 0,
 								fontFamily: MONO,
 								fontSize: FONT.sm,

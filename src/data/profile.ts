@@ -15,11 +15,11 @@ export const profile = {
 
 	/** The hero statement. Specific enough that nobody else could write it. */
 	headline:
-		'I build APIs and event-driven systems that replace manual work.',
+		'I build APIs and event‑driven systems that replace manual work.',
 
 	/** Concrete proof, not adjectives. */
 	proof:
-		"Four years in Go and Node.js. Previously backend for SATUSEHAT, Indonesia's national health data platform; currently building finance infrastructure at Meditap.",
+		"Four years in Go and Node.js. Previously backend for SATUSEHAT, Indonesia’s national health data platform; currently building finance infrastructure at Meditap.",
 
 	/** Names carry more weight above the fold than a list of technologies. */
 	previously: 'SATUSEHAT · Peruri · Moladin',
