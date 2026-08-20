@@ -115,6 +115,19 @@ honours a file still present in the listing, and the inline boot script in
 `layout.tsx` re-checks before setting `--wp-custom` ahead of first paint.
 Dropping any of those re-opens a style-injection hole.
 
+### The activation watermark
+
+The shell starts unactivated, so `ActivateWatermark` sits above the windows —
+being impossible to cover is the character of the thing. Unlike the real one it
+can be cleared, from Settings ▸ System ▸ Activation, which is exactly where its
+second line says to go. A portfolio that permanently blocks a corner of itself
+for a joke is a worse portfolio, and the instruction leading somewhere is
+funnier than a dead end.
+
+The toast is lifted clear of it (`.desktop:not([data-activated]) .toast`) rather
+than landing on top as it would in Windows — otherwise the welcome toast hides
+the watermark at the one moment anybody would read it.
+
 ### The desktop cat
 
 [src/components/desktop/cat/](src/components/desktop/cat/) follows the same

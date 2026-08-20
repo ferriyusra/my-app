@@ -1425,6 +1425,60 @@ input[type='range']::-moz-range-thumb {
 .toast-close:hover { background: var(--subtle-hover); }
 
 /* ═══════════════════════════════════════════════════════════
+   ACTIVATION WATERMARK
+   Above the windows, not behind them — being impossible to
+   cover is the whole character of the thing.
+   ═══════════════════════════════════════════════════════════ */
+
+.activate {
+  position: absolute;
+  right: 28px;
+  bottom: calc(var(--taskbar-h) + 22px);
+  z-index: 8500;
+  text-align: left;
+  pointer-events: none;
+  user-select: none;
+  color: rgba(255, 255, 255, 0.66);
+  /* Pale grey with a tight dark edge under a softer drop. The edge is what
+     keeps it readable when it lands on a white window, which is the one place
+     the real watermark tends to disappear. */
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.38),
+    0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.activate-head {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+.activate-sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* Real Windows lets a notification land straight on the watermark. Lifting the
+   toast instead costs nothing and stops the welcome one from hiding it at
+   exactly the moment somebody would first read it. */
+.desktop:not([data-activated]) .toast {
+  bottom: calc(var(--taskbar-h) + 104px);
+}
+
+.st-activated {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════
    DESKTOP CAT
    Walks the floor above the taskbar. The wrapper is moved by
    a transform written from the animation loop; everything

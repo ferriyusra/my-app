@@ -27,6 +27,7 @@ Open <http://localhost:3000>.
 | Apps | About (System Properties), File Explorer (Projects), Skills, Experience, Mail (Contact), Media Player, Settings, Browser, VS Code, Recycle Bin |
 | Media Player | Type a song, artist or album and play it. Search goes through `/api/music/search`, which proxies Apple's catalogue so its rate limit lands on the server rather than each visitor. Previews are 30 seconds — that is what the public API serves — and the full track is one click away |
 | Personalisation | Light / dark, six accents, four built-in wallpapers plus any image you drop into `public/background`, brightness and volume — all persisted, all changing the running shell |
+| Activation | It opens unactivated, watermark and all. Settings ▸ System ▸ Activation is where that watermark's own instruction leads, and activating actually clears it |
 | Desktop cat | Wanders the floor above the taskbar, sits, grooms and naps on its own. Click to pet it; put food down from the desktop menu or Settings and it will come and eat. It has a house: send it home and it trots over and goes inside — the switch stays disabled until it lands — and letting it out again brings it back through the door |
 
 The four built-in wallpapers are drawn in CSS and every system sound is

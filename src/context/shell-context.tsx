@@ -10,6 +10,7 @@ import {
 	useState,
 } from 'react';
 import { playSound, type SoundName } from '@/lib/sounds';
+import { DEFAULT_WALLPAPER, FALLBACK_WALLPAPER } from '@/lib/shell-defaults';
 import type { AppId, ShellNotification, SnapZone } from '@/types/windows';
 
 /** Which single overlay owns the screen. Only one may be open at a time. */
@@ -102,6 +103,14 @@ type ShellCtx = {
 	/** Image files found in `public/background`, in name order. */
 	customWallpapers: string[];
 
+	/**
+	 * Whether this "copy of Windows" is activated. It is not, to begin with,
+	 * which is what puts the watermark over the desktop — and Settings is
+	 * where the watermark's own instruction actually leads.
+	 */
+	activated: boolean;
+	activate: () => void;
+
 	/** The desktop cat. Off means it is in its house, and it walks there. */
 	catOn: boolean;
 	setCatOn: (on: boolean) => void;
@@ -161,6 +170,7 @@ const KEY = {
 	/* Session, not local: the boot sequence should play once per visit, not
 	   once per machine, and not on every in-session reload. */
 	booted: 'shell:booted',
+	activated: 'shell:activated',
 } as const;
 
 /**
@@ -300,21 +310,26 @@ export function ShellProvider({
 		readNumber(KEY.brightness, 1, 0.35),
 	);
 	const [wallpaper, setWallpaperState] = useState<WallpaperId>(() => {
-		if (typeof window === 'undefined') return 'bloom';
+		/* A custom id is only honoured if that file is still in the listing —
+		   otherwise a since-deleted image would leave a blank desktop. That
+		   applies to the default too, so removing it from public/background
+		   degrades to the drawn fallback instead of breaking. */
+		const usable = (id: string): WallpaperId | null => {
+			const file = customWallpaperFile(id);
+			if (file) return customWallpapers.includes(file) ? (id as WallpaperId) : null;
+			return (WALLPAPER_IDS as string[]).includes(id) ? (id as WallpaperId) : null;
+		};
+		const fallback = () =>
+			usable(DEFAULT_WALLPAPER) ?? (FALLBACK_WALLPAPER as WallpaperId);
+
+		if (typeof window === 'undefined') return fallback();
 		let stored: string | null = null;
 		try {
 			stored = localStorage.getItem(KEY.wallpaper);
 		} catch {
-			return 'bloom';
+			return fallback();
 		}
-		if (!stored) return 'bloom';
-		const file = customWallpaperFile(stored);
-		/* A custom choice is only honoured if that file is still there —
-		   otherwise a since-deleted image would leave a blank desktop. */
-		if (file) return customWallpapers.includes(file) ? (stored as WallpaperId) : 'bloom';
-		return (WALLPAPER_IDS as string[]).includes(stored)
-			? (stored as WallpaperId)
-			: 'bloom';
+		return (stored && usable(stored)) || fallback();
 	});
 	const [accent, setAccentState] = useState<AccentId>(() =>
 		read(KEY.accent, 'blue', ACCENT_IDS),
@@ -328,6 +343,9 @@ export function ShellProvider({
 		read(KEY.cat, 'on', ['on', 'off'] as const) === 'on' ? 'out' : 'home',
 	);
 	const [feedTick, setFeedTick] = useState(0);
+	const [activated, setActivated] = useState(
+		() => read(KEY.activated, 'no', ['yes', 'no'] as const) === 'yes',
+	);
 
 
 	/* Dimming is one custom property on <html>; the overlay that reads it sits
@@ -421,6 +439,11 @@ export function ShellProvider({
 
 	const feedCat = useCallback(() => setFeedTick((n) => n + 1), []);
 
+	const activate = useCallback(() => {
+		setActivated(true);
+		persist(KEY.activated, 'yes');
+	}, []);
+
 	const setAccent = useCallback((a: AccentId) => {
 		setAccentState(a);
 		persist(KEY.accent, a);
@@ -500,6 +523,9 @@ export function ShellProvider({
 			customWallpapers,
 			accent,
 			setAccent,
+			activated,
+			activate,
+
 			catOn,
 			setCatOn,
 			catPhase,
@@ -547,6 +573,8 @@ export function ShellProvider({
 			customWallpapers,
 			accent,
 			setAccent,
+			activated,
+			activate,
 			catOn,
 			setCatOn,
 			catPhase,

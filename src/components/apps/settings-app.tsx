@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import {
+	BadgeCheck,
 	Cat,
 	Info,
 	Monitor,
+	ShieldAlert,
 	Moon,
 	Paintbrush,
 	Sun,
@@ -53,6 +55,8 @@ export default function SettingsApp() {
 		wallpaper,
 		setWallpaper,
 		customWallpapers,
+		activated,
+		activate,
 		catOn,
 		setCatOn,
 		catBusy,
@@ -172,6 +176,36 @@ export default function SettingsApp() {
 
 			{page === 'system' && (
 				<>
+					{/* Where the watermark in the corner says to go. */}
+					<SettingCard
+						Icon={activated ? BadgeCheck : ShieldAlert}
+						tint={
+							activated
+								? 'color-mix(in srgb, var(--success) 16%, transparent)'
+								: undefined
+						}
+						title='Activation'
+						description={
+							activated
+								? 'Windows is activated.'
+								: 'Windows is not activated. Activate Windows to remove the watermark from the desktop.'
+						}
+						control={
+							activated ? (
+								<span className='st-activated'>
+									<BadgeCheck size={14} aria-hidden='true' /> Active
+								</span>
+							) : (
+								<button
+									type='button'
+									className='fl-btn fl-btn-accent'
+									onClick={activate}>
+									Activate Windows
+								</button>
+							)
+						}
+					/>
+
 					<SettingCard Icon={Cat} title='Desktop cat'>
 						<ToggleSwitch
 							checked={catOn}

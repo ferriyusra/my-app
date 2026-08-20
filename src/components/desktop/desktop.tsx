@@ -31,6 +31,7 @@ import StartMenu from '@/components/start-menu/start-menu';
 import ContextMenu, { type MenuEntry } from '@/components/ui/context-menu';
 import DesktopIcons from './desktop-icons';
 import DesktopCat from './cat/desktop-cat';
+import ActivateWatermark from './activate-watermark';
 import type { AppId } from '@/types/windows';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
@@ -102,6 +103,7 @@ function Shell() {
 		setCatOn,
 		catBusy,
 		feedCat,
+		activated,
 	} = useShell();
 	const icons = useDesktopIcons();
 	const [menu, setMenu] = useState<{
@@ -431,6 +433,7 @@ function Shell() {
 	return (
 		<div
 			className='desktop'
+			data-activated={activated || undefined}
 			data-dimmed={power !== 'on' || undefined}
 			onPointerDown={(e) => {
 				/* A click on bare wallpaper clears the selection and any menu.
@@ -502,6 +505,7 @@ function Shell() {
 				/>
 			)}
 
+			<ActivateWatermark />
 			<Toast />
 			<Taskbar />
 			<PowerScreen />
