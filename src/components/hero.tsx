@@ -55,14 +55,17 @@ export default function Hero() {
 		<section
 			id='hero'
 			style={{
-				/* Deliberately short of a full viewport: at 100svh the first
-				   Experience entry sat entirely below the fold, so a visitor
-				   skimming the page saw no evidence at all before scrolling. */
-				minHeight: '78svh',
+				/* Full viewport. Shortening this to 78svh to let the next section
+				   peek pulled the whole block up the screen, because the content
+				   is centred — the hero read as top-heavy. Letting Experience peek
+				   is not worth badly placed type. */
+				minHeight: '100svh',
 				display: 'flex',
 				alignItems: 'center',
 				position: 'relative',
 				background: 'var(--hero-bg)',
+				/* Asymmetric: the extra 56px on top offsets the fixed navbar so the
+				   block reads as optically centred rather than geometrically. */
 				paddingTop: 128,
 				paddingBottom: 72,
 			}}>
