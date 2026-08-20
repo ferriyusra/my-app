@@ -1,42 +1,45 @@
-import Navbar from "@/components/navbar";
-import Hero from "@/components/hero";
-import About from "@/components/about";
-import Skills from "@/components/skills";
-import Projects from "@/components/projects";
-import Experience from "@/components/experience";
-import Contact from "@/components/contact";
-import Footer from "@/components/footer";
-import WaveDivider from "@/components/wave-divider";
+import type { Metadata } from 'next';
+import Desktop from '@/components/desktop/desktop';
+import { listCustomWallpapers } from '@/lib/wallpapers';
+import PortfolioDocument from '@/components/content/portfolio-document';
+import { profile } from '@/data/profile';
 
 const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Ferri Yusra",
-  url: "https://ferriyusra.com",
-  jobTitle: "Full Stack Engineer",
-  description:
-    "Backend engineer with 4+ years building scalable API systems across fintech, GovTech health, and automotive industries.",
-  sameAs: [
-    "https://github.com/ferriyusra",
-    "https://linkedin.com/in/ferriyusra",
-  ],
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: profile.name,
+	url: profile.site,
+	jobTitle: profile.role,
+	description: profile.bio,
+	email: profile.email,
+	address: {
+		'@type': 'PostalAddress',
+		addressLocality: 'Jakarta',
+		addressCountry: 'ID',
+	},
+	sameAs: [profile.github, profile.linkedin],
 };
 
-export default function Home() {
-  return (
-    <main className="dot-grid min-h-screen">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <Navbar />
-      <Hero />
-      <About />
-      <Skills />
-      <Experience />
-      <Projects />
-      <Contact />
-      <Footer />
-    </main>
-  );
+export const metadata: Metadata = {
+	title: `${profile.name} — ${profile.role}`,
+};
+
+export default async function Home() {
+	/* Read here rather than from the client: this page is a server component
+	   and is prerendered, so the listing costs nothing at runtime. */
+	const customWallpapers = await listCustomWallpapers();
+
+	return (
+		<>
+			<script
+				type='application/ld+json'
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+			/>
+			{/* The document ships in the HTML and is the whole experience on a
+			    narrow screen. On a wide one the desktop shell covers it — see
+			    the `data-shell` switch in layout.tsx. */}
+			<PortfolioDocument />
+			<Desktop customWallpapers={customWallpapers} />
+		</>
+	);
 }
