@@ -11,6 +11,7 @@ import {
 	LayersIcon,
 	LinkedInIcon,
 	MailIcon,
+	MediaIcon,
 	PersonIcon,
 	RecycleIcon,
 } from '@/components/icons/app-icons';
@@ -23,6 +24,7 @@ import ExplorerApp from './explorer-app';
 import SkillsApp from './skills-app';
 import ExperienceApp from './experience-app';
 import ContactApp from './contact-app';
+import MediaApp from './media-app';
 import SettingsApp from './settings-app';
 import BrowserApp from './browser-app';
 import EditorApp from './editor-app';
@@ -86,6 +88,15 @@ export const APPS: AppDef[] = [
 		w: 940,
 		h: 620,
 		Content: ContactApp,
+	},
+	{
+		id: 'media',
+		title: 'Media Player',
+		blurb: 'Search and play music',
+		tile: { Art: MediaIcon },
+		w: 940,
+		h: 620,
+		Content: MediaApp,
 	},
 	{
 		id: 'vscode',
@@ -176,6 +187,7 @@ export const DESKTOP_ITEMS: { id: AppId | ShortcutId; label: string }[] = [
 	{ id: 'skills', label: 'Skills' },
 	{ id: 'experience', label: 'Experience' },
 	{ id: 'contact', label: 'Contact' },
+	{ id: 'media', label: 'Media Player' },
 	{ id: 'resume', label: 'Resume' },
 	{ id: 'github', label: 'GitHub' },
 	{ id: 'linkedin', label: 'LinkedIn' },
@@ -189,6 +201,7 @@ export const START_PINNED: AppId[] = [
 	'skills',
 	'experience',
 	'contact',
+	'media',
 	'vscode',
 	'edge',
 	'settings',

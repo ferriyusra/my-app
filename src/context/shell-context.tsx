@@ -168,6 +168,7 @@ const PINNABLE: AppId[] = [
 	'skills',
 	'experience',
 	'contact',
+	'media',
 	'settings',
 	'edge',
 	'vscode',

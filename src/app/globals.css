@@ -3091,6 +3091,152 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 .ml-reply:hover { text-decoration: underline; }
 
 /* ═══════════════════════════════════════════════════════════
+   MEDIA PLAYER
+   Search on top, results in the middle, now-playing pinned to
+   the bottom — the shape every desktop player has settled on.
+   ═══════════════════════════════════════════════════════════ */
+
+.mp { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+.mp-head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line-subtle);
+  background: var(--surface-header);
+}
+.mp-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-bottom: 2px solid var(--accent);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+.mp-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-size: 14px;
+  outline: none;
+}
+
+.mp-body { flex: 1; min-height: 0; overflow: auto; padding: 8px; }
+
+/* ── Now playing ── */
+.mp-now {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  border-top: 1px solid var(--line-subtle);
+  background: var(--surface-header);
+}
+.mp-now-cover {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface-chip);
+  color: var(--ink-muted);
+}
+.mp-now-cover img { width: 100%; height: 100%; object-fit: cover; }
+.mp-now-meta { display: flex; flex-direction: column; min-width: 120px; flex: 1; }
+.mp-now-meta strong {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mp-now-meta small {
+  font-size: 12px;
+  color: var(--ink-muted);
+  /* A long list of featured artists must not push the transport around. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mp-controls { display: flex; align-items: center; gap: 4px; }
+.mp-controls button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 99px;
+  background: transparent;
+  color: var(--ink);
+}
+.mp-controls button:hover:not(:disabled) { background: var(--subtle-hover); }
+.mp-controls button:disabled { color: var(--ink-disabled); cursor: not-allowed; }
+.mp-play {
+  background: var(--accent-fill) !important;
+  color: #fff !important;
+  width: 38px !important;
+  height: 38px !important;
+}
+.mp-play:hover:not(:disabled) { background: var(--accent-hover) !important; }
+.mp-play:disabled { opacity: 0.45; }
+
+.mp-seek {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 2;
+  min-width: 180px;
+}
+.mp-time {
+  font-size: 11.5px;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+}
+.mp-seek input[type='range'] { flex: 1; }
+
+.mp-mute {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-secondary);
+}
+.mp-mute:hover { background: var(--subtle-hover); }
+
+/* Previews stop at thirty seconds, so the way to the whole song is never
+   more than one click from the transport. */
+.mp-full {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--surface);
+  color: var(--ink-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.mp-full:hover { background: var(--subtle-hover); color: var(--ink); }
+
+@media (max-width: 720px) {
+  .mp-seek { order: 5; flex-basis: 100%; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    BROWSER
    ═══════════════════════════════════════════════════════════ */
 

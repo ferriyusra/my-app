@@ -363,3 +363,37 @@ export function LinkedInIcon({ size = 32 }: IconProps) {
 		</svg>
 	);
 }
+
+/** Media Player: a play mark over a disc, on the gradient it ships with. */
+export function MediaIcon({ size = 32 }: IconProps) {
+	const id = 'med';
+	return (
+		<svg {...box(size)}>
+			<defs>
+				<linearGradient id={`${id}-a`} x1='0.1' y1='0' x2='0.9' y2='1'>
+					<stop offset='0' stopColor='#7aa8ff' />
+					<stop offset='0.55' stopColor='#3d63e0' />
+					<stop offset='1' stopColor='#6b3fd4' />
+				</linearGradient>
+			</defs>
+			<rect width='32' height='32' rx='7' fill={`url(#${id}-a)`} />
+			{/* A ring behind the play mark reads as a disc without the clutter
+			    of grooves, which vanish at 16px anyway. */}
+			<circle
+				cx='16'
+				cy='16'
+				r='9.4'
+				fill='none'
+				stroke='#fff'
+				strokeOpacity='0.45'
+				strokeWidth='1.6'
+			/>
+			<path d='M13.4 11.3 21.6 16l-8.2 4.7Z' fill='#fff' />
+			<path
+				d='M32 9.5A7 7 0 0 0 25 2.6H7A7 7 0 0 0 0 9.5C1.9 6 8.2 3.6 16 3.6s14.1 2.4 16 5.9Z'
+				fill='#fff'
+				fillOpacity='0.18'
+			/>
+		</svg>
+	);
+}

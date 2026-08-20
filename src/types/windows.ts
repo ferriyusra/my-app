@@ -7,6 +7,7 @@ export type AppId =
 	| 'skills'
 	| 'experience'
 	| 'contact'
+	| 'media'
 	| 'settings'
 	| 'edge'
 	| 'vscode'
