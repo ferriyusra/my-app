@@ -53,6 +53,17 @@ Anything needing both the viewport and the registry lives in
 [src/hooks/use-window-manager.ts](src/hooks/use-window-manager.ts) — `launch`,
 `closeWindow`, `toggleFromTaskbar`, `desktopBounds`.
 
+### Startup
+
+[src/components/desktop/boot-screen.tsx](src/components/desktop/boot-screen.tsx)
+plays boot → lock → sign-in over the desktop, which mounts *underneath* it
+rather than after it — the overlay covers work the browser was doing anyway.
+`booted` in the shell context gates the two things that would be wasted behind
+it (the first window opening, the welcome toast). It runs once per browser
+session via `sessionStorage`, collapses to a short fade under
+`prefers-reduced-motion`, and Start's Restart replays it by setting `booted`
+back to false.
+
 ### Adding an app
 
 1. Write the content component in `src/components/apps/`.

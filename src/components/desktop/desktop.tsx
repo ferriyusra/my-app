@@ -29,6 +29,7 @@ import ContextMenu, { type MenuEntry } from '@/components/ui/context-menu';
 import DesktopIcons from './desktop-icons';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
+import BootScreen from './boot-screen';
 import MobileShell from './mobile-shell';
 
 /** Below this width a windowing metaphor stops being usable. */
@@ -65,8 +66,16 @@ function WindowLayer() {
 
 function Shell() {
 	const { launch } = useWindowManager();
-	const { flyout, openFlyout, closeFlyout, notify, pinned, togglePin, power } =
-		useShell();
+	const {
+		flyout,
+		openFlyout,
+		closeFlyout,
+		notify,
+		pinned,
+		togglePin,
+		power,
+		booted,
+	} = useShell();
 	const icons = useDesktopIcons();
 	const [menu, setMenu] = useState<{
 		x: number;
@@ -214,6 +223,7 @@ function Shell() {
 	   own, never as the first half of a system combination. */
 	const metaAlone = useRef(false);
 	useEffect(() => {
+		if (!booted) return;
 		const down = (e: KeyboardEvent) => {
 			if (e.key === 'Meta' || e.key === 'OS') metaAlone.current = true;
 			else metaAlone.current = false;
@@ -244,15 +254,21 @@ function Shell() {
 			window.removeEventListener('keydown', down);
 			window.removeEventListener('keyup', up);
 		};
-	}, [flyout, openFlyout, closeFlyout, icons, notify]);
+	}, [booted, flyout, openFlyout, closeFlyout, icons, notify]);
 
-	/* Open About once on first load so the desktop is never blank. */
-	const booted = useRef(false);
+	/* Open About once the visitor has signed in, so the desktop is never
+	   blank — and so the window animates in where they can see it. The ref
+	   resets when Restart replays the boot sequence. */
+	const opened = useRef(false);
 	useEffect(() => {
-		if (booted.current) return;
-		booted.current = true;
+		if (!booted) {
+			opened.current = false;
+			return;
+		}
+		if (opened.current) return;
+		opened.current = true;
 		launch('about');
-	}, [launch]);
+	}, [booted, launch]);
 
 	/* Greet the visitor the way Windows greets a fresh sign-in.
 	   Deliberately not ref-guarded: React's development double-invoke tears an
@@ -260,6 +276,7 @@ function Shell() {
 	   way out and then refuse to set another on the way back in — the toast
 	   would simply never appear while developing. */
 	useEffect(() => {
+		if (!booted) return;
 		const t = setTimeout(
 			() =>
 				notify({
@@ -271,7 +288,7 @@ function Shell() {
 			1600,
 		);
 		return () => clearTimeout(t);
-	}, [notify]);
+	}, [booted, notify]);
 
 	return (
 		<div
@@ -363,6 +380,7 @@ function Shell() {
  */
 function Viewport() {
 	const [wide, setWide] = useState<boolean | null>(null);
+	const { booted } = useShell();
 
 	useEffect(() => {
 		const mq = window.matchMedia(`(min-width: ${DESKTOP_MIN}px)`);
@@ -373,7 +391,18 @@ function Viewport() {
 	}, []);
 
 	if (wide === null) return <div className='boot' aria-hidden='true' />;
-	return wide ? <Shell /> : <MobileShell />;
+	if (!wide) return <MobileShell />;
+
+	/* The desktop mounts underneath the startup sequence, not after it, so the
+	   overlay is covering work the browser was doing regardless. The narrow
+	   layout skips it: a Windows sign-in in front of a plain reading view
+	   would be a costume, not a shell. */
+	return (
+		<>
+			<Shell />
+			<AnimatePresence>{!booted && <BootScreen key='boot' />}</AnimatePresence>
+		</>
+	);
 }
 
 export default function Desktop() {

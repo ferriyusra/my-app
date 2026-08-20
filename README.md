@@ -18,10 +18,11 @@ Open <http://localhost:3000>.
 
 | Surface | Behaviour |
 |---|---|
+| Startup | Firmware logo with the orbiting dot ring, lock screen with the clock, then sign-in — once per browser session. Any key walks it forward, Skip ends it, and it doubles as the shell's loading state: the desktop mounts behind it |
 | Desktop | Column-first icon grid, single click to select, double click to open, arrow-key navigation, right-click menu with working View / Sort by / Refresh |
 | Windows | Drag, eight-way resize, focus and z-order, minimise / maximise / restore / close, drag-to-edge snapping with a live preview plate, Snap Layouts flyout with four layouts, per-window system menu |
 | Taskbar | Pinned and running apps with Windows' widening focus indicator, hover previews, right-click to pin or close, live system tray, clock |
-| Start | Search across apps and links, pinned grid, all-apps list, Recommended from this session, power menu (sleep / restart / shut down — all of which do something) |
+| Start | Search across apps and links, pinned grid, all-apps list, Recommended from this session, power menu — sleep blanks the screen, restart replays the startup sequence, shut down leaves a way back |
 | Apps | About (System Properties), File Explorer (Projects), Skills, Experience, Mail (Contact), Settings, Browser, VS Code, Recycle Bin |
 | Personalisation | Light / dark, six accents, four wallpapers, brightness and volume — all persisted, all changing the running shell |
 

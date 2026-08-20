@@ -388,8 +388,12 @@ html[data-theme='dark'] .icon-adaptive { filter: invert(1) brightness(1.7); }
   color: var(--accent);
 }
 
-/* Shown for one frame while the viewport width is measured. */
-.boot { position: fixed; inset: 0; background: var(--bg); }
+/* Held while the viewport width is measured, before either shell mounts.
+   Black on wide screens so it runs straight into the startup sequence with
+   no flash; the narrow layout has no startup sequence, so it sits on the
+   page background instead. CSS knows the width before JavaScript does. */
+.boot { position: fixed; inset: 0; background: #000; }
+@media (max-width: 899px) { .boot { background: var(--bg); } }
 
 /* ═══════════════════════════════════════════════════════════
    DESKTOP + WALLPAPER
@@ -1588,6 +1592,173 @@ input[type='range']::-moz-range-thumb {
 }
 /* Near the right edge the sheet opens leftwards instead. */
 .menu-sub[data-flip] { left: auto; right: calc(100% - 2px); }
+
+/* ═══════════════════════════════════════════════════════════
+   STARTUP SEQUENCE
+   Firmware logo, lock screen, sign-in. It doubles as the
+   shell's loading state: the desktop mounts underneath, so
+   this is covering work the browser was doing anyway.
+   ═══════════════════════════════════════════════════════════ */
+
+.bootscreen {
+  position: absolute;
+  inset: 0;
+  z-index: 99995;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+  font-family: var(--sans);
+  user-select: none;
+  cursor: default;
+}
+
+.bt-stage {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* The lock and sign-in phases sit over the visitor's own wallpaper. */
+.bootscreen .wallpaper { z-index: 0; }
+.bootscreen[data-phase='welcome'] .wallpaper {
+  transform: scale(1.12);
+  filter: blur(34px) saturate(1.15) brightness(0.5);
+}
+.bt-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.42) 0%,
+    rgba(0, 0, 0, 0.18) 42%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+/* ── The orbiting dot ring under the boot logo ──
+   Each dot rides its own rotating wrapper on the same eased orbit, offset in
+   time. The easing is what makes the ring bunch and spread on each turn
+   instead of spinning like a wheel. */
+.bt-spinner {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  margin-top: 44px;
+  color: #fff;
+}
+.bt-spinner[data-small] { width: 32px; height: 32px; margin-top: 22px; }
+.bt-spinner i {
+  position: absolute;
+  inset: 0;
+  display: block;
+  /* Gentle enough that the dots stay strung out along the arc. A harsher
+     curve clumps all five into what reads as a comma rather than a ring. */
+  animation: bt-orbit 2.2s cubic-bezier(0.62, 0.18, 0.38, 0.82) infinite;
+}
+.bt-spinner i::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 99px;
+  background: currentColor;
+}
+.bt-spinner[data-small] i::after { width: 3px; height: 3px; margin-left: -1.5px; }
+@keyframes bt-orbit { to { transform: rotate(360deg); } }
+
+/* ── Lock screen ── */
+.bt-lock { margin-bottom: 8vh; }
+.bt-time {
+  margin: 0;
+  font-family: var(--display);
+  /* Windows sets the lock clock large and light, never bold. */
+  font-size: clamp(64px, 9vw, 108px);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
+}
+.bt-date {
+  margin: 14px 0 0;
+  font-size: clamp(17px, 1.7vw, 22px);
+  font-weight: 400;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+}
+.bt-hint {
+  position: absolute;
+  z-index: 2;
+  bottom: 12vh;
+  margin: 0;
+  font-size: 14px;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+  animation: bt-pulse 2.6s ease-in-out infinite;
+}
+@keyframes bt-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.95; }
+}
+
+/* ── Sign-in ── */
+.bt-avatar {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 99px;
+  background: var(--accent-fill);
+  color: #fff;
+  font-size: 32px;
+  font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+.bt-name {
+  margin: 20px 0 0;
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 400;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
+}
+.bt-welcome {
+  margin: 16px 0 0;
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.bt-skip {
+  position: absolute;
+  z-index: 3;
+  right: 24px;
+  bottom: 24px;
+  padding: 8px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background var(--dur-faster) var(--ease-standard);
+}
+.bt-skip:hover { background: rgba(255, 255, 255, 0.20); }
+.bt-skip:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bt-spinner i, .bt-hint { animation: none; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    POWER SCREEN

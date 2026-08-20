@@ -22,8 +22,8 @@ type Entry = {
 };
 
 export default function StartMenu({ onClose }: { onClose: () => void }) {
-	const { launch } = useWindowManager();
-	const { setPower } = useShell();
+	const { launch, closeAll } = useWindowManager();
+	const { setPower, replayBoot } = useShell();
 	const [query, setQuery] = useState('');
 	const [allApps, setAllApps] = useState(false);
 	const [powerOpen, setPowerOpen] = useState(false);
@@ -219,7 +219,10 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 						<PowerMenu
 							onClose={() => setPowerOpen(false)}
 							onShutdown={() => setPower('off')}
-							onRestart={() => setPower('restart')}
+							onRestart={() => {
+								closeAll();
+								replayBoot();
+							}}
 							onSleep={() => setPower('sleep')}
 						/>
 					)}

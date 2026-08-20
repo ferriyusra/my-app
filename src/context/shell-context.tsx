@@ -76,10 +76,21 @@ type ShellCtx = {
 	/* ── Power ── */
 	power: PowerState;
 	setPower: (p: PowerState) => void;
+
+	/**
+	 * False while the boot / lock / sign-in sequence is on screen. The desktop
+	 * mounts behind it either way, so this only gates the things that would be
+	 * wasted on a visitor who cannot see them yet — the first window opening
+	 * and the welcome toast.
+	 */
+	booted: boolean;
+	finishBoot: () => void;
+	/** Replays the sequence. Start's Restart is the only caller. */
+	replayBoot: () => void;
 };
 
-/** What the screen is doing: running, asleep, rebooting, or off. */
-export type PowerState = 'on' | 'sleep' | 'restart' | 'off';
+/** What the screen is doing: running, asleep, or off. */
+export type PowerState = 'on' | 'sleep' | 'off';
 
 const Ctx = createContext<ShellCtx | null>(null);
 
@@ -96,6 +107,9 @@ const KEY = {
 	wallpaper: 'shell:wallpaper',
 	accent: 'shell:accent',
 	pinned: 'shell:pinned',
+	/* Session, not local: the boot sequence should play once per visit, not
+	   once per machine, and not on every in-session reload. */
+	booted: 'shell:booted',
 } as const;
 
 /**
@@ -177,6 +191,28 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 	const dismissToast = useCallback(() => setToast(null), []);
 	const clearNotifications = useCallback(() => setNotifications([]), []);
 	const [power, setPowerState] = useState<PowerState>('on');
+	const [booted, setBooted] = useState(() => {
+		if (typeof window === 'undefined') return false;
+		try {
+			return sessionStorage.getItem(KEY.booted) === '1';
+		} catch {
+			return false;
+		}
+	});
+
+	const finishBoot = useCallback(() => {
+		setBooted(true);
+		try {
+			sessionStorage.setItem(KEY.booted, '1');
+		} catch {
+			/* Private mode — the sequence simply plays again next reload. */
+		}
+	}, []);
+
+	const replayBoot = useCallback(() => {
+		setFlyout(null);
+		setBooted(false);
+	}, []);
 	const [recents, setRecents] = useState<AppId[]>([]);
 	const [pinned, setPinned] = useState<AppId[]>(readPins);
 
@@ -344,6 +380,10 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			accent,
 			setAccent,
 
+			booted,
+			finishBoot,
+			replayBoot,
+
 			power,
 			setPower: (p) => {
 				if (p !== 'on') setFlyout(null);
@@ -375,6 +415,9 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			setWallpaper,
 			accent,
 			setAccent,
+			booted,
+			finishBoot,
+			replayBoot,
 			power,
 		],
 	);
