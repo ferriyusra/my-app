@@ -21,8 +21,12 @@ No test runner is configured yet.
   `@theme`; all component styling is hand-written CSS in
   [src/app/globals.css](src/app/globals.css)
 - **Framer Motion** for window, flyout and toast transitions
-- **Lucide** for glyph icons; free-form app artwork is hand-drawn SVG in
-  [src/components/icons/app-icons.tsx](src/components/icons/app-icons.tsx)
+- **Lucide** for system glyphs only — Start, Search, Task view, toolbar
+  buttons. **Every app icon is hand-drawn SVG** in
+  [src/components/icons/app-icons.tsx](src/components/icons/app-icons.tsx),
+  because that is what Windows 11 ships: shaped compositions, not line art on
+  a tinted square. `TileArt` deliberately has no glyph variant, so a new app
+  cannot quietly reintroduce one.
 
 ## What this is
 

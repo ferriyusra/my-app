@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Github, LayoutGrid, Pin, PinOff, Search, SquareStack, X } from 'lucide-react';
+import { LayoutGrid, Pin, PinOff, Search, SquareStack, X } from 'lucide-react';
+import { GitHubIcon } from '@/components/icons/app-icons';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { APP_BY_ID, APPS } from '@/components/apps/registry';
@@ -134,7 +135,10 @@ export default function Taskbar() {
 					target='_blank'
 					rel='noopener noreferrer'
 					aria-label='GitHub profile — opens in a new tab'>
-					<Github size={19} aria-hidden='true' />
+					{/* Its own mark, like every other app icon on the strip. The
+					    Start, Search and Task view glyphs stay line art because
+					    those are system controls, which is what Windows does. */}
+					<GitHubIcon size={22} />
 				</a>
 			</div>
 
