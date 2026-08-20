@@ -52,7 +52,13 @@
      whatever is behind it. Mica is the same idea without the blur,
      used for window bodies. */
   --acrylic: rgba(252, 252, 252, 0.72);
-  --acrylic-taskbar: rgba(243, 243, 243, 0.70);
+  /* Thin enough that the wallpaper's colour actually comes through — a 70%
+     tint over a strong blur just produced a flat slab. The top stop is the
+     lit edge every pane of glass has. */
+  --acrylic-taskbar: rgba(244, 247, 252, 0.56);
+  --acrylic-taskbar-top: rgba(255, 255, 255, 0.66);
+  --taskbar-edge: rgba(255, 255, 255, 0.55);
+  --taskbar-lift: 0 -1px 14px rgba(0, 0, 0, 0.13);
   --acrylic-blur: blur(30px) saturate(125%);
   /* Acrylic is blur *plus tint plus grain*. Without the grain it reads as
      plain frosted glass, which is the difference between "blurred" and
@@ -128,7 +134,10 @@ html[data-theme='dark'] {
   --sh-64: 0 32px 64px rgba(0, 0, 0, 0.55), 0 0 8px rgba(0, 0, 0, 0.35);
 
   --acrylic: rgba(44, 44, 44, 0.78);
-  --acrylic-taskbar: rgba(32, 32, 32, 0.72);
+  --acrylic-taskbar: rgba(20, 22, 26, 0.62);
+  --acrylic-taskbar-top: rgba(58, 63, 72, 0.62);
+  --taskbar-edge: rgba(255, 255, 255, 0.16);
+  --taskbar-lift: 0 -1px 16px rgba(0, 0, 0, 0.35);
   --mica: #282828;
   --mica-tint: rgba(71, 158, 245, 0.04);
   --caption-hover: rgba(255, 255, 255, 0.07);
@@ -793,12 +802,17 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
   align-items: center;
   justify-content: center;
   padding: 0 8px;
-  background: var(--grain) 0 0 / 160px 160px repeat, var(--acrylic-taskbar);
-  backdrop-filter: blur(40px) saturate(140%);
-  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  background:
+    var(--grain) 0 0 / 160px 160px repeat,
+    linear-gradient(var(--acrylic-taskbar-top), var(--acrylic-taskbar) 42%);
+  /* Less blur and more saturation than the flyouts: the taskbar sits directly
+     on the wallpaper, and letting some of its colour and structure survive is
+     what separates glass from frosting. */
+  backdrop-filter: blur(26px) saturate(190%);
+  border-top: 1px solid var(--taskbar-edge);
+  box-shadow: var(--taskbar-lift);
   z-index: 9000;
 }
-html[data-theme='dark'] .taskbar { border-top-color: rgba(255, 255, 255, 0.06); }
 
 /* ── Left widget: Windows puts weather here; this states my hours ── */
 .tb-widget {
