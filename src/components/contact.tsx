@@ -1,5 +1,6 @@
 'use client';
-import { useState, useRef } from 'react';
+
+import { useId, useRef, useState } from 'react';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import {
 	Mail,
@@ -7,41 +8,109 @@ import {
 	Linkedin,
 	Send,
 	CheckCircle,
+	AlertCircle,
+	Loader2,
 	User,
 	MessageSquare,
 	AtSign,
+	type LucideIcon,
 } from 'lucide-react';
-import gsap from 'gsap';
-
-const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
+import { profile } from '@/data/profile';
+import {
+	BORDER,
+	CARD,
+	CONTAINER,
+	EASE,
+	FONT,
+	MONO,
+	RADIUS,
+	SANS,
+} from '@/lib/theme';
 
 const contacts = [
 	{
 		icon: Mail,
 		label: 'Email',
-		value: 'feriyusra1616@gmail.com',
-		href: 'mailto:feriyusra1616@gmail.com',
+		value: profile.email,
+		href: `mailto:${profile.email}`,
+		external: false,
 	},
 	{
 		icon: Github,
 		label: 'GitHub',
-		value: 'github.com/ferriyusra',
-		href: 'https://github.com/ferriyusra',
+		value: profile.github.replace('https://', ''),
+		href: profile.github,
+		external: true,
 	},
 	{
 		icon: Linkedin,
 		label: 'LinkedIn',
-		value: 'linkedin.com/in/ferriyusra',
-		href: 'https://linkedin.com/in/ferriyusra',
+		value: profile.linkedin.replace('https://', ''),
+		href: profile.linkedin,
+		external: true,
 	},
 ];
 
-const CARD: React.CSSProperties = {
-	background: '#ffffff',
-	border: '2px solid #0a0a0a',
-	borderRadius: 20,
-	boxShadow: '6px 6px 0px #0a0a0a',
+type Status = 'idle' | 'sending' | 'sent' | 'error';
+
+/* Focus styling lives in globals.css (.field:focus) — CSS transitions handle
+   var()-based colours correctly, which GSAP tweens cannot. */
+const INPUT_BASE: React.CSSProperties = {
+	width: '100%',
+	padding: '11px 14px 11px 40px',
+	background: 'var(--surface)',
+	border: `${BORDER.soft} solid var(--line-soft)`,
+	borderRadius: RADIUS.md,
+	color: 'var(--ink)',
+	fontSize: FONT.sm,
+	fontFamily: SANS,
+	boxSizing: 'border-box',
 };
+
+const LABEL: React.CSSProperties = {
+	fontSize: FONT.sm,
+	fontWeight: 600,
+	color: 'var(--ink)',
+	display: 'block',
+	marginBottom: 7,
+	fontFamily: SANS,
+};
+
+/** One labelled input. Every field gets a real `for`/`id` pair. */
+function Field({
+	id,
+	label,
+	icon: Icon,
+	children,
+}: {
+	id: string;
+	label: string;
+	icon: LucideIcon;
+	children: React.ReactNode;
+}) {
+	return (
+		<div>
+			<label htmlFor={id} style={LABEL}>
+				{label}
+			</label>
+			<div style={{ position: 'relative' }}>
+				<Icon
+					size={15}
+					aria-hidden='true'
+					style={{
+						position: 'absolute',
+						left: 13,
+						top: 19,
+						transform: 'translateY(-50%)',
+						color: 'var(--ink-muted)',
+						pointerEvents: 'none',
+					}}
+				/>
+				{children}
+			</div>
+		</div>
+	);
+}
 
 export default function Contact() {
 	const [form, setForm] = useState({
@@ -50,7 +119,7 @@ export default function Contact() {
 		subject: '',
 		message: '',
 	});
-	const [sent, setSent] = useState(false);
+	const [status, setStatus] = useState<Status>('idle');
 	const shouldReduceMotion = useReducedMotion();
 
 	const t = (duration: number, delay: number) => ({
@@ -61,40 +130,27 @@ export default function Contact() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		setStatus('sending');
 		try {
 			const res = await fetch('/api/contact', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(form),
 			});
-			if (res.ok) {
-				setSent(true);
-				setForm({ name: '', email: '', subject: '', message: '' });
-				setTimeout(() => setSent(false), 3000);
-			}
+			if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+			setStatus('sent');
+			setForm({ name: '', email: '', subject: '', message: '' });
+			setTimeout(() => setStatus('idle'), 4000);
 		} catch {
-			// Network error - silently handle
+			// Surface the failure instead of swallowing it — the user needs
+			// to know the message did not go through.
+			setStatus('error');
 		}
 	};
 
-	const inputBase: React.CSSProperties = {
-		width: '100%',
-		padding: '11px 14px 11px 40px',
-		background: '#ffffff',
-		border: '1.5px solid #d4d4d4',
-		borderRadius: 12,
-		color: '#0a0a0a',
-		fontSize: 14,
-		fontFamily: "'Inter', sans-serif",
-		outline: 'none',
-		transition: 'border-color 0.2s ease',
-		boxSizing: 'border-box',
-	};
-
 	return (
-		<section id='contact' style={{ background: '#f0ece8' }}>
-			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-				{/* Two-column layout */}
+		<section id='contact' style={{ background: 'var(--section-a)' }}>
+			<div style={CONTAINER}>
 				<div
 					style={{
 						display: 'grid',
@@ -105,22 +161,6 @@ export default function Contact() {
 					}}>
 					{/* ── Left: heading + info ── */}
 					<div>
-						<motion.div
-							initial={{ opacity: 0, y: 10 }}
-							whileInView={{ opacity: 1, y: 0 }}
-							viewport={{ once: true, margin: '-80px' }}
-							transition={t(0.35, 0)}
-							style={{
-								fontFamily: "'JetBrains Mono', monospace",
-								fontSize: 11,
-								color: '#a3a3a3',
-								fontWeight: 600,
-								letterSpacing: '0.18em',
-								textTransform: 'uppercase',
-								marginBottom: 16,
-							}}
-						/>
-
 						<motion.h2
 							initial={{ opacity: 0, y: 18 }}
 							whileInView={{ opacity: 1, y: 0 }}
@@ -130,18 +170,18 @@ export default function Contact() {
 								fontSize: 'clamp(32px, 5vw, 56px)',
 								fontWeight: 800,
 								marginBottom: 16,
-								fontFamily: "'Inter', sans-serif",
-								color: '#0a0a0a',
+								fontFamily: SANS,
+								color: 'var(--ink)',
 								letterSpacing: '-0.03em',
 								lineHeight: 1.1,
 							}}>
 							Let&apos;s{' '}
 							<span
 								style={{
-									background: '#6366f1',
-									color: '#ffffff',
+									background: 'var(--accent)',
+									color: 'var(--accent-ink)',
 									padding: '2px 10px 4px',
-									borderRadius: 8,
+									borderRadius: RADIUS.sm,
 									display: 'inline-block',
 								}}>
 								Connect
@@ -154,24 +194,23 @@ export default function Contact() {
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.4, 0.16)}
 							style={{
-								color: '#525252',
-								fontSize: 15,
+								color: 'var(--ink-secondary)',
+								fontSize: FONT.base,
 								marginBottom: 36,
 								maxWidth: 380,
 								lineHeight: 1.75,
-								fontFamily: "'Inter', sans-serif",
+								fontFamily: SANS,
 							}}>
-							I&apos;m open to new opportunities — whether it&apos;s a project,
-							a question, or just want to say hi. My inbox is always open.
+							I&apos;m open to new opportunities — whether it&apos;s a project, a
+							question, or just want to say hi. My inbox is always open.
 						</motion.p>
 
-						{/* Contact info card */}
 						<motion.div
 							initial={{ opacity: 0, y: 20 }}
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.5, 0.24)}
-							className="card"
+							className='card'
 							style={{
 								...CARD,
 								padding: '24px 28px',
@@ -179,10 +218,13 @@ export default function Contact() {
 								flexDirection: 'column',
 								gap: 18,
 							}}>
-							{contacts.map(({ icon: Icon, label, value, href }, i) => (
+							{contacts.map(({ icon: Icon, label, value, href, external }, i) => (
 								<motion.a
 									key={label}
 									href={href}
+									{...(external
+										? { target: '_blank', rel: 'noopener noreferrer' }
+										: {})}
 									initial={{ opacity: 0, x: -12 }}
 									whileInView={{ opacity: 1, x: 0 }}
 									viewport={{ once: true }}
@@ -194,29 +236,31 @@ export default function Contact() {
 										textDecoration: 'none',
 										padding: '10px 0',
 										borderBottom:
-											i < contacts.length - 1 ? '1px solid #f0f0f0' : 'none',
+											i < contacts.length - 1
+												? `1px solid var(--line-subtle)`
+												: 'none',
 									}}>
 									<div
 										style={{
 											width: 38,
 											height: 38,
-											borderRadius: 10,
-											background: '#f4f4f5',
-											border: '1.5px solid #e4e4e7',
+											borderRadius: RADIUS.sm,
+											background: 'var(--surface-chip)',
+											border: `${BORDER.soft} solid var(--line-subtle)`,
 											display: 'flex',
 											alignItems: 'center',
 											justifyContent: 'center',
 											flexShrink: 0,
-											color: '#6366f1',
+											color: 'var(--accent)',
 										}}>
-										<Icon size={16} />
+										<Icon size={16} aria-hidden='true' />
 									</div>
 									<div>
 										<div
 											style={{
-												fontSize: 11,
-												color: '#a3a3a3',
-												fontFamily: "'JetBrains Mono', monospace",
+												fontSize: FONT.micro,
+												color: 'var(--ink-muted)',
+												fontFamily: MONO,
 												letterSpacing: '0.1em',
 												textTransform: 'uppercase',
 												marginBottom: 2,
@@ -225,10 +269,10 @@ export default function Contact() {
 										</div>
 										<div
 											style={{
-												fontSize: 13,
-												color: '#0a0a0a',
+												fontSize: FONT.sm,
+												color: 'var(--ink)',
 												fontWeight: 600,
-												fontFamily: "'Inter', sans-serif",
+												fontFamily: SANS,
 											}}>
 											{value}
 										</div>
@@ -244,27 +288,25 @@ export default function Contact() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.55, 0.2)}
-						className="card"
+						className='card'
 						style={{ ...CARD, padding: 36 }}>
 						<h3
 							style={{
-								fontSize: 20,
+								fontSize: FONT.xl,
 								fontWeight: 700,
 								marginBottom: 28,
-								fontFamily: "'Inter', sans-serif",
-								color: '#0a0a0a',
+								fontFamily: SANS,
+								color: 'var(--ink)',
 								letterSpacing: '-0.01em',
 							}}>
 							Send a message
 						</h3>
 
-						<FormFields
+						<ContactForm
 							form={form}
 							setForm={setForm}
-							sent={sent}
+							status={status}
 							handleSubmit={handleSubmit}
-							inputBase={inputBase}
-							shouldReduceMotion={shouldReduceMotion}
 							t={t}
 						/>
 					</motion.div>
@@ -274,263 +316,210 @@ export default function Contact() {
 	);
 }
 
-function FormFields({
+function ContactForm({
 	form,
 	setForm,
-	sent,
+	status,
 	handleSubmit,
-	inputBase,
-	shouldReduceMotion,
 	t,
 }: {
 	form: { name: string; email: string; subject: string; message: string };
-	setForm: (f: { name: string; email: string; subject: string; message: string }) => void;
-	sent: boolean;
+	setForm: (f: {
+		name: string;
+		email: string;
+		subject: string;
+		message: string;
+	}) => void;
+	status: Status;
 	handleSubmit: (e: React.FormEvent) => void;
-	inputBase: React.CSSProperties;
-	shouldReduceMotion: boolean | null;
-	t: (duration: number, delay: number) => { duration: number; ease: [number, number, number, number]; delay: number };
+	t: (
+		duration: number,
+		delay: number,
+	) => { duration: number; ease: [number, number, number, number]; delay: number };
 }) {
 	const formRef = useRef<HTMLFormElement>(null);
 	const isInView = useInView(formRef, { once: true, margin: '-60px' });
 
+	// Stable, collision-free ids so every label points at its own input.
+	const uid = useId();
+	const ids = {
+		name: `${uid}-name`,
+		email: `${uid}-email`,
+		subject: `${uid}-subject`,
+		message: `${uid}-message`,
+	};
+
+	const busy = status === 'sending';
+
 	return (
-						<form
-							ref={formRef}
-							onSubmit={handleSubmit}
-							style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-							{/* Name + Email row */}
-							<motion.div
-								initial={{ opacity: 0, y: 16 }}
-								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-								transition={t(0.4, 0.1)}
-								style={{
-									display: 'grid',
-									gridTemplateColumns:
-										'repeat(auto-fit, minmax(min(160px, 100%), 1fr))',
-									gap: 14,
-								}}>
-								{/* Name */}
-								<div>
-									<label
-										style={{
-											fontSize: 13,
-											fontWeight: 600,
-											color: '#0a0a0a',
-											display: 'block',
-											marginBottom: 7,
-											fontFamily: "'Inter', sans-serif",
-										}}>
-										Name
-									</label>
-									<div style={{ position: 'relative' }}>
-										<User
-											size={15}
-											style={{
-												position: 'absolute',
-												left: 13,
-												top: '50%',
-												transform: 'translateY(-50%)',
-												color: '#a3a3a3',
-												pointerEvents: 'none',
-											}}
-										/>
-										<input
-											type='text'
-											value={form.name}
-											onChange={(e) =>
-												setForm({ ...form, name: e.target.value })
-											}
-											placeholder='John Carter'
-											required
-											style={inputBase}
-											onFocus={(e) =>
-												gsap.to(e.currentTarget, { borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.12)', duration: 0.3, ease: 'power2.out' })
-											}
-											onBlur={(e) =>
-												gsap.to(e.currentTarget, { borderColor: '#d4d4d4', boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.25, ease: 'power2.in' })
-											}
-										/>
-									</div>
-								</div>
+		<form
+			ref={formRef}
+			onSubmit={handleSubmit}
+			style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+			{/* Name + Email row */}
+			<motion.div
+				initial={{ opacity: 0, y: 16 }}
+				animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+				transition={t(0.4, 0.1)}
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(auto-fit, minmax(min(160px, 100%), 1fr))',
+					gap: 14,
+				}}>
+				<Field id={ids.name} label='Name' icon={User}>
+					<input
+						id={ids.name}
+						name='name'
+						type='text'
+						autoComplete='name'
+						value={form.name}
+						onChange={(e) => setForm({ ...form, name: e.target.value })}
+						placeholder='John Carter'
+						required
+						disabled={busy}
+						className='field'
+						style={INPUT_BASE}
+					/>
+				</Field>
 
-								{/* Email */}
-								<div>
-									<label
-										style={{
-											fontSize: 13,
-											fontWeight: 600,
-											color: '#0a0a0a',
-											display: 'block',
-											marginBottom: 7,
-											fontFamily: "'Inter', sans-serif",
-										}}>
-										Email
-									</label>
-									<div style={{ position: 'relative' }}>
-										<AtSign
-											size={15}
-											style={{
-												position: 'absolute',
-												left: 13,
-												top: '50%',
-												transform: 'translateY(-50%)',
-												color: '#a3a3a3',
-												pointerEvents: 'none',
-											}}
-										/>
-										<input
-											type='email'
-											value={form.email}
-											onChange={(e) =>
-												setForm({ ...form, email: e.target.value })
-											}
-											placeholder='contact@email.com'
-											required
-											style={inputBase}
-											onFocus={(e) =>
-												gsap.to(e.currentTarget, { borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.12)', duration: 0.3, ease: 'power2.out' })
-											}
-											onBlur={(e) =>
-												gsap.to(e.currentTarget, { borderColor: '#d4d4d4', boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.25, ease: 'power2.in' })
-											}
-										/>
-									</div>
-								</div>
-							</motion.div>
+				<Field id={ids.email} label='Email' icon={AtSign}>
+					<input
+						id={ids.email}
+						name='email'
+						type='email'
+						autoComplete='email'
+						value={form.email}
+						onChange={(e) => setForm({ ...form, email: e.target.value })}
+						placeholder='contact@email.com'
+						required
+						disabled={busy}
+						className='field'
+						style={INPUT_BASE}
+					/>
+				</Field>
+			</motion.div>
 
-							{/* Subject */}
-							<motion.div
-								initial={{ opacity: 0, y: 16 }}
-								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-								transition={t(0.4, 0.2)}>
-								<label
-									style={{
-										fontSize: 13,
-										fontWeight: 600,
-										color: '#0a0a0a',
-										display: 'block',
-										marginBottom: 7,
-										fontFamily: "'Inter', sans-serif",
-									}}>
-									Subject
-								</label>
-								<div style={{ position: 'relative' }}>
-									<MessageSquare
-										size={15}
-										style={{
-											position: 'absolute',
-											left: 13,
-											top: '50%',
-											transform: 'translateY(-50%)',
-											color: '#a3a3a3',
-											pointerEvents: 'none',
-										}}
-									/>
-									<input
-										type='text'
-										value={form.subject}
-										onChange={(e) =>
-											setForm({ ...form, subject: e.target.value })
-										}
-										placeholder='Project inquiry...'
-										style={inputBase}
-										onFocus={(e) =>
-											gsap.to(e.currentTarget, { borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.12)', duration: 0.3, ease: 'power2.out' })
-										}
-										onBlur={(e) =>
-											gsap.to(e.currentTarget, { borderColor: '#d4d4d4', boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.25, ease: 'power2.in' })
-										}
-									/>
-								</div>
-							</motion.div>
+			{/* Subject */}
+			<motion.div
+				initial={{ opacity: 0, y: 16 }}
+				animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+				transition={t(0.4, 0.2)}>
+				<Field id={ids.subject} label='Subject' icon={MessageSquare}>
+					<input
+						id={ids.subject}
+						name='subject'
+						type='text'
+						value={form.subject}
+						onChange={(e) => setForm({ ...form, subject: e.target.value })}
+						placeholder='Project inquiry...'
+						disabled={busy}
+						className='field'
+						style={INPUT_BASE}
+					/>
+				</Field>
+			</motion.div>
 
-							{/* Message */}
-							<motion.div
-								initial={{ opacity: 0, y: 16 }}
-								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-								transition={t(0.4, 0.3)}>
-								<label
-									style={{
-										fontSize: 13,
-										fontWeight: 600,
-										color: '#0a0a0a',
-										display: 'block',
-										marginBottom: 7,
-										fontFamily: "'Inter', sans-serif",
-									}}>
-									Message
-								</label>
-								<textarea
-									value={form.message}
-									onChange={(e) =>
-										setForm({ ...form, message: e.target.value })
-									}
-									placeholder='Please write your message...'
-									rows={5}
-									required
-									style={{
-										...inputBase,
-										padding: '12px 14px',
-										resize: 'vertical',
-									}}
-									onFocus={(e) =>
-										gsap.to(e.currentTarget, { borderColor: '#6366f1', boxShadow: '0 0 0 3px rgba(99,102,241,0.12)', duration: 0.3, ease: 'power2.out' })
-									}
-									onBlur={(e) =>
-										gsap.to(e.currentTarget, { borderColor: '#d4d4d4', boxShadow: '0 0 0 0px rgba(99,102,241,0)', duration: 0.25, ease: 'power2.in' })
-									}
-								/>
-							</motion.div>
+			{/* Message */}
+			<motion.div
+				initial={{ opacity: 0, y: 16 }}
+				animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+				transition={t(0.4, 0.3)}>
+				<label htmlFor={ids.message} style={LABEL}>
+					Message
+				</label>
+				<textarea
+					id={ids.message}
+					name='message'
+					value={form.message}
+					onChange={(e) => setForm({ ...form, message: e.target.value })}
+					placeholder='Please write your message...'
+					rows={5}
+					required
+					disabled={busy}
+					className='field'
+					style={{ ...INPUT_BASE, padding: '12px 14px', resize: 'vertical' }}
+				/>
+			</motion.div>
 
-							{/* Submit */}
-							<motion.div
-								initial={{ opacity: 0, y: 16 }}
-								animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-								transition={t(0.4, 0.4)}>
-								<button
-									type='submit'
-									style={{
-										width: '100%',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
-										gap: 8,
-										padding: '14px 24px',
-										background: sent ? '#f4f4f5' : '#6366f1',
-										border: sent ? '1.5px solid #d4d4d4' : '2px solid #0a0a0a',
-										borderRadius: 12,
-										color: sent ? '#525252' : 'white',
-										fontSize: 15,
-										fontWeight: 700,
-										cursor: 'pointer',
-										fontFamily: "'Inter', sans-serif",
-										transition: 'all 0.2s ease',
-										boxShadow: sent ? 'none' : '3px 3px 0px #0a0a0a',
-									}}
-									onMouseEnter={(e) => {
-										if (!sent) {
-											e.currentTarget.style.transform = 'translate(-1px, -1px)';
-											e.currentTarget.style.boxShadow = '4px 4px 0px #0a0a0a';
-										}
-									}}
-									onMouseLeave={(e) => {
-										if (!sent) {
-											e.currentTarget.style.transform = 'translate(0, 0)';
-											e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
-										}
-									}}>
-									{sent ? (
-										<>
-											<CheckCircle size={16} /> Message Sent!
-										</>
-									) : (
-										<>
-											<Send size={16} /> Send Message
-										</>
-									)}
-								</button>
-							</motion.div>
-						</form>
+			{/* Submit */}
+			<motion.div
+				initial={{ opacity: 0, y: 16 }}
+				animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+				transition={t(0.4, 0.4)}>
+				<button
+					type='submit'
+					disabled={busy}
+					style={{
+						width: '100%',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						gap: 8,
+						padding: '14px 24px',
+						background: status === 'sent' ? 'var(--success)' : 'var(--accent)',
+						border: `${BORDER.hard} solid var(--line)`,
+						borderRadius: RADIUS.md,
+						color: 'var(--accent-ink)',
+						fontSize: FONT.base,
+						fontWeight: 700,
+						cursor: busy ? 'progress' : 'pointer',
+						fontFamily: SANS,
+						transition: 'background 0.2s ease, box-shadow 0.2s ease',
+						boxShadow: 'var(--sh-1-hi)',
+						opacity: busy ? 0.75 : 1,
+					}}
+					onMouseEnter={(e) => {
+						if (!busy) e.currentTarget.style.boxShadow = 'var(--sh-2)';
+					}}
+					onMouseLeave={(e) => {
+						e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
+					}}>
+					{busy && (
+						<>
+							<Loader2 size={16} className='spin' aria-hidden='true' /> Sending…
+						</>
+					)}
+					{status === 'sent' && (
+						<>
+							<CheckCircle size={16} aria-hidden='true' /> Message sent
+						</>
+					)}
+					{(status === 'idle' || status === 'error') && (
+						<>
+							<Send size={16} aria-hidden='true' /> Send Message
+						</>
+					)}
+				</button>
+
+				{/* Status is announced to screen readers, not just shown. */}
+				<p
+					role='status'
+					aria-live='polite'
+					style={{
+						minHeight: 20,
+						margin: '10px 0 0',
+						display: 'flex',
+						alignItems: 'center',
+						gap: 6,
+						fontSize: FONT.sm,
+						fontFamily: SANS,
+						color:
+							status === 'error' ? 'var(--danger)' : 'var(--ink-secondary)',
+					}}>
+					{status === 'sent' && (
+						<>
+							<CheckCircle size={14} aria-hidden='true' />
+							Thanks — I&apos;ll get back to you shortly.
+						</>
+					)}
+					{status === 'error' && (
+						<>
+							<AlertCircle size={14} aria-hidden='true' />
+							Could not send. Please email me directly at {profile.email}.
+						</>
+					)}
+				</p>
+			</motion.div>
+		</form>
 	);
 }

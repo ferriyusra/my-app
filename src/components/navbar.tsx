@@ -1,10 +1,13 @@
 'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Menu, X, Mail, Sun, Moon } from 'lucide-react';
 import { useTheme } from './theme-provider';
 import gsap from 'gsap';
+import { profile } from '@/data/profile';
+import { BORDER, FONT, RADIUS, SANS } from '@/lib/theme';
 
 const navLinks = [
 	{ href: '#hero', label: 'Home', id: 'hero', page: false },
@@ -20,7 +23,7 @@ const MD = 768;
 
 export default function Navbar() {
 	const pathname = usePathname();
-	const { theme, toggle } = useTheme();
+	const { theme, toggle, mounted } = useTheme();
 	const isDark = theme === 'dark';
 
 	const [menuOpen, setMenuOpen] = useState(false);
@@ -62,7 +65,7 @@ export default function Navbar() {
 		return () => window.removeEventListener('scroll', update);
 	}, [isHomePage]);
 
-	// GSAP: Slide pill to active nav link
+	// GSAP: slide the pill to the active nav link
 	useEffect(() => {
 		if (!isHomePage || isMobile) return;
 		const pill = pillRef.current;
@@ -86,7 +89,6 @@ export default function Navbar() {
 		});
 	}, [activeSection, isHomePage, isMobile]);
 
-	// Scroll detection for blur effect
 	useEffect(() => {
 		const onScroll = () => setScrolled(window.scrollY > 20);
 		onScroll();
@@ -94,21 +96,31 @@ export default function Navbar() {
 		return () => window.removeEventListener('scroll', onScroll);
 	}, []);
 
-	const borderColor = isDark ? '#2a2a2a' : '#0a0a0a';
-	const shadowColor = isDark ? '#000' : '#0a0a0a';
+	/* Colours come from CSS variables, so the navbar re-themes without
+	   re-rendering. `theme` is only read for the toggle icon. */
 	const navBg = scrolled
-		? isDark
-			? 'rgba(26,26,26,0.8)'
-			: 'rgba(255,255,255,0.8)'
-		: isDark
-			? '#1a1a1a'
-			: '#ffffff';
-	const textColor = isDark ? '#a3a3a3' : '#525252';
-	const textHoverColor = isDark ? '#e5e5e5' : '#0a0a0a';
+		? 'color-mix(in srgb, var(--surface) 80%, transparent)'
+		: 'var(--surface)';
+
+	const toggleButtonStyle: React.CSSProperties = {
+		width: 36,
+		height: 36,
+		borderRadius: '50%',
+		background: 'transparent',
+		border: `${BORDER.soft} solid var(--line-subtle)`,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		cursor: 'pointer',
+		color: 'var(--ink-secondary)',
+		transition: 'border-color 0.2s ease, color 0.2s ease',
+		flexShrink: 0,
+	};
 
 	return (
 		<>
 			<nav
+				aria-label='Main'
 				style={{
 					position: 'fixed',
 					top: 16,
@@ -120,13 +132,12 @@ export default function Navbar() {
 					gap: 4,
 					padding: '6px 6px 6px 8px',
 					background: navBg,
-					border: `2px solid ${borderColor}`,
-					borderRadius: 100,
-					boxShadow: `4px 4px 0px ${shadowColor}`,
+					border: `${BORDER.hard} solid var(--line)`,
+					borderRadius: RADIUS.full,
+					boxShadow: 'var(--sh-2)',
 					backdropFilter: scrolled ? 'blur(12px)' : 'none',
 					WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-					transition:
-						'background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
+					transition: 'background 0.3s ease, box-shadow 0.3s ease',
 					width: isMobile ? 'calc(100vw - 32px)' : 'max-content',
 					maxWidth: isMobile ? 480 : 'none',
 					boxSizing: 'border-box',
@@ -135,13 +146,13 @@ export default function Navbar() {
 				<a
 					href='#hero'
 					style={{ textDecoration: 'none', flexShrink: 0 }}
-					aria-label='Home'>
+					aria-label={`${profile.name} — home`}>
 					<div
 						style={{
 							width: 40,
 							height: 40,
 							borderRadius: '50%',
-							background: isDark ? '#6366f1' : '#0a0a0a',
+							background: 'var(--nav-brand)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
@@ -149,12 +160,12 @@ export default function Navbar() {
 						}}>
 						<span
 							style={{
-								color: '#ffffff',
-								fontSize: 13,
+								color: 'var(--nav-pill-ink)',
+								fontSize: FONT.sm,
 								fontWeight: 800,
-								fontFamily: "'Inter', sans-serif",
+								fontFamily: SANS,
 							}}>
-							FY
+							{profile.initials}
 						</span>
 					</div>
 				</a>
@@ -164,17 +175,22 @@ export default function Navbar() {
 					<>
 						<div
 							ref={linksRef}
-							style={{ display: 'flex', alignItems: 'center', gap: 0, position: 'relative' }}>
-							{/* Sliding active pill */}
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								gap: 0,
+								position: 'relative',
+							}}>
 							<div
 								ref={pillRef}
+								aria-hidden='true'
 								style={{
 									position: 'absolute',
 									top: 0,
 									left: 0,
 									height: '100%',
-									borderRadius: 100,
-									background: isDark ? '#333' : '#0a0a0a',
+									borderRadius: RADIUS.full,
+									background: 'var(--nav-pill)',
 									opacity: 0,
 									pointerEvents: 'none',
 									zIndex: 0,
@@ -182,9 +198,7 @@ export default function Navbar() {
 							/>
 							{navLinks.map((link) => {
 								const resolvedHref =
-									!link.page && !isHomePage
-										? `/${link.href}`
-										: link.href;
+									!link.page && !isHomePage ? `/${link.href}` : link.href;
 								const active = link.page
 									? pathname === link.href
 									: isHomePage && activeSection === link.id;
@@ -193,84 +207,68 @@ export default function Navbar() {
 									display: 'inline-flex',
 									alignItems: 'center',
 									padding: '8px 14px',
-									borderRadius: 100,
+									borderRadius: RADIUS.full,
 									textDecoration: 'none',
-									fontSize: 14,
+									fontSize: FONT.sm,
 									fontWeight: active ? 700 : 500,
-									fontFamily: "'Inter', sans-serif",
+									fontFamily: SANS,
 									position: 'relative',
 									zIndex: 1,
 									color: active
-										? '#ffffff'
+										? 'var(--nav-pill-ink)'
 										: hover
-											? textHoverColor
-											: textColor,
-									background: hover && !active
-										? isDark
-											? 'rgba(255,255,255,0.05)'
-											: 'rgba(0,0,0,0.05)'
-										: 'transparent',
-									transition:
-										'color 0.18s ease, background 0.18s ease',
+											? 'var(--ink)'
+											: 'var(--ink-secondary)',
+									background:
+										hover && !active ? 'var(--surface-chip)' : 'transparent',
+									transition: 'color 0.18s ease, background 0.18s ease',
 									whiteSpace: 'nowrap',
 								};
+								const shared = {
+									'data-nav': link.id,
+									onMouseEnter: () => setHovered(link.id),
+									onMouseLeave: () => setHovered(null),
+									style: linkStyle,
+									'aria-current': active
+										? ('page' as const)
+										: undefined,
+								};
 								return link.page ? (
-									<Link
-										key={link.id}
-										href={resolvedHref}
-										data-nav={link.id}
-										onMouseEnter={() => setHovered(link.id)}
-										onMouseLeave={() => setHovered(null)}
-										style={linkStyle}>
+									<Link key={link.id} href={resolvedHref} {...shared}>
 										{link.label}
 									</Link>
 								) : (
-									<a
-										key={link.id}
-										href={resolvedHref}
-										data-nav={link.id}
-										onMouseEnter={() => setHovered(link.id)}
-										onMouseLeave={() => setHovered(null)}
-										style={linkStyle}>
+									<a key={link.id} href={resolvedHref} {...shared}>
 										{link.label}
 									</a>
 								);
 							})}
 						</div>
 
-						{/* Theme toggle */}
+						{/* Theme toggle — icon only renders once the stored theme is known,
+						    so server and first client render always agree. */}
 						<button
+							type='button'
 							onClick={toggle}
 							aria-label={
-								isDark
-									? 'Switch to light mode'
-									: 'Switch to dark mode'
+								isDark ? 'Switch to light mode' : 'Switch to dark mode'
 							}
-							style={{
-								width: 36,
-								height: 36,
-								borderRadius: '50%',
-								background: 'transparent',
-								border: `1.5px solid ${isDark ? '#3a3a3a' : '#e5e5e5'}`,
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								cursor: 'pointer',
-								color: textColor,
-								transition: 'all 0.2s ease',
-								flexShrink: 0,
-							}}
+							style={toggleButtonStyle}
 							onMouseEnter={(e) => {
-								e.currentTarget.style.borderColor = '#6366f1';
-								e.currentTarget.style.color = '#6366f1';
+								e.currentTarget.style.borderColor = 'var(--accent)';
+								e.currentTarget.style.color = 'var(--accent)';
 							}}
 							onMouseLeave={(e) => {
-								e.currentTarget.style.borderColor = isDark
-									? '#3a3a3a'
-									: '#e5e5e5';
-								e.currentTarget.style.color = textColor;
+								e.currentTarget.style.borderColor = 'var(--line-subtle)';
+								e.currentTarget.style.color = 'var(--ink-secondary)';
 							}}>
-							{isDark ? <Sun size={15} /> : <Moon size={15} />}
+							{mounted ? (
+								isDark ? (
+									<Sun size={15} aria-hidden='true' />
+								) : (
+									<Moon size={15} aria-hidden='true' />
+								)
+							) : null}
 						</button>
 
 						{/* Mail CTA */}
@@ -280,8 +278,8 @@ export default function Navbar() {
 							style={{
 								width: 40,
 								height: 40,
-								borderRadius: 12,
-								background: isDark ? '#6366f1' : '#0a0a0a',
+								borderRadius: RADIUS.md,
+								background: 'var(--nav-brand)',
 								display: 'flex',
 								alignItems: 'center',
 								justifyContent: 'center',
@@ -290,14 +288,12 @@ export default function Navbar() {
 								transition: 'background 0.18s ease',
 							}}
 							onMouseEnter={(e) => {
-								e.currentTarget.style.background = '#6366f1';
+								e.currentTarget.style.background = 'var(--accent)';
 							}}
 							onMouseLeave={(e) => {
-								e.currentTarget.style.background = isDark
-									? '#6366f1'
-									: '#0a0a0a';
+								e.currentTarget.style.background = 'var(--nav-brand)';
 							}}>
-							<Mail size={16} color='#ffffff' />
+							<Mail size={16} color='var(--nav-pill-ink)' aria-hidden='true' />
 						</a>
 					</>
 				)}
@@ -307,36 +303,30 @@ export default function Navbar() {
 					<>
 						<div style={{ flex: 1 }} />
 						<button
+							type='button'
 							onClick={toggle}
 							aria-label={
-								isDark
-									? 'Switch to light mode'
-									: 'Switch to dark mode'
+								isDark ? 'Switch to light mode' : 'Switch to dark mode'
 							}
-							style={{
-								width: 36,
-								height: 36,
-								borderRadius: '50%',
-								background: 'transparent',
-								border: `1.5px solid ${isDark ? '#3a3a3a' : '#e5e5e5'}`,
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								cursor: 'pointer',
-								color: textColor,
-								flexShrink: 0,
-								marginRight: 4,
-							}}>
-							{isDark ? <Sun size={14} /> : <Moon size={14} />}
+							style={{ ...toggleButtonStyle, marginRight: 4 }}>
+							{mounted ? (
+								isDark ? (
+									<Sun size={14} aria-hidden='true' />
+								) : (
+									<Moon size={14} aria-hidden='true' />
+								)
+							) : null}
 						</button>
 						<button
+							type='button'
 							onClick={() => setMenuOpen(!menuOpen)}
-							aria-label='Toggle menu'
+							aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+							aria-expanded={menuOpen}
 							style={{
 								width: 40,
 								height: 40,
-								borderRadius: 12,
-								background: isDark ? '#333' : '#0a0a0a',
+								borderRadius: RADIUS.md,
+								background: 'var(--nav-pill)',
 								border: 'none',
 								display: 'flex',
 								alignItems: 'center',
@@ -345,9 +335,9 @@ export default function Navbar() {
 								flexShrink: 0,
 							}}>
 							{menuOpen ? (
-								<X size={16} color='#ffffff' />
+								<X size={16} color='var(--nav-pill-ink)' aria-hidden='true' />
 							) : (
-								<Menu size={16} color='#ffffff' />
+								<Menu size={16} color='var(--nav-pill-ink)' aria-hidden='true' />
 							)}
 						</button>
 					</>
@@ -365,10 +355,10 @@ export default function Navbar() {
 						zIndex: 49,
 						width: 'calc(100vw - 32px)',
 						maxWidth: 480,
-						background: isDark ? '#1a1a1a' : '#ffffff',
-						border: `2px solid ${borderColor}`,
-						borderRadius: 20,
-						boxShadow: `4px 4px 0px ${shadowColor}`,
+						background: 'var(--surface)',
+						border: `${BORDER.hard} solid var(--line)`,
+						borderRadius: RADIUS.lg,
+						boxShadow: 'var(--sh-2)',
 						padding: 12,
 						display: 'flex',
 						flexDirection: 'column',
@@ -377,9 +367,7 @@ export default function Navbar() {
 					}}>
 					{navLinks.map((link) => {
 						const resolvedHref =
-							!link.page && !isHomePage
-								? `/${link.href}`
-								: link.href;
+							!link.page && !isHomePage ? `/${link.href}` : link.href;
 						const active = link.page
 							? pathname === link.href
 							: isHomePage && activeSection === link.id;
@@ -387,25 +375,21 @@ export default function Navbar() {
 							display: 'flex',
 							alignItems: 'center',
 							padding: '11px 16px',
-							borderRadius: 12,
-							color: active ? '#ffffff' : textColor,
-							background: active
-								? isDark
-									? '#333'
-									: '#0a0a0a'
-								: 'transparent',
+							borderRadius: RADIUS.md,
+							color: active ? 'var(--nav-pill-ink)' : 'var(--ink-secondary)',
+							background: active ? 'var(--nav-pill)' : 'transparent',
 							textDecoration: 'none',
-							fontSize: 15,
+							fontSize: FONT.base,
 							fontWeight: active ? 700 : 500,
-							fontFamily: "'Inter', sans-serif",
-							transition:
-								'background 0.18s ease, color 0.18s ease',
+							fontFamily: SANS,
+							transition: 'background 0.18s ease, color 0.18s ease',
 						};
 						return link.page ? (
 							<Link
 								key={link.id}
 								href={resolvedHref}
 								onClick={() => setMenuOpen(false)}
+								aria-current={active ? 'page' : undefined}
 								style={mobileStyle}>
 								{link.label}
 							</Link>
@@ -414,6 +398,7 @@ export default function Navbar() {
 								key={link.id}
 								href={resolvedHref}
 								onClick={() => setMenuOpen(false)}
+								aria-current={active ? 'page' : undefined}
 								style={mobileStyle}>
 								{link.label}
 							</a>
@@ -430,15 +415,15 @@ export default function Navbar() {
 							gap: 8,
 							padding: '11px 16px',
 							marginTop: 4,
-							borderRadius: 12,
-							background: '#6366f1',
-							color: '#ffffff',
+							borderRadius: RADIUS.md,
+							background: 'var(--accent)',
+							color: 'var(--accent-ink)',
 							textDecoration: 'none',
-							fontSize: 14,
+							fontSize: FONT.sm,
 							fontWeight: 700,
-							fontFamily: "'Inter', sans-serif",
+							fontFamily: SANS,
 						}}>
-						<Mail size={14} /> Hire Me
+						<Mail size={14} aria-hidden='true' /> Hire Me
 					</a>
 				</div>
 			)}

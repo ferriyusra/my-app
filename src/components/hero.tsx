@@ -8,10 +8,10 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { profile } from '@/data/profile';
+import { BORDER, EASE, FONT, MONO, RADIUS, SANS } from '@/lib/theme';
 
 gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
-
-const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 const greetings = [
 	{ lang: 'English', text: "Hi, I'm Ferri", dir: 'ltr' as const },
@@ -23,6 +23,21 @@ const greetings = [
 
 const GEO_SIZES = [180, 300, 420, 540];
 const CYCLE_DELAY = 3400;
+
+const CTA_BASE: React.CSSProperties = {
+	display: 'inline-flex',
+	alignItems: 'center',
+	gap: 8,
+	padding: '14px 28px',
+	border: `${BORDER.hard} solid var(--line)`,
+	borderRadius: RADIUS.md,
+	fontSize: FONT.base,
+	fontWeight: 700,
+	textDecoration: 'none',
+	fontFamily: SANS,
+	boxShadow: 'var(--sh-1-hi)',
+	transition: 'box-shadow 0.2s ease',
+};
 
 export default function Hero() {
 	const [index, setIndex] = useState(0);
@@ -39,7 +54,7 @@ export default function Hero() {
 		return () => clearInterval(timer);
 	}, []);
 
-	// GSAP ScrambleText — replaces the old typing effect
+	// GSAP ScrambleText
 	useEffect(() => {
 		const el = textRef.current;
 		if (!el) return;
@@ -68,7 +83,6 @@ export default function Hero() {
 			GEO_SIZES.forEach((_, i) => {
 				const el = `.hero-ring-${i}`;
 
-				// Continuous rotation
 				gsap.to(el, {
 					rotation: i % 2 === 0 ? 360 : -360,
 					duration: 18 + i * 6,
@@ -76,7 +90,6 @@ export default function Hero() {
 					ease: 'none',
 				});
 
-				// Parallax — rings drift up at different speeds as user scrolls
 				gsap.to(el, {
 					y: -(60 + i * 50),
 					ease: 'none',
@@ -99,15 +112,16 @@ export default function Hero() {
 			id='hero'
 			ref={heroRef}
 			style={{
-				minHeight: '100vh',
+				/* svh tracks the visible viewport, so mobile browser chrome
+				   no longer pushes the CTAs below the fold. */
+				minHeight: '100svh',
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',
 				justifyContent: 'center',
 				position: 'relative',
 				overflow: 'hidden',
-				background:
-					'linear-gradient(160deg, #f0ece8 0%, #f9f7f5 60%, #ffffff 100%)',
+				background: 'var(--hero-bg)',
 				paddingTop: 80,
 			}}>
 			{/* ── Geometric rings — GSAP rotation + parallax ── */}
@@ -120,7 +134,7 @@ export default function Hero() {
 						position: 'absolute',
 						width: size,
 						height: size,
-						border: `1.5px solid rgba(10,10,10,${0.12 - i * 0.02})`,
+						border: `${BORDER.soft} solid color-mix(in srgb, var(--ink) ${12 - i * 2}%, transparent)`,
 						borderRadius: 28,
 						pointerEvents: 'none',
 						willChange: 'transform',
@@ -152,7 +166,7 @@ export default function Hero() {
 					maxWidth: 760,
 					width: '100%',
 				}}>
-				{/* Availability badge */}
+				{/* Availability badge — single source of truth in profile.ts */}
 				<motion.div
 					initial={{ opacity: 0, y: -8 }}
 					animate={{ opacity: 1, y: 0 }}
@@ -162,10 +176,10 @@ export default function Hero() {
 						alignItems: 'center',
 						gap: 8,
 						padding: '7px 16px',
-						background: '#ffffff',
-						border: '1.5px solid #0a0a0a',
-						borderRadius: 100,
-						boxShadow: '3px 3px 0px #0a0a0a',
+						background: 'var(--surface)',
+						border: `${BORDER.soft} solid var(--line)`,
+						borderRadius: RADIUS.full,
+						boxShadow: 'var(--sh-1-hi)',
 						marginBottom: 32,
 						cursor: 'default',
 					}}>
@@ -178,9 +192,7 @@ export default function Hero() {
 						}}>
 						<motion.span
 							animate={
-								shouldReduceMotion
-									? {}
-									: { scale: [1, 2], opacity: [0.6, 0] }
+								shouldReduceMotion ? {} : { scale: [1, 2], opacity: [0.6, 0] }
 							}
 							transition={{
 								duration: 1.4,
@@ -191,7 +203,7 @@ export default function Hero() {
 								position: 'absolute',
 								inset: 0,
 								borderRadius: '50%',
-								background: '#22c55e',
+								background: 'var(--success)',
 							}}
 						/>
 						<span
@@ -199,20 +211,20 @@ export default function Hero() {
 								width: 8,
 								height: 8,
 								borderRadius: '50%',
-								background: '#22c55e',
+								background: 'var(--success)',
 								display: 'block',
 							}}
 						/>
 					</span>
 					<span
 						style={{
-							fontSize: 12,
+							fontSize: FONT.micro,
 							fontWeight: 700,
-							color: '#0a0a0a',
-							fontFamily: "'Inter', sans-serif",
+							color: 'var(--ink)',
+							fontFamily: SANS,
 							letterSpacing: '-0.01em',
 						}}>
-						Open to opportunities
+						{profile.availabilityShort}
 					</span>
 				</motion.div>
 
@@ -230,11 +242,11 @@ export default function Hero() {
 						style={{
 							fontSize: 'clamp(36px, 8vw, 88px)',
 							fontWeight: 800,
-							fontFamily: "'Inter', sans-serif",
+							fontFamily: SANS,
 							letterSpacing: '-0.03em',
 							lineHeight: 1.1,
 							margin: 0,
-							color: '#0a0a0a',
+							color: 'var(--ink)',
 							wordBreak: 'keep-all',
 							overflowWrap: 'break-word',
 						}}>
@@ -246,7 +258,7 @@ export default function Hero() {
 								display: 'inline-block',
 								width: '0.08em',
 								height: '0.85em',
-								background: '#6366f1',
+								background: 'var(--accent)',
 								borderRadius: 2,
 								marginLeft: '0.06em',
 								verticalAlign: 'middle',
@@ -255,40 +267,59 @@ export default function Hero() {
 					</h1>
 				</div>
 
-				{/* Language indicator dots */}
+				{/* Language switcher.
+				    Plain buttons, not tabs — there is no tabpanel to control.
+				    Each has a 24px hit area (WCAG 2.5.8) with a smaller visual pill. */}
 				<div
-					role='tablist'
-					aria-label='Language selector'
+					role='group'
+					aria-label='Greeting language'
 					style={{
 						display: 'flex',
 						justifyContent: 'center',
 						alignItems: 'center',
-						gap: 6,
-						marginBottom: 44,
+						gap: 2,
+						marginBottom: 36,
 						flexWrap: 'nowrap',
 					}}>
-					{greetings.map((g, i) => (
-						<button
-							key={g.lang}
-							role='tab'
-							aria-selected={i === index}
-							aria-label={`Switch to ${g.lang}`}
-							onClick={() => setIndex(i)}
-							style={{
-								width: i === index ? 22 : 6,
-								height: 6,
-								minWidth: i === index ? 22 : 6,
-								borderRadius: 3,
-								background: i === index ? '#6366f1' : '#d4d4d4',
-								border: 'none',
-								cursor: 'pointer',
-								padding: 0,
-								flexShrink: 0,
-								transition:
-									'width 0.3s ease, min-width 0.3s ease, background 0.3s ease',
-							}}
-						/>
-					))}
+					{greetings.map((g, i) => {
+						const isActive = i === index;
+						return (
+							<button
+								key={g.lang}
+								type='button'
+								onClick={() => setIndex(i)}
+								aria-label={`Show greeting in ${g.lang}`}
+								aria-current={isActive ? 'true' : undefined}
+								style={{
+									width: 32,
+									height: 32,
+									minWidth: 32,
+									display: 'inline-flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									background: 'transparent',
+									border: 'none',
+									borderRadius: RADIUS.sm,
+									cursor: 'pointer',
+									padding: 0,
+									flexShrink: 0,
+								}}>
+								<span
+									aria-hidden='true'
+									style={{
+										display: 'block',
+										width: isActive ? 22 : 6,
+										height: 6,
+										borderRadius: 3,
+										background: isActive ? 'var(--accent)' : 'var(--line-soft)',
+										transition: shouldReduceMotion
+											? 'none'
+											: 'width 0.3s ease, background 0.3s ease',
+									}}
+								/>
+							</button>
+						);
+					})}
 				</div>
 
 				{/* Role */}
@@ -299,13 +330,12 @@ export default function Hero() {
 					style={{
 						fontSize: 'clamp(18px, 3vw, 24px)',
 						fontWeight: 700,
-						color: '#0a0a0a',
-						fontFamily: "'Inter', sans-serif",
+						color: 'var(--ink)',
+						fontFamily: SANS,
 						marginBottom: 16,
 						letterSpacing: '-0.02em',
 					}}>
-					Currently Focused Learning Full Stack Engineer and Improve to
-					DSA and System Design
+					{profile.role} — {profile.roleDetail}
 				</motion.p>
 
 				{/* Tagline */}
@@ -314,15 +344,14 @@ export default function Hero() {
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5, ease: EASE, delay: 0.25 }}
 					style={{
-						fontSize: 16,
-						color: '#525252',
+						fontSize: FONT.base,
+						color: 'var(--ink-secondary)',
 						lineHeight: 1.75,
-						maxWidth: 500,
+						maxWidth: 520,
 						margin: '0 auto 44px',
-						fontFamily: "'Inter', sans-serif",
+						fontFamily: SANS,
 					}}>
-					Building production-grade web applications with React,
-					Node.js, and Golang. Fast, clean, and people love to use.
+					{profile.tagline}
 				</motion.p>
 
 				{/* CTA buttons */}
@@ -338,31 +367,18 @@ export default function Hero() {
 					}}>
 					<MagneticButton strength={0.3}>
 						<a
-							href='https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I'
+							href={profile.cvDownload}
 							download
 							style={{
-								display: 'inline-flex',
-								alignItems: 'center',
-								gap: 8,
-								padding: '14px 28px',
-								background: '#6366f1',
-								border: '2px solid #0a0a0a',
-								borderRadius: 12,
-								color: '#ffffff',
-								fontSize: 15,
-								fontWeight: 700,
-								textDecoration: 'none',
-								fontFamily: "'Inter', sans-serif",
-								boxShadow: '3px 3px 0px #0a0a0a',
-								transition: 'all 0.2s ease',
+								...CTA_BASE,
+								background: 'var(--accent)',
+								color: 'var(--accent-ink)',
 							}}
 							onMouseEnter={(e) => {
-								e.currentTarget.style.boxShadow =
-									'4px 4px 0px #0a0a0a';
+								e.currentTarget.style.boxShadow = 'var(--sh-2)';
 							}}
 							onMouseLeave={(e) => {
-								e.currentTarget.style.boxShadow =
-									'3px 3px 0px #0a0a0a';
+								e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
 							}}>
 							<Download size={16} aria-hidden='true' />
 							Download CV
@@ -373,28 +389,15 @@ export default function Hero() {
 						<a
 							href='#contact'
 							style={{
-								display: 'inline-flex',
-								alignItems: 'center',
-								gap: 8,
-								padding: '14px 28px',
-								background: '#ffffff',
-								border: '2px solid #0a0a0a',
-								borderRadius: 12,
-								color: '#0a0a0a',
-								fontSize: 15,
-								fontWeight: 700,
-								textDecoration: 'none',
-								fontFamily: "'Inter', sans-serif",
-								boxShadow: '3px 3px 0px #0a0a0a',
-								transition: 'all 0.2s ease',
+								...CTA_BASE,
+								background: 'var(--surface)',
+								color: 'var(--ink)',
 							}}
 							onMouseEnter={(e) => {
-								e.currentTarget.style.boxShadow =
-									'4px 4px 0px #0a0a0a';
+								e.currentTarget.style.boxShadow = 'var(--sh-2)';
 							}}
 							onMouseLeave={(e) => {
-								e.currentTarget.style.boxShadow =
-									'3px 3px 0px #0a0a0a';
+								e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
 							}}>
 							<ArrowRight size={16} aria-hidden='true' />
 							Let&apos;s Build Together
@@ -419,9 +422,9 @@ export default function Hero() {
 					}}>
 					<span
 						style={{
-							fontSize: 11,
-							color: '#a3a3a3',
-							fontFamily: "'JetBrains Mono', monospace",
+							fontSize: FONT.micro,
+							color: 'var(--ink-muted)',
+							fontFamily: MONO,
 							letterSpacing: '0.12em',
 							textTransform: 'uppercase',
 						}}>
@@ -431,19 +434,17 @@ export default function Hero() {
 						style={{
 							width: 26,
 							height: 42,
-							border: '1.5px solid #0a0a0a',
+							border: `${BORDER.soft} solid var(--line)`,
 							borderRadius: 13,
 							display: 'flex',
 							alignItems: 'flex-start',
 							justifyContent: 'center',
 							padding: 5,
-							background: 'rgba(255,255,255,0.6)',
+							background: 'var(--surface)',
 						}}>
 						<motion.div
 							animate={
-								shouldReduceMotion
-									? {}
-									: { y: [0, 14, 0], opacity: [1, 0.2, 1] }
+								shouldReduceMotion ? {} : { y: [0, 14, 0], opacity: [1, 0.2, 1] }
 							}
 							transition={{
 								duration: 1.6,
@@ -454,7 +455,7 @@ export default function Hero() {
 								width: 4,
 								height: 8,
 								borderRadius: 2,
-								background: '#6366f1',
+								background: 'var(--accent)',
 							}}
 						/>
 					</div>

@@ -1,22 +1,36 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 import gsap from 'gsap';
+import { FONT, MONO } from '@/lib/theme';
+
+/* The custom cursor hides the OS pointer, which is a real accessibility cost.
+   It is therefore limited to fine pointers where the user has *not* asked for
+   reduced motion — the same condition guards `cursor: none` in globals.css. */
+const QUERY = '(pointer: fine) and (prefers-reduced-motion: no-preference)';
+
+function subscribe(onChange: () => void) {
+	const mq = window.matchMedia(QUERY);
+	mq.addEventListener('change', onChange);
+	return () => mq.removeEventListener('change', onChange);
+}
+
+const INTERACTIVE =
+	'a, button, [role="button"], input, textarea, select, [data-cursor="interactive"]';
 
 export default function CustomCursor() {
 	const dotRef = useRef<HTMLDivElement>(null);
 	const ringRef = useRef<HTMLDivElement>(null);
 	const labelRef = useRef<HTMLDivElement>(null);
-	const [visible, setVisible] = useState(false);
+
+	const enabled = useSyncExternalStore(
+		subscribe,
+		() => window.matchMedia(QUERY).matches,
+		() => false,
+	);
 
 	useEffect(() => {
-		if (window.matchMedia('(pointer: fine)').matches) {
-			setVisible(true);
-		}
-	}, []);
-
-	useEffect(() => {
-		if (!visible) return;
+		if (!enabled) return;
 
 		const dot = dotRef.current;
 		const ring = ringRef.current;
@@ -26,30 +40,12 @@ export default function CustomCursor() {
 		document.documentElement.classList.add('custom-cursor-active');
 
 		// GSAP quickTo — GPU-accelerated, buttery smooth
-		const dotX = gsap.quickTo(dot, 'x', {
-			duration: 0.12,
-			ease: 'power3',
-		});
-		const dotY = gsap.quickTo(dot, 'y', {
-			duration: 0.12,
-			ease: 'power3',
-		});
-		const ringX = gsap.quickTo(ring, 'x', {
-			duration: 0.45,
-			ease: 'power3',
-		});
-		const ringY = gsap.quickTo(ring, 'y', {
-			duration: 0.45,
-			ease: 'power3',
-		});
-		const labelX = gsap.quickTo(label, 'x', {
-			duration: 0.4,
-			ease: 'power3',
-		});
-		const labelY = gsap.quickTo(label, 'y', {
-			duration: 0.4,
-			ease: 'power3',
-		});
+		const dotX = gsap.quickTo(dot, 'x', { duration: 0.12, ease: 'power3' });
+		const dotY = gsap.quickTo(dot, 'y', { duration: 0.12, ease: 'power3' });
+		const ringX = gsap.quickTo(ring, 'x', { duration: 0.45, ease: 'power3' });
+		const ringY = gsap.quickTo(ring, 'y', { duration: 0.45, ease: 'power3' });
+		const labelX = gsap.quickTo(label, 'x', { duration: 0.4, ease: 'power3' });
+		const labelY = gsap.quickTo(label, 'y', { duration: 0.4, ease: 'power3' });
 
 		const onMouseMove = (e: MouseEvent) => {
 			dotX(e.clientX);
@@ -67,13 +63,7 @@ export default function CustomCursor() {
 				label.classList.add('cursor-label-visible');
 				return;
 			}
-			if (
-				el.closest(
-					'a, button, [role="button"], input, textarea, select, [data-cursor="interactive"]',
-				)
-			) {
-				ring.classList.add('cursor-hover');
-			}
+			if (el.closest(INTERACTIVE)) ring.classList.add('cursor-hover');
 		};
 
 		const onMouseOut = (e: MouseEvent) => {
@@ -82,13 +72,7 @@ export default function CustomCursor() {
 				ring.classList.remove('cursor-expanded');
 				label.classList.remove('cursor-label-visible');
 			}
-			if (
-				el.closest(
-					'a, button, [role="button"], input, textarea, select, [data-cursor="interactive"]',
-				)
-			) {
-				ring.classList.remove('cursor-hover');
-			}
+			if (el.closest(INTERACTIVE)) ring.classList.remove('cursor-hover');
 		};
 
 		const onMouseDown = () => ring.classList.add('cursor-click');
@@ -109,14 +93,15 @@ export default function CustomCursor() {
 			gsap.killTweensOf([dot, ring, label]);
 			document.documentElement.classList.remove('custom-cursor-active');
 		};
-	}, [visible]);
+	}, [enabled]);
 
-	if (!visible) return null;
+	if (!enabled) return null;
 
 	return (
 		<>
 			<div
 				ref={dotRef}
+				aria-hidden='true'
 				style={{
 					position: 'fixed',
 					top: -4,
@@ -124,7 +109,7 @@ export default function CustomCursor() {
 					width: 8,
 					height: 8,
 					borderRadius: '50%',
-					background: '#6366f1',
+					background: 'var(--accent)',
 					pointerEvents: 'none',
 					zIndex: 99999,
 					willChange: 'transform',
@@ -133,6 +118,7 @@ export default function CustomCursor() {
 			<div
 				ref={ringRef}
 				className='cursor-ring'
+				aria-hidden='true'
 				style={{
 					position: 'fixed',
 					top: -20,
@@ -140,7 +126,7 @@ export default function CustomCursor() {
 					width: 40,
 					height: 40,
 					borderRadius: '50%',
-					border: '2px solid #6366f1',
+					border: '2px solid var(--accent)',
 					pointerEvents: 'none',
 					zIndex: 99998,
 					willChange: 'transform',
@@ -148,10 +134,10 @@ export default function CustomCursor() {
 						'width 0.3s ease, height 0.3s ease, top 0.3s ease, left 0.3s ease, border-color 0.3s ease, background 0.3s ease, opacity 0.3s ease',
 				}}
 			/>
-			{/* "View" label */}
 			<div
 				ref={labelRef}
 				className='cursor-label'
+				aria-hidden='true'
 				style={{
 					position: 'fixed',
 					top: -10,
@@ -165,10 +151,10 @@ export default function CustomCursor() {
 				<span
 					style={{
 						display: 'block',
-						fontSize: 11,
+						fontSize: FONT.micro,
 						fontWeight: 700,
-						fontFamily: "'JetBrains Mono', monospace",
-						color: '#ffffff',
+						fontFamily: MONO,
+						color: 'var(--on-dark)',
 						letterSpacing: '0.1em',
 						textTransform: 'uppercase',
 						whiteSpace: 'nowrap',

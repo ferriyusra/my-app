@@ -1,0 +1,38 @@
+/**
+ * Single source of truth for profile facts.
+ *
+ * These strings previously lived in 3–5 components each and had drifted apart
+ * (availability was stated three different ways, the role title two).
+ */
+
+export const profile = {
+	name: 'Ferri Yusra',
+	initials: 'FY',
+
+	/** Used by the page title, hero, about card and structured data. */
+	role: 'Backend Engineer',
+	roleDetail: 'Go, Node.js & PostgreSQL',
+
+	tagline:
+		'4+ years building production APIs and event-driven systems across fintech, GovTech health, and automotive. Currently going deeper on system design and DSA.',
+
+	bio: 'Backend engineer with 4+ years building scalable API systems across fintech, GovTech health, and automotive industries.',
+
+	location: 'Jakarta, Indonesia',
+	locationDetail: 'Jakarta, Indonesia (Hybrid / Remote)',
+	workType: 'Freelance & Full-time roles',
+
+	/** Stated once, rendered everywhere. */
+	availability: 'Available from April 2026',
+	availabilityShort: 'Open from April 2026',
+
+	email: 'feriyusra1616@gmail.com',
+	github: 'https://github.com/ferriyusra',
+	linkedin: 'https://linkedin.com/in/ferriyusra',
+	site: 'https://ferriyusra.com',
+
+	cvView:
+		'https://drive.google.com/file/d/1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I/view?usp=sharing',
+	cvDownload:
+		'https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I',
+} as const;

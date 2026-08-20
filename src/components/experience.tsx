@@ -7,10 +7,20 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import TextReveal from '@/components/text-reveal';
+import {
+	BORDER,
+	CARD,
+	CONTAINER,
+	EASE,
+	FONT,
+	H2,
+	MONO,
+	RADIUS,
+	SANS,
+} from '@/lib/theme';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 const COLLAPSED_COUNT = 2;
 
 const experiences = [
@@ -171,15 +181,17 @@ function Badge({ label }: { label: 'Present' | 'Previous Role' }) {
 				alignItems: 'center',
 				gap: 6,
 				padding: '5px 14px',
-				borderRadius: 100,
-				fontSize: 12,
+				borderRadius: RADIUS.full,
+				fontSize: FONT.micro,
 				fontWeight: 700,
-				fontFamily: 'var(--font-sans)',
-				background: isPresent ? '#6366f1' : '#f4f4f5',
-				color: isPresent ? '#fff' : '#3f3f46',
+				fontFamily: SANS,
+				background: isPresent ? 'var(--accent)' : 'var(--surface-chip)',
+				color: isPresent ? 'var(--accent-ink)' : 'var(--ink-secondary)',
 				whiteSpace: 'nowrap' as const,
 				boxShadow: isPresent ? '0 2px 12px rgba(99,102,241,0.25)' : 'none',
-				border: isPresent ? 'none' : '1px solid #d4d4d8',
+				border: isPresent
+					? 'none'
+					: `1px solid var(--line-soft)`,
 			}}>
 			<span
 				className={isPresent ? 'present-dot' : ''}
@@ -187,7 +199,7 @@ function Badge({ label }: { label: 'Present' | 'Previous Role' }) {
 					width: 6,
 					height: 6,
 					borderRadius: '50%',
-					background: isPresent ? '#ffffff' : '#71717a',
+					background: isPresent ? 'var(--accent-ink)' : 'var(--ink-muted)',
 					display: 'inline-block',
 				}}
 			/>
@@ -211,47 +223,42 @@ function Card({ exp }: { exp: Exp }) {
 	return (
 		<article
 			ref={cardRef}
-			className='exp-card'
+			className='card card-lift'
 			aria-label={`${exp.role} at ${exp.company}`}
-			style={{
-				background: '#ffffff',
-				border: '2px solid #0a0a0a',
-				borderRadius: 20,
-				boxShadow: '6px 6px 0px #0a0a0a',
-				overflow: 'hidden',
-			}}>
+			style={CARD}>
 			{/* ── Illustration header ── */}
 			<header
 				style={{
-					background: '#f0ece8',
+					background: 'var(--surface-header)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
 					gap: 12,
 					padding: '20px 24px',
 					minHeight: 120,
-					borderBottom: '2px solid #0a0a0a',
+					borderBottom: `${BORDER.hard} solid var(--line)`,
 				}}>
-				<div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+				<div
+					style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
 					<div
 						aria-hidden='true'
 						style={{
 							width: 56,
 							height: 56,
-							borderRadius: 14,
-							background: '#ffffff',
-							border: '2px solid #0a0a0a',
+							borderRadius: RADIUS.md,
+							background: 'var(--surface)',
+							border: `${BORDER.hard} solid var(--line)`,
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							boxShadow: '3px 3px 0px #0a0a0a',
+							boxShadow: 'var(--sh-1-hi)',
 							flexShrink: 0,
 						}}>
 						<span
 							style={{
-								fontSize: 17,
+								fontSize: FONT.lg,
 								fontWeight: 800,
-								fontFamily: 'var(--font-sans)',
+								fontFamily: SANS,
 								color: exp.color,
 								letterSpacing: '-0.02em',
 							}}>
@@ -265,13 +272,13 @@ function Card({ exp }: { exp: Exp }) {
 				<time
 					dateTime={exp.startISO}
 					style={{
-						fontSize: 11,
-						fontFamily: 'var(--font-mono)',
-						color: '#3f3f46',
-						background: '#ffffff',
-						border: '1.5px solid #0a0a0a',
+						fontSize: FONT.micro,
+						fontFamily: MONO,
+						color: 'var(--ink-secondary)',
+						background: 'var(--surface)',
+						border: `${BORDER.soft} solid var(--line)`,
 						padding: '5px 10px',
-						borderRadius: 8,
+						borderRadius: RADIUS.sm,
 						fontVariantNumeric: 'tabular-nums',
 						letterSpacing: '0.01em',
 						whiteSpace: 'nowrap',
@@ -283,12 +290,11 @@ function Card({ exp }: { exp: Exp }) {
 
 			{/* ── Content ── */}
 			<div style={{ padding: '24px 28px 28px' }}>
-				{/* Role title */}
 				<h3
 					style={{
 						fontSize: 'clamp(20px, 2.4vw, 24px)',
 						fontWeight: 800,
-						fontFamily: 'var(--font-sans)',
+						fontFamily: SANS,
 						letterSpacing: '-0.02em',
 						lineHeight: 1.2,
 						marginBottom: 8,
@@ -313,19 +319,19 @@ function Card({ exp }: { exp: Exp }) {
 					/>
 					<span
 						style={{
-							fontSize: 14,
+							fontSize: FONT.sm,
 							fontWeight: 700,
-							color: '#0a0a0a',
-							fontFamily: 'var(--font-sans)',
+							color: 'var(--ink)',
+							fontFamily: SANS,
 						}}>
 						{exp.company}
 					</span>
 				</div>
 				<div
 					style={{
-						fontSize: 12,
-						color: '#71717a',
-						fontFamily: 'var(--font-mono)',
+						fontSize: FONT.micro,
+						color: 'var(--ink-muted)',
+						fontFamily: MONO,
 						marginBottom: 18,
 						letterSpacing: '0.01em',
 					}}>
@@ -335,10 +341,10 @@ function Card({ exp }: { exp: Exp }) {
 				{/* Description */}
 				<p
 					style={{
-						color: '#3f3f46',
-						fontSize: 14,
+						color: 'var(--ink-secondary)',
+						fontSize: FONT.sm,
 						lineHeight: 1.65,
-						fontFamily: 'var(--font-sans)',
+						fontFamily: SANS,
 						marginBottom: 22,
 					}}>
 					{exp.description}
@@ -356,10 +362,10 @@ function Card({ exp }: { exp: Exp }) {
 						<Trophy size={14} style={{ color: exp.glow }} aria-hidden='true' />
 						<span
 							style={{
-								fontSize: 13,
+								fontSize: FONT.sm,
 								fontWeight: 700,
-								color: '#0a0a0a',
-								fontFamily: 'var(--font-sans)',
+								color: 'var(--ink)',
+								fontFamily: SANS,
 							}}>
 							Key Achievements
 						</span>
@@ -390,9 +396,9 @@ function Card({ exp }: { exp: Exp }) {
 									alignItems: 'flex-start',
 									gap: 10,
 									padding: '10px 14px',
-									background: '#f9f9f7',
-									border: '1px solid #e4e4e7',
-									borderRadius: 10,
+									background: 'var(--surface-subtle)',
+									border: `1px solid var(--line-subtle)`,
+									borderRadius: RADIUS.sm,
 								}}>
 								<span
 									aria-hidden='true'
@@ -408,10 +414,10 @@ function Card({ exp }: { exp: Exp }) {
 								/>
 								<span
 									style={{
-										fontSize: 13,
-										color: '#3f3f46',
+										fontSize: FONT.sm,
+										color: 'var(--ink-secondary)',
 										lineHeight: 1.55,
-										fontFamily: 'var(--font-sans)',
+										fontFamily: SANS,
 									}}>
 									{a}
 								</span>
@@ -439,12 +445,12 @@ function Card({ exp }: { exp: Exp }) {
 							padding: '8px 12px',
 							marginBottom: 18,
 							background: 'transparent',
-							border: '1.5px solid #0a0a0a',
-							borderRadius: 8,
-							fontSize: 12,
+							border: `${BORDER.soft} solid var(--line)`,
+							borderRadius: RADIUS.sm,
+							fontSize: FONT.micro,
 							fontWeight: 700,
-							fontFamily: 'var(--font-sans)',
-							color: '#0a0a0a',
+							fontFamily: SANS,
+							color: 'var(--ink)',
 							letterSpacing: '0.01em',
 						}}>
 						{expanded ? 'Show less' : `Show ${hiddenCount} more`}
@@ -453,9 +459,7 @@ function Card({ exp }: { exp: Exp }) {
 							aria-hidden='true'
 							style={{
 								transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-								transition: shouldReduceMotion
-									? 'none'
-									: 'transform 0.2s ease',
+								transition: shouldReduceMotion ? 'none' : 'transform 0.2s ease',
 							}}
 						/>
 					</button>
@@ -472,9 +476,7 @@ function Card({ exp }: { exp: Exp }) {
 							role='listitem'
 							initial={{ opacity: 0, scale: 0.8 }}
 							animate={
-								isInView
-									? { opacity: 1, scale: 1 }
-									: { opacity: 0, scale: 0.8 }
+								isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }
 							}
 							transition={{
 								duration: shouldReduceMotion ? 0 : 0.3,
@@ -483,12 +485,12 @@ function Card({ exp }: { exp: Exp }) {
 							}}
 							style={{
 								padding: '3px 10px',
-								background: '#f4f4f5',
-								border: '1px solid #d4d4d8',
-								borderRadius: 100,
-								fontSize: 11,
-								fontFamily: 'var(--font-mono)',
-								color: '#3f3f46',
+								background: 'var(--surface-chip)',
+								border: `1px solid var(--line-soft)`,
+								borderRadius: RADIUS.full,
+								fontSize: FONT.micro,
+								fontFamily: MONO,
+								color: 'var(--ink-secondary)',
 							}}>
 							{t}
 						</motion.span>
@@ -523,12 +525,12 @@ function TimelineDot({
 				width: 52,
 				height: 52,
 				borderRadius: '50%',
-				background: '#ffffff',
-				border: `2px solid #0a0a0a`,
+				background: 'var(--surface)',
+				border: `${BORDER.hard} solid var(--line)`,
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
-				boxShadow: `4px 4px 0px #0a0a0a`,
+				boxShadow: 'var(--sh-2)',
 				position: 'relative',
 				zIndex: 1,
 				flexShrink: 0,
@@ -536,9 +538,9 @@ function TimelineDot({
 			}}>
 			<span
 				style={{
-					fontSize: 12,
+					fontSize: FONT.micro,
 					fontWeight: 800,
-					fontFamily: 'var(--font-sans)',
+					fontFamily: SANS,
 					color: exp.color,
 					letterSpacing: '-0.01em',
 				}}>
@@ -581,43 +583,22 @@ export default function Experience() {
 	);
 
 	return (
-		<section id='experience' style={{ background: '#f0ece8' }}>
-			<div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
-				{/* Header */}
+		<section id='experience' style={{ background: 'var(--section-a)' }}>
+			<div style={CONTAINER}>
 				<TextReveal
 					parts={[
 						{ text: "Where I've " },
-						{ text: 'Worked', color: '#6366f1' },
+						{ text: 'Worked', color: 'var(--accent)' },
 					]}
 					as='h2'
-					style={{
-						fontSize: 'clamp(28px, 5vw, 48px)',
-						fontWeight: 800,
-						marginBottom: 64,
-						fontFamily: 'var(--font-sans)',
-						color: '#0a0a0a',
-						letterSpacing: '-0.02em',
-					}}
+					style={{ ...H2, marginBottom: 64 }}
 				/>
 
-				{/* Timeline container */}
-				<div ref={timelineRef} style={{ position: 'relative' }}>
-					{/* Vertical center line — GSAP scroll-linked draw */}
-					<div
-						ref={lineRef}
-						aria-hidden='true'
-						style={{
-							position: 'absolute',
-							left: '50%',
-							top: 0,
-							bottom: 0,
-							width: 2,
-							background: '#0a0a0a',
-							pointerEvents: 'none',
-							transformOrigin: 'top',
-							transform: 'translateX(-50%) scaleY(0)',
-						}}
-					/>
+				<div ref={timelineRef} className='exp-timeline'>
+					{/* Vertical spine — GSAP scroll-linked draw.
+					    Position lives in CSS so it can track the dot column
+					    when the grid collapses on mobile. */}
+					<div ref={lineRef} className='exp-line' aria-hidden='true' />
 
 					<ol
 						aria-label='Work experience, most recent first'
@@ -634,7 +615,6 @@ export default function Experience() {
 							const delay = shouldReduceMotion ? 0 : 0.15 + i * 0.1;
 							return (
 								<li key={i} className='exp-row'>
-									{/* Left slot: card for even, spacer for odd */}
 									{isLeft ? (
 										<motion.div
 											className='exp-slot-left'
@@ -652,7 +632,6 @@ export default function Experience() {
 										<div className='exp-slot-spacer' />
 									)}
 
-									{/* Center: timeline dot */}
 									<div className='exp-slot-mid'>
 										<TimelineDot
 											exp={exp}
@@ -661,7 +640,6 @@ export default function Experience() {
 										/>
 									</div>
 
-									{/* Right slot: spacer for even, card for odd */}
 									{!isLeft ? (
 										<motion.div
 											className='exp-slot-right'

@@ -7,6 +7,16 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Github, ExternalLink, Star } from 'lucide-react';
 import { projects, type Project } from '@/data/projects';
 import TextReveal from '@/components/text-reveal';
+import {
+	BORDER,
+	CARD,
+	CONTAINER,
+	FONT,
+	H2,
+	MONO,
+	RADIUS,
+	SANS,
+} from '@/lib/theme';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,25 +24,40 @@ const TYPE_BADGE = {
 	real: {
 		label: 'Production',
 		bg: '#dcfce7',
-		color: '#16a34a',
-		border: '#bbf7d0',
+		color: '#166534',
+		border: '#86efac',
 	},
 	'case-study': {
 		label: 'Case Study',
 		bg: '#ede9fe',
-		color: '#7c3aed',
-		border: '#ddd6fe',
+		color: '#5b21b6',
+		border: '#c4b5fd',
 	},
 } as const;
 
-const HEADING_STYLE: React.CSSProperties = {
-	fontSize: 'clamp(28px, 5vw, 48px)',
-	fontWeight: 800,
-	fontFamily: "'Inter', sans-serif",
-	color: '#0a0a0a',
-	letterSpacing: '-0.02em',
-	marginBottom: 48,
+const LINK_BASE: React.CSSProperties = {
+	display: 'inline-flex',
+	alignItems: 'center',
+	gap: 6,
+	padding: '8px 16px',
+	border: `${BORDER.soft} solid var(--line)`,
+	borderRadius: RADIUS.sm,
+	fontSize: FONT.sm,
+	fontWeight: 700,
+	textDecoration: 'none',
+	fontFamily: SANS,
+	boxShadow: 'var(--sh-1)',
+	transition: 'transform 0.2s ease, box-shadow 0.2s ease',
 };
+
+function liftOn(e: React.MouseEvent<HTMLElement>) {
+	e.currentTarget.style.transform = 'translate(-1px,-1px)';
+	e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
+}
+function liftOff(e: React.MouseEvent<HTMLElement>) {
+	e.currentTarget.style.transform = 'translate(0,0)';
+	e.currentTarget.style.boxShadow = 'var(--sh-1)';
+}
 
 /* ── Generated Placeholder ────────────────────────── */
 function CoverPlaceholder({ project }: { project: Project }) {
@@ -41,7 +66,7 @@ function CoverPlaceholder({ project }: { project: Project }) {
 			style={{
 				width: '100%',
 				height: '100%',
-				background: `linear-gradient(135deg, ${project.color}18 0%, #f0ece8 50%, ${project.color}10 100%)`,
+				background: `linear-gradient(135deg, ${project.color}18 0%, var(--surface-header) 50%, ${project.color}10 100%)`,
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',
@@ -52,19 +77,19 @@ function CoverPlaceholder({ project }: { project: Project }) {
 				style={{
 					width: 72,
 					height: 72,
-					borderRadius: 20,
-					background: '#ffffff',
-					border: '2px solid #0a0a0a',
+					borderRadius: RADIUS.lg,
+					background: 'var(--surface)',
+					border: `${BORDER.hard} solid var(--line)`,
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
-					boxShadow: '4px 4px 0px #0a0a0a',
+					boxShadow: 'var(--sh-2)',
 				}}>
 				<span
 					style={{
 						fontSize: 24,
 						fontWeight: 800,
-						fontFamily: "'Inter', sans-serif",
+						fontFamily: SANS,
 						color: project.color,
 						letterSpacing: '-0.02em',
 					}}>
@@ -84,12 +109,12 @@ function CoverPlaceholder({ project }: { project: Project }) {
 						key={t}
 						style={{
 							padding: '2px 8px',
-							background: '#ffffff',
-							border: '1px solid #d4d4d4',
-							borderRadius: 100,
-							fontSize: 9,
-							fontFamily: "'JetBrains Mono', monospace",
-							color: '#525252',
+							background: 'var(--surface)',
+							border: `1px solid var(--line-soft)`,
+							borderRadius: RADIUS.full,
+							fontSize: FONT.micro,
+							fontFamily: MONO,
+							color: 'var(--ink-secondary)',
 						}}>
 						{t}
 					</span>
@@ -103,28 +128,19 @@ function CoverPlaceholder({ project }: { project: Project }) {
 function BentoCard({ project }: { project: Project }) {
 	const badge = TYPE_BADGE[project.type];
 	const [imgError, setImgError] = useState(false);
-	const isFeatured = project.featured;
 
 	return (
 		<div
 			className='project-card card'
 			data-cursor='view'
-			style={{
-				background: '#ffffff',
-				border: '2px solid #0a0a0a',
-				borderRadius: 20,
-				boxShadow: '6px 6px 0px #0a0a0a',
-				overflow: 'hidden',
-				display: 'flex',
-				flexDirection: 'column',
-			}}>
+			style={{ ...CARD, display: 'flex', flexDirection: 'column' }}>
 			{/* Cover */}
 			<div
 				style={{
 					position: 'relative',
 					height: 200,
 					overflow: 'hidden',
-					background: '#f0ece8',
+					background: 'var(--surface-header)',
 				}}>
 				{!project.cover || imgError ? (
 					<CoverPlaceholder project={project} />
@@ -132,7 +148,8 @@ function BentoCard({ project }: { project: Project }) {
 					/* eslint-disable-next-line @next/next/no-img-element */
 					<img
 						src={project.cover}
-						alt={project.name}
+						alt={`${project.name} preview`}
+						loading='lazy'
 						onError={() => setImgError(true)}
 						style={{
 							width: '100%',
@@ -142,7 +159,7 @@ function BentoCard({ project }: { project: Project }) {
 						}}
 					/>
 				)}
-				{/* Type badge */}
+
 				<div
 					style={{
 						position: 'absolute',
@@ -150,30 +167,31 @@ function BentoCard({ project }: { project: Project }) {
 						left: 12,
 						padding: '4px 12px',
 						background: badge.bg,
-						border: `1.5px solid ${badge.border}`,
-						borderRadius: 100,
-						fontSize: 11,
-						fontFamily: "'JetBrains Mono', monospace",
+						border: `${BORDER.soft} solid ${badge.border}`,
+						borderRadius: RADIUS.full,
+						fontSize: FONT.micro,
+						fontFamily: MONO,
 						color: badge.color,
 						fontWeight: 700,
 					}}>
 					{badge.label}
 				</div>
-				{isFeatured && (
+
+				{project.featured && (
 					<div
 						style={{
 							position: 'absolute',
 							top: 12,
 							right: 12,
 							padding: '4px 12px',
-							background: '#ffffff',
-							border: '1.5px solid #0a0a0a',
-							borderRadius: 100,
-							fontSize: 11,
-							fontFamily: "'JetBrains Mono', monospace",
+							background: 'var(--surface)',
+							border: `${BORDER.soft} solid var(--line)`,
+							borderRadius: RADIUS.full,
+							fontSize: FONT.micro,
+							fontFamily: MONO,
 							color: project.color,
 							fontWeight: 700,
-							boxShadow: '2px 2px 0px #0a0a0a',
+							boxShadow: 'var(--sh-1)',
 						}}>
 						featured
 					</div>
@@ -197,10 +215,10 @@ function BentoCard({ project }: { project: Project }) {
 					}}>
 					<h3
 						style={{
-							fontSize: 17,
+							fontSize: FONT.lg,
 							fontWeight: 800,
-							fontFamily: "'Inter', sans-serif",
-							color: '#0a0a0a',
+							fontFamily: SANS,
+							color: 'var(--ink)',
 							letterSpacing: '-0.02em',
 							margin: 0,
 						}}>
@@ -212,25 +230,27 @@ function BentoCard({ project }: { project: Project }) {
 								display: 'flex',
 								alignItems: 'center',
 								gap: 4,
-								color: '#f59e0b',
-								fontSize: 12,
-								fontFamily: "'JetBrains Mono', monospace",
+								color: 'var(--warn)',
+								fontSize: FONT.micro,
+								fontFamily: MONO,
 								flexShrink: 0,
 								marginLeft: 12,
 							}}>
-							<Star size={12} fill='#f59e0b' />
-							{project.stars}
+							<Star size={12} fill='currentColor' aria-hidden='true' />
+							<span aria-label={`${project.stars} GitHub stars`}>
+								{project.stars}
+							</span>
 						</div>
 					)}
 				</div>
 
 				<p
 					style={{
-						color: '#525252',
-						fontSize: 13,
+						color: 'var(--ink-secondary)',
+						fontSize: FONT.sm,
 						lineHeight: 1.65,
 						marginBottom: 16,
-						fontFamily: "'Inter', sans-serif",
+						fontFamily: SANS,
 						display: '-webkit-box',
 						WebkitLineClamp: 3,
 						WebkitBoxOrient: 'vertical',
@@ -252,13 +272,13 @@ function BentoCard({ project }: { project: Project }) {
 							key={t}
 							style={{
 								padding: '3px 10px',
-								background: '#f0ece8',
-								border: '1.5px solid #0a0a0a',
-								borderRadius: 100,
-								fontSize: 11,
-								fontFamily: "'JetBrains Mono', monospace",
-								color: '#0a0a0a',
-								boxShadow: '1px 1px 0px #0a0a0a',
+								background: 'var(--surface-header)',
+								border: `${BORDER.soft} solid var(--line)`,
+								borderRadius: RADIUS.full,
+								fontSize: FONT.micro,
+								fontFamily: MONO,
+								color: 'var(--ink)',
+								boxShadow: '1px 1px 0 var(--shadow-ink)',
 							}}>
 							{t}
 						</span>
@@ -271,67 +291,33 @@ function BentoCard({ project }: { project: Project }) {
 						{project.github && (
 							<a
 								href={project.github}
+								target='_blank'
+								rel='noopener noreferrer'
+								aria-label={`${project.name} source code on GitHub`}
 								style={{
-									display: 'inline-flex',
-									alignItems: 'center',
-									gap: 6,
-									padding: '8px 16px',
-									background: '#ffffff',
-									border: '1.5px solid #0a0a0a',
-									borderRadius: 10,
-									fontSize: 13,
-									fontWeight: 700,
-									color: '#0a0a0a',
-									textDecoration: 'none',
-									fontFamily: "'Inter', sans-serif",
-									boxShadow: '2px 2px 0px #0a0a0a',
-									transition: 'all 0.2s ease',
+									...LINK_BASE,
+									background: 'var(--surface)',
+									color: 'var(--ink)',
 								}}
-								onMouseEnter={(e) => {
-									e.currentTarget.style.transform =
-										'translate(-1px,-1px)';
-									e.currentTarget.style.boxShadow =
-										'3px 3px 0px #0a0a0a';
-								}}
-								onMouseLeave={(e) => {
-									e.currentTarget.style.transform = 'translate(0,0)';
-									e.currentTarget.style.boxShadow =
-										'2px 2px 0px #0a0a0a';
-								}}>
-								<Github size={14} /> Code
+								onMouseEnter={liftOn}
+								onMouseLeave={liftOff}>
+								<Github size={14} aria-hidden='true' /> Code
 							</a>
 						)}
 						{project.demo && (
 							<a
 								href={project.demo}
+								target='_blank'
+								rel='noopener noreferrer'
+								aria-label={`${project.name} live demo`}
 								style={{
-									display: 'inline-flex',
-									alignItems: 'center',
-									gap: 6,
-									padding: '8px 16px',
-									background: '#6366f1',
-									border: '1.5px solid #0a0a0a',
-									borderRadius: 10,
-									fontSize: 13,
-									fontWeight: 700,
-									color: '#ffffff',
-									textDecoration: 'none',
-									fontFamily: "'Inter', sans-serif",
-									boxShadow: '2px 2px 0px #0a0a0a',
-									transition: 'all 0.2s ease',
+									...LINK_BASE,
+									background: 'var(--accent)',
+									color: 'var(--accent-ink)',
 								}}
-								onMouseEnter={(e) => {
-									e.currentTarget.style.transform =
-										'translate(-1px,-1px)';
-									e.currentTarget.style.boxShadow =
-										'3px 3px 0px #0a0a0a';
-								}}
-								onMouseLeave={(e) => {
-									e.currentTarget.style.transform = 'translate(0,0)';
-									e.currentTarget.style.boxShadow =
-										'2px 2px 0px #0a0a0a';
-								}}>
-								<ExternalLink size={14} /> Live Demo
+								onMouseEnter={liftOn}
+								onMouseLeave={liftOff}>
+								<ExternalLink size={14} aria-hidden='true' /> Live Demo
 							</a>
 						)}
 					</div>
@@ -345,11 +331,9 @@ function BentoCard({ project }: { project: Project }) {
 export default function Projects() {
 	const sectionRef = useRef<HTMLElement>(null);
 
-	// GSAP staggered entrance
 	useGSAP(
 		() => {
-			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-				return;
+			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
 			gsap.from('.project-card', {
 				y: 60,
@@ -376,18 +360,14 @@ export default function Projects() {
 		<section
 			id='projects'
 			ref={sectionRef}
-			style={{ background: '#faf9f7', padding: '96px 0' }}>
-			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+			style={{ background: 'var(--section-b)' }}>
+			<div style={CONTAINER}>
 				<TextReveal
-					parts={[
-						{ text: "Things I've " },
-						{ text: 'Built', color: '#6366f1' },
-					]}
+					parts={[{ text: "Things I've " }, { text: 'Built', color: 'var(--accent)' }]}
 					as='h2'
-					style={HEADING_STYLE}
+					style={{ ...H2, marginBottom: 48 }}
 				/>
 
-				{/* Bento Grid */}
 				<div className='bento-grid'>
 					{ordered.map((project) => (
 						<BentoCard key={project.id} project={project} />

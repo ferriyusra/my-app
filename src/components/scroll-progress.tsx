@@ -26,13 +26,14 @@ export default function ScrollProgress() {
 	return (
 		<div
 			ref={barRef}
+			aria-hidden='true'
 			style={{
 				position: 'fixed',
 				top: 0,
 				left: 0,
 				right: 0,
 				height: 3,
-				background: '#6366f1',
+				background: 'var(--accent)',
 				transformOrigin: '0%',
 				transform: 'scaleX(0)',
 				zIndex: 100,

@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
 	MapPin,
-	Calendar,
+	Clock,
 	Briefcase,
 	Download,
 	Zap,
@@ -16,6 +16,18 @@ import TextReveal from '@/components/text-reveal';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { profile } from '@/data/profile';
+import {
+	BORDER,
+	CARD,
+	CONTAINER,
+	EASE,
+	FONT,
+	H2,
+	MONO,
+	RADIUS,
+	SANS,
+} from '@/lib/theme';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -62,48 +74,41 @@ const stats = [
 		label: 'Years Experience',
 		value: 4,
 		suffix: '+',
-		color: '#10b981',
+		color: 'var(--success)',
 		icon: Zap,
-		bg: 'rgba(16,185,129,0.10)',
 	},
 	{
 		label: 'APIs Built',
 		value: 30,
 		suffix: '+',
-		color: '#6366f1',
+		color: 'var(--accent)',
 		icon: Server,
-		bg: 'rgba(99,102,241,0.10)',
 	},
 	{
 		label: 'Industries',
 		value: 3,
 		suffix: '',
-		color: '#f59e0b',
+		color: 'var(--warn)',
 		icon: Building2,
-		bg: 'rgba(245,158,11,0.10)',
 	},
 	{
 		label: 'Monthly API Reqs',
 		value: 40,
 		suffix: 'K+',
-		color: '#3b82f6',
+		color: 'var(--info)',
 		icon: Activity,
-		bg: 'rgba(59,130,246,0.10)',
 	},
 ];
 
+/* Availability is stated once, by the badge below — these are the facts
+   the badge does not cover. */
 const infoItems = [
-	{
-		icon: MapPin,
-		text: 'Jakarta, Indonesia (Hybrid / Remote)',
-		label: 'Location',
-	},
-	{ icon: Calendar, text: 'Available', label: 'Availability' },
-	{ icon: Briefcase, text: 'Freelance & Full-time roles', label: 'Work type' },
+	{ icon: MapPin, text: profile.locationDetail, label: 'Location' },
+	{ icon: Clock, text: 'GMT+7 (WIB) — overlaps EU & APAC', label: 'Timezone' },
+	{ icon: Briefcase, text: profile.workType, label: 'Work type' },
 ];
 
 const SPRING = { type: 'spring' as const, stiffness: 300, damping: 28 };
-const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 export default function About() {
 	const shouldReduceMotion = useReducedMotion();
@@ -118,41 +123,13 @@ export default function About() {
 		<section
 			id='about'
 			aria-labelledby='about-heading'
-			style={{ background: '#f0ece8' }}>
-			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-				{/* Section label */}
-				<motion.div
-					initial={{ opacity: 0, y: 10 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: '-80px' }}
-					transition={t(0.35, 0)}
-					style={{
-						fontFamily: "'JetBrains Mono', monospace",
-						fontSize: 11,
-						color: '#a3a3a3',
-						fontWeight: 600,
-						letterSpacing: '0.18em',
-						textTransform: 'uppercase',
-						marginBottom: 12,
-					}}
-				/>
-
-				{/* Heading */}
+			style={{ background: 'var(--section-a)' }}>
+			<div style={CONTAINER}>
 				<TextReveal
 					id='about-heading'
-					parts={[
-						{ text: 'Who I ' },
-						{ text: 'Am', color: '#6366f1' },
-					]}
+					parts={[{ text: 'Who I ' }, { text: 'Am', color: 'var(--accent)' }]}
 					as='h2'
-					style={{
-						fontSize: 'clamp(28px, 5vw, 48px)',
-						fontWeight: 800,
-						marginBottom: 64,
-						fontFamily: "'Inter', sans-serif",
-						color: '#0a0a0a',
-						letterSpacing: '-0.02em',
-					}}
+					style={{ ...H2, marginBottom: 64 }}
 				/>
 
 				<div
@@ -169,18 +146,12 @@ export default function About() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.12)}
-						className="card"
-						style={{
-							background: '#ffffff',
-							border: '2px solid #0a0a0a',
-							borderRadius: 20,
-							boxShadow: '6px 6px 0px #0a0a0a',
-							overflow: 'hidden',
-						}}>
+						className='card'
+						style={CARD}>
 						{/* Illustration header */}
 						<div
 							style={{
-								background: '#f0ece8',
+								background: 'var(--surface-header)',
 								display: 'flex',
 								alignItems: 'center',
 								justifyContent: 'center',
@@ -196,15 +167,14 @@ export default function About() {
 								style={{
 									width: 72,
 									height: 72,
-									borderRadius: 18,
+									borderRadius: RADIUS.lg,
 									flexShrink: 0,
-									background: '#6366f1',
-									border: '2px solid #0a0a0a',
+									background: 'var(--accent)',
+									border: `${BORDER.hard} solid var(--line)`,
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
-									boxShadow: '4px 4px 0px #0a0a0a',
-									cursor: 'pointer',
+									boxShadow: 'var(--sh-2)',
 									position: 'relative',
 									overflow: 'hidden',
 								}}>
@@ -228,70 +198,69 @@ export default function About() {
 								)}
 								<span
 									style={{
-										color: '#fff',
-										fontSize: 22,
+										color: 'var(--accent-ink)',
+										fontSize: FONT.xl,
 										fontWeight: 800,
-										fontFamily: "'Inter', sans-serif",
+										fontFamily: SANS,
 									}}>
-									FY
+									{profile.initials}
 								</span>
 							</motion.div>
 							<div>
 								<div
 									style={{
 										fontWeight: 800,
-										fontSize: 20,
-										color: '#0a0a0a',
-										fontFamily: "'Inter', sans-serif",
+										fontSize: FONT.xl,
+										color: 'var(--ink)',
+										fontFamily: SANS,
 										marginBottom: 4,
 										letterSpacing: '-0.02em',
 									}}>
-									Ferri Yusra
+									{profile.name}
 								</div>
 								<div
 									style={{
-										color: '#6366f1',
-										fontSize: 13,
-										fontFamily: "'JetBrains Mono', monospace",
+										color: 'var(--accent)',
+										fontSize: FONT.sm,
+										fontFamily: MONO,
 										fontWeight: 500,
 									}}>
-									Backend Engineer
+									{profile.role}
 								</div>
 							</div>
 						</div>
+
 						{/* Content */}
 						<div style={{ padding: 'clamp(20px, 4vw, 28px)' }}>
 							<p
 								style={{
-									color: '#525252',
+									color: 'var(--ink-secondary)',
 									lineHeight: 1.8,
 									marginBottom: 12,
-									fontFamily: "'Inter', sans-serif",
-									fontSize: 15,
+									fontFamily: SANS,
+									fontSize: FONT.base,
 								}}>
-								Backend engineer with 4+ years building scalable API systems
-								across fintech, GovTech health, and automotive industries. I
-								specialize in{' '}
-								<span style={{ color: '#0a0a0a', fontWeight: 500 }}>Go</span>{' '}
+								{profile.bio} I specialize in{' '}
+								<span style={{ color: 'var(--ink)', fontWeight: 600 }}>Go</span>{' '}
 								and{' '}
-								<span style={{ color: '#0a0a0a', fontWeight: 500 }}>
+								<span style={{ color: 'var(--ink)', fontWeight: 600 }}>
 									Node.js
 								</span>{' '}
 								— from RESTful APIs to event-driven architectures.
 							</p>
 							<p
 								style={{
-									color: '#525252',
+									color: 'var(--ink-secondary)',
 									lineHeight: 1.8,
 									marginBottom: 24,
-									fontFamily: "'Inter', sans-serif",
-									fontSize: 15,
+									fontFamily: SANS,
+									fontSize: FONT.base,
 								}}>
 								I care deeply about clean architecture, system reliability, and
 								writing code that teams can maintain and scale confidently.
 							</p>
+
 							<ul
-								role='list'
 								aria-label='Personal information'
 								style={{
 									display: 'flex',
@@ -313,35 +282,35 @@ export default function About() {
 											alignItems: 'center',
 											gap: 12,
 											padding: '10px 14px',
-											borderRadius: 12,
-											background: '#f9f9f7',
-											border: '1px solid #e5e5e5',
+											borderRadius: RADIUS.md,
+											background: 'var(--surface-subtle)',
+											border: `1px solid var(--line-subtle)`,
 										}}>
 										<div
 											style={{
 												width: 32,
 												height: 32,
-												borderRadius: 9,
+												borderRadius: RADIUS.sm,
 												flexShrink: 0,
-												background: '#ffffff',
-												border: '1.5px solid #0a0a0a',
+												background: 'var(--surface)',
+												border: `${BORDER.soft} solid var(--line)`,
 												display: 'flex',
 												alignItems: 'center',
 												justifyContent: 'center',
-												boxShadow: '2px 2px 0px #0a0a0a',
+												boxShadow: 'var(--sh-1)',
 											}}>
 											<Icon
 												size={14}
-												style={{ color: '#6366f1' }}
+												style={{ color: 'var(--accent)' }}
 												aria-hidden='true'
 											/>
 										</div>
 										<div>
 											<div
 												style={{
-													fontSize: 10,
-													color: '#a3a3a3',
-													fontFamily: "'JetBrains Mono', monospace",
+													fontSize: FONT.micro,
+													color: 'var(--ink-muted)',
+													fontFamily: MONO,
 													textTransform: 'uppercase',
 													letterSpacing: '0.12em',
 													marginBottom: 1,
@@ -351,9 +320,9 @@ export default function About() {
 											</div>
 											<div
 												style={{
-													fontSize: 13,
-													color: '#0a0a0a',
-													fontFamily: "'Inter', sans-serif",
+													fontSize: FONT.sm,
+													color: 'var(--ink)',
+													fontFamily: SANS,
 													fontWeight: 500,
 												}}>
 												{text}
@@ -362,6 +331,7 @@ export default function About() {
 									</motion.li>
 								))}
 							</ul>
+
 							<div
 								style={{
 									display: 'flex',
@@ -376,9 +346,9 @@ export default function About() {
 										alignItems: 'center',
 										gap: 7,
 										padding: '7px 14px',
-										background: 'rgba(99,102,241,0.08)',
-										border: '1px solid rgba(99,102,241,0.2)',
-										borderRadius: 100,
+										background: 'var(--accent-soft)',
+										border: `1px solid var(--accent-ring)`,
+										borderRadius: RADIUS.full,
 									}}>
 									<motion.span
 										animate={
@@ -396,49 +366,50 @@ export default function About() {
 											width: 7,
 											height: 7,
 											borderRadius: '50%',
-											background: '#6366f1',
+											background: 'var(--accent)',
 											display: 'inline-block',
 											flexShrink: 0,
 										}}
 									/>
 									<span
 										style={{
-											fontSize: 12,
-											color: '#6366f1',
-											fontFamily: "'JetBrains Mono', monospace",
+											fontSize: FONT.micro,
+											color: 'var(--accent)',
+											fontFamily: MONO,
 											fontWeight: 600,
 										}}>
-										Available from April 2026
+										{profile.availability}
 									</span>
 								</div>
 								<a
-									href='https://drive.google.com/file/d/1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I/view?usp=sharing'
+									href={profile.cvView}
+									target='_blank'
+									rel='noopener noreferrer'
 									style={{
 										display: 'inline-flex',
 										alignItems: 'center',
 										gap: 6,
 										padding: '7px 16px',
-										borderRadius: 100,
-										border: '1.5px solid #0a0a0a',
+										borderRadius: RADIUS.full,
+										border: `${BORDER.soft} solid var(--line)`,
 										background: 'transparent',
-										color: '#525252',
-										fontSize: 12,
+										color: 'var(--ink-secondary)',
+										fontSize: FONT.micro,
 										textDecoration: 'none',
-										fontFamily: "'Inter', sans-serif",
+										fontFamily: SANS,
 										fontWeight: 600,
 										transition:
 											'border-color 0.2s ease, color 0.2s ease, transform 0.2s ease',
-										cursor: 'pointer',
 									}}
 									onMouseEnter={(e) => {
-										e.currentTarget.style.borderColor = '#6366f1';
-										e.currentTarget.style.color = '#6366f1';
+										e.currentTarget.style.borderColor = 'var(--accent)';
+										e.currentTarget.style.color = 'var(--accent)';
 										if (!shouldReduceMotion)
 											e.currentTarget.style.transform = 'translateY(-1px)';
 									}}
 									onMouseLeave={(e) => {
-										e.currentTarget.style.borderColor = '#0a0a0a';
-										e.currentTarget.style.color = '#525252';
+										e.currentTarget.style.borderColor = 'var(--line)';
+										e.currentTarget.style.color = 'var(--ink-secondary)';
 										e.currentTarget.style.transform = 'translateY(0)';
 									}}>
 									<Download size={13} aria-hidden='true' />
@@ -467,19 +438,11 @@ export default function About() {
 										...SPRING,
 										delay: shouldReduceMotion ? 0 : 0.18 + i * 0.05,
 									}}
-									className="card"
-									style={{
-										background: '#ffffff',
-										border: '2px solid #0a0a0a',
-										borderRadius: 16,
-										boxShadow: '4px 4px 0px #0a0a0a',
-										overflow: 'hidden',
-										cursor: 'default',
-									}}>
-									{/* Icon header */}
+									className='card'
+									style={{ ...CARD, cursor: 'default' }}>
 									<div
 										style={{
-											background: '#f0ece8',
+											background: 'var(--surface-header)',
 											display: 'flex',
 											alignItems: 'center',
 											justifyContent: 'center',
@@ -489,18 +452,17 @@ export default function About() {
 											style={{
 												width: 52,
 												height: 52,
-												borderRadius: 14,
-												background: '#ffffff',
-												border: '2px solid #0a0a0a',
+												borderRadius: RADIUS.md,
+												background: 'var(--surface)',
+												border: `${BORDER.hard} solid var(--line)`,
 												display: 'flex',
 												alignItems: 'center',
 												justifyContent: 'center',
-												boxShadow: '3px 3px 0px #0a0a0a',
+												boxShadow: 'var(--sh-1-hi)',
 											}}>
 											<Icon size={22} style={{ color }} aria-hidden='true' />
 										</div>
 									</div>
-									{/* Number + label */}
 									<div
 										style={{
 											padding: '16px 16px 20px',
@@ -508,9 +470,9 @@ export default function About() {
 										}}>
 										<div
 											style={{
-												fontSize: 32,
+												fontSize: FONT.stat,
 												fontWeight: 800,
-												fontFamily: "'Inter', sans-serif",
+												fontFamily: SANS,
 												color,
 												marginBottom: 4,
 												lineHeight: 1,
@@ -519,9 +481,9 @@ export default function About() {
 										</div>
 										<div
 											style={{
-												color: '#a3a3a3',
-												fontSize: 11,
-												fontFamily: "'Inter', sans-serif",
+												color: 'var(--ink-muted)',
+												fontSize: FONT.micro,
+												fontFamily: SANS,
 												fontWeight: 500,
 											}}>
 											{label}
@@ -537,18 +499,11 @@ export default function About() {
 							whileInView={{ opacity: 1, y: 0 }}
 							viewport={{ once: true, margin: '-80px' }}
 							transition={t(0.5, 0.5)}
-							className="card"
-							style={{
-								background: '#ffffff',
-								border: '2px solid #0a0a0a',
-								borderRadius: 20,
-								boxShadow: '6px 6px 0px #0a0a0a',
-								overflow: 'hidden',
-							}}>
-							{/* Header */}
+							className='card'
+							style={CARD}>
 							<div
 								style={{
-									background: '#f0ece8',
+									background: 'var(--surface-header)',
 									padding: '18px 28px',
 									display: 'flex',
 									alignItems: 'center',
@@ -558,30 +513,30 @@ export default function About() {
 									style={{
 										width: 36,
 										height: 36,
-										borderRadius: 10,
-										background: '#ffffff',
-										border: '1.5px solid #0a0a0a',
+										borderRadius: RADIUS.sm,
+										background: 'var(--surface)',
+										border: `${BORDER.soft} solid var(--line)`,
 										display: 'flex',
 										alignItems: 'center',
 										justifyContent: 'center',
-										boxShadow: '2px 2px 0px #0a0a0a',
+										boxShadow: 'var(--sh-1)',
 										flexShrink: 0,
 									}}>
 									<span
 										style={{
-											fontSize: 16,
-											fontFamily: "'JetBrains Mono', monospace",
+											fontSize: FONT.lg,
+											fontFamily: MONO,
 											fontWeight: 800,
-											color: '#6366f1',
+											color: 'var(--accent)',
 										}}>
 										&ldquo;
 									</span>
 								</div>
 								<div
 									style={{
-										fontFamily: "'JetBrains Mono', monospace",
-										fontSize: 11,
-										color: '#6366f1',
+										fontFamily: MONO,
+										fontSize: FONT.micro,
+										color: 'var(--accent)',
 										letterSpacing: '0.15em',
 										textTransform: 'uppercase' as const,
 										fontWeight: 600,
@@ -589,29 +544,28 @@ export default function About() {
 									my approach
 								</div>
 							</div>
-							{/* Content */}
 							<div style={{ padding: '24px 28px' }}>
 								<blockquote style={{ margin: 0 }}>
 									<p
 										style={{
-											color: '#525252',
-											fontSize: 15,
+											color: 'var(--ink-secondary)',
+											fontSize: FONT.base,
 											lineHeight: 1.8,
-											fontFamily: "'Inter', sans-serif",
+											fontFamily: SANS,
 											fontWeight: 400,
 											margin: '0 0 16px',
 										}}>
 										&ldquo;Great backend systems are invisible — they just work.
 										I build for{' '}
-										<span style={{ color: '#10b981', fontWeight: 600 }}>
+										<span style={{ color: 'var(--success)', fontWeight: 600 }}>
 											reliability
 										</span>
 										,{' '}
-										<span style={{ color: '#6366f1', fontWeight: 600 }}>
+										<span style={{ color: 'var(--accent)', fontWeight: 600 }}>
 											scalability
 										</span>
 										, and the{' '}
-										<span style={{ color: '#f59e0b', fontWeight: 600 }}>
+										<span style={{ color: 'var(--warn)', fontWeight: 600 }}>
 											engineers
 										</span>{' '}
 										who maintain them.&rdquo;
@@ -635,13 +589,13 @@ export default function About() {
 												delay: shouldReduceMotion ? 0 : 0.6 + i * 0.07,
 											}}
 											style={{
-												fontSize: 11,
+												fontSize: FONT.micro,
 												padding: '4px 10px',
-												borderRadius: 100,
-												background: '#f4f4f5',
-												border: '1px solid #e4e4e7',
-												color: '#71717a',
-												fontFamily: "'JetBrains Mono', monospace",
+												borderRadius: RADIUS.full,
+												background: 'var(--surface-chip)',
+												border: `1px solid var(--line-subtle)`,
+												color: 'var(--ink-secondary)',
+												fontFamily: MONO,
 												letterSpacing: '0.04em',
 											}}>
 											{tag}

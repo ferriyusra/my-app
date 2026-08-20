@@ -2,14 +2,23 @@
 
 import { useState, useRef, useLayoutEffect } from 'react';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
-import { Code2, Zap, Globe, Briefcase, Layers } from 'lucide-react';
+import { Code2, Zap, Globe, Briefcase, Layers, type LucideIcon } from 'lucide-react';
 import TextReveal from '@/components/text-reveal';
 import gsap from 'gsap';
 import { Flip } from 'gsap/all';
+import {
+	BORDER,
+	CARD,
+	CONTAINER,
+	EASE,
+	FONT,
+	H2,
+	MONO,
+	RADIUS,
+	SANS,
+} from '@/lib/theme';
 
 gsap.registerPlugin(Flip);
-
-const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 type Category =
 	| 'All'
@@ -28,220 +37,166 @@ const categories: Category[] = [
 	'AI Tools',
 ];
 
-const skills = [
+/* Chips are coloured by category rather than by brand. Brand colours were
+   unreadable for the near-black logos (Next.js, Express, Copilot) and made
+   the filter row look arbitrary. */
+const CATEGORY_COLOR: Record<Exclude<Category, 'All'>, string> = {
+	Frontend: 'var(--info)',
+	Backend: 'var(--success)',
+	Database: '#8b5cf6',
+	Tools: 'var(--warn)',
+	'AI Tools': '#ec4899',
+};
+
+/* `adaptive` marks near-black logos that need inverting on dark surfaces. */
+type Skill = {
+	name: string;
+	category: Exclude<Category, 'All'>;
+	icon: string;
+	adaptive?: boolean;
+};
+
+const skills: Skill[] = [
 	// Frontend
-	{
-		name: 'JavaScript',
-		category: 'Frontend' as Category,
-		color: '#eab308',
-		bg: '#eab30818',
-		icon: 'https://cdn.simpleicons.org/javascript/eab308',
-	},
-	{
-		name: 'TypeScript',
-		category: 'Frontend' as Category,
-		color: '#3178C6',
-		bg: '#3178C618',
-		icon: 'https://cdn.simpleicons.org/typescript/3178C6',
-	},
-	{
-		name: 'React',
-		category: 'Frontend' as Category,
-		color: '#0ea5e9',
-		bg: '#0ea5e918',
-		icon: 'https://cdn.simpleicons.org/react/0ea5e9',
-	},
+	{ name: 'JavaScript', category: 'Frontend', icon: '/icons/javascript.svg' },
+	{ name: 'TypeScript', category: 'Frontend', icon: '/icons/typescript.svg' },
+	{ name: 'React', category: 'Frontend', icon: '/icons/react.svg' },
 	{
 		name: 'Next.js',
-		category: 'Frontend' as Category,
-		color: '#0a0a0a',
-		bg: '#0a0a0a10',
-		icon: 'https://cdn.simpleicons.org/nextdotjs/0a0a0a',
+		category: 'Frontend',
+		icon: '/icons/nextdotjs.svg',
+		adaptive: true,
 	},
-	{
-		name: 'TailwindCSS',
-		category: 'Frontend' as Category,
-		color: '#06B6D4',
-		bg: '#06B6D418',
-		icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4',
-	},
+	{ name: 'TailwindCSS', category: 'Frontend', icon: '/icons/tailwindcss.svg' },
 	// Backend
-	{
-		name: 'Node.js',
-		category: 'Backend' as Category,
-		color: '#16a34a',
-		bg: '#16a34a18',
-		icon: 'https://cdn.simpleicons.org/nodedotjs/16a34a',
-	},
+	{ name: 'Node.js', category: 'Backend', icon: '/icons/nodedotjs.svg' },
 	{
 		name: 'Express.js',
-		category: 'Backend' as Category,
-		color: '#525252',
-		bg: '#52525210',
-		icon: 'https://cdn.simpleicons.org/express/525252',
+		category: 'Backend',
+		icon: '/icons/express.svg',
+		adaptive: true,
 	},
-	{
-		name: 'NestJS',
-		category: 'Backend' as Category,
-		color: '#E0234E',
-		bg: '#E0234E18',
-		icon: 'https://cdn.simpleicons.org/nestjs/E0234E',
-	},
-	{
-		name: 'Golang',
-		category: 'Backend' as Category,
-		color: '#00ADD8',
-		bg: '#00ADD818',
-		icon: 'https://cdn.simpleicons.org/go/00ADD8',
-	},
+	{ name: 'NestJS', category: 'Backend', icon: '/icons/nestjs.svg' },
+	{ name: 'Golang', category: 'Backend', icon: '/icons/go.svg' },
 	// Database
-	{
-		name: 'PostgreSQL',
-		category: 'Database' as Category,
-		color: '#4169E1',
-		bg: '#4169E118',
-		icon: 'https://cdn.simpleicons.org/postgresql/4169E1',
-	},
-	{
-		name: 'MySQL',
-		category: 'Database' as Category,
-		color: '#4479A1',
-		bg: '#4479A118',
-		icon: 'https://cdn.simpleicons.org/mysql/4479A1',
-	},
-	{
-		name: 'MongoDB',
-		category: 'Database' as Category,
-		color: '#47A248',
-		bg: '#47A24818',
-		icon: 'https://cdn.simpleicons.org/mongodb/47A248',
-	},
-	{
-		name: 'Redis',
-		category: 'Database' as Category,
-		color: '#DC382D',
-		bg: '#DC382D18',
-		icon: 'https://cdn.simpleicons.org/redis/DC382D',
-	},
+	{ name: 'PostgreSQL', category: 'Database', icon: '/icons/postgresql.svg' },
+	{ name: 'MySQL', category: 'Database', icon: '/icons/mysql.svg' },
+	{ name: 'MongoDB', category: 'Database', icon: '/icons/mongodb.svg' },
+	{ name: 'Redis', category: 'Database', icon: '/icons/redis.svg' },
 	// Tools
-	{
-		name: 'Docker',
-		category: 'Tools' as Category,
-		color: '#2496ED',
-		bg: '#2496ED18',
-		icon: 'https://cdn.simpleicons.org/docker/2496ED',
-	},
-	{
-		name: 'Git',
-		category: 'Tools' as Category,
-		color: '#F05032',
-		bg: '#F0503218',
-		icon: 'https://cdn.simpleicons.org/git/F05032',
-	},
-	{
-		name: 'AWS',
-		category: 'Tools' as Category,
-		color: '#FF9900',
-		bg: '#FF990018',
-		icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg',
-	},
-	{
-		name: 'GCP',
-		category: 'Tools' as Category,
-		color: '#4285F4',
-		bg: '#4285F418',
-		icon: 'https://cdn.simpleicons.org/googlecloud/4285F4',
-	},
+	{ name: 'Docker', category: 'Tools', icon: '/icons/docker.svg' },
+	{ name: 'Git', category: 'Tools', icon: '/icons/git.svg' },
+	{ name: 'AWS', category: 'Tools', icon: '/icons/aws.svg' },
+	{ name: 'GCP', category: 'Tools', icon: '/icons/googlecloud.svg' },
 	{
 		name: 'Google Pub/Sub',
-		category: 'Tools' as Category,
-		color: '#FBBC04',
-		bg: '#FBBC0418',
-		icon: 'https://cdn.simpleicons.org/googlepubsub/FBBC04',
+		category: 'Tools',
+		icon: '/icons/googlepubsub.svg',
 	},
 	{
 		name: 'Cloud Scheduler',
-		category: 'Tools' as Category,
-		color: '#34A853',
-		bg: '#34A85318',
-		icon: 'https://cdn.simpleicons.org/googlecloud/34A853',
+		category: 'Tools',
+		icon: '/icons/cloudscheduler.svg',
 	},
 	// AI Tools
-	{
-		name: 'Claude',
-		category: 'AI Tools' as Category,
-		color: '#D97706',
-		bg: '#D9770618',
-		icon: 'https://cdn.simpleicons.org/anthropic/D97706',
-	},
-	{
-		name: 'ChatGPT',
-		category: 'AI Tools' as Category,
-		color: '#10a37f',
-		bg: '#10a37f18',
-		icon: '/icons/openai.svg',
-	},
+	{ name: 'Claude', category: 'AI Tools', icon: '/icons/anthropic.svg' },
+	{ name: 'ChatGPT', category: 'AI Tools', icon: '/icons/openai.svg' },
 	{
 		name: 'GitHub Copilot',
-		category: 'AI Tools' as Category,
-		color: '#525252',
-		bg: '#52525210',
-		icon: 'https://cdn.simpleicons.org/githubcopilot/525252',
+		category: 'AI Tools',
+		icon: '/icons/githubcopilot.svg',
+		adaptive: true,
+	},
+	{ name: 'Cursor', category: 'AI Tools', icon: '/icons/cursor.svg' },
+];
+
+/* Icons shown inside the bento "Tech Stack" card */
+const stackIcons = [
+	{ name: 'Next.js', icon: '/icons/nextdotjs.svg', adaptive: true },
+	{ name: 'React', icon: '/icons/react.svg' },
+	{ name: 'TypeScript', icon: '/icons/typescript.svg' },
+	{ name: 'Node.js', icon: '/icons/nodedotjs.svg' },
+	{ name: 'Golang', icon: '/icons/go.svg' },
+	{ name: 'PostgreSQL', icon: '/icons/postgresql.svg' },
+	{ name: 'Docker', icon: '/icons/docker.svg' },
+	{ name: 'Redis', icon: '/icons/redis.svg' },
+];
+
+/* The four cards that share one shape — previously copy-pasted four times. */
+const bentoCards: { icon: LucideIcon; color: string; title: string; body: string }[] = [
+	{
+		icon: Code2,
+		color: 'var(--success)',
+		title: 'Clean Code First',
+		body: 'Writing maintainable, scalable code with engineering excellence at every layer of the stack.',
 	},
 	{
-		name: 'Cursor',
-		category: 'AI Tools' as Category,
-		color: '#7c3aed',
-		bg: '#7c3aed18',
-		icon: 'https://cdn.simpleicons.org/cursor/7c3aed',
+		icon: Layers,
+		color: 'var(--info)',
+		title: 'Full Stack Expertise',
+		body: 'From React frontends to Golang backends — end-to-end ownership across every layer.',
 	},
-	// {
-	// 	name: 'Hugging Face',
-	// 	category: 'AI Tools' as Category,
-	// 	color: '#FFD21E',
-	// 	bg: '#FFD21E18',
-	// 	icon: 'https://cdn.simpleicons.org/huggingface/FFD21E',
-	// },
-	// {
-	// 	name: 'LangChain',
-	// 	category: 'AI Tools' as Category,
-	// 	color: '#525252',
-	// 	bg: '#52525210',
-	// 	icon: 'https://cdn.simpleicons.org/langchain/525252',
-	// },
+	{
+		icon: Globe,
+		color: '#0ea5e9',
+		title: 'Remote Ready',
+		body: 'Available across time zones for seamless worldwide collaboration, hybrid or remote.',
+	},
+	{
+		icon: Zap,
+		color: 'var(--warn)',
+		title: 'Performance at Scale',
+		body: 'Optimizing APIs and services to handle high-throughput workloads reliably.',
+	},
 ];
 
-// Icons shown inside the bento "Tech Stack" card
-const stackIcons = [
-	{ name: 'Next.js', icon: 'https://cdn.simpleicons.org/nextdotjs/0a0a0a' },
-	{ name: 'React', icon: 'https://cdn.simpleicons.org/react/0ea5e9' },
-	{ name: 'TypeScript', icon: 'https://cdn.simpleicons.org/typescript/3178C6' },
-	{ name: 'Node.js', icon: 'https://cdn.simpleicons.org/nodedotjs/16a34a' },
-	{ name: 'Golang', icon: 'https://cdn.simpleicons.org/go/00ADD8' },
-	{ name: 'PostgreSQL', icon: 'https://cdn.simpleicons.org/postgresql/4169E1' },
-	{ name: 'Docker', icon: 'https://cdn.simpleicons.org/docker/2496ED' },
-	{ name: 'Redis', icon: 'https://cdn.simpleicons.org/redis/DC382D' },
-];
-
-const CARD_BASE: React.CSSProperties = {
-	background: '#ffffff',
-	border: '2px solid #0a0a0a',
-	borderRadius: 20,
-	boxShadow: '6px 6px 0px #0a0a0a',
-	overflow: 'hidden',
-	display: 'flex',
-	flexDirection: 'column',
+const CARD_TITLE: React.CSSProperties = {
+	fontSize: FONT.xl,
+	fontWeight: 800,
+	color: 'var(--ink)',
+	fontFamily: SANS,
+	marginBottom: 10,
+	letterSpacing: '-0.02em',
 };
 
+const CARD_BODY: React.CSSProperties = {
+	fontSize: FONT.sm,
+	color: 'var(--ink-secondary)',
+	lineHeight: 1.65,
+	fontFamily: SANS,
+	margin: 0,
+};
+
+const ICON_TILE: React.CSSProperties = {
+	width: 80,
+	height: 80,
+	borderRadius: RADIUS.lg,
+	background: 'var(--surface)',
+	border: `${BORDER.hard} solid var(--line)`,
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	boxShadow: 'var(--sh-2)',
+};
+
+const HEADER_PANEL: React.CSSProperties = {
+	background: 'var(--surface-header)',
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	minHeight: 160,
+};
 
 /* ── Bento icon hover — GSAP powered ─────────────── */
 function handleBentoEnter(e: React.MouseEvent) {
 	const icon = (e.currentTarget as HTMLElement).querySelector('.bento-icon');
-	if (icon) gsap.to(icon, { scale: 1.18, rotate: 8, duration: 0.4, ease: 'back.out(2)' });
+	if (icon)
+		gsap.to(icon, { scale: 1.18, rotate: 8, duration: 0.4, ease: 'back.out(2)' });
 }
 function handleBentoLeave(e: React.MouseEvent) {
 	const icon = (e.currentTarget as HTMLElement).querySelector('.bento-icon');
-	if (icon) gsap.to(icon, { scale: 1, rotate: 0, duration: 0.3, ease: 'power2.out' });
+	if (icon)
+		gsap.to(icon, { scale: 1, rotate: 0, duration: 0.3, ease: 'power2.out' });
 }
 
 export default function Skills() {
@@ -258,7 +213,6 @@ export default function Skills() {
 		setInteracted(true);
 	};
 
-	// Flip animation after React re-renders
 	useLayoutEffect(() => {
 		if (!flipStateRef.current || shouldReduceMotion) {
 			flipStateRef.current = null;
@@ -290,38 +244,15 @@ export default function Skills() {
 		delay: shouldReduceMotion ? 0 : delay,
 	});
 
+	const shown = active === 'All' ? skills : skills.filter((s) => s.category === active);
+
 	return (
-		<section id='skills' style={{ background: '#faf9f7' }}>
-			<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-				{/* Section label */}
-				<motion.div
-					initial={{ opacity: 0, y: 10 }}
-					whileInView={{ opacity: 1, y: 0 }}
-					viewport={{ once: true, margin: '-80px' }}
-					transition={t(0.35, 0)}
-					style={{
-						fontFamily: "'JetBrains Mono', monospace",
-						fontSize: 11,
-						color: '#a3a3a3',
-						letterSpacing: '0.18em',
-						textTransform: 'uppercase',
-						marginBottom: 12,
-						fontWeight: 600,
-					}}></motion.div>
+		<section id='skills' style={{ background: 'var(--section-b)' }}>
+			<div style={CONTAINER}>
 				<TextReveal
-					parts={[
-						{ text: 'Tech ' },
-						{ text: 'Stack', color: '#6366f1' },
-					]}
+					parts={[{ text: 'Tech ' }, { text: 'Stack', color: 'var(--accent)' }]}
 					as='h2'
-					style={{
-						fontSize: 'clamp(28px, 5vw, 48px)',
-						fontWeight: 800,
-						marginBottom: 12,
-						fontFamily: "'Inter', sans-serif",
-						color: '#0a0a0a',
-						letterSpacing: '-0.02em',
-					}}
+					style={{ ...H2, marginBottom: 12 }}
 				/>
 				<motion.p
 					initial={{ opacity: 0, y: 14 }}
@@ -329,12 +260,12 @@ export default function Skills() {
 					viewport={{ once: true, margin: '-80px' }}
 					transition={t(0.4, 0.16)}
 					style={{
-						color: '#525252',
-						fontSize: 16,
+						color: 'var(--ink-secondary)',
+						fontSize: FONT.base,
 						marginBottom: 56,
 						maxWidth: 480,
 						lineHeight: 1.6,
-						fontFamily: "'Inter', sans-serif",
+						fontFamily: SANS,
 					}}>
 					Tools and technologies I use to ship production-grade software.
 				</motion.p>
@@ -343,151 +274,131 @@ export default function Skills() {
 				<div
 					style={{
 						display: 'grid',
-						gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
+						gridTemplateColumns:
+							'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
 						gap: 20,
 						marginBottom: 64,
 					}}>
-					{/* Card 1 — Clean Code First */}
+					{/* Tech Stack card — icon wall */}
 					<motion.div
 						initial={{ opacity: 0, y: 24 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.1)}
-						className="card" style={CARD_BASE}
+						className='card'
+						style={{ ...CARD, display: 'flex', flexDirection: 'column' }}
 						onMouseEnter={handleBentoEnter}
 						onMouseLeave={handleBentoLeave}>
-						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
-							<div className="bento-icon" style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
-								<Code2 size={36} style={{ color: '#10b981' }} aria-hidden='true' />
-							</div>
-						</div>
-						<div style={{ padding: '24px 24px 28px' }}>
-							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
-								Clean Code First
-							</h3>
-							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
-								Writing maintainable, scalable code with engineering excellence at every layer of the stack.
-							</p>
-						</div>
-					</motion.div>
-
-					{/* Card 2 — Modern Tech Stack */}
-					<motion.div
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.18)}
-						className="card" style={CARD_BASE}
-						onMouseEnter={handleBentoEnter}
-						onMouseLeave={handleBentoLeave}>
-						<div style={{ background: '#f0ece8', padding: '24px 20px 20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+						<div
+							style={{
+								background: 'var(--surface-header)',
+								padding: '24px 20px 20px',
+								display: 'grid',
+								gridTemplateColumns: 'repeat(4, 1fr)',
+								gap: 10,
+							}}>
 							{stackIcons.map((s) => (
-								<div key={s.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-									<div style={{ width: 44, height: 44, borderRadius: 12, background: '#ffffff', border: '1.5px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '2px 2px 0px #0a0a0a' }}>
+								<div
+									key={s.name}
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										gap: 6,
+									}}>
+									<div
+										style={{
+											width: 44,
+											height: 44,
+											borderRadius: RADIUS.md,
+											background: 'var(--surface)',
+											border: `${BORDER.soft} solid var(--line)`,
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											boxShadow: 'var(--sh-1)',
+										}}>
 										{/* eslint-disable-next-line @next/next/no-img-element */}
-										<img src={s.icon} alt={s.name} width={22} height={22} />
+										<img
+											src={s.icon}
+											alt=''
+											aria-hidden='true'
+											width={22}
+											height={22}
+											loading='lazy'
+											className={s.adaptive ? 'icon-adaptive' : undefined}
+										/>
 									</div>
-									<span style={{ fontSize: 9, color: '#525252', fontFamily: "'JetBrains Mono', monospace", textAlign: 'center', lineHeight: 1.2 }}>{s.name}</span>
+									<span
+										style={{
+											fontSize: FONT.micro,
+											color: 'var(--ink-secondary)',
+											fontFamily: MONO,
+											textAlign: 'center',
+											lineHeight: 1.2,
+										}}>
+										{s.name}
+									</span>
 								</div>
 							))}
 						</div>
 						<div style={{ padding: '20px 24px 28px' }}>
-							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
-								Modern Tech Stack
-							</h3>
-							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
+							<h3 style={CARD_TITLE}>Modern Tech Stack</h3>
+							<p style={CARD_BODY}>
 								Technologies and tools I use to build innovative solutions.
 							</p>
 						</div>
 					</motion.div>
 
-					{/* Card 3 — Full Stack Expertise */}
-					<motion.div
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.26)}
-						className="card" style={CARD_BASE}
-						onMouseEnter={handleBentoEnter}
-						onMouseLeave={handleBentoLeave}>
-						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
-							<div className="bento-icon" style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
-								<Layers size={36} style={{ color: '#3b82f6' }} aria-hidden='true' />
+					{/* The four uniform cards */}
+					{bentoCards.map(({ icon: Icon, color, title, body }, i) => (
+						<motion.div
+							key={title}
+							initial={{ opacity: 0, y: 24 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							viewport={{ once: true, margin: '-80px' }}
+							transition={t(0.5, 0.18 + i * 0.08)}
+							className='card'
+							style={{ ...CARD, display: 'flex', flexDirection: 'column' }}
+							onMouseEnter={handleBentoEnter}
+							onMouseLeave={handleBentoLeave}>
+							<div style={HEADER_PANEL}>
+								<div className='bento-icon' style={ICON_TILE}>
+									<Icon size={36} style={{ color }} aria-hidden='true' />
+								</div>
 							</div>
-						</div>
-						<div style={{ padding: '24px 24px 28px' }}>
-							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
-								Full Stack Expertise
-							</h3>
-							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
-								From React frontends to Golang backends — end-to-end ownership across every layer.
-							</p>
-						</div>
-					</motion.div>
-
-					{/* Card 4 — Remote Ready */}
-					<motion.div
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.34)}
-						className="card" style={CARD_BASE}
-						onMouseEnter={handleBentoEnter}
-						onMouseLeave={handleBentoLeave}>
-						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
-							<div className="bento-icon" style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
-								<Globe size={36} style={{ color: '#0ea5e9' }} aria-hidden='true' />
+							<div style={{ padding: '24px 24px 28px' }}>
+								<h3 style={CARD_TITLE}>{title}</h3>
+								<p style={CARD_BODY}>{body}</p>
 							</div>
-						</div>
-						<div style={{ padding: '24px 24px 28px' }}>
-							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
-								Remote Ready
-							</h3>
-							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
-								Available across time zones for seamless worldwide collaboration, hybrid or remote.
-							</p>
-						</div>
-					</motion.div>
+						</motion.div>
+					))}
 
-					{/* Card 5 — Performance at Scale */}
-					<motion.div
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-80px' }}
-						transition={t(0.5, 0.42)}
-						className="card" style={CARD_BASE}
-						onMouseEnter={handleBentoEnter}
-						onMouseLeave={handleBentoLeave}>
-						<div style={{ background: '#f0ece8', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 160 }}>
-							<div className="bento-icon" style={{ width: 80, height: 80, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a' }}>
-								<Zap size={36} style={{ color: '#f59e0b' }} aria-hidden='true' />
-							</div>
-						</div>
-						<div style={{ padding: '24px 24px 28px' }}>
-							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 10, letterSpacing: '-0.02em' }}>
-								Performance at Scale
-							</h3>
-							<p style={{ fontSize: 14, color: '#525252', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", margin: 0 }}>
-								Optimizing APIs and services to handle high-throughput workloads reliably.
-							</p>
-						</div>
-					</motion.div>
-
-					{/* Card 6 — Get in Touch (amber CTA) */}
+					{/* CTA card (amber) — keeps its own literal colours: it is a fixed
+					    light surface in both themes by design. */}
 					<motion.div
 						initial={{ opacity: 0, y: 24 }}
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-80px' }}
 						transition={t(0.5, 0.5)}
-						className="card card-accent" style={{ ...CARD_BASE, background: '#fbbf24', alignItems: 'center', justifyContent: 'center', padding: '40px 28px', textAlign: 'center' as const, position: 'relative', overflow: 'hidden' }}
->
-						{/* Pulsing light glow */}
+						className='card'
+						style={{
+							...CARD,
+							background: '#fbbf24',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							padding: '40px 28px',
+							textAlign: 'center' as const,
+							position: 'relative',
+						}}>
 						<motion.div
 							aria-hidden='true'
-							animate={shouldReduceMotion ? {} : {
-								opacity: [0.3, 0.65, 0.3],
-								scale:   [1, 1.3, 1],
-							}}
+							animate={
+								shouldReduceMotion
+									? {}
+									: { opacity: [0.3, 0.65, 0.3], scale: [1, 1.3, 1] }
+							}
 							transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
 							style={{
 								position: 'absolute',
@@ -497,26 +408,72 @@ export default function Skills() {
 								width: 220,
 								height: 220,
 								borderRadius: '50%',
-								background: 'radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)',
+								background:
+									'radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)',
 								pointerEvents: 'none',
 							}}
 						/>
-						{/* Content */}
-						<div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-							<div style={{ width: 72, height: 72, borderRadius: 20, background: '#ffffff', border: '2px solid #0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0px #0a0a0a', marginBottom: 20 }}>
+						<div
+							style={{
+								position: 'relative',
+								zIndex: 1,
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+							}}>
+							<div
+								style={{
+									width: 72,
+									height: 72,
+									borderRadius: RADIUS.lg,
+									background: '#ffffff',
+									border: `${BORDER.hard} solid #0a0a0a`,
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									boxShadow: '4px 4px 0 #0a0a0a',
+									marginBottom: 20,
+								}}>
 								<Briefcase size={32} style={{ color: '#0a0a0a' }} aria-hidden='true' />
 							</div>
-							<h3 style={{ fontSize: 20, fontWeight: 800, color: '#0a0a0a', fontFamily: "'Inter', sans-serif", marginBottom: 12, letterSpacing: '-0.02em' }}>
-								Get in touch
+							<h3 style={{ ...CARD_TITLE, color: '#0a0a0a', marginBottom: 12 }}>
+								Let&apos;s work together
 							</h3>
-							<p style={{ fontSize: 14, color: '#78350f', lineHeight: 1.65, fontFamily: "'Inter', sans-serif", marginBottom: 24 }}>
-								Looking for a backend engineer? There&apos;s a high chance I&apos;ll be able to help!
+							<p
+								style={{
+									...CARD_BODY,
+									color: '#78350f',
+									marginBottom: 24,
+								}}>
+								Looking for a backend engineer? There&apos;s a high chance
+								I&apos;ll be able to help!
 							</p>
 							<a
 								href='#contact'
-								style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#0a0a0a', color: '#ffffff', borderRadius: 12, textDecoration: 'none', fontSize: 14, fontWeight: 700, fontFamily: "'Inter', sans-serif", border: '2px solid #0a0a0a', boxShadow: '3px 3px 0px rgba(0,0,0,0.25)', transition: 'transform 0.15s ease, box-shadow 0.15s ease' }}
-								onMouseEnter={(e) => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '4px 4px 0px rgba(0,0,0,0.25)'; }}
-								onMouseLeave={(e) => { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '3px 3px 0px rgba(0,0,0,0.25)'; }}>
+								style={{
+									display: 'inline-flex',
+									alignItems: 'center',
+									gap: 8,
+									padding: '12px 28px',
+									background: '#0a0a0a',
+									color: '#ffffff',
+									borderRadius: RADIUS.md,
+									textDecoration: 'none',
+									fontSize: FONT.sm,
+									fontWeight: 700,
+									fontFamily: SANS,
+									border: `${BORDER.hard} solid #0a0a0a`,
+									boxShadow: '3px 3px 0 rgba(0,0,0,0.25)',
+									transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+								}}
+								onMouseEnter={(e) => {
+									e.currentTarget.style.transform = 'translate(-1px,-1px)';
+									e.currentTarget.style.boxShadow = '4px 4px 0 rgba(0,0,0,0.25)';
+								}}
+								onMouseLeave={(e) => {
+									e.currentTarget.style.transform = 'translate(0,0)';
+									e.currentTarget.style.boxShadow = '3px 3px 0 rgba(0,0,0,0.25)';
+								}}>
 								Get in touch
 							</a>
 						</div>
@@ -537,43 +494,69 @@ export default function Skills() {
 						gap: 16,
 						marginBottom: 28,
 					}}>
-					{/* Left label */}
 					<div>
-						<p style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", color: '#a3a3a3', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600, margin: '0 0 4px' }}>
+						<p
+							style={{
+								fontSize: FONT.micro,
+								fontFamily: MONO,
+								color: 'var(--ink-muted)',
+								letterSpacing: '0.15em',
+								textTransform: 'uppercase',
+								fontWeight: 600,
+								margin: '0 0 4px',
+							}}>
 							all technologies
 						</p>
-						<p style={{ fontSize: 13, fontFamily: "'Inter', sans-serif", color: '#525252', margin: 0 }}>
+						<p
+							style={{
+								fontSize: FONT.sm,
+								fontFamily: SANS,
+								color: 'var(--ink-secondary)',
+								margin: 0,
+							}}>
 							Filter by category to explore the stack
 						</p>
 					</div>
 
-					{/* Right: Paperfolio chip filters */}
-					<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+					<div
+						role='group'
+						aria-label='Filter skills by category'
+						style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
 						{categories.map((cat) => {
 							const isActive = active === cat;
 							return (
 								<button
 									key={cat}
+									type='button'
 									onClick={() => handleFilter(cat)}
+									aria-pressed={isActive}
 									style={{
 										padding: '8px 18px',
-										borderRadius: 10,
-										border: '1.5px solid #0a0a0a',
+										borderRadius: RADIUS.sm,
+										border: `${BORDER.soft} solid var(--line)`,
 										cursor: 'pointer',
-										fontSize: 13,
+										fontSize: FONT.sm,
 										fontWeight: 600,
-										fontFamily: "'Inter', sans-serif",
+										fontFamily: SANS,
 										transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-										background: isActive ? '#6366f1' : '#ffffff',
-										color: isActive ? '#ffffff' : '#0a0a0a',
-										boxShadow: isActive ? '3px 3px 0px #0a0a0a' : '2px 2px 0px #0a0a0a',
-										transform: isActive ? 'translate(-1px,-1px)' : 'translate(0,0)',
+										background: isActive ? 'var(--accent)' : 'var(--surface)',
+										color: isActive ? 'var(--accent-ink)' : 'var(--ink)',
+										boxShadow: isActive ? 'var(--sh-1-hi)' : 'var(--sh-1)',
+										transform: isActive
+											? 'translate(-1px,-1px)'
+											: 'translate(0,0)',
 									}}
 									onMouseEnter={(e) => {
-										if (!isActive) { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a'; }
+										if (!isActive) {
+											e.currentTarget.style.transform = 'translate(-1px,-1px)';
+											e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
+										}
 									}}
 									onMouseLeave={(e) => {
-										if (!isActive) { e.currentTarget.style.transform = 'translate(0,0)'; e.currentTarget.style.boxShadow = '2px 2px 0px #0a0a0a'; }
+										if (!isActive) {
+											e.currentTarget.style.transform = 'translate(0,0)';
+											e.currentTarget.style.boxShadow = 'var(--sh-1)';
+										}
 									}}>
 									{cat}
 								</button>
@@ -582,9 +565,10 @@ export default function Skills() {
 					</div>
 				</motion.div>
 
-				{/* Skill Tags Grid — GSAP Flip */}
+				{/* Skill tags — GSAP Flip */}
 				<div
 					ref={gridRef}
+					aria-live='polite'
 					style={{
 						display: 'flex',
 						flexWrap: 'wrap',
@@ -592,8 +576,12 @@ export default function Skills() {
 						padding: '32px 0 40px',
 						minHeight: 200,
 					}}>
-					{(active === 'All' ? skills : skills.filter((s) => s.category === active)).map((skill, i) => {
-						const entranceDelay = shouldReduceMotion ? 0 : interacted ? 0 : i * 0.028;
+					{shown.map((skill, i) => {
+						const entranceDelay = shouldReduceMotion
+							? 0
+							: interacted
+								? 0
+								: i * 0.028;
 						return (
 							<motion.div
 								key={skill.name}
@@ -607,9 +595,21 @@ export default function Skills() {
 								}
 								whileHover={{ x: -1, y: -1 }}
 								transition={{
-									opacity: { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
-									y: { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
-									scale: { duration: shouldReduceMotion ? 0 : 0.3, ease: EASE, delay: entranceDelay },
+									opacity: {
+										duration: shouldReduceMotion ? 0 : 0.3,
+										ease: EASE,
+										delay: entranceDelay,
+									},
+									y: {
+										duration: shouldReduceMotion ? 0 : 0.3,
+										ease: EASE,
+										delay: entranceDelay,
+									},
+									scale: {
+										duration: shouldReduceMotion ? 0 : 0.3,
+										ease: EASE,
+										delay: entranceDelay,
+									},
 									x: { duration: 0.15, ease: EASE },
 								}}
 								style={{
@@ -617,32 +617,54 @@ export default function Skills() {
 									alignItems: 'center',
 									gap: 8,
 									padding: '10px 16px',
-									background: '#ffffff',
-									border: '1.5px solid #0a0a0a',
-									borderRadius: 12,
-									boxShadow: '2px 2px 0px #0a0a0a',
+									background: 'var(--surface)',
+									border: `${BORDER.soft} solid var(--line)`,
+									borderRadius: RADIUS.md,
+									boxShadow: 'var(--sh-1)',
 									transition: 'box-shadow 0.2s ease',
 									cursor: 'default',
 								}}
 								onMouseEnter={(e) => {
-									e.currentTarget.style.boxShadow = '3px 3px 0px #0a0a0a';
+									e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
 								}}
 								onMouseLeave={(e) => {
-									e.currentTarget.style.boxShadow = '2px 2px 0px #0a0a0a';
+									e.currentTarget.style.boxShadow = 'var(--sh-1)';
 								}}>
 								{/* eslint-disable-next-line @next/next/no-img-element */}
-								<img src={skill.icon} alt={skill.name} width={18} height={18} />
-								<span style={{ fontSize: 13, fontWeight: 600, color: '#0a0a0a', fontFamily: "'Inter', sans-serif" }}>
+								<img
+									src={skill.icon}
+									alt=''
+									aria-hidden='true'
+									width={18}
+									height={18}
+									loading='lazy'
+									className={skill.adaptive ? 'icon-adaptive' : undefined}
+								/>
+								<span
+									style={{
+										fontSize: FONT.sm,
+										fontWeight: 600,
+										color: 'var(--ink)',
+										fontFamily: SANS,
+									}}>
 									{skill.name}
 								</span>
-								<span style={{ fontSize: 10, fontWeight: 600, color: skill.color, fontFamily: "'JetBrains Mono', monospace", background: skill.bg, padding: '2px 6px', borderRadius: 4 }}>
+								<span
+									style={{
+										fontSize: FONT.micro,
+										fontWeight: 600,
+										color: CATEGORY_COLOR[skill.category],
+										fontFamily: MONO,
+										background: 'var(--surface-chip)',
+										padding: '2px 6px',
+										borderRadius: 4,
+									}}>
 									{skill.category}
 								</span>
 							</motion.div>
 						);
 					})}
 				</div>
-
 			</div>
 		</section>
 	);
