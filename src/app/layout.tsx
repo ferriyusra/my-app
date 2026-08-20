@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import ScrollProgress from '@/components/scroll-progress';
 
 /* Self-hosted by Next — no render-blocking request to Google, no layout shift. */
 const inter = Inter({
@@ -75,7 +74,6 @@ export default function RootLayout({
 					<a href='#main' className='skip-link'>
 						Skip to content
 					</a>
-					<ScrollProgress />
 					{children}
 				</ThemeProvider>
 			</body>

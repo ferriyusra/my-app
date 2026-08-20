@@ -1,11 +1,5 @@
-import Navbar from '@/components/navbar';
-import Hero from '@/components/hero';
-import About from '@/components/about';
-import Skills from '@/components/skills';
-import Projects from '@/components/projects';
-import Experience from '@/components/experience';
-import Contact from '@/components/contact';
-import Footer from '@/components/footer';
+import type { Metadata } from 'next';
+import Desktop from '@/components/os/desktop';
 import { profile } from '@/data/profile';
 
 const jsonLd = {
@@ -24,23 +18,18 @@ const jsonLd = {
 	sameAs: [profile.github, profile.linkedin],
 };
 
+export const metadata: Metadata = {
+	title: `${profile.name} — ${profile.role}`,
+};
+
 export default function Home() {
 	return (
-		<main id='main' className='dot-grid min-h-screen'>
+		<>
 			<script
 				type='application/ld+json'
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
 			/>
-			<Navbar />
-			<Hero />
-			{/* Evidence first: the Experience entries are the strongest content on
-			    the page, so they come before the self-description. */}
-			<Experience />
-			<Projects />
-			<Skills />
-			<About />
-			<Contact />
-			<Footer />
-		</main>
+			<Desktop />
+		</>
 	);
 }
