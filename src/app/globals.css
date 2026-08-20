@@ -3176,6 +3176,100 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 
 .mp-body { flex: 1; min-height: 0; overflow: auto; padding: 8px; }
 
+.mp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 56px 24px;
+  color: var(--ink-muted);
+  text-align: center;
+}
+.mp-empty p { margin: 0; font-size: 13px; line-height: 20px; }
+.mp-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.mp-chips button {
+  padding: 5px 13px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--surface);
+  color: var(--ink-secondary);
+  font-size: 12.5px;
+}
+.mp-chips button:hover { background: var(--subtle-hover); color: var(--ink); }
+
+.mp-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 32px auto;
+  max-width: 420px;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.mp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+/* Three fixed tracks, so the duration lines up down the whole list rather
+   than trailing whatever the title happens to be. */
+.mp-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  transition: background var(--dur-faster) var(--ease-standard);
+}
+.mp-row:hover { background: var(--subtle-hover); }
+.mp-row[data-current] { background: var(--accent-soft); }
+
+.mp-cover {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface-chip);
+}
+.mp-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.mp-cover-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  opacity: 0;
+  transition: opacity var(--dur-faster) var(--ease-standard);
+}
+.mp-row:hover .mp-cover-play,
+.mp-row[data-current] .mp-cover-play,
+.mp-row:focus-visible .mp-cover-play { opacity: 1; }
+
+/* `min-width: 0` is what lets the middle column shrink so the ellipsis can
+   do its job — a grid track will not shrink below its content otherwise. */
+.mp-meta { display: flex; flex-direction: column; min-width: 0; }
+.mp-meta strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mp-meta small {
+  font-size: 12px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mp-len { font-size: 12px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+
 /* ── Now playing ── */
 .mp-now {
   display: flex;
