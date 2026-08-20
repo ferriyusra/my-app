@@ -20,7 +20,8 @@ Open <http://localhost:3000>.
 |---|---|
 | Startup | Firmware logo with the orbiting dot ring, lock screen with the clock, then sign-in — once per browser session. Any key walks it forward, Skip ends it, and it doubles as the shell's loading state: the desktop mounts behind it |
 | Desktop | Column-first icon grid, single click to select, double click to open, arrow-key navigation, right-click menu with working View / Sort by / Refresh |
-| Windows | Drag, eight-way resize, focus and z-order, minimise / maximise / restore / close, drag-to-edge snapping with a live preview plate, Snap Layouts flyout with four layouts, per-window system menu |
+| Windows | Drag, eight-way resize, focus and z-order, minimise into the taskbar button and back out, drag-to-edge snapping with a live preview plate, Snap Layouts flyout with four layouts, Snap Assist offering to fill the free half, per-window system menu |
+| Keyboard | `⊞`+`←`/`→` snap, `⊞`+`↑`/`↓` maximise and restore, `⊞`+`D` show desktop, `⊞`+`E` File Explorer, `Alt`+`F4` close, `Esc` close, arrow keys on the desktop grid. Windows itself claims the `⊞` combinations before the browser sees them, so in practice they serve macOS and Linux |
 | Taskbar | Pinned and running apps with Windows' widening focus indicator, hover previews, right-click to pin or close, live system tray, clock |
 | Start | Search across apps and links, pinned grid, all-apps list, Recommended from this session, power menu — sleep blanks the screen, restart replays the startup sequence, shut down leaves a way back |
 | Apps | About (System Properties), File Explorer (Projects), Skills, Experience, Mail (Contact), Settings, Browser, VS Code, Recycle Bin |

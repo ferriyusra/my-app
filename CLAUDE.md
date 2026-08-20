@@ -53,6 +53,27 @@ Anything needing both the viewport and the registry lives in
 [src/hooks/use-window-manager.ts](src/hooks/use-window-manager.ts) — `launch`,
 `closeWindow`, `toggleFromTaskbar`, `desktopBounds`.
 
+### Window geometry does not live in React
+
+`WindowFrame` holds position and size in framer-motion **motion values**, not
+state. A pointer-move that dispatched to the reducer publishes a new context
+value, and a context change re-renders every consumer regardless of
+`React.memo` — so dragging one window re-rendered every *other* open window
+and all of its app content, once per frame. Measured over four seconds of
+dragging with five windows open, that was 653ms of scripting; through motion
+values it is 87ms.
+
+The rule that follows: **a pointer gesture must not dispatch**. Drag and
+resize write to `mx/my/mw/mh` and paint the snap plate straight onto the DOM,
+then commit once on `pointerup`. The `gesture` ref tells the sync effect to
+keep its hands off while a gesture is live, and `settle` tells it not to
+animate a commit that is already on screen.
+
+Minimising is one scale animation with `transform-origin` pointed at the
+window's taskbar button (`[data-app-id]`), so it drops into the taskbar and
+grows back out without a second set of coordinates. Minimised windows stay
+mounted — and `inert` — because unmounting would make both halves impossible.
+
 ### Startup
 
 [src/components/desktop/boot-screen.tsx](src/components/desktop/boot-screen.tsx)

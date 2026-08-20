@@ -54,6 +54,14 @@
   --acrylic: rgba(252, 252, 252, 0.72);
   --acrylic-taskbar: rgba(243, 243, 243, 0.70);
   --acrylic-blur: blur(30px) saturate(125%);
+  /* Acrylic is blur *plus tint plus grain*. Without the grain it reads as
+     plain frosted glass, which is the difference between "blurred" and
+     "Windows". Generated rather than shipped: an feTurbulence tile costs a
+     few hundred bytes and scales to any density.
+     The speckle is composited normally at a low alpha rather than blended:
+     `overlay` against a near-white tint resolves back to near-white, so the
+     grain simply disappears on the light theme. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.16'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   --mica: #f9f9f9;
   --mica-tint: rgba(15, 108, 189, 0.03);
   --caption-hover: rgba(0, 0, 0, 0.055);
@@ -638,6 +646,8 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
   border-radius: 0;
   border-width: 0 0 1px;
 }
+/* Shrunk into its taskbar button; nothing about it should still be reachable. */
+.win[data-minimised] { pointer-events: none; }
 
 /* ── Title bar ── */
 .win-title {
@@ -712,11 +722,19 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
 /* ── The plate Windows paints where a drag would land ── */
 .snap-ghost {
   position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
   border: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
   border-radius: var(--r-lg);
   background: color-mix(in srgb, var(--accent) 22%, transparent);
   backdrop-filter: blur(6px);
   pointer-events: none;
+  /* Painted straight from the drag handler, so the fade lives here rather
+     than in a React transition. */
+  transition: opacity var(--dur-fast) var(--ease-standard);
+  will-change: transform, opacity;
 }
 
 /* ── Snap Layouts flyout ── */
@@ -732,7 +750,7 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
   padding: 12px;
   border: 1px solid var(--line-soft);
   border-radius: var(--r-lg);
-  background: var(--acrylic);
+  background: var(--grain) 0 0 / 160px 160px repeat, var(--acrylic);
   backdrop-filter: var(--acrylic-blur);
   box-shadow: var(--sh-16);
   animation: snap-in var(--dur-fast) var(--ease-decel);
@@ -771,7 +789,7 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
   align-items: center;
   justify-content: center;
   padding: 0 8px;
-  background: var(--acrylic-taskbar);
+  background: var(--grain) 0 0 / 160px 160px repeat, var(--acrylic-taskbar);
   backdrop-filter: blur(40px) saturate(140%);
   border-top: 1px solid rgba(255, 255, 255, 0.10);
   z-index: 9000;
@@ -868,7 +886,7 @@ html[data-theme='dark'] .taskbar { border-top-color: rgba(255, 255, 255, 0.06); 
   padding: 10px 12px;
   border: 1px solid var(--line-soft);
   border-radius: var(--r-lg);
-  background: var(--acrylic);
+  background: var(--grain) 0 0 / 160px 160px repeat, var(--acrylic);
   backdrop-filter: var(--acrylic-blur);
   box-shadow: var(--sh-16);
   pointer-events: none;
@@ -951,7 +969,7 @@ html[data-theme='dark'] .taskbar { border-top-color: rgba(255, 255, 255, 0.06); 
   z-index: 9100;
   border: 1px solid var(--line-soft);
   border-radius: var(--r-lg);
-  background: var(--acrylic);
+  background: var(--grain) 0 0 / 160px 160px repeat, var(--acrylic);
   backdrop-filter: var(--acrylic-blur);
   box-shadow: var(--sh-64);
 }
@@ -1154,7 +1172,7 @@ html[data-theme='dark'] .taskbar { border-top-color: rgba(255, 255, 255, 0.06); 
   padding: 4px;
   border: 1px solid var(--line-soft);
   border-radius: var(--r-lg);
-  background: var(--acrylic);
+  background: var(--grain) 0 0 / 160px 160px repeat, var(--acrylic);
   backdrop-filter: var(--acrylic-blur);
   box-shadow: var(--sh-16);
   animation: snap-in var(--dur-fast) var(--ease-decel);
@@ -1366,7 +1384,7 @@ input[type='range']::-moz-range-thumb {
   padding: 14px 14px 14px 16px;
   border: 1px solid var(--line-soft);
   border-radius: var(--r-lg);
-  background: var(--acrylic);
+  background: var(--grain) 0 0 / 160px 160px repeat, var(--acrylic);
   backdrop-filter: var(--acrylic-blur);
   box-shadow: var(--sh-64);
   animation: toast-in var(--dur-slow) var(--ease-spring);
@@ -1401,6 +1419,91 @@ input[type='range']::-moz-range-thumb {
   color: var(--ink-muted);
 }
 .toast-close:hover { background: var(--subtle-hover); }
+
+/* ═══════════════════════════════════════════════════════════
+   SNAP ASSIST
+   The panel Windows drops into the half a snap left free.
+   ═══════════════════════════════════════════════════════════ */
+
+.sa {
+  position: absolute;
+  z-index: 8900;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--bg) 42%, transparent);
+  backdrop-filter: blur(30px) saturate(125%);
+  overflow: hidden;
+}
+.sa-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+}
+.sa-head {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  text-align: center;
+}
+.sa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 520px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sa-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-8);
+  overflow: hidden;
+  transition: transform var(--dur-fast) var(--ease-decel),
+              box-shadow var(--dur-fast) var(--ease-standard);
+}
+.sa-card:hover { transform: translateY(-3px); box-shadow: var(--sh-16); }
+.sa-thumb {
+  display: grid;
+  place-items: center;
+  height: 92px;
+  background: var(--surface-subtle);
+}
+.sa-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line-subtle);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.sa-skip {
+  padding: 6px 16px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--surface);
+  color: var(--ink-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+.sa-skip:hover { background: var(--subtle-hover); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sa-card:hover { transform: none; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    TASK VIEW
@@ -1514,7 +1617,7 @@ input[type='range']::-moz-range-thumb {
   padding: 4px;
   border: 1px solid var(--line-soft);
   border-radius: var(--r-lg);
-  background: var(--acrylic);
+  background: var(--grain) 0 0 / 160px 160px repeat, var(--acrylic);
   backdrop-filter: var(--acrylic-blur);
   box-shadow: var(--sh-16);
   outline: none;

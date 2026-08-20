@@ -10,7 +10,7 @@ import {
 	useState,
 } from 'react';
 import { playSound, type SoundName } from '@/lib/sounds';
-import type { AppId, ShellNotification } from '@/types/windows';
+import type { AppId, ShellNotification, SnapZone } from '@/types/windows';
 
 /** Which single overlay owns the screen. Only one may be open at a time. */
 export type Flyout = 'start' | 'taskview' | 'quick' | 'notifications' | null;
@@ -52,6 +52,15 @@ type ShellCtx = {
 	/** Apps opened this session, most recent first — Start's Recommended row. */
 	recents: AppId[];
 	pushRecent: (id: AppId) => void;
+
+	/**
+	 * Set while Windows' Snap Assist is offering to fill the other half of the
+	 * screen: the zone still free, and the window that just claimed its
+	 * neighbour (which is therefore not a candidate).
+	 */
+	snapAssist: { zone: SnapZone; source: AppId } | null;
+	offerSnapAssist: (source: AppId, zone: SnapZone) => void;
+	dismissSnapAssist: () => void;
 
 	/** Apps pinned to the taskbar, whether or not they are running. */
 	pinned: AppId[];
@@ -214,6 +223,14 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 		setBooted(false);
 	}, []);
 	const [recents, setRecents] = useState<AppId[]>([]);
+	const [snapAssist, setSnapAssist] =
+		useState<ShellCtx['snapAssist']>(null);
+
+	const offerSnapAssist = useCallback(
+		(source: AppId, zone: SnapZone) => setSnapAssist({ source, zone }),
+		[],
+	);
+	const dismissSnapAssist = useCallback(() => setSnapAssist(null), []);
 	const [pinned, setPinned] = useState<AppId[]>(readPins);
 
 	const pushRecent = useCallback(
@@ -364,6 +381,9 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 
 			recents,
 			pushRecent,
+			snapAssist,
+			offerSnapAssist,
+			dismissSnapAssist,
 			pinned,
 			togglePin,
 			isPinned: (id) => pinned.includes(id),
@@ -402,6 +422,9 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			notify,
 			recents,
 			pushRecent,
+			snapAssist,
+			offerSnapAssist,
+			dismissSnapAssist,
 			pinned,
 			togglePin,
 			sound,

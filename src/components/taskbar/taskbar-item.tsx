@@ -48,6 +48,8 @@ function TaskbarItem({
 			<button
 				type='button'
 				className='tb-btn'
+				/* The anchor a minimising window shrinks into. */
+				data-app-id={app.id}
 				data-running={running || undefined}
 				data-active={active || undefined}
 				aria-label={

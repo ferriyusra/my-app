@@ -4,7 +4,10 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useWindows } from '@/context/window-context';
 import { useShell } from '@/context/shell-context';
 import { APP_BY_ID } from '@/components/apps/registry';
-import type { AppId, Bounds } from '@/types/windows';
+import type { AppId, Bounds, SnapZone } from '@/types/windows';
+
+/** The half a snapped window leaves free, for Snap Assist to offer. */
+const COMPLEMENT = { left: 'right', right: 'left' } as const;
 
 /** Taskbar height in CSS pixels; mirrors `--taskbar-h` in globals.css. */
 export const TASKBAR_H = 48;
@@ -22,8 +25,9 @@ export function desktopBounds(): Bounds {
  */
 export function useWindowManager() {
 	const ctx = useWindows();
-	const { play, closeFlyout, pushRecent } = useShell();
-	const { open, close, minimise, focus, windows } = ctx;
+	const { play, closeFlyout, pushRecent, offerSnapAssist, dismissSnapAssist } =
+		useShell();
+	const { open, close, minimise, focus, snap, windows } = ctx;
 
 	/* The running set is read through a ref so `launch` keeps a stable
 	   identity. It ends up in the dependency array of the desktop's one-shot
@@ -44,8 +48,10 @@ export function useWindowManager() {
 			if (!running) play('open');
 			pushRecent(id);
 			closeFlyout();
+			/* Opening something else answers Snap Assist's question. */
+			dismissSnapAssist();
 		},
-		[open, play, pushRecent, closeFlyout],
+		[open, play, pushRecent, closeFlyout, dismissSnapAssist],
 	);
 
 	const closeWindow = useCallback(
@@ -54,6 +60,25 @@ export function useWindowManager() {
 			play('close');
 		},
 		[close, play],
+	);
+
+	/**
+	 * Snap, then offer Snap Assist for the half that is now free — the
+	 * interaction Windows is best known for. Only the two halves qualify:
+	 * offering to fill three thirds or four quadrants one window at a time
+	 * turns a convenience into a chore, which is why Windows does not either.
+	 */
+	const snapWindow = useCallback(
+		(id: AppId, zone: SnapZone, b: Bounds) => {
+			snap(id, zone, b);
+			const other = COMPLEMENT[zone as keyof typeof COMPLEMENT];
+			const candidates = runningRef.current.filter(
+				(win) => win.id !== id && !win.minimised,
+			);
+			if (other && candidates.length) offerSnapAssist(id, other);
+			else dismissSnapAssist();
+		},
+		[snap, offerSnapAssist, dismissSnapAssist],
 	);
 
 	/** Taskbar click: launch, minimise if it is already on top, else raise. */
@@ -72,14 +97,15 @@ export function useWindowManager() {
 		bounds: desktopBounds,
 		launch,
 		closeWindow,
+		snapWindow,
 		toggleFromTaskbar,
 	};
 }
 
 /**
- * Snapped windows hold pixel geometry, so a browser resize would leave them
- * straddling the new edge. Re-deriving each zone on resize keeps a snapped
- * layout aligned exactly the way Windows re-flows one when the display changes.
+ * Snapped and maximised windows hold pixel geometry, so a browser resize would
+ * leave them straddling the new edge. Re-deriving each zone on resize keeps the
+ * layout aligned the way Windows re-flows one when the display changes.
  */
 export function useSnapReflow() {
 	const { windows, snap } = useWindows();
@@ -97,7 +123,7 @@ export function useSnapReflow() {
 			frame = requestAnimationFrame(() => {
 				const b = desktopBounds();
 				for (const w of ref.current) {
-					if (w.snapped && w.snapped !== 'max') snap(w.id, w.snapped, b);
+					if (w.snapped) snap(w.id, w.snapped, b);
 				}
 			});
 		};

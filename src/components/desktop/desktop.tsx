@@ -20,6 +20,7 @@ import { useWindowManager, useSnapReflow } from '@/hooks/use-window-manager';
 import { useDesktopIcons, type DeskItem } from '@/hooks/use-desktop-icons';
 import { APP_BY_ID, isAppId } from '@/components/apps/registry';
 import WindowFrame from '@/components/windows/window';
+import SnapAssist from '@/components/windows/snap-assist';
 import TaskView from '@/components/windows/task-view';
 import Taskbar from '@/components/taskbar/taskbar';
 import QuickSettings from '@/components/taskbar/quick-settings';
@@ -27,6 +28,7 @@ import NotificationCenter, { Toast } from '@/components/taskbar/notification-cen
 import StartMenu from '@/components/start-menu/start-menu';
 import ContextMenu, { type MenuEntry } from '@/components/ui/context-menu';
 import DesktopIcons from './desktop-icons';
+import type { AppId } from '@/types/windows';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
 import BootScreen from './boot-screen';
@@ -43,29 +45,48 @@ function onBareDesktop(e: React.PointerEvent | React.MouseEvent) {
 	return !(e.target as HTMLElement).closest(SURFACES);
 }
 
-/** Every open window, each memoised so a drag only re-renders its own frame. */
+/**
+ * Every open window, minimised ones included.
+ *
+ * A minimised window stays mounted so it can shrink into its taskbar button
+ * and grow back out of it; unmounting would make both halves of that gesture
+ * impossible. AnimatePresence is left to handle closing, which really is an
+ * unmount.
+ */
 function WindowLayer() {
-	const { windows, topZ } = useWindows();
+	const { windows } = useWindows();
+	/* Focus belongs to the topmost window that can actually be seen. */
+	const visibleTop = Math.max(
+		0,
+		...windows.filter((w) => !w.minimised).map((w) => w.z),
+	);
 	return (
-		/* AnimatePresence lets a window play its exit animation when it is
-		   closed or minimised, instead of vanishing. */
 		<AnimatePresence>
-			{windows
-				.filter((w) => !w.minimised)
-				.map((w) => (
-					<WindowFrame
-						key={w.id}
-						win={w}
-						app={APP_BY_ID[w.id]}
-						focused={w.z === topZ}
-					/>
-				))}
+			{windows.map((w) => (
+				<WindowFrame
+					key={w.id}
+					win={w}
+					app={APP_BY_ID[w.id]}
+					focused={!w.minimised && w.z === visibleTop}
+				/>
+			))}
 		</AnimatePresence>
 	);
 }
 
 function Shell() {
-	const { launch } = useWindowManager();
+	const {
+		launch,
+		windows,
+		snap,
+		snapWindow,
+		toggleMax,
+		minimise,
+		minimiseAll,
+		closeWindow,
+		focus,
+		bounds,
+	} = useWindowManager();
 	const {
 		flyout,
 		openFlyout,
@@ -222,8 +243,32 @@ function Shell() {
 	/* The Windows key opens Start — but only when pressed and released on its
 	   own, never as the first half of a system combination. */
 	const metaAlone = useRef(false);
+	/* What Show desktop minimised, so pressing it again puts it all back. */
+	const stashed = useRef<AppId[] | null>(null);
+
 	useEffect(() => {
 		if (!booted) return;
+
+		/* The window a shortcut acts on is the topmost one you can see. */
+		const topWindow = () =>
+			windows
+				.filter((w) => !w.minimised)
+				.reduce<(typeof windows)[number] | null>(
+					(best, w) => (best && best.z > w.z ? best : w),
+					null,
+				);
+
+		const showDesktop = () => {
+			const visible = windows.filter((w) => !w.minimised).map((w) => w.id);
+			if (visible.length) {
+				stashed.current = visible;
+				minimiseAll();
+			} else if (stashed.current) {
+				stashed.current.forEach(focus);
+				stashed.current = null;
+			}
+		};
+
 		const down = (e: KeyboardEvent) => {
 			if (e.key === 'Meta' || e.key === 'OS') metaAlone.current = true;
 			else metaAlone.current = false;
@@ -241,6 +286,44 @@ function Shell() {
 				closeFlyout();
 				setMenu(null);
 			}
+
+			/* Alt+F4 closes the active window, as it has since Windows 3.0. */
+			if (e.altKey && e.key === 'F4') {
+				const top = topWindow();
+				if (top) {
+					e.preventDefault();
+					closeWindow(top.id);
+				}
+				return;
+			}
+
+			/* The ⊞ shortcuts. On Windows itself the OS claims these before the
+			   browser ever sees them, so in practice they serve macOS and Linux
+			   visitors — which is most of anyone reading a portfolio. */
+			if (!e.metaKey || e.altKey || e.ctrlKey) return;
+			const b = bounds();
+			const top = topWindow();
+
+			if (e.key === 'ArrowLeft' && top) {
+				e.preventDefault();
+				snapWindow(top.id, 'left', b);
+			} else if (e.key === 'ArrowRight' && top) {
+				e.preventDefault();
+				snapWindow(top.id, 'right', b);
+			} else if (e.key === 'ArrowUp' && top) {
+				e.preventDefault();
+				snap(top.id, 'max', b);
+			} else if (e.key === 'ArrowDown' && top) {
+				e.preventDefault();
+				if (top.maximised || top.snapped) toggleMax(top.id, b);
+				else minimise(top.id);
+			} else if (e.key.toLowerCase() === 'd') {
+				e.preventDefault();
+				showDesktop();
+			} else if (e.key.toLowerCase() === 'e') {
+				e.preventDefault();
+				launch('explorer');
+			}
 		};
 		const up = (e: KeyboardEvent) => {
 			if ((e.key === 'Meta' || e.key === 'OS') && metaAlone.current) {
@@ -254,7 +337,24 @@ function Shell() {
 			window.removeEventListener('keydown', down);
 			window.removeEventListener('keyup', up);
 		};
-	}, [booted, flyout, openFlyout, closeFlyout, icons, notify]);
+	}, [
+		booted,
+		flyout,
+		openFlyout,
+		closeFlyout,
+		icons,
+		notify,
+		windows,
+		snap,
+		snapWindow,
+		toggleMax,
+		minimise,
+		minimiseAll,
+		closeWindow,
+		focus,
+		bounds,
+		launch,
+	]);
 
 	/* Open About once the visitor has signed in, so the desktop is never
 	   blank — and so the window animates in where they can see it. The ref
@@ -340,6 +440,9 @@ function Shell() {
 			/>
 
 			<WindowLayer />
+			<AnimatePresence>
+				<SnapAssist key='snap-assist' />
+			</AnimatePresence>
 
 			<AnimatePresence>
 				{flyout === 'start' && <StartMenu key='start' onClose={closeFlyout} />}

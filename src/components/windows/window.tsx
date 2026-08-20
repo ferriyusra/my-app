@@ -1,7 +1,7 @@
 'use client';
 
-import { memo, useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { animate, motion, useMotionValue, useReducedMotion } from 'framer-motion';
 import {
 	Maximize2,
 	Minimize2,
@@ -12,22 +12,27 @@ import {
 } from 'lucide-react';
 import { MIN_H, MIN_W, zoneRect } from '@/context/window-context';
 import { useShell } from '@/context/shell-context';
-import { useWindowManager, TASKBAR_H } from '@/hooks/use-window-manager';
+import { useWindowManager } from '@/hooks/use-window-manager';
 import ContextMenu, { type MenuEntry } from '@/components/ui/context-menu';
 import WindowHeader from './window-header';
 import WindowControls from './window-controls';
 import type { AppDef } from '@/components/apps/registry';
-import type { ResizeEdge, SnapZone, WindowState } from '@/types/windows';
+import type { Bounds, ResizeEdge, SnapZone, WindowState } from '@/types/windows';
 
 /** Distance from a screen edge that arms a snap while dragging. */
 const EDGE = 10;
 /** Pointer travel before a maximised window tears loose. */
 const TEAR = 8;
+/** Fluent's decelerate curve, and the duration every geometry change uses. */
+const EASE = [0.16, 1, 0.3, 1] as const;
+const GEOMETRY = 0.24;
+/** How far a window shrinks as it drops into its taskbar button. */
+const MINIMISED_SCALE = 0.06;
 
 const EDGES: ResizeEdge[] = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
 
 /** Which snap a drag at this pointer position would land on, if any. */
-function edgeZone(cx: number, cy: number, b: { w: number; h: number }): SnapZone | null {
+function edgeZone(cx: number, cy: number, b: Bounds): SnapZone | null {
 	const nearTop = cy <= EDGE;
 	const nearLeft = cx <= EDGE;
 	const nearRight = cx >= b.w - EDGE;
@@ -48,6 +53,8 @@ type DragState = {
 	startY: number;
 	/** Horizontal grab point as a fraction of the width, for tear-off. */
 	fracX: number;
+	/** False until a maximised or snapped window has been pulled loose. */
+	floating: boolean;
 	moved: boolean;
 };
 
@@ -58,6 +65,16 @@ type SizeState = {
 	rect: { x: number; y: number; w: number; h: number };
 };
 
+/**
+ * A window frame.
+ *
+ * Geometry lives in motion values rather than React state. A pointer-move that
+ * dispatched to the reducer would publish a new context value, and a context
+ * change re-renders every consumer no matter how well memoised — so dragging
+ * one window used to re-render every *other* open window and all of its app
+ * content, sixty times a second. Now a drag writes to the DOM directly and the
+ * reducer hears about it once, on release.
+ */
 function WindowFrame({
 	win,
 	app,
@@ -72,21 +89,76 @@ function WindowFrame({
 		minimise,
 		toggleMax,
 		snap,
+		snapWindow,
 		setRect,
 		tearOff,
 		closeWindow,
 		bounds,
 	} = useWindowManager();
 
-	const { id, x, y, w, h, z, maximised, snapped } = win;
+	const { id, z, maximised, minimised, snapped } = win;
 	const { flyout } = useShell();
 	const reduce = useReducedMotion();
+
 	const frameRef = useRef<HTMLDivElement>(null);
+	const ghostRef = useRef<HTMLDivElement>(null);
 	const dragRef = useRef<DragState | null>(null);
 	const sizeRef = useRef<SizeState | null>(null);
-	const [preview, setPreview] = useState<SnapZone | null>(null);
+	const zoneRef = useRef<SnapZone | null>(null);
+	/** Non-null while a pointer gesture owns the geometry. */
+	const gesture = useRef<'drag' | 'resize' | null>(null);
+	/** Set when the next committed geometry is already on screen. */
+	const settle = useRef(false);
+
 	const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
 	const titleId = `win-${id}-title`;
+
+	const mx = useMotionValue(win.x);
+	const my = useMotionValue(win.y);
+	const mw = useMotionValue(win.w);
+	const mh = useMotionValue(win.h);
+
+	/* Commited geometry drives the motion values. A snap or a maximise glides
+	   into place; the end of a drag does not, because the window is already
+	   exactly where the reducer has just been told it is. */
+	useEffect(() => {
+		if (gesture.current) return;
+		if (settle.current || reduce) {
+			settle.current = false;
+			mx.set(win.x);
+			my.set(win.y);
+			mw.set(win.w);
+			mh.set(win.h);
+			return;
+		}
+		const opts = { duration: GEOMETRY, ease: EASE };
+		const running = [
+			animate(mx, win.x, opts),
+			animate(my, win.y, opts),
+			animate(mw, win.w, opts),
+			animate(mh, win.h, opts),
+		];
+		return () => running.forEach((r) => r.stop());
+	}, [win.x, win.y, win.w, win.h, mx, my, mw, mh, reduce]);
+
+	/* ── Snap preview ────────────────────────────────────────── */
+
+	/* The plate is mounted from the start and painted straight to the DOM, so
+	   arming a snap mid-drag costs no render either. */
+	const paintGhost = (zone: SnapZone | null, b: Bounds) => {
+		zoneRef.current = zone;
+		const el = ghostRef.current;
+		if (!el) return;
+		if (!zone) {
+			el.style.opacity = '0';
+			return;
+		}
+		const r = zoneRect(zone, b);
+		el.style.opacity = '1';
+		el.style.transform = `translate3d(${r.x}px, ${r.y}px, 0)`;
+		el.style.width = `${r.w}px`;
+		el.style.height = `${r.h}px`;
+	};
 
 	/* ── Drag ────────────────────────────────────────────────── */
 
@@ -94,12 +166,14 @@ function WindowFrame({
 		if (e.button !== 0) return;
 		if ((e.target as HTMLElement).closest('button')) return;
 		focus(id);
+		gesture.current = 'drag';
 		dragRef.current = {
-			offX: e.clientX - x,
-			offY: e.clientY - y,
+			offX: e.clientX - mx.get(),
+			offY: e.clientY - my.get(),
 			startX: e.clientX,
 			startY: e.clientY,
-			fracX: w > 0 ? (e.clientX - x) / w : 0.5,
+			fracX: mw.get() > 0 ? (e.clientX - mx.get()) / mw.get() : 0.5,
+			floating: !maximised && !snapped,
 			moved: false,
 		};
 		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -112,36 +186,45 @@ function WindowFrame({
 
 		/* A maximised or snapped window pops back to its floating size and
 		   re-anchors under the cursor, the way Windows tears one loose. */
-		if (maximised || snapped) {
+		if (!d.floating) {
 			if (Math.abs(e.clientY - d.startY) + Math.abs(e.clientX - d.startX) < TEAR)
 				return;
 			const rw = win.restore?.w ?? Math.round(b.w / 2);
-			const nx = Math.round(e.clientX - rw * d.fracX);
-			const ny = Math.max(0, e.clientY - d.offY);
+			const rh = win.restore?.h ?? Math.round(b.h / 2);
 			d.offX = Math.round(rw * d.fracX);
+			d.offY = Math.min(d.offY, 24);
+			const nx = Math.round(e.clientX - d.offX);
+			const ny = Math.max(0, e.clientY - d.offY);
+			mw.set(rw);
+			mh.set(rh);
+			mx.set(nx);
+			my.set(ny);
+			d.floating = true;
 			d.moved = true;
 			tearOff(id, nx, ny);
 			return;
 		}
 
 		d.moved = true;
-		setRect(id, {
-			/* Keep at least a strip of the title bar reachable on every side. */
-			x: Math.min(Math.max(e.clientX - d.offX, -w + 140), b.w - 140),
-			y: Math.min(Math.max(e.clientY - d.offY, 0), b.h - 36),
-			w,
-			h,
-		});
-		setPreview(edgeZone(e.clientX, e.clientY, b));
+		const width = mw.get();
+		/* Keep at least a strip of the title bar reachable on every side. */
+		mx.set(Math.min(Math.max(e.clientX - d.offX, -width + 140), b.w - 140));
+		my.set(Math.min(Math.max(e.clientY - d.offY, 0), b.h - 36));
+		paintGhost(edgeZone(e.clientX, e.clientY, b), b);
 	};
 
 	const onTitleUp = (e: React.PointerEvent) => {
 		const d = dragRef.current;
 		dragRef.current = null;
+		gesture.current = null;
 		(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
-		const zone = preview;
-		setPreview(null);
-		if (d?.moved && zone) snap(id, zone, bounds());
+		const b = bounds();
+		const zone = zoneRef.current;
+		paintGhost(null, b);
+		if (!d?.moved) return;
+		if (zone) return snapWindow(id, zone, b);
+		settle.current = true;
+		setRect(id, { x: mx.get(), y: my.get(), w: mw.get(), h: mh.get() });
 	};
 
 	/* ── Resize ──────────────────────────────────────────────── */
@@ -150,7 +233,13 @@ function WindowFrame({
 		if (e.button !== 0) return;
 		e.stopPropagation();
 		focus(id);
-		sizeRef.current = { edge, px: e.clientX, py: e.clientY, rect: { x, y, w, h } };
+		gesture.current = 'resize';
+		sizeRef.current = {
+			edge,
+			px: e.clientX,
+			py: e.clientY,
+			rect: { x: mx.get(), y: my.get(), w: mw.get(), h: mh.get() },
+		};
 		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 	};
 
@@ -175,18 +264,37 @@ function WindowFrame({
 			ny = Math.max(0, s.rect.y + (s.rect.h - nh));
 		}
 
-		setRect(id, {
-			x: nx,
-			y: ny,
-			w: Math.min(Math.max(MIN_W, nw), b.w + 200),
-			h: Math.min(Math.max(MIN_H, nh), b.h),
-		});
+		mx.set(nx);
+		my.set(ny);
+		mw.set(Math.min(Math.max(MIN_W, nw), b.w + 200));
+		mh.set(Math.min(Math.max(MIN_H, nh), b.h));
 	};
 
 	const onGripUp = (e: React.PointerEvent) => {
+		if (!sizeRef.current) return;
 		sizeRef.current = null;
+		gesture.current = null;
 		(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+		settle.current = true;
+		setRect(id, { x: mx.get(), y: my.get(), w: mw.get(), h: mh.get() });
 	};
+
+	/* ── Minimise ────────────────────────────────────────────── */
+
+	/* Windows drops a window into its own taskbar button rather than fading it
+	   out on the spot. Pointing the transform origin at that button turns one
+	   scale animation into exactly that, with no second set of coordinates to
+	   keep in step — and restoring plays it in reverse for free. */
+	useLayoutEffect(() => {
+		const el = frameRef.current;
+		if (!el || !minimised) return;
+		const btn = document
+			.querySelector<HTMLElement>(`[data-app-id='${id}']`)
+			?.getBoundingClientRect();
+		el.style.transformOrigin = btn
+			? `${btn.left + btn.width / 2 - mx.get()}px ${btn.top + btn.height / 2 - my.get()}px`
+			: '50% 100%';
+	}, [minimised, id, mx, my]);
 
 	/* ── Keyboard ────────────────────────────────────────────── */
 
@@ -195,7 +303,7 @@ function WindowFrame({
 	   field all own Escape first, so a visitor dismissing a menu never loses
 	   the window underneath it. */
 	useEffect(() => {
-		if (!focused || flyout || menu) return;
+		if (!focused || minimised || flyout || menu) return;
 		const onKey = (e: KeyboardEvent) => {
 			if (e.key !== 'Escape' || e.defaultPrevented) return;
 			const el = document.activeElement;
@@ -209,15 +317,15 @@ function WindowFrame({
 		};
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
-	}, [focused, flyout, menu, closeWindow, id]);
+	}, [focused, minimised, flyout, menu, closeWindow, id]);
 
 	/* Move focus into the window when it is raised, but never steal it from a
 	   control the visitor is already using inside that window. */
 	useEffect(() => {
-		if (!focused) return;
+		if (!focused || minimised) return;
 		const el = frameRef.current;
 		if (el && !el.contains(document.activeElement)) el.focus({ preventScroll: true });
-	}, [focused]);
+	}, [focused, minimised]);
 
 	const openSystemMenu = (e: React.MouseEvent) => {
 		e.preventDefault();
@@ -243,6 +351,7 @@ function WindowFrame({
 			kind: 'item',
 			label: 'Minimise',
 			Icon: Minus as LucideIcon,
+			shortcut: '⊞ ↓',
 			onSelect: () => minimise(id),
 		},
 		{
@@ -250,6 +359,7 @@ function WindowFrame({
 			label: 'Maximise',
 			Icon: Maximize2 as LucideIcon,
 			disabled: maximised,
+			shortcut: '⊞ ↑',
 			onSelect: () => snap(id, 'max', bounds()),
 		},
 		{ kind: 'separator' },
@@ -263,22 +373,17 @@ function WindowFrame({
 		},
 	];
 
-	const ghost = preview ? zoneRect(preview, bounds()) : null;
 	const { Content } = app;
 
 	return (
 		<>
 			{/* The translucent plate Windows paints where a drag would land. */}
-			{ghost && (
-				<motion.div
-					className='snap-ghost'
-					aria-hidden='true'
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{ duration: 0.12 }}
-					style={{ left: ghost.x, top: ghost.y, width: ghost.w, height: ghost.h, zIndex: z - 1 }}
-				/>
-			)}
+			<div
+				ref={ghostRef}
+				className='snap-ghost'
+				aria-hidden='true'
+				style={{ zIndex: z - 1, opacity: 0 }}
+			/>
 
 			<motion.div
 				ref={frameRef}
@@ -287,25 +392,27 @@ function WindowFrame({
 				aria-labelledby={titleId}
 				aria-modal='false'
 				tabIndex={-1}
+				inert={minimised}
 				data-focused={focused}
 				data-maximised={maximised}
+				data-minimised={minimised || undefined}
 				data-snapped={snapped ?? undefined}
-				/* Windows scales a window up as it opens and drops it toward the
-				   taskbar as it closes or minimises. Only transform and opacity
-				   animate, so this never fights the left/top the drag writes. */
-				initial={reduce ? false : { opacity: 0, scale: 0.92, y: 10 }}
-				animate={{ opacity: 1, scale: 1, y: 0 }}
-				exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 26 }}
-				transition={{
-					duration: reduce ? 0 : 0.22,
-					ease: [0.16, 1, 0.3, 1],
+				initial={reduce ? false : { opacity: 0, scale: 0.92 }}
+				animate={{
+					opacity: minimised ? 0 : 1,
+					scale: minimised ? MINIMISED_SCALE : 1,
 				}}
+				exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
+				transition={{ duration: reduce ? 0 : GEOMETRY, ease: EASE }}
+				/* Position and size are motion values: framer writes them to the
+				   DOM without going through React at all. */
 				style={{
-					left: maximised ? 0 : x,
-					top: maximised ? 0 : y,
-					width: maximised ? '100%' : w,
-					height: maximised ? `calc(100% - ${TASKBAR_H}px)` : h,
+					x: mx,
+					y: my,
+					width: mw,
+					height: mh,
 					zIndex: z,
+					pointerEvents: minimised ? 'none' : undefined,
 				}}
 				onPointerDownCapture={() => focus(id)}>
 				<WindowHeader
@@ -323,7 +430,7 @@ function WindowFrame({
 							maximised={maximised}
 							onMinimise={() => minimise(id)}
 							onToggleMax={() => toggleMax(id, bounds())}
-							onSnap={(zone) => snap(id, zone, bounds())}
+							onSnap={(zone) => snapWindow(id, zone, bounds())}
 							onClose={() => closeWindow(id)}
 						/>
 					}
@@ -362,6 +469,6 @@ function WindowFrame({
 	);
 }
 
-/* Every window re-renders when any window's geometry changes unless the list
-   items are memoised — this shell can have eight open at once. */
+/* Geometry no longer flows through props, so a re-render here means something
+   structural changed — focus, snap state, or the app itself. */
 export default memo(WindowFrame);
