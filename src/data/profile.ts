@@ -80,3 +80,19 @@ highlights: [
 	cvDownload:
 		'https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I',
 } as const;
+
+/** First month of professional work — the anchor for every "years" figure. */
+export const CAREER_START = '2021-10';
+
+/**
+ * Years of experience, computed rather than written down.
+ *
+ * The old copy said "4+ years" in five places and had already drifted from the
+ * dates in `experience.ts`. Deriving it from one constant means the number is
+ * still true next year without anyone remembering to edit it.
+ */
+export function yearsOfExperience(now: Date = new Date()): number {
+	const [y, m] = CAREER_START.split('-').map(Number);
+	const months = (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m);
+	return Math.max(1, Math.floor(months / 12));
+}

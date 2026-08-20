@@ -1,36 +1,28 @@
 import type { Metadata } from 'next';
-import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 
-/* Self-hosted by Next — no render-blocking request to Google, no layout shift. */
+/**
+ * Segoe UI Variable is the Windows 11 system face, so a Windows visitor gets
+ * the real thing with no download at all. Inter is the fallback everywhere
+ * else — the closest widely available neo-grotesque — self-hosted by next/font
+ * so there is no render-blocking request to Google and no layout shift.
+ *
+ * The previous serif display face and monospace pair have gone: a Windows
+ * desktop has exactly two type roles, UI text and code, and Cascadia covers
+ * the second natively.
+ */
 const inter = Inter({
 	subsets: ['latin'],
 	display: 'swap',
 	variable: '--font-inter',
-	weight: ['400', '500', '600', '700', '800'],
-});
-
-/* Display face. Inter everywhere was the single most generic choice on the
-   page; a serif for headings against a neutral sans for body is what makes a
-   layout read as set rather than generated. */
-const instrumentSerif = Instrument_Serif({
-	subsets: ['latin'],
-	display: 'swap',
-	variable: '--font-display',
-	weight: ['400'],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-	subsets: ['latin'],
-	display: 'swap',
-	variable: '--font-jetbrains',
 	weight: ['400', '500', '600', '700'],
 });
 
 const TITLE = 'Ferri Yusra — Backend Engineer';
 const DESCRIPTION =
-	'Backend engineer with 4+ years building scalable API systems across fintech, GovTech health, and automotive. Specialising in Go, Node.js, and PostgreSQL.';
+	'Backend engineer building scalable API systems across fintech, GovTech health and automotive. Go, Node.js and PostgreSQL — presented as a Windows 11 desktop.';
 
 export const metadata: Metadata = {
 	title: TITLE,
@@ -52,24 +44,35 @@ export const metadata: Metadata = {
 	robots: { index: true, follow: true },
 };
 
+export const viewport = {
+	themeColor: [
+		{ media: '(prefers-color-scheme: light)', color: '#f3f3f3' },
+		{ media: '(prefers-color-scheme: dark)', color: '#202020' },
+	],
+};
+
+/**
+ * Applies theme, accent and wallpaper before first paint.
+ *
+ * All three are plain attributes on <html> that the stylesheet keys off, so
+ * running this ahead of hydration is what stops a stored dark desktop from
+ * flashing light — and it costs one synchronous localStorage read.
+ */
+const BOOT = `try{var d=document.documentElement,g=function(k,f){try{return localStorage.getItem(k)||f}catch(e){return f}};
+var t=g('theme',null);if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))d.setAttribute('data-theme','dark');
+d.setAttribute('data-accent',g('shell:accent','blue'));
+d.setAttribute('data-wallpaper',g('shell:wallpaper','bloom'));
+var b=g('shell:brightness','1');if(b)d.style.setProperty('--screen-dim',String(Math.max(0,Math.min(0.65,1-parseFloat(b)||0))));}catch(e){}`;
+
 export default function RootLayout({
 	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
 	return (
-		<html
-			lang='en'
-			className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
-			suppressHydrationWarning>
+		<html lang='en' className={inter.variable} suppressHydrationWarning>
 			<head>
-				<script
-					dangerouslySetInnerHTML={{
-						__html: `try{const t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.setAttribute('data-theme','dark')}catch(e){}`,
-					}}
-				/>
+				<script dangerouslySetInnerHTML={{ __html: BOOT }} />
 			</head>
-			<body className='antialiased'>
+			<body>
 				<ThemeProvider>
 					<a href='#main' className='skip-link'>
 						Skip to content

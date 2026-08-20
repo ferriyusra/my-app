@@ -1,42 +1,37 @@
 'use client';
 
-import { Folder, Star } from 'lucide-react';
-
 /**
- * An Explorer tile. Windows shows a folder glyph tinted by content; the
- * project's own colour does that job here.
+ * An Explorer tile in the Large icons view. Single click selects, double
+ * click opens — the same contract as the desktop grid.
  */
 export default function FolderCard({
-	name,
-	meta,
-	colour,
-	featured,
-	onOpen,
+	entry,
+	selected,
+	onSelect,
 }: {
-	name: string;
-	meta: string;
-	colour: string;
-	featured?: boolean;
-	onOpen: () => void;
+	entry: import('./types').FsEntry;
+	selected: boolean;
+	onSelect: () => void;
 }) {
 	return (
 		<button
 			type='button'
-			className='xp-folder'
-			onDoubleClick={onOpen}
+			className='xp-tile'
+			data-selected={selected || undefined}
+			aria-label={`${entry.name} — ${entry.type}`}
+			onClick={onSelect}
+			onDoubleClick={entry.onOpen}
 			onKeyDown={(e) => {
 				if (e.key === 'Enter') {
 					e.preventDefault();
-					onOpen();
+					entry.onOpen();
 				}
-			}}
-			aria-label={`Open ${name}`}>
-			<span className='xp-folder-icon' aria-hidden='true'>
-				<Folder size={38} fill={colour} color={colour} />
-				{featured && <Star size={12} fill='currentColor' className='xp-folder-star' />}
+			}}>
+			<span className='xp-tile-icon' aria-hidden='true'>
+				{entry.icon}
 			</span>
-			<span className='xp-folder-name'>{name}</span>
-			<span className='xp-folder-meta'>{meta}</span>
+			<span className='xp-tile-name'>{entry.name}</span>
+			<span className='xp-tile-meta'>{entry.meta}</span>
 		</button>
 	);
 }

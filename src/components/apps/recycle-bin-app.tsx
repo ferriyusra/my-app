@@ -1,14 +1,16 @@
 'use client';
 
-import { Trash2 } from 'lucide-react';
+import { RecycleIcon } from '@/components/icons/app-icons';
 
+/** An empty bin, and an honest reason why. */
 export default function RecycleBinApp() {
 	return (
-		<div className='app-pad recycle-empty'>
-			<Trash2 size={44} aria-hidden='true' />
-			<p className='app-h2'>Recycle Bin is empty</p>
-			<p className='app-sub'>
-				Nothing thrown away yet. The abandoned ideas live in a notebook.
+		<div className='rb-empty'>
+			<RecycleIcon size={72} />
+			<h2>Recycle Bin is empty</h2>
+			<p>
+				Nothing thrown away yet. The abandoned ideas live in a notebook, and the
+				dead branches live in Git.
 			</p>
 		</div>
 	);

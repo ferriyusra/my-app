@@ -7,6 +7,8 @@ export const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'PT. Teknologi Pamadya Analitika (Meditap)',
+		short: 'Meditap',
+		endISO: null,
 		period: 'Jul 2025 — Present',
 		years: '2025 —',
 		startISO: '2025-07',
@@ -37,6 +39,8 @@ export const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'INA Digital (Peruri Digital Security)',
+		short: 'INA Digital',
+		endISO: '2025-03',
 		period: 'Jan 2024 — Mar 2025',
 		years: '2024 — 2025',
 		startISO: '2024-01',
@@ -67,6 +71,8 @@ export const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'Health Technology Transformation & Digitalization Team',
+		short: 'GovTech Health',
+		endISO: '2023-12',
 		period: 'Jul 2023 — Dec 2023',
 		years: '2023',
 		startISO: '2023-07',
@@ -96,6 +102,8 @@ export const experiences = [
 	{
 		role: 'Software Engineer Backend',
 		company: 'PT Moladin Digital Indonesia',
+		short: 'Moladin',
+		endISO: '2023-02',
 		period: 'Mar 2022 — Feb 2023',
 		years: '2022 — 2023',
 		startISO: '2022-03',
@@ -125,6 +133,8 @@ export const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'PT Jojonomic Indonesia',
+		short: 'Jojonomic',
+		endISO: '2022-01',
 		period: 'Oct 2021 — Jan 2022',
 		years: '2021 — 2022',
 		startISO: '2021-10',
@@ -141,3 +151,23 @@ export const experiences = [
 ];
 
 export type Experience = (typeof experiences)[number];
+
+/** Length of a role in months, from its own ISO dates. */
+export function tenureMonths(exp: Experience, now: Date = new Date()): number {
+	const [sy, sm] = exp.startISO.split('-').map(Number);
+	const [ey, em] = exp.endISO
+		? exp.endISO.split('-').map(Number)
+		: [now.getFullYear(), now.getMonth() + 1];
+	return Math.max(1, (ey - sy) * 12 + (em - sm) + 1);
+}
+
+/** "1 yr 8 mos" — the way LinkedIn and Windows both phrase a duration. */
+export function tenureLabel(exp: Experience, now: Date = new Date()): string {
+	const m = tenureMonths(exp, now);
+	const years = Math.floor(m / 12);
+	const months = m % 12;
+	const parts = [];
+	if (years) parts.push(`${years} yr${years > 1 ? 's' : ''}`);
+	if (months) parts.push(`${months} mo${months > 1 ? 's' : ''}`);
+	return parts.join(' ') || '1 mo';
+}

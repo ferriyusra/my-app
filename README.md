@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ferri Yusra — portfolio
 
-## Getting Started
+A backend engineer's portfolio, built as a **Windows 11 desktop that runs in
+the browser**. Not a page with Windows colours: a shell with draggable,
+resizable, snappable windows, a real taskbar, Start, Quick Settings, a
+notification centre and a File Explorer.
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What's in it
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Surface | Behaviour |
+|---|---|
+| Desktop | Column-first icon grid, single click to select, double click to open, arrow-key navigation, right-click menu with working View / Sort by / Refresh |
+| Windows | Drag, eight-way resize, focus and z-order, minimise / maximise / restore / close, drag-to-edge snapping with a live preview plate, Snap Layouts flyout with four layouts, per-window system menu |
+| Taskbar | Pinned and running apps with Windows' widening focus indicator, hover previews, right-click to pin or close, live system tray, clock |
+| Start | Search across apps and links, pinned grid, all-apps list, Recommended from this session, power menu (sleep / restart / shut down — all of which do something) |
+| Apps | About (System Properties), File Explorer (Projects), Skills, Experience, Mail (Contact), Settings, Browser, VS Code, Recycle Bin |
+| Personalisation | Light / dark, six accents, four wallpapers, brightness and volume — all persisted, all changing the running shell |
 
-## Learn More
+Every wallpaper is drawn in CSS and every system sound is synthesised with the
+Web Audio API, so the shell ships zero image and zero audio bytes.
 
-To learn more about Next.js, take a look at the following resources:
+Below 900px the desktop is replaced by a stacked reading view built from the
+same design tokens.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The contact form posts to `/api/contact`, which delivers over Resend when
+configured and otherwise falls back to a pre-filled `mailto:` draft.
 
-## Deploy on Vercel
+```bash
+RESEND_API_KEY=...          # optional; without it, mail falls back to mailto:
+CONTACT_FROM=portfolio@example.com
+CONTACT_TO=you@example.com
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run dev      # development server
+npm run build    # production build
+npm run start    # serve the production build
+npm run lint     # ESLint
+```
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 (reset and
+theme only — the shell is hand-written CSS) · Framer Motion · Lucide.
+
+See [CLAUDE.md](CLAUDE.md) for the architecture notes.

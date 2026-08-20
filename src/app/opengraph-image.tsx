@@ -17,11 +17,11 @@ export default function OpengraphImage() {
 					display: 'flex',
 					flexDirection: 'column',
 					justifyContent: 'space-between',
-					background: '#f5f5f5',
+					background: '#f3f3f3',
 					padding: 72,
-					/* Satori only ships a sans fallback, so the card does not pick up
-					   Instrument Serif the way the site does. Declaring `serif` here
-					   would be a lie about what renders. */
+					/* Satori renders this on the server, where Segoe UI Variable is
+					   not installed, so the card cannot pick up the desktop's face.
+					   Declaring it here would be a lie about what renders. */
 					fontFamily: 'sans-serif',
 				}}>
 				{/* Top row: avatar tile + availability */}

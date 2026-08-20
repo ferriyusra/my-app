@@ -1,61 +1,96 @@
 'use client';
 
-import AppTile from '@/components/ui/app-tile';
-import type { AppDef, ShortcutDef } from '@/components/apps/registry';
+import { memo } from 'react';
+import AppTile, { type TileArt } from '@/components/ui/app-tile';
 
 type Props = {
-	title: string;
+	id: string;
+	label: string;
+	tile: TileArt;
 	selected: boolean;
+	/** Artwork size in px, set by the desktop's View sub-menu. */
+	tileSize: number;
+	/** True for the one cell that is reachable by Tab (roving tabindex). */
+	tabbable: boolean;
+	href?: string;
 	onSelect: () => void;
 	onOpen: () => void;
-	tile: React.ReactNode;
-	href?: string;
+	onKeyDown: (e: React.KeyboardEvent) => void;
+	onContextMenu: (e: React.MouseEvent) => void;
 };
 
 /**
- * One desktop item. Single click selects and double click opens, matching
- * Windows; Enter opens too, so the grid is reachable from the keyboard.
+ * One desktop cell. Single click selects and double click opens, matching
+ * Windows; Enter opens too, so the grid works from the keyboard.
  */
-export default function DesktopIcon({
-	title,
+function DesktopIcon({
+	id,
+	label,
+	tile,
 	selected,
+	tileSize,
+	tabbable,
+	href,
 	onSelect,
 	onOpen,
-	tile,
-	href,
+	onKeyDown,
+	onContextMenu,
 }: Props) {
 	const common = {
+		'data-icon-id': id,
 		className: 'desk-icon',
 		'data-selected': selected,
+		tabIndex: tabbable ? 0 : -1,
 		onPointerDown: (e: React.PointerEvent) => {
+			/* Stop the desktop's own pointerdown from clearing the selection
+			   this click is about to make. */
 			e.stopPropagation();
 			onSelect();
 		},
 		onDoubleClick: onOpen,
 		onKeyDown: (e: React.KeyboardEvent) => {
-			if (e.key === 'Enter') {
+			if (e.key === 'Enter' || e.key === ' ') {
 				e.preventDefault();
 				onOpen();
+			} else {
+				onKeyDown(e);
 			}
 		},
+		onContextMenu,
 	};
 
+	const inner = (
+		<>
+			<span className='desk-icon-art' aria-hidden='true'>
+				<AppTile tile={tile} size={tileSize} />
+			</span>
+			<span className='desk-icon-label'>{label}</span>
+		</>
+	);
+
+	/* Shortcuts stay real anchors: middle-click, copy-link and open-in-new-tab
+	   all keep working, which a button would throw away. */
 	if (href) {
 		return (
-			<a {...common} href={href} target='_blank' rel='noopener noreferrer'>
-				{tile}
-				{title}
+			<a
+				{...common}
+				href={href}
+				target='_blank'
+				rel='noopener noreferrer'
+				aria-label={`${label} — opens in a new tab`}
+				/* The anchor's own activation would race the double-click, so the
+				   open path stays the one the grid controls. */
+				onClick={(e) => e.preventDefault()}>
+				{inner}
 			</a>
 		);
 	}
+
 	return (
-		<button type='button' {...common} aria-label={`Open ${title}`}>
-			{tile}
-			{title}
+		<button type='button' {...common} aria-label={`Open ${label}`}>
+			{inner}
 		</button>
 	);
 }
 
-export function tileFor(def: AppDef | ShortcutDef) {
-	return <AppTile app={def} size={46} />;
-}
+export default memo(DesktopIcon);

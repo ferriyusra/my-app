@@ -2,23 +2,63 @@
 
 import type { SnapZone } from '@/types/windows';
 
+type Cell = { zone: SnapZone; style?: React.CSSProperties };
+type Layout = {
+	label: string;
+	cols: string;
+	rows: string;
+	cells: Cell[];
+};
+
 /**
- * Windows 11's Snap Layouts: hovering (or focusing) the maximise button
- * offers layout positions instead of only maximise. Each option is a
- * miniature of the screen with the target zone filled.
+ * Windows 11's Snap Layouts. Hovering or focusing the maximise button offers
+ * layout positions instead of only maximise; each thumbnail is a miniature of
+ * the screen whose regions are individually clickable.
  */
-const LAYOUTS: { label: string; zones: SnapZone[]; cells: string }[] = [
-	{ label: 'Split left and right', zones: ['left', 'right'], cells: '1fr 1fr' },
-	{ label: 'Four quadrants', zones: ['tl', 'tr', 'bl', 'br'], cells: '1fr 1fr' },
+const LAYOUTS: Layout[] = [
+	{
+		label: 'Two columns',
+		cols: '1fr 1fr',
+		rows: '1fr',
+		cells: [{ zone: 'left' }, { zone: 'right' }],
+	},
+	{
+		label: 'Three columns',
+		cols: '1fr 1fr 1fr',
+		rows: '1fr',
+		cells: [{ zone: 'third-l' }, { zone: 'third-c' }, { zone: 'third-r' }],
+	},
+	{
+		label: 'Wide left, two stacked right',
+		cols: '2fr 1fr',
+		rows: '1fr 1fr',
+		cells: [
+			{ zone: 'wide-l', style: { gridRow: 'span 2' } },
+			{ zone: 'stack-tr' },
+			{ zone: 'stack-br' },
+		],
+	},
+	{
+		label: 'Four quadrants',
+		cols: '1fr 1fr',
+		rows: '1fr 1fr',
+		cells: [{ zone: 'tl' }, { zone: 'tr' }, { zone: 'bl' }, { zone: 'br' }],
+	},
 ];
 
 const ZONE_LABEL: Record<SnapZone, string> = {
-	left: 'Snap to left half',
-	right: 'Snap to right half',
-	tl: 'Snap to top-left quarter',
-	tr: 'Snap to top-right quarter',
-	bl: 'Snap to bottom-left quarter',
-	br: 'Snap to bottom-right quarter',
+	left: 'Snap to the left half',
+	right: 'Snap to the right half',
+	tl: 'Snap to the top-left quarter',
+	tr: 'Snap to the top-right quarter',
+	bl: 'Snap to the bottom-left quarter',
+	br: 'Snap to the bottom-right quarter',
+	'third-l': 'Snap to the left third',
+	'third-c': 'Snap to the centre third',
+	'third-r': 'Snap to the right third',
+	'wide-l': 'Snap to the left two-thirds',
+	'stack-tr': 'Snap to the top-right third',
+	'stack-br': 'Snap to the bottom-right third',
 	max: 'Maximise',
 };
 
@@ -34,22 +74,27 @@ export default function SnapFlyout({
 			className='snap-flyout'
 			role='group'
 			aria-label='Snap layouts'
-			onMouseLeave={onDismiss}>
-			{LAYOUTS.map(({ label, zones, cells }) => (
+			onPointerDown={(e) => e.stopPropagation()}>
+			{LAYOUTS.map((layout) => (
 				<div
-					key={label}
+					key={layout.label}
 					className='snap-layout'
-					style={{ gridTemplateColumns: cells }}
-					aria-label={label}>
-					{zones.map((z) => (
+					role='group'
+					aria-label={layout.label}
+					style={{
+						gridTemplateColumns: layout.cols,
+						gridTemplateRows: layout.rows,
+					}}>
+					{layout.cells.map((cell) => (
 						<button
-							key={z}
+							key={cell.zone}
 							type='button'
 							className='snap-cell'
-							title={ZONE_LABEL[z]}
-							aria-label={ZONE_LABEL[z]}
+							style={cell.style}
+							title={ZONE_LABEL[cell.zone]}
+							aria-label={ZONE_LABEL[cell.zone]}
 							onClick={() => {
-								onSnap(z);
+								onSnap(cell.zone);
 								onDismiss();
 							}}
 						/>

@@ -1,92 +1,100 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import {
-	Sun,
-	Moon,
-	Wifi,
-	Volume2,
-	BatteryFull,
-	ChevronUp,
-	Search,
-	Copy,
-} from 'lucide-react';
-import { useWindows } from '@/context/window-context';
-import { APPS } from '@/components/apps/registry';
-import { useTheme } from '@/components/theme-provider';
-import AppTile from '@/components/ui/app-tile';
+import { useMemo, useState } from 'react';
+import { Github, LayoutGrid, Pin, PinOff, Search, SquareStack, X } from 'lucide-react';
+import { useShell } from '@/context/shell-context';
+import { useWindowManager } from '@/hooks/use-window-manager';
+import { APP_BY_ID, APPS } from '@/components/apps/registry';
+import ContextMenu, { type MenuEntry } from '@/components/ui/context-menu';
 import WindowsLogo from '@/components/ui/windows-logo';
+import TaskbarItem from './taskbar-item';
+import SystemTray from './system-tray';
+import { useClock } from '@/hooks/use-clock';
 import { profile } from '@/data/profile';
+import type { AppId } from '@/types/windows';
 
 /** Windows 11 taskbar: a left widget, a centred cluster, and the tray. */
-export default function Taskbar({
-	startOpen,
-	onToggleStart,
-	taskViewOpen,
-	onToggleTaskView,
-	onSearch,
-}: {
-	startOpen: boolean;
-	onToggleStart: () => void;
-	taskViewOpen: boolean;
-	onToggleTaskView: () => void;
-	onSearch: () => void;
-}) {
-	const { windows, open, focus, minimise } = useWindows();
-	const { theme, toggle, mounted } = useTheme();
-	const [clock, setClock] = useState({ time: '', date: '', jakarta: '' });
+export default function Taskbar() {
+	const { flyout, toggleFlyout, openFlyout, pinned, togglePin } = useShell();
+	const { windows, topZ, toggleFromTaskbar, closeWindow, launch, minimiseAll } =
+		useWindowManager();
+	const { jakarta } = useClock();
+	const [menu, setMenu] = useState<{ x: number; y: number; id: AppId } | null>(null);
 
-	useEffect(() => {
-		const tick = () => {
-			const d = new Date();
-			setClock({
-				/* Windows shows a 12-hour clock over a short date, stacked. */
-				time: d.toLocaleTimeString('en-US', {
-					hour: 'numeric',
-					minute: '2-digit',
-				}),
-				date: d.toLocaleDateString('en-GB'),
-				jakarta: d.toLocaleTimeString('en-US', {
-					timeZone: 'Asia/Jakarta',
-					hour: 'numeric',
-					minute: '2-digit',
-				}),
-			});
-		};
-		tick();
-		const t = setInterval(tick, 30_000);
-		return () => clearInterval(t);
-	}, []);
+	/* Pinned apps first, then anything else that is running — which is exactly
+	   how Windows orders the strip. */
+	const shown = useMemo(() => {
+		const running = windows.map((w) => w.id);
+		const extra = APPS.filter(
+			(a) => running.includes(a.id) && !pinned.includes(a.id),
+		).map((a) => a.id);
+		return [...pinned, ...extra];
+	}, [windows, pinned]);
 
-	const topZ = Math.max(0, ...windows.map((w) => w.z));
+	const itemMenu = (id: AppId): MenuEntry[] => {
+		const app = APP_BY_ID[id];
+		const running = windows.some((w) => w.id === id);
+		const isPinned = pinned.includes(id);
+		return [
+			{ kind: 'label', label: app.title },
+			{
+				kind: 'item',
+				label: running ? 'Bring to front' : 'Open',
+				Icon: LayoutGrid,
+				onSelect: () => launch(id),
+			},
+			{
+				kind: 'item',
+				label: isPinned ? 'Unpin from taskbar' : 'Pin to taskbar',
+				Icon: isPinned ? PinOff : Pin,
+				/* Unpinning the last pin would leave an empty strip. */
+				disabled: isPinned && pinned.length === 1,
+				onSelect: () => togglePin(id),
+			},
+			{ kind: 'separator' },
+			{
+				kind: 'item',
+				label: 'Close window',
+				Icon: X,
+				danger: true,
+				disabled: !running,
+				onSelect: () => closeWindow(id),
+			},
+		];
+	};
 
 	return (
 		<div className='taskbar'>
 			{/* Windows puts a weather widget here. Ours carries something a
 			    visitor can act on: what time it is where I am. */}
-			<div className='tb-widget' suppressHydrationWarning>
+			<button
+				type='button'
+				className='tb-widget'
+				onClick={() => launch('contact')}
+				suppressHydrationWarning>
 				<span className='tb-widget-dot' aria-hidden='true' />
-				<span>
-					<strong>{clock.jakarta} in Jakarta</strong>
+				<span className='tb-widget-text'>
+					<strong>{jakarta || '--:--'} in Jakarta</strong>
 					{profile.availability}
 				</span>
-			</div>
+			</button>
 
 			<div className='taskbar-centre'>
 				<button
 					type='button'
 					className='tb-btn tb-start'
 					aria-label='Start'
-					aria-expanded={startOpen}
-					onClick={onToggleStart}>
-					<WindowsLogo size={19} />
+					aria-expanded={flyout === 'start'}
+					data-active={flyout === 'start' || undefined}
+					onClick={() => toggleFlyout('start')}>
+					<WindowsLogo size={20} />
 				</button>
 
 				<button
 					type='button'
 					className='tb-btn'
 					aria-label='Search apps'
-					onClick={onSearch}>
+					onClick={() => openFlyout('start')}>
 					<Search size={19} aria-hidden='true' />
 				</button>
 
@@ -94,73 +102,53 @@ export default function Taskbar({
 					type='button'
 					className='tb-btn'
 					aria-label='Task view'
-					aria-expanded={taskViewOpen}
-					data-active={taskViewOpen}
-					onClick={onToggleTaskView}>
-					<Copy size={18} aria-hidden='true' />
+					aria-expanded={flyout === 'taskview'}
+					data-active={flyout === 'taskview' || undefined}
+					onClick={() => toggleFlyout('taskview')}>
+					<SquareStack size={19} aria-hidden='true' />
 				</button>
 
 				<span className='tb-sep' aria-hidden='true' />
 
-				{APPS.map((app) => {
-					const { id, title } = app;
+				{shown.map((id) => {
 					const win = windows.find((w) => w.id === id);
-					const isTop = !!win && !win.minimised && win.z === topZ;
 					return (
-						<button
+						<TaskbarItem
 							key={id}
-							type='button'
-							className='tb-btn'
-							data-running={!!win}
-							data-active={isTop}
-							aria-label={win ? `${title} — open` : `Open ${title}`}
-							aria-pressed={!!win}
-							onClick={() => {
-								if (!win) return open(id);
-								if (isTop) return minimise(id);
-								focus(id);
-							}}>
-							<AppTile app={app} size={26} />
-							<span className='tb-indicator' aria-hidden='true' />
-						</button>
+							app={APP_BY_ID[id]}
+							running={!!win}
+							active={!!win && !win.minimised && win.z === topZ}
+							onActivate={() => toggleFromTaskbar(id)}
+							onContextMenu={(e) => {
+								e.preventDefault();
+								setMenu({ x: e.clientX, y: e.clientY, id });
+							}}
+						/>
 					);
 				})}
+
+				{/* GitHub is a real destination, not an app — it leaves the page. */}
+				<a
+					className='tb-btn tb-link'
+					href={profile.github}
+					target='_blank'
+					rel='noopener noreferrer'
+					aria-label='GitHub profile — opens in a new tab'>
+					<Github size={19} aria-hidden='true' />
+				</a>
 			</div>
 
-			<div className='taskbar-right'>
-				<span className='tb-chevron' aria-hidden='true'>
-					<ChevronUp size={14} />
-				</span>
-				{/* Decorative: labelled as such rather than posing as controls. */}
-				<span className='tb-trayicons' aria-hidden='true'>
-					<Wifi size={15} />
-					<Volume2 size={15} />
-					<BatteryFull size={15} />
-				</span>
-				<button
-					type='button'
-					className='tb-tray'
-					aria-label={
-						mounted
-							? theme === 'dark'
-								? 'Switch to light mode'
-								: 'Switch to dark mode'
-							: 'Toggle colour theme'
-					}
-					onClick={toggle}>
-					{mounted ? (
-						theme === 'dark' ? (
-							<Sun size={16} aria-hidden='true' />
-						) : (
-							<Moon size={16} aria-hidden='true' />
-						)
-					) : null}
-				</button>
-				<span className='tb-clock' suppressHydrationWarning>
-					<span>{clock.time}</span>
-					<span>{clock.date}</span>
-				</span>
-			</div>
+			<SystemTray onShowDesktop={minimiseAll} />
+
+			{menu && (
+				<ContextMenu
+					x={menu.x}
+					y={menu.y}
+					items={itemMenu(menu.id)}
+					label='Taskbar app menu'
+					onClose={() => setMenu(null)}
+				/>
+			)}
 		</div>
 	);
 }

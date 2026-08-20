@@ -1,220 +1,367 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Minus, Square, X, Copy } from 'lucide-react';
-import { useWindows } from '@/context/window-context';
-import type { AppId } from '@/types/windows';
-import SnapFlyout from '@/components/windows/snap-flyout';
+import {
+	Maximize2,
+	Minimize2,
+	Minus,
+	Move,
+	X,
+	type LucideIcon,
+} from 'lucide-react';
+import { MIN_H, MIN_W, zoneRect } from '@/context/window-context';
+import { useShell } from '@/context/shell-context';
+import { useWindowManager, TASKBAR_H } from '@/hooks/use-window-manager';
+import ContextMenu, { type MenuEntry } from '@/components/ui/context-menu';
+import WindowHeader from './window-header';
+import WindowControls from './window-controls';
+import type { AppDef } from '@/components/apps/registry';
+import type { ResizeEdge, SnapZone, WindowState } from '@/types/windows';
 
-const TASKBAR = 56;
+/** Distance from a screen edge that arms a snap while dragging. */
+const EDGE = 10;
+/** Pointer travel before a maximised window tears loose. */
+const TEAR = 8;
 
-type Props = {
-	id: AppId;
-	title: string;
-	icon: React.ReactNode;
-	x: number;
-	y: number;
-	w: number;
-	h: number;
-	z: number;
-	maximised: boolean;
-	focused: boolean;
-	children: React.ReactNode;
+const EDGES: ResizeEdge[] = ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'];
+
+/** Which snap a drag at this pointer position would land on, if any. */
+function edgeZone(cx: number, cy: number, b: { w: number; h: number }): SnapZone | null {
+	const nearTop = cy <= EDGE;
+	const nearLeft = cx <= EDGE;
+	const nearRight = cx >= b.w - EDGE;
+	if (nearTop && nearLeft) return 'tl';
+	if (nearTop && nearRight) return 'tr';
+	if (nearTop) return 'max';
+	if (nearLeft) return cy >= b.h - b.h / 4 ? 'bl' : 'left';
+	if (nearRight) return cy >= b.h - b.h / 4 ? 'br' : 'right';
+	return null;
+}
+
+type DragState = {
+	/** Pointer offset inside the window at grab time. */
+	offX: number;
+	offY: number;
+	/** Where the grab started, to measure tear-off distance. */
+	startX: number;
+	startY: number;
+	/** Horizontal grab point as a fraction of the width, for tear-off. */
+	fracX: number;
+	moved: boolean;
 };
 
-/**
- * A Windows 11 app window: title bar, caption buttons, pointer drag, and a
- * resize grip. Dragging uses pointer capture so the window keeps tracking
- * even when the cursor outruns it.
- */
-export default function WindowFrame({
-	id,
-	title,
-	icon,
-	x,
-	y,
-	w,
-	h,
-	z,
-	maximised,
+type SizeState = {
+	edge: ResizeEdge;
+	px: number;
+	py: number;
+	rect: { x: number; y: number; w: number; h: number };
+};
+
+function WindowFrame({
+	win,
+	app,
 	focused,
-	children,
-}: Props) {
-	const { close, focus, minimise, toggleMax, snap, move, resize } = useWindows();
-	const [snapOpen, setSnapOpen] = useState(false);
-	const shouldReduceMotion = useReducedMotion();
-	const dragRef = useRef<{ dx: number; dy: number } | null>(null);
-	const sizeRef = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
+}: {
+	win: WindowState;
+	app: AppDef;
+	focused: boolean;
+}) {
+	const {
+		focus,
+		minimise,
+		toggleMax,
+		snap,
+		setRect,
+		tearOff,
+		closeWindow,
+		bounds,
+	} = useWindowManager();
+
+	const { id, x, y, w, h, z, maximised, snapped } = win;
+	const { flyout } = useShell();
+	const reduce = useReducedMotion();
 	const frameRef = useRef<HTMLDivElement>(null);
+	const dragRef = useRef<DragState | null>(null);
+	const sizeRef = useRef<SizeState | null>(null);
+	const [preview, setPreview] = useState<SnapZone | null>(null);
+	const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
 	const titleId = `win-${id}-title`;
 
-	const bounds = useCallback(
-		() => ({ w: window.innerWidth, h: window.innerHeight - TASKBAR }),
-		[],
-	);
+	/* ── Drag ────────────────────────────────────────────────── */
 
-	/* ── Drag ── */
-	const onTitlePointerDown = (e: React.PointerEvent) => {
-		if (maximised) return;
+	const onTitleDown = (e: React.PointerEvent) => {
+		if (e.button !== 0) return;
 		if ((e.target as HTMLElement).closest('button')) return;
 		focus(id);
-		dragRef.current = { dx: e.clientX - x, dy: e.clientY - y };
+		dragRef.current = {
+			offX: e.clientX - x,
+			offY: e.clientY - y,
+			startX: e.clientX,
+			startY: e.clientY,
+			fracX: w > 0 ? (e.clientX - x) / w : 0.5,
+			moved: false,
+		};
 		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 	};
 
-	const onTitlePointerMove = (e: React.PointerEvent) => {
+	const onTitleMove = (e: React.PointerEvent) => {
 		const d = dragRef.current;
 		if (!d) return;
 		const b = bounds();
-		move(
-			id,
-			Math.min(Math.max(e.clientX - d.dx, -w + 120), b.w - 120),
-			Math.min(Math.max(e.clientY - d.dy, 0), b.h - 40),
-		);
+
+		/* A maximised or snapped window pops back to its floating size and
+		   re-anchors under the cursor, the way Windows tears one loose. */
+		if (maximised || snapped) {
+			if (Math.abs(e.clientY - d.startY) + Math.abs(e.clientX - d.startX) < TEAR)
+				return;
+			const rw = win.restore?.w ?? Math.round(b.w / 2);
+			const nx = Math.round(e.clientX - rw * d.fracX);
+			const ny = Math.max(0, e.clientY - d.offY);
+			d.offX = Math.round(rw * d.fracX);
+			d.moved = true;
+			tearOff(id, nx, ny);
+			return;
+		}
+
+		d.moved = true;
+		setRect(id, {
+			/* Keep at least a strip of the title bar reachable on every side. */
+			x: Math.min(Math.max(e.clientX - d.offX, -w + 140), b.w - 140),
+			y: Math.min(Math.max(e.clientY - d.offY, 0), b.h - 36),
+			w,
+			h,
+		});
+		setPreview(edgeZone(e.clientX, e.clientY, b));
 	};
 
-	const endDrag = (e: React.PointerEvent) => {
-		const wasDragging = !!dragRef.current;
+	const onTitleUp = (e: React.PointerEvent) => {
+		const d = dragRef.current;
 		dragRef.current = null;
 		(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
-		if (!wasDragging) return;
-		// Dragging a window into an edge snaps it, as Windows 11 does.
-		const b = bounds();
-		const EDGE = 12;
-		if (e.clientY <= EDGE) snap(id, 'max', b);
-		else if (e.clientX <= EDGE) snap(id, 'left', b);
-		else if (e.clientX >= b.w - EDGE) snap(id, 'right', b);
+		const zone = preview;
+		setPreview(null);
+		if (d?.moved && zone) snap(id, zone, bounds());
 	};
 
-	/* ── Resize ── */
-	const onGripPointerDown = (e: React.PointerEvent) => {
+	/* ── Resize ──────────────────────────────────────────────── */
+
+	const onGripDown = (edge: ResizeEdge) => (e: React.PointerEvent) => {
+		if (e.button !== 0) return;
 		e.stopPropagation();
 		focus(id);
-		sizeRef.current = { x: e.clientX, y: e.clientY, w, h };
+		sizeRef.current = { edge, px: e.clientX, py: e.clientY, rect: { x, y, w, h } };
 		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 	};
 
-	const onGripPointerMove = (e: React.PointerEvent) => {
+	const onGripMove = (e: React.PointerEvent) => {
 		const s = sizeRef.current;
 		if (!s) return;
-		resize(
-			id,
-			Math.max(420, s.w + (e.clientX - s.x)),
-			Math.max(280, s.h + (e.clientY - s.y)),
-		);
+		const b = bounds();
+		const dx = e.clientX - s.px;
+		const dy = e.clientY - s.py;
+		let { x: nx, y: ny, w: nw, h: nh } = s.rect;
+
+		if (s.edge.includes('e')) nw = s.rect.w + dx;
+		if (s.edge.includes('s')) nh = s.rect.h + dy;
+		/* Dragging a leading edge moves the origin by however much the size
+		   actually changed, so the opposite edge stays pinned at the minimum. */
+		if (s.edge.includes('w')) {
+			nw = Math.max(MIN_W, s.rect.w - dx);
+			nx = s.rect.x + (s.rect.w - nw);
+		}
+		if (s.edge.includes('n')) {
+			nh = Math.max(MIN_H, s.rect.h - dy);
+			ny = Math.max(0, s.rect.y + (s.rect.h - nh));
+		}
+
+		setRect(id, {
+			x: nx,
+			y: ny,
+			w: Math.min(Math.max(MIN_W, nw), b.w + 200),
+			h: Math.min(Math.max(MIN_H, nh), b.h),
+		});
 	};
 
-	const endResize = (e: React.PointerEvent) => {
+	const onGripUp = (e: React.PointerEvent) => {
 		sizeRef.current = null;
 		(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
 	};
 
-	/* Escape closes the focused window — the keyboard route out. */
+	/* ── Keyboard ────────────────────────────────────────────── */
+
+	/* Escape closes the focused window — but only when it is the outermost
+	   thing on screen. Start, Quick Settings, the window menu and any text
+	   field all own Escape first, so a visitor dismissing a menu never loses
+	   the window underneath it. */
 	useEffect(() => {
-		if (!focused) return;
+		if (!focused || flyout || menu) return;
 		const onKey = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') close(id);
+			if (e.key !== 'Escape' || e.defaultPrevented) return;
+			const el = document.activeElement;
+			if (
+				el instanceof HTMLElement &&
+				(el.isContentEditable ||
+					['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName))
+			)
+				return;
+			closeWindow(id);
 		};
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
-	}, [focused, close, id]);
+	}, [focused, flyout, menu, closeWindow, id]);
 
-	/* Move focus into the window when it opens or is raised. */
+	/* Move focus into the window when it is raised, but never steal it from a
+	   control the visitor is already using inside that window. */
 	useEffect(() => {
-		if (focused) frameRef.current?.focus({ preventScroll: true });
+		if (!focused) return;
+		const el = frameRef.current;
+		if (el && !el.contains(document.activeElement)) el.focus({ preventScroll: true });
 	}, [focused]);
 
+	const openSystemMenu = (e: React.MouseEvent) => {
+		e.preventDefault();
+		setMenu({ x: e.clientX, y: e.clientY });
+	};
+
+	const systemMenu: MenuEntry[] = [
+		{
+			kind: 'item',
+			label: 'Restore',
+			Icon: Minimize2 as LucideIcon,
+			disabled: !maximised && !snapped,
+			onSelect: () => toggleMax(id, bounds()),
+		},
+		{
+			kind: 'item',
+			label: 'Move',
+			Icon: Move as LucideIcon,
+			disabled: true,
+			shortcut: 'Drag title',
+		},
+		{
+			kind: 'item',
+			label: 'Minimise',
+			Icon: Minus as LucideIcon,
+			onSelect: () => minimise(id),
+		},
+		{
+			kind: 'item',
+			label: 'Maximise',
+			Icon: Maximize2 as LucideIcon,
+			disabled: maximised,
+			onSelect: () => snap(id, 'max', bounds()),
+		},
+		{ kind: 'separator' },
+		{
+			kind: 'item',
+			label: 'Close',
+			Icon: X as LucideIcon,
+			shortcut: 'Esc',
+			danger: true,
+			onSelect: () => closeWindow(id),
+		},
+	];
+
+	const ghost = preview ? zoneRect(preview, bounds()) : null;
+	const { Content } = app;
+
 	return (
-		<motion.div
-			ref={frameRef}
-			className='win'
-			role='dialog'
-			aria-labelledby={titleId}
-			tabIndex={-1}
-			data-focused={focused}
-			data-maximised={maximised}
-			/* Windows 11 scales a window up as it opens and back down as it
-			   closes or minimises. Only transform and opacity animate, so this
-			   never fights the left/top the drag handler writes. */
-			initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.94 }}
-			animate={{ opacity: 1, scale: 1 }}
-			exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 12 }}
-			transition={{ duration: shouldReduceMotion ? 0 : 0.18, ease: [0.33, 0, 0.67, 1] }}
-			style={{
-				left: x,
-				top: y,
-				width: maximised ? '100%' : w,
-				height: maximised ? `calc(100% - ${TASKBAR}px)` : h,
-				zIndex: z,
-			}}
-			onPointerDownCapture={() => focus(id)}>
-			<div
-				className='win-title'
-				onPointerDown={onTitlePointerDown}
-				onPointerMove={onTitlePointerMove}
-				onPointerUp={endDrag}
-				onPointerCancel={endDrag}
-				onDoubleClick={() => toggleMax(id, bounds())}>
-				<span className='win-title-icon' aria-hidden='true'>
-					{icon}
-				</span>
-				<span className='win-title-text' id={titleId}>
-					{title}
-				</span>
-
-				<div className='win-caption'>
-					<button
-						type='button'
-						aria-label={`Minimise ${title}`}
-						onClick={() => minimise(id)}>
-						<Minus size={14} aria-hidden='true' />
-					</button>
-					<span
-						className='win-max-wrap'
-						onMouseEnter={() => setSnapOpen(true)}
-						onMouseLeave={() => setSnapOpen(false)}>
-						<button
-							type='button'
-							aria-label={maximised ? `Restore ${title}` : `Maximise ${title}`}
-							aria-expanded={snapOpen}
-							onFocus={() => setSnapOpen(true)}
-							onClick={() => toggleMax(id, bounds())}>
-							{maximised ? (
-								<Copy size={12} aria-hidden='true' />
-							) : (
-								<Square size={11} aria-hidden='true' />
-							)}
-						</button>
-						{snapOpen && (
-							<SnapFlyout
-								onSnap={(zone) => snap(id, zone, bounds())}
-								onDismiss={() => setSnapOpen(false)}
-							/>
-						)}
-					</span>
-					<button
-						type='button'
-						className='win-close'
-						aria-label={`Close ${title}`}
-						onClick={() => close(id)}>
-						<X size={15} aria-hidden='true' />
-					</button>
-				</div>
-			</div>
-
-			<div className='win-body'>{children}</div>
-
-			{!maximised && (
-				<span
-					className='win-grip'
+		<>
+			{/* The translucent plate Windows paints where a drag would land. */}
+			{ghost && (
+				<motion.div
+					className='snap-ghost'
 					aria-hidden='true'
-					onPointerDown={onGripPointerDown}
-					onPointerMove={onGripPointerMove}
-					onPointerUp={endResize}
-					onPointerCancel={endResize}
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ duration: 0.12 }}
+					style={{ left: ghost.x, top: ghost.y, width: ghost.w, height: ghost.h, zIndex: z - 1 }}
 				/>
 			)}
-		</motion.div>
+
+			<motion.div
+				ref={frameRef}
+				className='win'
+				role='dialog'
+				aria-labelledby={titleId}
+				aria-modal='false'
+				tabIndex={-1}
+				data-focused={focused}
+				data-maximised={maximised}
+				data-snapped={snapped ?? undefined}
+				/* Windows scales a window up as it opens and drops it toward the
+				   taskbar as it closes or minimises. Only transform and opacity
+				   animate, so this never fights the left/top the drag writes. */
+				initial={reduce ? false : { opacity: 0, scale: 0.92, y: 10 }}
+				animate={{ opacity: 1, scale: 1, y: 0 }}
+				exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 26 }}
+				transition={{
+					duration: reduce ? 0 : 0.22,
+					ease: [0.16, 1, 0.3, 1],
+				}}
+				style={{
+					left: maximised ? 0 : x,
+					top: maximised ? 0 : y,
+					width: maximised ? '100%' : w,
+					height: maximised ? `calc(100% - ${TASKBAR_H}px)` : h,
+					zIndex: z,
+				}}
+				onPointerDownCapture={() => focus(id)}>
+				<WindowHeader
+					titleId={titleId}
+					title={app.title}
+					tile={app.tile}
+					onPointerDown={onTitleDown}
+					onPointerMove={onTitleMove}
+					onPointerUp={onTitleUp}
+					onDoubleClick={() => toggleMax(id, bounds())}
+					onContextMenu={openSystemMenu}
+					controls={
+						<WindowControls
+							title={app.title}
+							maximised={maximised}
+							onMinimise={() => minimise(id)}
+							onToggleMax={() => toggleMax(id, bounds())}
+							onSnap={(zone) => snap(id, zone, bounds())}
+							onClose={() => closeWindow(id)}
+						/>
+					}
+				/>
+
+				<div className='win-body'>
+					<Content />
+				</div>
+
+				{/* Eight grips. Windows lets you resize from any edge or corner. */}
+				{!maximised &&
+					EDGES.map((edge) => (
+						<span
+							key={edge}
+							className='win-grip'
+							data-edge={edge}
+							aria-hidden='true'
+							onPointerDown={onGripDown(edge)}
+							onPointerMove={onGripMove}
+							onPointerUp={onGripUp}
+							onPointerCancel={onGripUp}
+						/>
+					))}
+
+				{menu && (
+					<ContextMenu
+						x={menu.x}
+						y={menu.y}
+						items={systemMenu}
+						label={`${app.title} window menu`}
+						onClose={() => setMenu(null)}
+					/>
+				)}
+			</motion.div>
+		</>
 	);
 }
+
+/* Every window re-renders when any window's geometry changes unless the list
+   items are memoised — this shell can have eight open at once. */
+export default memo(WindowFrame);
