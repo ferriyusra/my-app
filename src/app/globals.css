@@ -159,6 +159,25 @@ section { padding: 96px 0; }
 /* Brand icons that are near-black lose contrast on dark surfaces */
 html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
 
+/* Keyboard users can jump past the fixed navbar */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  transform: translateY(-200%);
+  padding: 10px 18px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--sh-1-hi);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus-visible { transform: translateY(0); }
+
 /* Visually hidden, still announced by screen readers */
 .sr-only {
   position: absolute;
@@ -212,14 +231,7 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
    ═══════════════════════════════════════════════ */
 
 .card {
-  --tilt-x: 0deg;
-  --tilt-y: 0deg;
-  transition: transform 0.15s ease-out, box-shadow 0.2s ease;
-}
-
-.card.is-tilting {
-  transform: perspective(800px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
-  will-change: transform;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 .card:hover { box-shadow: var(--sh-3-hi); }
@@ -232,7 +244,6 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
 
 @media (prefers-reduced-motion: reduce) {
   .card { transition: none; }
-  .card.is-tilting { transform: none; will-change: auto; }
   .card-lift:hover { transform: none; box-shadow: var(--sh-3); }
   .present-dot { animation: none; }
   .cursor-blink { animation: none; }
@@ -308,45 +319,3 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
 
 @media (max-width: 1024px) { .bento-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px)  { .bento-grid { grid-template-columns: 1fr; } }
-
-/* ═══════════════════════════════════════════════
-   CUSTOM CURSOR
-   Only ever active on fine pointers with motion allowed —
-   see custom-cursor.tsx. Never hide the OS cursor otherwise.
-   ═══════════════════════════════════════════════ */
-
-@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  html.custom-cursor-active,
-  html.custom-cursor-active * {
-    cursor: none;
-  }
-}
-
-.cursor-ring.cursor-hover {
-  width: 56px;
-  height: 56px;
-  top: -28px;
-  left: -28px;
-  border-color: rgba(99, 102, 241, 0.4);
-  background: rgba(99, 102, 241, 0.06);
-}
-
-.cursor-ring.cursor-expanded {
-  width: 80px;
-  height: 80px;
-  top: -40px;
-  left: -40px;
-  border-color: rgba(99, 102, 241, 0.6);
-  background: rgba(99, 102, 241, 0.12);
-}
-
-.cursor-ring.cursor-click {
-  width: 32px;
-  height: 32px;
-  top: -16px;
-  left: -16px;
-  border-color: var(--accent);
-  background: rgba(99, 102, 241, 0.15);
-}
-
-.cursor-label.cursor-label-visible { opacity: 1; }

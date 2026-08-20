@@ -1,22 +1,22 @@
 'use client';
 
-import { useId, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useRef } from 'react';
+import { useReducedMotion } from 'framer-motion';
 import { Mail, Github, Linkedin, Send } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { profile } from '@/data/profile';
-import { BORDER, CARD, EASE, FONT, MONO, RADIUS, SANS } from '@/lib/theme';
+import { BORDER, FONT, MONO, RADIUS, SANS } from '@/lib/theme';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const navLinks = [
 	{ label: 'Home', href: '#hero' },
-	{ label: 'About', href: '#about' },
-	{ label: 'Skills', href: '#skills' },
 	{ label: 'Experience', href: '#experience' },
 	{ label: 'Projects', href: '#projects' },
+	{ label: 'Skills', href: '#skills' },
+	{ label: 'About', href: '#about' },
 	{ label: 'Contact', href: '#contact' },
 ];
 
@@ -67,11 +67,8 @@ const DARK_LINK: React.CSSProperties = {
 };
 
 export default function Footer() {
-	const [email, setEmail] = useState('');
-	const [subscribed, setSubscribed] = useState(false);
 	const shouldReduceMotion = useReducedMotion();
 	const footerBodyRef = useRef<HTMLDivElement>(null);
-	const newsletterId = useId();
 
 	useGSAP(
 		() => {
@@ -93,141 +90,14 @@ export default function Footer() {
 		{ scope: footerBodyRef, dependencies: [shouldReduceMotion] },
 	);
 
-	const handleSubscribe = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!email) return;
-		setSubscribed(true);
-		setEmail('');
-		setTimeout(() => setSubscribed(false), 3000);
-	};
 
 	return (
 		<footer style={{ background: 'var(--section-a)', position: 'relative' }}>
-			{/* ── Newsletter CTA strip ── */}
-			<div style={{ padding: '0 24px' }}>
-				<div style={{ maxWidth: 1200, margin: '0 auto' }}>
-					<motion.div
-						initial={{ opacity: 0, y: 24 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: '-40px' }}
-						transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: EASE }}
-						className='card'
-						style={{
-							...CARD,
-							padding: '28px 36px',
-							display: 'flex',
-							alignItems: 'center',
-							gap: 24,
-							flexWrap: 'wrap',
-						}}>
-						<div
-							aria-hidden='true'
-							style={{
-								width: 64,
-								height: 64,
-								borderRadius: '50%',
-								background: 'var(--accent)',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								flexShrink: 0,
-								border: `${BORDER.hard} solid var(--line)`,
-							}}>
-							<Mail size={26} color='var(--accent-ink)' />
-						</div>
-
-						<div style={{ flex: '1 1 180px' }}>
-							<label
-								htmlFor={newsletterId}
-								style={{
-									display: 'block',
-									fontFamily: SANS,
-									fontWeight: 800,
-									fontSize: FONT.lg,
-									color: 'var(--ink)',
-									letterSpacing: '-0.01em',
-								}}>
-								Subscribe to my newsletter
-							</label>
-							<div
-								style={{
-									fontFamily: SANS,
-									fontSize: FONT.sm,
-									color: 'var(--ink-secondary)',
-									marginTop: 3,
-								}}>
-								Get updates on new projects and articles.
-							</div>
-						</div>
-
-						<form
-							onSubmit={handleSubscribe}
-							style={{
-								display: 'flex',
-								gap: 10,
-								flex: '1 1 320px',
-								maxWidth: 440,
-							}}>
-							<input
-								id={newsletterId}
-								name='email'
-								type='email'
-								autoComplete='email'
-								className='field'
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								placeholder='Enter your email address'
-								style={{
-									flex: 1,
-									padding: '11px 16px',
-									border: `${BORDER.soft} solid var(--line-soft)`,
-									borderRadius: RADIUS.sm,
-									fontSize: FONT.sm,
-									fontFamily: SANS,
-									color: 'var(--ink)',
-									background: 'var(--surface)',
-								}}
-							/>
-							<button
-								type='submit'
-								style={{
-									padding: '11px 22px',
-									background: subscribed ? 'var(--success)' : 'var(--ink)',
-									color: 'var(--surface)',
-									border: `${BORDER.hard} solid var(--line)`,
-									borderRadius: RADIUS.sm,
-									fontSize: FONT.sm,
-									fontWeight: 700,
-									cursor: 'pointer',
-									fontFamily: SANS,
-									whiteSpace: 'nowrap',
-									transition: 'background 0.2s ease',
-									display: 'flex',
-									alignItems: 'center',
-									gap: 6,
-								}}>
-								{subscribed ? (
-									'Subscribed!'
-								) : (
-									<>
-										<Send size={14} aria-hidden='true' /> Subscribe
-									</>
-								)}
-							</button>
-						</form>
-						<p role='status' aria-live='polite' className='sr-only'>
-							{subscribed ? 'Subscribed to the newsletter.' : ''}
-						</p>
-					</motion.div>
-				</div>
-			</div>
-
 			{/* ── Dark footer body ── */}
 			<div
 				ref={footerBodyRef}
 				style={{
 					background: 'var(--footer-bg)',
-					marginTop: 48,
 					paddingTop: 64,
 					paddingBottom: 40,
 				}}>
@@ -474,7 +344,7 @@ export default function Footer() {
 								fontFamily: MONO,
 								margin: 0,
 							}}>
-							{'</>'} built with Claude Code and Skill.sh :D
+							Built with Next.js, and a lot of Claude Code.
 						</p>
 					</div>
 				</div>

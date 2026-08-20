@@ -1,11 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { motion, useReducedMotion } from 'framer-motion';
+import { EASE } from '@/lib/theme';
 
 interface TextPart {
 	text: string;
@@ -20,6 +16,13 @@ interface TextRevealProps {
 	id?: string;
 }
 
+/**
+ * Section heading with a restrained entrance.
+ *
+ * This used to split every heading into per-character spans and tween each one
+ * on a 3D `rotateX` — expensive, and it fought the content for attention. The
+ * whole heading now moves as one, which is the point of a heading.
+ */
 export default function TextReveal({
 	parts,
 	as: Tag = 'h2',
@@ -27,74 +30,23 @@ export default function TextReveal({
 	className,
 	id,
 }: TextRevealProps) {
-	const ref = useRef<HTMLElement>(null);
-
-	useGSAP(
-		() => {
-			const el = ref.current;
-			if (!el) return;
-
-			const chars = el.querySelectorAll('.tr-char');
-
-			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-				gsap.set(chars, { opacity: 1, y: 0, rotateX: 0 });
-				return;
-			}
-
-			gsap.set(chars, { opacity: 0, y: 50, rotateX: -80 });
-
-			gsap.to(chars, {
-				opacity: 1,
-				y: 0,
-				rotateX: 0,
-				duration: 0.7,
-				stagger: 0.025,
-				ease: 'back.out(2)',
-				scrollTrigger: {
-					trigger: el,
-					start: 'top 85%',
-					toggleActions: 'play none none none',
-				},
-			});
-		},
-		{ scope: ref },
-	);
+	const shouldReduceMotion = useReducedMotion();
+	const MotionTag = motion[Tag];
 
 	return (
-		<Tag
-			ref={ref as React.Ref<HTMLHeadingElement> & React.Ref<HTMLParagraphElement>}
-			className={className}
+		<MotionTag
 			id={id}
-			style={{ ...style, perspective: 600, overflow: 'hidden' }}>
-			{parts.map((part, pi) => {
-				const words = part.text.split(' ');
-				return words.map((word, wi) => (
-					<span
-						key={`${pi}-${wi}`}
-						style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
-						{word.split('').map((char, ci) => (
-							<span
-								key={ci}
-								className='tr-char'
-								style={{
-									display: 'inline-block',
-									color: part.color,
-									willChange: 'transform, opacity',
-									transformStyle: 'preserve-3d',
-								}}>
-								{char}
-							</span>
-						))}
-						{(wi < words.length - 1 || pi < parts.length - 1) && (
-							<span
-								className='tr-char'
-								style={{ display: 'inline-block', willChange: 'transform, opacity' }}>
-								&nbsp;
-							</span>
-						)}
-					</span>
-				));
-			})}
-		</Tag>
+			className={className}
+			initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 14 }}
+			whileInView={{ opacity: 1, y: 0 }}
+			viewport={{ once: true, margin: '-80px' }}
+			transition={{ duration: shouldReduceMotion ? 0 : 0.5, ease: EASE }}
+			style={style}>
+			{parts.map((part, i) => (
+				<span key={i} style={{ color: part.color }}>
+					{part.text}
+				</span>
+			))}
+		</MotionTag>
 	);
 }

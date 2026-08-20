@@ -26,17 +26,19 @@ const jsonLd = {
 
 export default function Home() {
 	return (
-		<main className='dot-grid min-h-screen'>
+		<main id='main' className='dot-grid min-h-screen'>
 			<script
 				type='application/ld+json'
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
 			/>
 			<Navbar />
 			<Hero />
-			<About />
-			<Skills />
+			{/* Evidence first: the Experience entries are the strongest content on
+			    the page, so they come before the self-description. */}
 			<Experience />
 			<Projects />
+			<Skills />
+			<About />
 			<Contact />
 			<Footer />
 		</main>

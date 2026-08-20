@@ -13,6 +13,14 @@ export const profile = {
 	role: 'Backend Engineer',
 	roleDetail: 'Go, Node.js & PostgreSQL',
 
+	/** The hero statement. Specific enough that nobody else could write it. */
+	headline:
+		'I build APIs and event-driven systems that replace manual work.',
+
+	/** Concrete proof, not adjectives. */
+	proof:
+		"Four years in Go and Node.js. Previously backend for SATUSEHAT, Indonesia's national health data platform; currently building finance infrastructure at Meditap.",
+
 	tagline:
 		'4+ years building production APIs and event-driven systems across fintech, GovTech health, and automotive. Currently going deeper on system design and DSA.',
 

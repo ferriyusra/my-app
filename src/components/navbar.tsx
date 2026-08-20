@@ -11,10 +11,10 @@ import { BORDER, FONT, RADIUS, SANS } from '@/lib/theme';
 
 const navLinks = [
 	{ href: '#hero', label: 'Home', id: 'hero', page: false },
-	{ href: '#about', label: 'About', id: 'about', page: false },
-	{ href: '#skills', label: 'Skills', id: 'skills', page: false },
 	{ href: '#experience', label: 'Experience', id: 'experience', page: false },
 	{ href: '#projects', label: 'Projects', id: 'projects', page: false },
+	{ href: '#skills', label: 'Skills', id: 'skills', page: false },
+	{ href: '#about', label: 'About', id: 'about', page: false },
 	{ href: '#contact', label: 'Contact', id: 'contact', page: false },
 	{ href: '/articles', label: 'Articles', id: 'articles', page: true },
 ];

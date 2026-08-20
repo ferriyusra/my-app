@@ -3,8 +3,6 @@ import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import ScrollProgress from '@/components/scroll-progress';
-import TiltEffect from '@/components/tilt-effect';
-import CustomCursor from '@/components/custom-cursor';
 
 /* Self-hosted by Next — no render-blocking request to Google, no layout shift. */
 const inter = Inter({
@@ -64,9 +62,10 @@ export default function RootLayout({
 			</head>
 			<body className='antialiased'>
 				<ThemeProvider>
+					<a href='#main' className='skip-link'>
+						Skip to content
+					</a>
 					<ScrollProgress />
-					<TiltEffect />
-					<CustomCursor />
 					{children}
 				</ThemeProvider>
 			</body>
