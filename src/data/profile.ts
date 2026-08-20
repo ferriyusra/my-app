@@ -31,8 +31,8 @@ export const profile = {
 	workType: 'Freelance & Full-time roles',
 
 	/** Stated once, rendered everywhere. */
-	availability: 'Available from April 2026',
-	availabilityShort: 'Open from April 2026',
+	availability: 'Available',
+	availabilityShort: 'Open for opportunities',
 
 	email: 'feriyusra1616@gmail.com',
 	github: 'https://github.com/ferriyusra',

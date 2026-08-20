@@ -112,8 +112,8 @@ export default function NotFound() {
 								alignItems: 'center',
 								justifyContent: 'center',
 								padding: '16px 40px',
-								background: 'var(--nav-brand)',
-								color: 'var(--nav-pill-ink)',
+								background: 'var(--solid)',
+								color: 'var(--solid-ink)',
 								borderRadius: RADIUS.full,
 								textDecoration: 'none',
 								fontSize: FONT.base,
@@ -126,7 +126,7 @@ export default function NotFound() {
 								e.currentTarget.style.background = 'var(--accent)';
 							}}
 							onMouseLeave={(e) => {
-								e.currentTarget.style.background = 'var(--nav-brand)';
+								e.currentTarget.style.background = 'var(--solid)';
 							}}>
 							Go to homepage
 						</Link>

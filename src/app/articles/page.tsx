@@ -189,9 +189,9 @@ export default function ArticlesPage() {
 							justifyContent: 'center',
 							gap: 8,
 							padding: '14px 32px',
-							background: toast ? 'var(--success)' : 'var(--nav-brand)',
-							color: 'var(--nav-pill-ink)',
-							border: `${BORDER.hard} solid ${toast ? 'var(--success)' : 'var(--nav-brand)'}`,
+							background: toast ? 'var(--success)' : 'var(--solid)',
+							color: 'var(--solid-ink)',
+							border: `${BORDER.hard} solid ${toast ? 'var(--success)' : 'var(--solid)'}`,
 							borderRadius: RADIUS.full,
 							fontSize: FONT.sm,
 							fontWeight: 700,
@@ -210,8 +210,8 @@ export default function ArticlesPage() {
 						}}
 						onMouseLeave={(e) => {
 							if (toast) return;
-							e.currentTarget.style.background = 'var(--nav-brand)';
-							e.currentTarget.style.borderColor = 'var(--nav-brand)';
+							e.currentTarget.style.background = 'var(--solid)';
+							e.currentTarget.style.borderColor = 'var(--solid)';
 							e.currentTarget.style.transform = 'translate(0, 0)';
 							e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
 						}}>

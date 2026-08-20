@@ -56,10 +56,12 @@
   --on-dark-muted: #a49a8d;
   --on-dark-line: #3a332c;
 
-  /* ── Navbar solids ── */
-  --nav-brand: #1c1815;
-  --nav-pill: #1c1815;
-  --nav-pill-ink: #faf7f2;
+  /* ── Solid neutral button (404, Articles CTA) ──
+     Inverts with the theme so a primary button is always the opposite of the
+     paper it sits on. Used to be three --nav-* tokens; the navbar no longer
+     needs a solid fill at all. */
+  --solid: #1c1815;
+  --solid-ink: #faf7f2;
 
   /* ── Elevation ──
      Soft and low. The 6px hard offset shadow was the single loudest
@@ -111,9 +113,8 @@ html[data-theme="dark"] {
   --on-dark-muted: #978d80;
   --on-dark-line: #342e27;
 
-  --nav-brand: #d9714f;
-  --nav-pill: #ece6dd;
-  --nav-pill-ink: #14120f;
+  --solid: #ece6dd;
+  --solid-ink: #14120f;
 
   /* Shadows barely register on dark paper — borders do the work instead. */
   --sh-1: 0 1px 2px rgba(0, 0, 0, 0.4);
@@ -141,7 +142,7 @@ html[data-theme="dark"] {
 * { box-sizing: border-box; }
 
 html {
-  scroll-padding-top: 88px;
+  scroll-padding-top: 80px;
   scroll-behavior: smooth;
 }
 
@@ -187,6 +188,65 @@ section { padding: 96px 0; }
 
 /* Brand icons that are near-black lose contrast on dark surfaces */
 html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
+
+/* ═══════════════════════════════════════════════
+   NAVBAR — editorial top bar
+
+   Was a centred floating pill with a sliding near-black blob behind the
+   active link, plus a filled logo circle and a Mail button duplicating the
+   Contact link: three heavy dark shapes and three layers of chrome. The
+   active state is now colour plus a rule, which is what the rest of the
+   page does.
+   ═══════════════════════════════════════════════ */
+
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: 64px;
+  padding: 0 24px;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.nav-bar[data-scrolled='true'] {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom-color: var(--line);
+}
+
+.nav-link {
+  position: relative;
+  padding: 6px 0;
+  text-decoration: none;
+  color: var(--ink-secondary);
+  transition: color 0.18s ease;
+}
+.nav-link:hover { color: var(--ink); }
+.nav-link[data-active='true'] { color: var(--accent); }
+
+/* Underline spans the text, not a padding box */
+.nav-link[data-active='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-bar, .nav-link { transition: none; }
+}
 
 /* Keyboard users can jump past the fixed navbar */
 .skip-link {

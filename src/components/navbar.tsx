@@ -1,16 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Menu, X, Mail, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useTheme } from './theme-provider';
-import gsap from 'gsap';
 import { profile } from '@/data/profile';
-import { BORDER, FONT, RADIUS, SANS } from '@/lib/theme';
+import { DISPLAY, FONT, RADIUS, SANS } from '@/lib/theme';
 
 const navLinks = [
-	{ href: '#hero', label: 'Home', id: 'hero', page: false },
 	{ href: '#experience', label: 'Experience', id: 'experience', page: false },
 	{ href: '#projects', label: 'Projects', id: 'projects', page: false },
 	{ href: '#skills', label: 'Skills', id: 'skills', page: false },
@@ -28,11 +26,8 @@ export default function Navbar() {
 
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [activeSection, setActiveSection] = useState('hero');
-	const [hovered, setHovered] = useState<string | null>(null);
 	const [isMobile, setIsMobile] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
-	const pillRef = useRef<HTMLDivElement>(null);
-	const linksRef = useRef<HTMLDivElement>(null);
 
 	const isHomePage = pathname === '/';
 
@@ -49,8 +44,8 @@ export default function Navbar() {
 
 	useEffect(() => {
 		if (!isHomePage) return;
-		const OFFSET = 88;
-		const ids = navLinks.filter((l) => !l.page).map((l) => l.id);
+		const OFFSET = 80;
+		const ids = ['hero', ...navLinks.filter((l) => !l.page).map((l) => l.id)];
 		const update = () => {
 			let current = ids[0];
 			for (const id of ids) {
@@ -65,283 +60,120 @@ export default function Navbar() {
 		return () => window.removeEventListener('scroll', update);
 	}, [isHomePage]);
 
-	// GSAP: slide the pill to the active nav link
 	useEffect(() => {
-		if (!isHomePage || isMobile) return;
-		const pill = pillRef.current;
-		const container = linksRef.current;
-		if (!pill || !container) return;
-
-		const activeLink = container.querySelector(
-			`[data-nav="${activeSection}"]`,
-		) as HTMLElement;
-		if (!activeLink) return;
-
-		const containerRect = container.getBoundingClientRect();
-		const linkRect = activeLink.getBoundingClientRect();
-
-		gsap.to(pill, {
-			x: linkRect.left - containerRect.left,
-			width: linkRect.width,
-			opacity: 1,
-			duration: 0.4,
-			ease: 'power3.out',
-		});
-	}, [activeSection, isHomePage, isMobile]);
-
-	useEffect(() => {
-		const onScroll = () => setScrolled(window.scrollY > 20);
+		const onScroll = () => setScrolled(window.scrollY > 12);
 		onScroll();
 		window.addEventListener('scroll', onScroll, { passive: true });
 		return () => window.removeEventListener('scroll', onScroll);
 	}, []);
 
-	/* Colours come from CSS variables, so the navbar re-themes without
-	   re-rendering. `theme` is only read for the toggle icon. */
-	const navBg = scrolled
-		? 'color-mix(in srgb, var(--surface) 80%, transparent)'
-		: 'var(--surface)';
+	const isActive = (link: (typeof navLinks)[number]) =>
+		link.page
+			? pathname === link.href
+			: isHomePage && activeSection === link.id;
 
-	const toggleButtonStyle: React.CSSProperties = {
+	const iconButton: React.CSSProperties = {
 		width: 36,
 		height: 36,
-		borderRadius: '50%',
+		borderRadius: RADIUS.sm,
 		background: 'transparent',
-		border: `${BORDER.soft} solid var(--line-subtle)`,
+		border: 'none',
 		display: 'flex',
 		alignItems: 'center',
 		justifyContent: 'center',
 		cursor: 'pointer',
-		color: 'var(--ink-secondary)',
-		transition: 'border-color 0.2s ease, color 0.2s ease',
+		color: 'var(--ink-muted)',
+		transition: 'color 0.18s ease',
 		flexShrink: 0,
 	};
 
 	return (
 		<>
-			<nav
-				aria-label='Main'
-				style={{
-					position: 'fixed',
-					top: 16,
-					left: '50%',
-					transform: 'translateX(-50%)',
-					zIndex: 50,
-					display: 'flex',
-					alignItems: 'center',
-					gap: 4,
-					padding: '6px 6px 6px 8px',
-					background: navBg,
-					border: `${BORDER.hard} solid var(--line)`,
-					borderRadius: RADIUS.full,
-					boxShadow: 'var(--sh-2)',
-					backdropFilter: scrolled ? 'blur(12px)' : 'none',
-					WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-					transition: 'background 0.3s ease, box-shadow 0.3s ease',
-					width: isMobile ? 'calc(100vw - 32px)' : 'max-content',
-					maxWidth: isMobile ? 480 : 'none',
-					boxSizing: 'border-box',
-				}}>
-				{/* Logo */}
+			<nav aria-label='Main' className='nav-bar' data-scrolled={scrolled}>
+				{/* Wordmark — set in the display serif, no filled circle */}
 				<a
-					href='#hero'
-					style={{ textDecoration: 'none', flexShrink: 0 }}
-					aria-label={`${profile.name} — home`}>
-					<div
-						style={{
-							width: 40,
-							height: 40,
-							borderRadius: '50%',
-							background: 'var(--nav-brand)',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							transition: 'background 0.3s ease',
-						}}>
-						<span
-							style={{
-								color: 'var(--nav-pill-ink)',
-								fontSize: FONT.sm,
-								fontWeight: 800,
-								fontFamily: SANS,
-							}}>
-							{profile.initials}
-						</span>
-					</div>
+					href={isHomePage ? '#hero' : '/'}
+					style={{
+						textDecoration: 'none',
+						color: 'var(--ink)',
+						fontFamily: DISPLAY,
+						fontSize: 22,
+						letterSpacing: '-0.01em',
+						whiteSpace: 'nowrap',
+						flexShrink: 0,
+					}}>
+					{profile.name}
 				</a>
 
-				{/* Desktop nav */}
-				{!isMobile && (
-					<>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+					{!isMobile && (
 						<div
-							ref={linksRef}
 							style={{
 								display: 'flex',
 								alignItems: 'center',
-								gap: 0,
-								position: 'relative',
+								gap: 26,
+								marginRight: 12,
+								fontSize: FONT.sm,
+								fontFamily: SANS,
 							}}>
-							<div
-								ref={pillRef}
-								aria-hidden='true'
-								style={{
-									position: 'absolute',
-									top: 0,
-									left: 0,
-									height: '100%',
-									borderRadius: RADIUS.full,
-									background: 'var(--nav-pill)',
-									opacity: 0,
-									pointerEvents: 'none',
-									zIndex: 0,
-								}}
-							/>
 							{navLinks.map((link) => {
-								const resolvedHref =
+								const active = isActive(link);
+								const href =
 									!link.page && !isHomePage ? `/${link.href}` : link.href;
-								const active = link.page
-									? pathname === link.href
-									: isHomePage && activeSection === link.id;
-								const hover = hovered === link.id;
-								const linkStyle: React.CSSProperties = {
-									display: 'inline-flex',
-									alignItems: 'center',
-									padding: '8px 14px',
-									borderRadius: RADIUS.full,
-									textDecoration: 'none',
-									fontSize: FONT.sm,
-									fontWeight: active ? 700 : 500,
-									fontFamily: SANS,
-									position: 'relative',
-									zIndex: 1,
-									color: active
-										? 'var(--nav-pill-ink)'
-										: hover
-											? 'var(--ink)'
-											: 'var(--ink-secondary)',
-									background:
-										hover && !active ? 'var(--surface-chip)' : 'transparent',
-									transition: 'color 0.18s ease, background 0.18s ease',
-									whiteSpace: 'nowrap',
-								};
-								const shared = {
-									'data-nav': link.id,
-									onMouseEnter: () => setHovered(link.id),
-									onMouseLeave: () => setHovered(null),
-									style: linkStyle,
-									'aria-current': active
-										? ('page' as const)
-										: undefined,
+								const props = {
+									className: 'nav-link',
+									'data-active': active,
+									'aria-current': active ? ('page' as const) : undefined,
+									style: { fontWeight: active ? 600 : 500 },
 								};
 								return link.page ? (
-									<Link key={link.id} href={resolvedHref} {...shared}>
+									<Link key={link.id} href={href} {...props}>
 										{link.label}
 									</Link>
 								) : (
-									<a key={link.id} href={resolvedHref} {...shared}>
+									<a key={link.id} href={href} {...props}>
 										{link.label}
 									</a>
 								);
 							})}
 						</div>
+					)}
 
-						{/* Theme toggle — icon only renders once the stored theme is known,
-						    so server and first client render always agree. */}
-						<button
-							type='button'
-							onClick={toggle}
-							aria-label={
-								isDark ? 'Switch to light mode' : 'Switch to dark mode'
-							}
-							style={toggleButtonStyle}
-							onMouseEnter={(e) => {
-								e.currentTarget.style.borderColor = 'var(--accent)';
-								e.currentTarget.style.color = 'var(--accent)';
-							}}
-							onMouseLeave={(e) => {
-								e.currentTarget.style.borderColor = 'var(--line-subtle)';
-								e.currentTarget.style.color = 'var(--ink-secondary)';
-							}}>
-							{mounted ? (
-								isDark ? (
-									<Sun size={15} aria-hidden='true' />
-								) : (
-									<Moon size={15} aria-hidden='true' />
-								)
-							) : null}
-						</button>
+					<button
+						type='button'
+						onClick={toggle}
+						aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+						style={iconButton}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.color = 'var(--accent)';
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.color = 'var(--ink-muted)';
+						}}>
+						{mounted ? (
+							isDark ? (
+								<Sun size={17} aria-hidden='true' />
+							) : (
+								<Moon size={17} aria-hidden='true' />
+							)
+						) : null}
+					</button>
 
-						{/* Mail CTA */}
-						<a
-							href={isHomePage ? '#contact' : '/#contact'}
-							aria-label='Contact'
-							style={{
-								width: 40,
-								height: 40,
-								borderRadius: RADIUS.md,
-								background: 'var(--nav-brand)',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								textDecoration: 'none',
-								flexShrink: 0,
-								transition: 'background 0.18s ease',
-							}}
-							onMouseEnter={(e) => {
-								e.currentTarget.style.background = 'var(--accent)';
-							}}
-							onMouseLeave={(e) => {
-								e.currentTarget.style.background = 'var(--nav-brand)';
-							}}>
-							<Mail size={16} color='var(--nav-pill-ink)' aria-hidden='true' />
-						</a>
-					</>
-				)}
-
-				{/* Mobile: spacer + toggle + hamburger */}
-				{isMobile && (
-					<>
-						<div style={{ flex: 1 }} />
-						<button
-							type='button'
-							onClick={toggle}
-							aria-label={
-								isDark ? 'Switch to light mode' : 'Switch to dark mode'
-							}
-							style={{ ...toggleButtonStyle, marginRight: 4 }}>
-							{mounted ? (
-								isDark ? (
-									<Sun size={14} aria-hidden='true' />
-								) : (
-									<Moon size={14} aria-hidden='true' />
-								)
-							) : null}
-						</button>
+					{isMobile && (
 						<button
 							type='button'
 							onClick={() => setMenuOpen(!menuOpen)}
 							aria-label={menuOpen ? 'Close menu' : 'Open menu'}
 							aria-expanded={menuOpen}
-							style={{
-								width: 40,
-								height: 40,
-								borderRadius: RADIUS.md,
-								background: 'var(--nav-pill)',
-								border: 'none',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								cursor: 'pointer',
-								flexShrink: 0,
-							}}>
+							style={{ ...iconButton, color: 'var(--ink)' }}>
 							{menuOpen ? (
-								<X size={16} color='var(--nav-pill-ink)' aria-hidden='true' />
+								<X size={19} aria-hidden='true' />
 							) : (
-								<Menu size={16} color='var(--nav-pill-ink)' aria-hidden='true' />
+								<Menu size={19} aria-hidden='true' />
 							)}
 						</button>
-					</>
-				)}
+					)}
+				</div>
 			</nav>
 
 			{/* Mobile dropdown */}
@@ -349,82 +181,48 @@ export default function Navbar() {
 				<div
 					style={{
 						position: 'fixed',
-						top: 80,
-						left: '50%',
-						transform: 'translateX(-50%)',
+						top: 64,
+						left: 0,
+						right: 0,
 						zIndex: 49,
-						width: 'calc(100vw - 32px)',
-						maxWidth: 480,
-						background: 'var(--surface)',
-						border: `${BORDER.hard} solid var(--line)`,
-						borderRadius: RADIUS.lg,
-						boxShadow: 'var(--sh-2)',
-						padding: 12,
+						background: 'var(--bg)',
+						borderBottom: `1px solid var(--line)`,
+						padding: '8px 24px 20px',
 						display: 'flex',
 						flexDirection: 'column',
-						gap: 4,
-						boxSizing: 'border-box',
 					}}>
 					{navLinks.map((link) => {
-						const resolvedHref =
-							!link.page && !isHomePage ? `/${link.href}` : link.href;
-						const active = link.page
-							? pathname === link.href
-							: isHomePage && activeSection === link.id;
-						const mobileStyle: React.CSSProperties = {
-							display: 'flex',
-							alignItems: 'center',
-							padding: '11px 16px',
-							borderRadius: RADIUS.md,
-							color: active ? 'var(--nav-pill-ink)' : 'var(--ink-secondary)',
-							background: active ? 'var(--nav-pill)' : 'transparent',
+						const active = isActive(link);
+						const href = !link.page && !isHomePage ? `/${link.href}` : link.href;
+						const style: React.CSSProperties = {
+							padding: '14px 0',
+							borderBottom: `1px solid var(--line-subtle)`,
+							color: active ? 'var(--accent)' : 'var(--ink-secondary)',
 							textDecoration: 'none',
 							fontSize: FONT.base,
-							fontWeight: active ? 700 : 500,
+							fontWeight: active ? 600 : 500,
 							fontFamily: SANS,
-							transition: 'background 0.18s ease, color 0.18s ease',
 						};
 						return link.page ? (
 							<Link
 								key={link.id}
-								href={resolvedHref}
+								href={href}
 								onClick={() => setMenuOpen(false)}
 								aria-current={active ? 'page' : undefined}
-								style={mobileStyle}>
+								style={style}>
 								{link.label}
 							</Link>
 						) : (
 							<a
 								key={link.id}
-								href={resolvedHref}
+								href={href}
 								onClick={() => setMenuOpen(false)}
 								aria-current={active ? 'page' : undefined}
-								style={mobileStyle}>
+								style={style}>
 								{link.label}
 							</a>
 						);
 					})}
-
-					<a
-						href={isHomePage ? '#contact' : '/#contact'}
-						onClick={() => setMenuOpen(false)}
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							gap: 8,
-							padding: '11px 16px',
-							marginTop: 4,
-							borderRadius: RADIUS.md,
-							background: 'var(--accent)',
-							color: 'var(--accent-ink)',
-							textDecoration: 'none',
-							fontSize: FONT.sm,
-							fontWeight: 700,
-							fontFamily: SANS,
-						}}>
-						<Mail size={14} aria-hidden='true' /> Hire Me
-					</a>
 				</div>
 			)}
 		</>
