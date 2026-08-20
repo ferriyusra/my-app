@@ -26,10 +26,10 @@ const categories: Category[] = [
    Copilot) were unreadable, and per-brand colour made the row look arbitrary. */
 const CATEGORY_COLOR: Record<Exclude<Category, 'All'>, string> = {
 	Backend: 'var(--success)',
-	Database: '#8b5cf6',
+	Database: 'var(--info)',
 	Infrastructure: 'var(--warn)',
-	Frontend: 'var(--info)',
-	'AI Tools': '#ec4899',
+	Frontend: 'var(--accent)',
+	'AI Tools': 'var(--ink-muted)',
 };
 
 /* `adaptive` marks near-black logos that need inverting on dark surfaces. */

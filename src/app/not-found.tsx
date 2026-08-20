@@ -59,13 +59,13 @@ export default function NotFound() {
 								xmlns='http://www.w3.org/2000/svg'>
 								<path
 									d='M90 14L170 150H10L90 14Z'
-									fill='#FBBF24'
-									stroke='var(--line)'
+									fill='var(--warn)'
+									stroke='var(--line-strong)'
 									strokeWidth='5'
 									strokeLinejoin='round'
 								/>
-								<rect x='84' y='62' width='12' height='48' rx='6' fill='#0a0a0a' />
-								<rect x='84' y='120' width='12' height='12' rx='6' fill='#0a0a0a' />
+								<rect x='84' y='62' width='12' height='48' rx='6' fill='#1c1815' />
+								<rect x='84' y='120' width='12' height='12' rx='6' fill='#1c1815' />
 							</svg>
 						</div>
 					</div>

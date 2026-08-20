@@ -2,16 +2,15 @@
 
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { MapPin, Trophy, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import TextReveal from '@/components/text-reveal';
 import {
-	BORDER,
-	CARD,
 	CONTAINER,
 	EASE,
+	EYEBROW,
 	FONT,
 	H2,
 	MONO,
@@ -23,17 +22,18 @@ gsap.registerPlugin(ScrollTrigger);
 
 const COLLAPSED_COUNT = 2;
 
+/* The five entries used to carry a per-company colour (indigo, emerald, blue,
+   amber, pink — Tailwind's defaults). Five unrelated hues in one column read
+   as decoration. Hierarchy here comes from type and rules instead. */
 const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'PT. Teknologi Pamadya Analitika (Meditap)',
-		period: 'July 2025 — Present',
+		period: 'Jul 2025 — Present',
+		years: '2025 —',
 		startISO: '2025-07',
-		badge: 'Present' as const,
+		current: true,
 		location: 'Jakarta, Indonesia',
-		color: '#6366f1',
-		glow: '#818cf8',
-		initial: 'MT',
 		description:
 			'Designed and developed backend systems for finance-related platforms using Go (Gin Framework) and PostgreSQL, delivering core services (ASO Database, ASO Notification Below Threshold) that replaced manual spreadsheet-based tracking and became the single source of truth for finance operations.',
 		achievements: [
@@ -59,13 +59,11 @@ const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'INA Digital (Peruri Digital Security)',
-		period: 'January 2024 — March 2025',
+		period: 'Jan 2024 — Mar 2025',
+		years: '2024 — 2025',
 		startISO: '2024-01',
-		badge: 'Previous Role' as const,
+		current: false,
 		location: 'Jakarta, Indonesia',
-		color: '#10b981',
-		glow: '#34d399',
-		initial: 'ID',
 		description:
 			"Primary backend engineer on multiple health data products under SATUSEHAT — Indonesia's national health data interoperability platform — collaborating with Product Managers, Technical Program Managers, and cross-functional stakeholders to deliver backend systems supporting national-scale health data initiatives.",
 		achievements: [
@@ -91,13 +89,11 @@ const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'Health Technology Transformation & Digitalization Team',
-		period: 'July 2023 — December 2023',
+		period: 'Jul 2023 — Dec 2023',
+		years: '2023',
 		startISO: '2023-07',
-		badge: 'Previous Role' as const,
+		current: false,
 		location: 'Jakarta, Indonesia',
-		color: '#3b82f6',
-		glow: '#60a5fa',
-		initial: 'HT',
 		description:
 			'Primary backend engineer on multiple data-driven products under the Health Technology Transformation initiative, collaborating with Product Managers, Data Analysts, and frontend engineers to deliver internal web-based dashboard solutions for operational teams.',
 		achievements: [
@@ -122,13 +118,11 @@ const experiences = [
 	{
 		role: 'Software Engineer Backend',
 		company: 'PT Moladin Digital Indonesia',
-		period: 'March 2022 — February 2023',
+		period: 'Mar 2022 — Feb 2023',
+		years: '2022 — 2023',
 		startISO: '2022-03',
-		badge: 'Previous Role' as const,
+		current: false,
 		location: 'Jakarta, Indonesia',
-		color: '#f59e0b',
-		glow: '#fbbf24',
-		initial: 'MD',
 		description:
 			'Implemented backend systems alongside Engineering Managers and Senior Software Engineers, translating technical designs and product requirements into reliable and scalable engineering solutions across multiple product lines.',
 		achievements: [
@@ -153,13 +147,11 @@ const experiences = [
 	{
 		role: 'Backend Engineer',
 		company: 'PT Jojonomic Indonesia',
-		period: 'October 2021 — January 2022',
+		period: 'Oct 2021 — Jan 2022',
+		years: '2021 — 2022',
 		startISO: '2021-10',
-		badge: 'Previous Role' as const,
+		current: false,
 		location: 'Jakarta, Indonesia',
-		color: '#ec4899',
-		glow: '#f472b6',
-		initial: 'JN',
 		description:
 			'Implemented backend systems alongside System Analysts based on technical designs and business processes defined by the Product Team, contributing to backend development for banking-related web applications.',
 		achievements: [
@@ -172,45 +164,9 @@ const experiences = [
 
 type Exp = (typeof experiences)[number];
 
-function Badge({ label }: { label: 'Present' | 'Previous Role' }) {
-	const isPresent = label === 'Present';
-	return (
-		<span
-			style={{
-				display: 'inline-flex',
-				alignItems: 'center',
-				gap: 6,
-				padding: '5px 14px',
-				borderRadius: RADIUS.full,
-				fontSize: FONT.micro,
-				fontWeight: 700,
-				fontFamily: SANS,
-				background: isPresent ? 'var(--accent)' : 'var(--surface-chip)',
-				color: isPresent ? 'var(--accent-ink)' : 'var(--ink-secondary)',
-				whiteSpace: 'nowrap' as const,
-				boxShadow: isPresent ? '0 2px 12px rgba(99,102,241,0.25)' : 'none',
-				border: isPresent
-					? 'none'
-					: `1px solid var(--line-soft)`,
-			}}>
-			<span
-				className={isPresent ? 'present-dot' : ''}
-				style={{
-					width: 6,
-					height: 6,
-					borderRadius: '50%',
-					background: isPresent ? 'var(--accent-ink)' : 'var(--ink-muted)',
-					display: 'inline-block',
-				}}
-			/>
-			{label}
-		</span>
-	);
-}
-
-function Card({ exp }: { exp: Exp }) {
-	const cardRef = useRef<HTMLDivElement>(null);
-	const isInView = useInView(cardRef, { once: true, margin: '-60px' });
+function Entry({ exp, index }: { exp: Exp; index: number }) {
+	const ref = useRef<HTMLLIElement>(null);
+	const isInView = useInView(ref, { once: true, margin: '-60px' });
 	const shouldReduceMotion = useReducedMotion();
 	const [expanded, setExpanded] = useState(false);
 
@@ -221,239 +177,175 @@ function Card({ exp }: { exp: Exp }) {
 	const hiddenCount = exp.achievements.length - COLLAPSED_COUNT;
 
 	return (
-		<article
-			ref={cardRef}
-			className='card card-lift'
-			aria-label={`${exp.role} at ${exp.company}`}
-			style={CARD}>
-			{/* ── Illustration header ── */}
-			<header
-				style={{
-					background: 'var(--surface-header)',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-					gap: 12,
-					padding: '20px 24px',
-					minHeight: 120,
-					borderBottom: `${BORDER.hard} solid var(--line)`,
-				}}>
-				<div
-					style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
-					<div
-						aria-hidden='true'
-						style={{
-							width: 56,
-							height: 56,
-							borderRadius: RADIUS.md,
-							background: 'var(--surface)',
-							border: `${BORDER.hard} solid var(--line)`,
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							boxShadow: 'var(--sh-1-hi)',
-							flexShrink: 0,
-						}}>
-						<span
-							style={{
-								fontSize: FONT.lg,
-								fontWeight: 800,
-								fontFamily: SANS,
-								color: exp.color,
-								letterSpacing: '-0.02em',
-							}}>
-							{exp.initial}
-						</span>
-					</div>
-					<Badge label={exp.badge} />
-				</div>
-
-				{/* Period chip — top-right for fast scanning */}
+		<motion.li
+			ref={ref}
+			className='exp-row'
+			initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 16 }}
+			animate={isInView ? { opacity: 1, y: 0 } : {}}
+			transition={{
+				duration: shouldReduceMotion ? 0 : 0.5,
+				ease: EASE,
+				delay: shouldReduceMotion ? 0 : Math.min(index, 2) * 0.06,
+			}}
+			style={{ paddingBottom: 64 }}>
+			{/* ── Gutter: period, sticky while the entry is on screen ── */}
+			<div className='exp-gutter' style={{ position: 'relative' }}>
+				<span className='exp-marker' aria-hidden='true' />
 				<time
 					dateTime={exp.startISO}
 					style={{
-						fontSize: FONT.micro,
+						display: 'block',
 						fontFamily: MONO,
-						color: 'var(--ink-secondary)',
-						background: 'var(--surface)',
-						border: `${BORDER.soft} solid var(--line)`,
-						padding: '5px 10px',
-						borderRadius: RADIUS.sm,
+						fontSize: FONT.sm,
+						fontWeight: 500,
+						color: 'var(--ink)',
 						fontVariantNumeric: 'tabular-nums',
 						letterSpacing: '0.01em',
-						whiteSpace: 'nowrap',
-						flexShrink: 0,
+					}}>
+					{exp.years}
+				</time>
+				<span
+					style={{
+						display: 'block',
+						marginTop: 4,
+						fontFamily: MONO,
+						fontSize: FONT.micro,
+						color: 'var(--ink-muted)',
 					}}>
 					{exp.period}
-				</time>
-			</header>
+				</span>
+				{exp.current && (
+					<span
+						style={{
+							display: 'inline-flex',
+							alignItems: 'center',
+							gap: 6,
+							marginTop: 10,
+							padding: '3px 10px',
+							borderRadius: RADIUS.full,
+							background: 'var(--accent-soft)',
+							border: `1px solid var(--accent-ring)`,
+							fontFamily: MONO,
+							fontSize: FONT.micro,
+							fontWeight: 600,
+							color: 'var(--accent)',
+						}}>
+						<span
+							className='present-dot'
+							aria-hidden='true'
+							style={{
+								width: 5,
+								height: 5,
+								borderRadius: '50%',
+								background: 'var(--accent)',
+							}}
+						/>
+						Current
+					</span>
+				)}
+			</div>
 
-			{/* ── Content ── */}
-			<div style={{ padding: '24px 28px 28px' }}>
+			{/* ── Entry body ── */}
+			<div className='exp-body'>
 				<h3
 					style={{
-						fontSize: 'clamp(20px, 2.4vw, 24px)',
-						fontWeight: 800,
+						fontSize: 'clamp(20px, 2.2vw, 26px)',
+						fontWeight: 500,
 						fontFamily: SANS,
 						letterSpacing: '-0.02em',
-						lineHeight: 1.2,
-						marginBottom: 8,
-						color: exp.color,
+						lineHeight: 1.25,
+						margin: '0 0 4px',
+						color: 'var(--ink)',
 					}}>
 					{exp.role}
 				</h3>
 
-				{/* Company + location */}
-				<div
+				<p
 					style={{
-						display: 'flex',
-						alignItems: 'center',
-						gap: 6,
-						marginBottom: 4,
-						flexWrap: 'wrap',
+						margin: '0 0 18px',
+						fontSize: FONT.base,
+						color: 'var(--ink-secondary)',
+						fontFamily: SANS,
 					}}>
-					<MapPin
-						size={13}
-						style={{ color: exp.color, flexShrink: 0 }}
-						aria-hidden='true'
-					/>
-					<span
-						style={{
-							fontSize: FONT.sm,
-							fontWeight: 700,
-							color: 'var(--ink)',
-							fontFamily: SANS,
-						}}>
-						{exp.company}
-					</span>
-				</div>
-				<div
-					style={{
-						fontSize: FONT.micro,
-						color: 'var(--ink-muted)',
-						fontFamily: MONO,
-						marginBottom: 18,
-						letterSpacing: '0.01em',
-					}}>
-					{exp.location}
-				</div>
+					{exp.company}
+					<span style={{ color: 'var(--ink-muted)' }}> · {exp.location}</span>
+				</p>
 
-				{/* Description */}
 				<p
 					style={{
 						color: 'var(--ink-secondary)',
-						fontSize: FONT.sm,
-						lineHeight: 1.65,
+						fontSize: FONT.base,
+						lineHeight: 1.75,
 						fontFamily: SANS,
-						marginBottom: 22,
+						margin: '0 0 22px',
+						maxWidth: '68ch',
 					}}>
 					{exp.description}
 				</p>
 
-				{/* Key achievements */}
-				<div style={{ marginBottom: collapsible ? 14 : 22 }}>
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: 7,
-							marginBottom: 12,
-						}}>
-						<Trophy size={14} style={{ color: exp.glow }} aria-hidden='true' />
-						<span
+				<ul
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 12,
+						listStyle: 'none',
+						padding: 0,
+						margin: '0 0 16px',
+						maxWidth: '70ch',
+					}}>
+					{visible.map((a, j) => (
+						<li
+							key={j}
 							style={{
-								fontSize: FONT.sm,
-								fontWeight: 700,
-								color: 'var(--ink)',
-								fontFamily: SANS,
+								display: 'flex',
+								alignItems: 'flex-start',
+								gap: 12,
 							}}>
-							Key Achievements
-						</span>
-					</div>
-					<ul
-						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							gap: 8,
-							listStyle: 'none',
-							padding: 0,
-							margin: 0,
-						}}>
-						{visible.map((a, j) => (
-							<motion.li
-								key={j}
-								initial={{ opacity: 0, x: -16 }}
-								animate={
-									isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }
-								}
-								transition={{
-									duration: shouldReduceMotion ? 0 : 0.4,
-									ease: EASE,
-									delay: shouldReduceMotion ? 0 : 0.3 + j * 0.1,
-								}}
+							<span
+								aria-hidden='true'
 								style={{
-									display: 'flex',
-									alignItems: 'flex-start',
-									gap: 10,
-									padding: '10px 14px',
-									background: 'var(--surface-subtle)',
-									border: `1px solid var(--line-subtle)`,
-									borderRadius: RADIUS.sm,
+									width: 14,
+									height: 1,
+									background: 'var(--line-strong)',
+									flexShrink: 0,
+									marginTop: 12,
+									opacity: 0.45,
+								}}
+							/>
+							<span
+								style={{
+									fontSize: FONT.sm,
+									color: 'var(--ink-secondary)',
+									lineHeight: 1.7,
+									fontFamily: SANS,
 								}}>
-								<span
-									aria-hidden='true'
-									style={{
-										width: 7,
-										height: 7,
-										borderRadius: '50%',
-										background: exp.color,
-										flexShrink: 0,
-										marginTop: 5,
-										boxShadow: `0 0 8px ${exp.color}40`,
-									}}
-								/>
-								<span
-									style={{
-										fontSize: FONT.sm,
-										color: 'var(--ink-secondary)',
-										lineHeight: 1.55,
-										fontFamily: SANS,
-									}}>
-									{a}
-								</span>
-							</motion.li>
-						))}
-					</ul>
-				</div>
+								{a}
+							</span>
+						</li>
+					))}
+				</ul>
 
-				{/* Expand toggle */}
 				{collapsible && (
 					<button
 						type='button'
 						className='exp-toggle'
 						onClick={() => setExpanded((v) => !v)}
 						aria-expanded={expanded}
-						aria-label={
-							expanded
-								? 'Show fewer achievements'
-								: `Show ${hiddenCount} more achievements`
-						}
 						style={{
 							display: 'inline-flex',
 							alignItems: 'center',
 							gap: 6,
-							padding: '8px 12px',
+							padding: '6px 0',
 							marginBottom: 18,
 							background: 'transparent',
-							border: `${BORDER.soft} solid var(--line)`,
-							borderRadius: RADIUS.sm,
-							fontSize: FONT.micro,
-							fontWeight: 700,
+							border: 'none',
+							borderBottom: `1px solid var(--line-soft)`,
+							fontSize: FONT.sm,
+							fontWeight: 500,
 							fontFamily: SANS,
-							color: 'var(--ink)',
-							letterSpacing: '0.01em',
+							color: 'var(--accent)',
 						}}>
-						{expanded ? 'Show less' : `Show ${hiddenCount} more`}
+						{expanded ? 'Show less' : `${hiddenCount} more`}
 						<ChevronDown
 							size={14}
 							aria-hidden='true'
@@ -465,88 +357,20 @@ function Card({ exp }: { exp: Exp }) {
 					</button>
 				)}
 
-				{/* Tech tags */}
-				<div
-					role='list'
-					aria-label='Technologies used'
-					style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-					{exp.tech.map((t, k) => (
-						<motion.span
-							key={t}
-							role='listitem'
-							initial={{ opacity: 0, scale: 0.8 }}
-							animate={
-								isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }
-							}
-							transition={{
-								duration: shouldReduceMotion ? 0 : 0.3,
-								ease: EASE,
-								delay: shouldReduceMotion ? 0 : 0.5 + k * 0.04,
-							}}
-							style={{
-								padding: '3px 10px',
-								background: 'var(--surface-chip)',
-								border: `1px solid var(--line-soft)`,
-								borderRadius: RADIUS.full,
-								fontSize: FONT.micro,
-								fontFamily: MONO,
-								color: 'var(--ink-secondary)',
-							}}>
-							{t}
-						</motion.span>
-					))}
-				</div>
+				<p
+					style={{
+						margin: 0,
+						fontFamily: MONO,
+						fontSize: FONT.micro,
+						color: 'var(--ink-muted)',
+						lineHeight: 1.9,
+						letterSpacing: '0.02em',
+						maxWidth: '70ch',
+					}}>
+					{exp.tech.join('  ·  ')}
+				</p>
 			</div>
-		</article>
-	);
-}
-
-function TimelineDot({
-	exp,
-	delay,
-	shouldReduceMotion,
-}: {
-	exp: Exp;
-	delay: number;
-	shouldReduceMotion: boolean | null;
-}) {
-	return (
-		<motion.div
-			aria-hidden='true'
-			initial={{ opacity: 0, scale: 0.5 }}
-			whileInView={{ opacity: 1, scale: 1 }}
-			viewport={{ once: true, margin: '-80px' }}
-			transition={{
-				duration: shouldReduceMotion ? 0 : 0.4,
-				ease: EASE,
-				delay: shouldReduceMotion ? 0 : delay,
-			}}
-			style={{
-				width: 52,
-				height: 52,
-				borderRadius: '50%',
-				background: 'var(--surface)',
-				border: `${BORDER.hard} solid var(--line)`,
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				boxShadow: 'var(--sh-2)',
-				position: 'relative',
-				zIndex: 1,
-				flexShrink: 0,
-				marginTop: 20,
-			}}>
-			<span
-				style={{
-					fontSize: FONT.micro,
-					fontWeight: 800,
-					fontFamily: SANS,
-					color: exp.color,
-					letterSpacing: '-0.01em',
-				}}>
-				{exp.initial}
-			</span>
-		</motion.div>
+		</motion.li>
 	);
 }
 
@@ -562,18 +386,17 @@ export default function Experience() {
 			if (!line || !container) return;
 
 			if (shouldReduceMotion) {
-				gsap.set(line, { scaleY: 1, opacity: 1 });
+				gsap.set(line, { scaleY: 1 });
 				return;
 			}
 
-			gsap.set(line, { scaleY: 0, opacity: 1 });
-
+			gsap.set(line, { scaleY: 0 });
 			gsap.to(line, {
 				scaleY: 1,
 				ease: 'none',
 				scrollTrigger: {
 					trigger: container,
-					start: 'top 60%',
+					start: 'top 70%',
 					end: 'bottom 80%',
 					scrub: 0.5,
 				},
@@ -585,6 +408,7 @@ export default function Experience() {
 	return (
 		<section id='experience' style={{ background: 'var(--section-a)' }}>
 			<div style={CONTAINER}>
+				<p style={{ ...EYEBROW, marginBottom: 14 }}>Experience</p>
 				<TextReveal
 					parts={[
 						{ text: "Where I've " },
@@ -595,70 +419,15 @@ export default function Experience() {
 				/>
 
 				<div ref={timelineRef} className='exp-timeline'>
-					{/* Vertical spine — GSAP scroll-linked draw.
-					    Position lives in CSS so it can track the dot column
-					    when the grid collapses on mobile. */}
+					{/* Scroll-drawn spine — the one signature motion left on the page. */}
 					<div ref={lineRef} className='exp-line' aria-hidden='true' />
 
 					<ol
 						aria-label='Work experience, most recent first'
-						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							gap: 48,
-							listStyle: 'none',
-							padding: 0,
-							margin: 0,
-						}}>
-						{experiences.map((exp, i) => {
-							const isLeft = i % 2 === 0;
-							const delay = shouldReduceMotion ? 0 : 0.15 + i * 0.1;
-							return (
-								<li key={i} className='exp-row'>
-									{isLeft ? (
-										<motion.div
-											className='exp-slot-left'
-											initial={{ opacity: 0, x: -32 }}
-											whileInView={{ opacity: 1, x: 0 }}
-											viewport={{ once: true, margin: '-80px' }}
-											transition={{
-												duration: shouldReduceMotion ? 0 : 0.55,
-												ease: EASE,
-												delay,
-											}}>
-											<Card exp={exp} />
-										</motion.div>
-									) : (
-										<div className='exp-slot-spacer' />
-									)}
-
-									<div className='exp-slot-mid'>
-										<TimelineDot
-											exp={exp}
-											delay={delay + 0.1}
-											shouldReduceMotion={shouldReduceMotion}
-										/>
-									</div>
-
-									{!isLeft ? (
-										<motion.div
-											className='exp-slot-right'
-											initial={{ opacity: 0, x: 32 }}
-											whileInView={{ opacity: 1, x: 0 }}
-											viewport={{ once: true, margin: '-80px' }}
-											transition={{
-												duration: shouldReduceMotion ? 0 : 0.55,
-												ease: EASE,
-												delay,
-											}}>
-											<Card exp={exp} />
-										</motion.div>
-									) : (
-										<div className='exp-slot-spacer' />
-									)}
-								</li>
-							);
-						})}
+						style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+						{experiences.map((exp, i) => (
+							<Entry key={exp.company} exp={exp} index={i} />
+						))}
 					</ol>
 				</div>
 			</div>

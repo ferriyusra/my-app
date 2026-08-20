@@ -20,18 +20,20 @@ import {
 
 gsap.registerPlugin(ScrollTrigger);
 
+/* Tints are mixed from palette tokens so they follow the theme instead of
+   sitting on top of it as two bright pills. */
 const TYPE_BADGE = {
 	real: {
 		label: 'Production',
-		bg: '#dcfce7',
-		color: '#166534',
-		border: '#86efac',
+		bg: 'color-mix(in srgb, var(--success) 12%, var(--surface))',
+		color: 'var(--success)',
+		border: 'color-mix(in srgb, var(--success) 32%, transparent)',
 	},
 	'case-study': {
 		label: 'Case Study',
-		bg: '#ede9fe',
-		color: '#5b21b6',
-		border: '#c4b5fd',
+		bg: 'var(--surface-chip)',
+		color: 'var(--ink-secondary)',
+		border: 'var(--line)',
 	},
 } as const;
 
@@ -278,7 +280,6 @@ function BentoCard({ project }: { project: Project }) {
 								fontSize: FONT.micro,
 								fontFamily: MONO,
 								color: 'var(--ink)',
-								boxShadow: '1px 1px 0 var(--shadow-ink)',
 							}}>
 							{t}
 						</span>

@@ -10,89 +10,118 @@
 :root {
   color-scheme: light;
 
-  /* ── Page & section surfaces ── */
-  --bg: #ffffff;
-  --section-a: #f0ece8;   /* warm sections: about, experience, contact */
-  --section-b: #faf9f7;   /* cool sections: skills, projects */
-  --hero-bg: linear-gradient(160deg, #f0ece8 0%, #f9f7f5 60%, #ffffff 100%);
+  /* ── Paper ──
+     Warm neutrals rather than pure #ffffff. Paper that is very slightly
+     off-white reads as printed rather than as a default canvas. */
+  --bg: #faf7f2;
+  --section-a: #f1ece3;
+  --section-b: #faf7f2;
+  --hero-bg: #f1ece3;
 
-  /* ── Component surfaces ── */
-  --surface: #ffffff;         /* card body */
-  --surface-header: #f0ece8;  /* card illustration header */
-  --surface-subtle: #f9f9f7;  /* nested list rows */
-  --surface-chip: #f4f4f5;    /* tags, chips, inert badges */
+  --surface: #fffefb;
+  --surface-header: #f4efe6;
+  --surface-subtle: #f7f3ec;
+  --surface-chip: #f0ebe2;
 
-  /* ── Ink (text) ── */
-  --ink: #0a0a0a;
-  --ink-secondary: #4a4a4a;
-  --ink-muted: #6b6b6b;       /* was #a3a3a3 — failed WCAG AA at 2.4:1 */
+  /* ── Ink ──
+     Warm near-black. #0a0a0a is a screen colour; ink has a temperature. */
+  --ink: #1c1815;
+  --ink-secondary: #4d453d;   /* 8.0:1 on --section-a */
+  --ink-muted: #6f665c;       /* 4.8:1 on --section-a */
 
-  /* ── Lines ── */
-  --line: #0a0a0a;            /* the hard neo-brutalist border */
-  --line-soft: #d4d4d8;
-  --line-subtle: #e4e4e7;
+  /* ── Rules ──
+     Hairlines carry the structure now; --line-strong is reserved for the few
+     rules that should read as deliberate architecture. */
+  --line: #ddd4c6;
+  --line-strong: #1c1815;
+  --line-soft: #e8e1d5;
+  --line-subtle: #efe9df;
 
-  /* ── Accent ── */
-  --accent: #6366f1;
-  --accent-ink: #ffffff;      /* text on top of --accent */
-  --accent-soft: rgba(99, 102, 241, 0.08);
-  --accent-ring: rgba(99, 102, 241, 0.35);
+  /* ── Accent ──
+     Burnt terracotta. Deliberately not Tailwind indigo-500. */
+  --accent: #a8432a;          /* 6.0:1 with white, 5.0:1 on paper */
+  --accent-ink: #fffefb;
+  --accent-soft: rgba(168, 67, 42, 0.08);
+  --accent-ring: rgba(168, 67, 42, 0.30);
 
-  /* ── Semantic ── */
-  --success: #10b981;
-  --info: #3b82f6;
-  --warn: #f59e0b;
-  --danger: #dc2626;
+  /* ── Semantic — muted so they sit inside the palette ── */
+  --success: #3d7a5c;
+  --info: #3b6ea5;
+  --warn: #a8762b;
+  --danger: #b3261e;
 
   /* ── Always-dark footer body ── */
-  --footer-bg: #0a0a0a;
-  --on-dark: #ffffff;
-  --on-dark-muted: #8f8f99;   /* 6.1:1 on --footer-bg */
-  --on-dark-line: #3f3f46;
+  --footer-bg: #1c1815;
+  --on-dark: #faf7f2;
+  --on-dark-muted: #a49a8d;
+  --on-dark-line: #3a332c;
 
-  /* ── Navbar solids (so the navbar needs no JS colour branching) ── */
-  --nav-brand: #0a0a0a;       /* logo dot + mail CTA */
-  --nav-pill: #0a0a0a;        /* sliding active-link pill */
-  --nav-pill-ink: #ffffff;
+  /* ── Navbar solids ── */
+  --nav-brand: #1c1815;
+  --nav-pill: #1c1815;
+  --nav-pill-ink: #faf7f2;
 
-  /* ── Elevation: hard offset shadows (2 / 4 / 6 + hover) ── */
-  --shadow-ink: #0a0a0a;
-  --sh-1: 2px 2px 0 var(--shadow-ink);
-  --sh-2: 4px 4px 0 var(--shadow-ink);
-  --sh-3: 6px 6px 0 var(--shadow-ink);
-  --sh-1-hi: 3px 3px 0 var(--shadow-ink);
-  --sh-2-hi: 6px 6px 0 var(--shadow-ink);
-  --sh-3-hi: 8px 8px 0 var(--shadow-ink);
+  /* ── Elevation ──
+     Soft and low. The 6px hard offset shadow was the single loudest
+     neo-brutalist marker; depth now comes from paper, not from outline. */
+  --sh-1: 0 1px 2px rgba(28, 24, 21, 0.05);
+  --sh-2: 0 2px 8px rgba(28, 24, 21, 0.06);
+  --sh-3: 0 6px 24px rgba(28, 24, 21, 0.07);
+  --sh-1-hi: 0 2px 6px rgba(28, 24, 21, 0.09);
+  --sh-2-hi: 0 4px 14px rgba(28, 24, 21, 0.10);
+  --sh-3-hi: 0 10px 32px rgba(28, 24, 21, 0.11);
 }
 
 html[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg: #0f0f0f;
-  --section-a: #121212;
-  --section-b: #0e0e0e;
-  --hero-bg: linear-gradient(160deg, #0a0a0a 0%, #0f0f0f 60%, #121212 100%);
+  --bg: #14120f;
+  --section-a: #1a1714;
+  --section-b: #14120f;
+  --hero-bg: #1a1714;
 
-  --surface: #1a1a1a;
-  --surface-header: #161616;
-  --surface-subtle: #161616;
-  --surface-chip: #232326;
+  --surface: #201c18;
+  --surface-header: #1a1714;
+  --surface-subtle: #1a1714;
+  --surface-chip: #272119;
 
-  --ink: #e5e5e5;
-  --ink-secondary: #a8a8a8;
-  --ink-muted: #8a8a8a;
+  --ink: #ece6dd;
+  --ink-secondary: #a89e92;
+  --ink-muted: #8a8075;       /* 4.6:1 on --section-a */
 
-  --line: #2f2f2f;
-  --line-soft: #3a3a3a;
-  --line-subtle: #2a2a2a;
+  --line: #342e27;
+  --line-strong: #ece6dd;
+  --line-soft: #3d362e;
+  --line-subtle: #2b2620;
 
-  --accent-soft: rgba(99, 102, 241, 0.16);
-  --danger: #f87171;          /* lifted for contrast on dark surfaces */
+  /* Lighter terracotta so it reads on dark paper; --accent-ink flips to dark
+     because white on this value would only reach 3.3:1. */
+  --accent: #d9714f;          /* 5.5:1 on dark paper */
+  --accent-ink: #14120f;
+  --accent-soft: rgba(217, 113, 79, 0.14);
+  --accent-ring: rgba(217, 113, 79, 0.35);
 
-  --nav-brand: #6366f1;
-  --nav-pill: #333333;
+  --success: #5f9e7e;
+  --info: #6d9ed4;
+  --warn: #cfa04e;
+  --danger: #e07a72;
 
-  --shadow-ink: #000000;
+  --footer-bg: #0f0d0b;
+  --on-dark: #ece6dd;
+  --on-dark-muted: #978d80;
+  --on-dark-line: #342e27;
+
+  --nav-brand: #d9714f;
+  --nav-pill: #ece6dd;
+  --nav-pill-ink: #14120f;
+
+  /* Shadows barely register on dark paper — borders do the work instead. */
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --sh-2: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --sh-3: 0 6px 24px rgba(0, 0, 0, 0.5);
+  --sh-1-hi: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --sh-2-hi: 0 4px 14px rgba(0, 0, 0, 0.55);
+  --sh-3-hi: 0 10px 32px rgba(0, 0, 0, 0.6);
 }
 
 /* ═══════════════════════════════════════════════
@@ -130,11 +159,11 @@ body {
 
 /* Subtle dot grid */
 .dot-grid {
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(28, 24, 21, 0.05) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 html[data-theme="dark"] .dot-grid {
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(236, 230, 221, 0.035) 1px, transparent 1px);
 }
 
 /* Scrollbar */
@@ -231,14 +260,16 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
    ═══════════════════════════════════════════════ */
 
 .card {
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.card:hover { box-shadow: var(--sh-3-hi); }
+.card:hover {
+  box-shadow: var(--sh-3-hi);
+  border-color: var(--line-soft);
+}
 
-/* Hover lift that preserves the hard offset shadow */
 .card-lift:hover {
-  transform: translate(-2px, -2px);
+  transform: translateY(-3px);
   box-shadow: var(--sh-3-hi);
 }
 
@@ -250,56 +281,70 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
 }
 
 /* ═══════════════════════════════════════════════
-   EXPERIENCE — ALTERNATING TIMELINE
+   EXPERIENCE — EDITORIAL ENTRIES
+
+   Replaces the alternating left/right timeline. That layout was symmetric
+   (so, visually inert), threw away half the row width on every entry, and
+   collapsed to a single column on mobile anyway. A left gutter holding the
+   period, with the entry running full width beside it, is denser and reads
+   like a well-set CV.
    ═══════════════════════════════════════════════ */
 
 .exp-timeline { position: relative; }
 
-/* Scroll-drawn spine. Centered on desktop, aligned to the
-   dot column on mobile — these must stay in sync with
-   .exp-row's grid-template-columns below. */
+/* Scroll-drawn spine, sitting on the gutter boundary. */
 .exp-line {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%;
-  width: 2px;
+  left: 168px;
+  width: 1px;
   background: var(--line);
   pointer-events: none;
   transform-origin: top;
-  transform: translateX(-50%) scaleY(0);
+  transform: scaleY(0);
 }
 
 .exp-row {
   display: grid;
-  grid-template-columns: 1fr 72px 1fr;
+  grid-template-columns: 168px 1fr;
+  column-gap: 40px;
   align-items: start;
 }
 
-.exp-slot-left  { padding-right: 24px; }
-.exp-slot-mid   { display: flex; justify-content: center; }
-.exp-slot-right { padding-left: 24px; }
+.exp-gutter {
+  position: sticky;
+  top: 108px;
+  padding-right: 24px;
+  text-align: right;
+}
+
+/* Marker straddling the spine */
+.exp-marker {
+  position: absolute;
+  top: 8px;
+  right: -4.5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+}
 
 @media (max-width: 768px) {
-  /* Dot column is 52px wide, so its centre sits at 26px */
-  .exp-line { left: 26px; }
-
-  .exp-row { grid-template-columns: 52px 1fr; }
-
-  .exp-slot-left,
-  .exp-slot-right {
-    grid-column: 2;
-    grid-row: 1;
-    padding-left: 16px;
+  .exp-line { left: 0; }
+  .exp-row {
+    grid-template-columns: 1fr;
+    row-gap: 12px;
+  }
+  .exp-gutter {
+    position: static;
+    text-align: left;
+    padding-left: 20px;
     padding-right: 0;
   }
-
-  .exp-slot-mid {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .exp-slot-spacer { display: none; }
+  .exp-marker { right: auto; left: -4.5px; top: 4px; }
+  .exp-body { padding-left: 20px; }
 }
 
 .exp-toggle {

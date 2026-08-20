@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import ScrollProgress from '@/components/scroll-progress';
@@ -10,6 +10,16 @@ const inter = Inter({
 	display: 'swap',
 	variable: '--font-inter',
 	weight: ['400', '500', '600', '700', '800'],
+});
+
+/* Display face. Inter everywhere was the single most generic choice on the
+   page; a serif for headings against a neutral sans for body is what makes a
+   layout read as set rather than generated. */
+const instrumentSerif = Instrument_Serif({
+	subsets: ['latin'],
+	display: 'swap',
+	variable: '--font-display',
+	weight: ['400'],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -51,7 +61,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang='en'
-			className={`${inter.variable} ${jetbrainsMono.variable}`}
+			className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
 			suppressHydrationWarning>
 			<head>
 				<script
