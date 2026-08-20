@@ -229,25 +229,39 @@ export default function Hero() {
 						</motion.div>
 					) : (
 						<motion.div {...step(3)} className='hero-highlights'>
-							<p
-								style={{
-									...EYEBROW,
-									margin: '0 0 4px',
-								}}>
+							<p id='hero-outcomes' style={{ ...EYEBROW, margin: '0 0 4px' }}>
 								Selected outcomes
 							</p>
-							<ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+
+							{/* Three type levels so the block can be scanned rather than
+							    read: the result, then how, then where and when. It was
+							    previously one flat grey weight throughout. */}
+							<ul
+								aria-labelledby='hero-outcomes'
+								style={{ listStyle: 'none', margin: 0, padding: 0 }}>
 								{profile.highlights.map((h) => (
-									<li key={h.outcome} className='hero-highlight'>
+									<li key={h.lead} className='hero-highlight'>
 										<p
 											style={{
-												margin: '0 0 6px',
+												margin: '0 0 4px',
+												fontSize: FONT.base,
+												fontWeight: 600,
+												lineHeight: 1.35,
+												letterSpacing: '-0.01em',
+												color: 'var(--ink)',
+												fontFamily: SANS,
+											}}>
+											{h.lead}
+										</p>
+										<p
+											style={{
+												margin: '0 0 8px',
 												fontSize: FONT.sm,
-												lineHeight: 1.6,
+												lineHeight: 1.55,
 												color: 'var(--ink-secondary)',
 												fontFamily: SANS,
 											}}>
-											{h.outcome}
+											{h.detail}
 										</p>
 										<p
 											style={{
@@ -262,6 +276,11 @@ export default function Hero() {
 									</li>
 								))}
 							</ul>
+
+							<a href='#experience' className='hero-outcomes-link'>
+								All experience
+								<ArrowRight size={14} aria-hidden='true' />
+							</a>
 						</motion.div>
 					)}
 				</div>

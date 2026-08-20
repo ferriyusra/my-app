@@ -215,10 +215,28 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
 }
 
 .hero-highlight {
-  padding: 16px 0;
+  padding: 15px 0;
   border-top: 1px solid var(--line);
 }
 .hero-highlight:last-child { border-bottom: 1px solid var(--line); }
+
+/* One link for the whole block rather than three rows pointing at the same
+   anchor, which screen readers would announce as three identical targets. */
+.hero-outcomes-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+}
+.hero-outcomes-link svg { transition: transform 0.18s ease; }
+.hero-outcomes-link:hover svg { transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) {
+  .hero-outcomes-link:hover svg { transform: none; }
+}
 
 .hero-portrait {
   width: 100%;

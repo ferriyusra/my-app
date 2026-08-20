@@ -29,22 +29,22 @@ export const profile = {
 	 * They fill the right half of the hero with proof rather than decoration —
 	 * a visitor now sees what the work actually produced before scrolling.
 	 */
-	highlights: [
+highlights: [
 		{
-			outcome:
-				'Billing source of truth for ~160 ASO entities, replacing spreadsheet tracking',
+			lead: 'Billing source of truth',
+			detail: 'for ~160 ASO entities, replacing spreadsheet tracking',
 			at: 'Meditap',
 			year: '2025',
 		},
 		{
-			outcome:
-				'Event-driven billing and threshold alerts on Pub/Sub, ending manual monitoring',
+			lead: 'Manual monitoring eliminated',
+			detail: 'event-driven billing and threshold alerts on Pub/Sub',
 			at: 'Meditap',
 			year: '2025',
 		},
 		{
-			outcome:
-				'Tableau dashboards migrated to native API services, cutting licence costs',
+			lead: 'Tableau licence costs cut',
+			detail: 'dashboards migrated to native, API-driven services',
 			at: 'SATUSEHAT',
 			year: '2024',
 		},
