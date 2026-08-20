@@ -127,7 +127,7 @@ export default function Hero() {
 						<motion.h1
 							{...step(1)}
 							style={{
-								fontSize: 'clamp(36px, 4.8vw, 58px)',
+								fontSize: 'clamp(36px, 5.2vw, 62px)',
 								fontWeight: 400,
 								fontFamily: DISPLAY,
 								letterSpacing: '-0.02em',
@@ -138,7 +138,6 @@ export default function Hero() {
 								   and never auto-hyphenate a display face. */
 								textWrap: 'balance',
 								hyphens: 'none',
-								maxWidth: '20ch',
 							}}>
 							{profile.headline}
 						</motion.h1>
@@ -149,7 +148,7 @@ export default function Hero() {
 								fontSize: 'clamp(16px, 1.6vw, 19px)',
 								color: 'var(--ink-secondary)',
 								lineHeight: 1.7,
-								maxWidth: '58ch',
+								maxWidth: '64ch',
 								margin: '0 0 36px',
 								fontFamily: SANS,
 							}}>

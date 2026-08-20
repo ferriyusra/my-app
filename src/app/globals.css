@@ -196,8 +196,9 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
 .hero-grid {
   display: grid;
   gap: 48px;
-  align-items: center;
+  align-items: start;
 }
+.hero-grid[data-portrait='true'] { align-items: center; }
 
 @media (min-width: 1000px) {
   /* Statement left, proof right. Without this the right half of a wide
