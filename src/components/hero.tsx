@@ -9,34 +9,9 @@ import {
 	EASE,
 	EYEBROW,
 	FONT,
-	MONO,
 	RADIUS,
 	SANS,
 } from '@/lib/theme';
-
-const CTA_BASE: React.CSSProperties = {
-	display: 'inline-flex',
-	alignItems: 'center',
-	gap: 8,
-	padding: '13px 26px',
-	border: `1px solid var(--line)`,
-	borderRadius: RADIUS.md,
-	fontSize: FONT.base,
-	fontWeight: 600,
-	textDecoration: 'none',
-	fontFamily: SANS,
-	boxShadow: 'var(--sh-1)',
-	transition: 'box-shadow 0.2s ease, transform 0.2s ease',
-};
-
-function lift(e: React.MouseEvent<HTMLElement>) {
-	e.currentTarget.style.transform = 'translateY(-1px)';
-	e.currentTarget.style.boxShadow = 'var(--sh-2-hi)';
-}
-function drop(e: React.MouseEvent<HTMLElement>) {
-	e.currentTarget.style.transform = 'translateY(0)';
-	e.currentTarget.style.boxShadow = 'var(--sh-1)';
-}
 
 export default function Hero() {
 	const shouldReduceMotion = useReducedMotion();
@@ -67,7 +42,7 @@ export default function Hero() {
 				background: 'var(--hero-bg)',
 				/* Asymmetric: the extra 56px on top offsets the fixed navbar so the
 				   block reads as optically centred rather than geometrically. */
-				paddingTop: 128,
+				paddingTop: 104,
 				paddingBottom: 72,
 			}}>
 			<div style={{ ...CONTAINER, width: '100%' }}>
@@ -83,14 +58,14 @@ export default function Hero() {
 								flexWrap: 'wrap',
 								marginBottom: 30,
 							}}>
+							{/* Fluent labels sections with BodyStrong, not tracked-out
+							    uppercase mono — Windows 11 has no such text style. */}
 							<span
 								style={{
-									fontFamily: MONO,
-									fontSize: FONT.micro,
+									fontFamily: SANS,
+									fontSize: FONT.sm,
 									fontWeight: 600,
-									letterSpacing: '0.18em',
-									textTransform: 'uppercase',
-									color: 'var(--ink-muted)',
+									color: 'var(--ink-secondary)',
 								}}>
 								{profile.role} · {profile.location}
 							</span>
@@ -99,12 +74,11 @@ export default function Hero() {
 									display: 'inline-flex',
 									alignItems: 'center',
 									gap: 7,
-									padding: '5px 12px',
-									background:
-										'color-mix(in srgb, var(--accent) 11%, var(--surface))',
-									border: `1px solid color-mix(in srgb, var(--accent) 34%, transparent)`,
+									padding: '3px 10px',
+									background: 'var(--accent-soft)',
+									border: `1px solid var(--accent-ring)`,
 									borderRadius: RADIUS.full,
-									fontFamily: MONO,
+									fontFamily: SANS,
 									fontSize: FONT.micro,
 									fontWeight: 600,
 									color: 'var(--accent)',
@@ -122,16 +96,16 @@ export default function Hero() {
 							</span>
 						</motion.div>
 
-						{/* Set in the display serif, matching every section heading.
-						    It was the one piece of display type still in Inter 800. */}
+						{/* Fluent Display: Semibold, no negative tracking. Windows 11
+						    never sets headings in a light weight or tracks them tight. */}
 						<motion.h1
 							{...step(1)}
 							style={{
-								fontSize: 'clamp(36px, 5.2vw, 62px)',
-								fontWeight: 400,
+								fontSize: 'clamp(32px, 4.4vw, 52px)',
+								fontWeight: 600,
 								fontFamily: DISPLAY,
-								letterSpacing: '-0.02em',
-								lineHeight: 1.05,
+								letterSpacing: 0,
+								lineHeight: 1.24,
 								margin: '0 0 26px',
 								color: 'var(--ink)',
 								/* Even out the rag instead of leaving a short last line,
@@ -145,7 +119,7 @@ export default function Hero() {
 						<motion.p
 							{...step(2)}
 							style={{
-								fontSize: 'clamp(16px, 1.6vw, 19px)',
+								fontSize: FONT.base,
 								color: 'var(--ink-secondary)',
 								lineHeight: 1.7,
 								maxWidth: '64ch',
@@ -158,16 +132,7 @@ export default function Hero() {
 						<motion.div
 							{...step(3)}
 							style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-							<a
-								href='#contact'
-								style={{
-									...CTA_BASE,
-									background: 'var(--accent)',
-									borderColor: 'var(--accent)',
-									color: 'var(--accent-ink)',
-								}}
-								onMouseEnter={lift}
-								onMouseLeave={drop}>
+							<a href='#contact' className='fl-btn fl-btn-accent'>
 								Get in touch
 								<ArrowRight size={16} aria-hidden='true' />
 							</a>
@@ -175,13 +140,7 @@ export default function Hero() {
 							<a
 								href={profile.cvDownload}
 								download
-								style={{
-									...CTA_BASE,
-									background: 'var(--surface)',
-									color: 'var(--ink)',
-								}}
-								onMouseEnter={lift}
-								onMouseLeave={drop}>
+								className='fl-btn fl-btn-standard'>
 								<Download size={16} aria-hidden='true' />
 								Download CV
 							</a>
@@ -192,26 +151,13 @@ export default function Hero() {
 						<motion.p
 							{...step(4)}
 							style={{
-								display: 'flex',
-								alignItems: 'center',
-								gap: 12,
-								marginTop: 48,
+								marginTop: 40,
 								marginBottom: 0,
-								fontFamily: MONO,
+								fontFamily: SANS,
 								fontSize: FONT.sm,
+								lineHeight: 1.45,
 								color: 'var(--ink-muted)',
-								letterSpacing: '0.02em',
 							}}>
-							<span
-								aria-hidden='true'
-								style={{
-									width: 24,
-									height: 1,
-									background: 'var(--line-strong)',
-									opacity: 0.35,
-									flexShrink: 0,
-								}}
-							/>
 							Previously — {profile.previously}
 						</motion.p>
 					</div>
@@ -247,7 +193,6 @@ export default function Hero() {
 												fontSize: FONT.base,
 												fontWeight: 600,
 												lineHeight: 1.35,
-												letterSpacing: '-0.01em',
 												color: 'var(--ink)',
 												fontFamily: SANS,
 											}}>
@@ -266,10 +211,9 @@ export default function Hero() {
 										<p
 											style={{
 												margin: 0,
-												fontFamily: MONO,
+												fontFamily: SANS,
 												fontSize: FONT.micro,
 												color: 'var(--ink-muted)',
-												letterSpacing: '0.06em',
 											}}>
 											{h.at} · {h.year}
 										</p>

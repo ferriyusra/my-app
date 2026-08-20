@@ -22,7 +22,6 @@ import {
 	CONTAINER,
 	EASE,
 	FONT,
-	MONO,
 	RADIUS,
 	SANS,
 } from '@/lib/theme';
@@ -168,11 +167,10 @@ export default function Contact() {
 							transition={t(0.45, 0.08)}
 							style={{
 								fontSize: 'clamp(32px, 5vw, 56px)',
-								fontWeight: 800,
+								fontWeight: 600,
 								marginBottom: 16,
 								fontFamily: SANS,
 								color: 'var(--ink)',
-								letterSpacing: '-0.03em',
 								lineHeight: 1.1,
 							}}>
 							Let’s{' '}
@@ -260,9 +258,7 @@ export default function Contact() {
 											style={{
 												fontSize: FONT.micro,
 												color: 'var(--ink-muted)',
-												fontFamily: MONO,
-												letterSpacing: '0.1em',
-												textTransform: 'uppercase',
+												fontFamily: SANS,
 												marginBottom: 2,
 											}}>
 											{label}
@@ -293,11 +289,10 @@ export default function Contact() {
 						<h3
 							style={{
 								fontSize: FONT.xl,
-								fontWeight: 700,
+								fontWeight: 600,
 								marginBottom: 28,
 								fontFamily: SANS,
 								color: 'var(--ink)',
-								letterSpacing: '-0.01em',
 							}}>
 							Send a message
 						</h3>
@@ -461,7 +456,7 @@ function ContactForm({
 						borderRadius: RADIUS.md,
 						color: 'var(--accent-ink)',
 						fontSize: FONT.base,
-						fontWeight: 700,
+						fontWeight: 600,
 						cursor: busy ? 'progress' : 'pointer',
 						fontFamily: SANS,
 						transition: 'background 0.2s ease, box-shadow 0.2s ease',

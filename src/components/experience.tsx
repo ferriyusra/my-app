@@ -13,7 +13,6 @@ import {
 	EYEBROW,
 	FONT,
 	H2,
-	MONO,
 	RADIUS,
 	SANS,
 } from '@/lib/theme';
@@ -195,12 +194,11 @@ function Entry({ exp, index }: { exp: Exp; index: number }) {
 					dateTime={exp.startISO}
 					style={{
 						display: 'block',
-						fontFamily: MONO,
+						fontFamily: SANS,
 						fontSize: FONT.sm,
 						fontWeight: 500,
 						color: 'var(--ink)',
 						fontVariantNumeric: 'tabular-nums',
-						letterSpacing: '0.01em',
 					}}>
 					{exp.years}
 				</time>
@@ -208,7 +206,7 @@ function Entry({ exp, index }: { exp: Exp; index: number }) {
 					style={{
 						display: 'block',
 						marginTop: 4,
-						fontFamily: MONO,
+						fontFamily: SANS,
 						fontSize: FONT.micro,
 						color: 'var(--ink-muted)',
 					}}>
@@ -225,7 +223,7 @@ function Entry({ exp, index }: { exp: Exp; index: number }) {
 							borderRadius: RADIUS.full,
 							background: 'var(--accent-soft)',
 							border: `1px solid var(--accent-ring)`,
-							fontFamily: MONO,
+							fontFamily: SANS,
 							fontSize: FONT.micro,
 							fontWeight: 600,
 							color: 'var(--accent)',
@@ -252,7 +250,6 @@ function Entry({ exp, index }: { exp: Exp; index: number }) {
 						fontSize: 'clamp(20px, 2.2vw, 26px)',
 						fontWeight: 500,
 						fontFamily: SANS,
-						letterSpacing: '-0.02em',
 						lineHeight: 1.25,
 						margin: '0 0 4px',
 						color: 'var(--ink)',
@@ -360,11 +357,10 @@ function Entry({ exp, index }: { exp: Exp; index: number }) {
 				<p
 					style={{
 						margin: 0,
-						fontFamily: MONO,
+						fontFamily: SANS,
 						fontSize: FONT.micro,
 						color: 'var(--ink-muted)',
 						lineHeight: 1.9,
-						letterSpacing: '0.02em',
 						maxWidth: '70ch',
 					}}>
 					{exp.tech.join('  ·  ')}

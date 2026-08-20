@@ -7,7 +7,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { profile } from '@/data/profile';
-import { BORDER, FONT, MONO, RADIUS, SANS } from '@/lib/theme';
+import { BORDER, FONT, RADIUS, SANS } from '@/lib/theme';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -50,10 +50,9 @@ const contactRows = [
 const COL_HEADING: React.CSSProperties = {
 	color: 'var(--on-dark)',
 	fontFamily: SANS,
-	fontWeight: 700,
+	fontWeight: 600,
 	fontSize: FONT.sm,
 	marginBottom: 20,
-	letterSpacing: '-0.01em',
 };
 
 /* The footer body is a fixed dark slab in both themes, so it uses the
@@ -134,7 +133,7 @@ export default function Footer() {
 										style={{
 											color: 'var(--accent-ink)',
 											fontSize: FONT.sm,
-											fontWeight: 800,
+											fontWeight: 600,
 											fontFamily: SANS,
 										}}>
 										{profile.initials}
@@ -144,9 +143,8 @@ export default function Footer() {
 									style={{
 										color: 'var(--on-dark)',
 										fontFamily: SANS,
-										fontWeight: 700,
+										fontWeight: 600,
 										fontSize: FONT.base,
-										letterSpacing: '-0.01em',
 									}}>
 									{profile.name}
 								</span>
@@ -294,7 +292,7 @@ export default function Footer() {
 									borderRadius: RADIUS.md,
 									textDecoration: 'none',
 									fontSize: FONT.base,
-									fontWeight: 700,
+									fontWeight: 600,
 									fontFamily: SANS,
 									boxShadow: '3px 3px 0 rgba(255,255,255,0.15)',
 									transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -302,13 +300,11 @@ export default function Footer() {
 									boxSizing: 'border-box' as const,
 								}}
 								onMouseEnter={(e) => {
-									e.currentTarget.style.transform = 'translate(-1px, -1px)';
-									e.currentTarget.style.boxShadow =
+																		e.currentTarget.style.boxShadow =
 										'4px 4px 0 rgba(255,255,255,0.15)';
 								}}
 								onMouseLeave={(e) => {
-									e.currentTarget.style.transform = 'translate(0, 0)';
-									e.currentTarget.style.boxShadow =
+																		e.currentTarget.style.boxShadow =
 										'3px 3px 0 rgba(255,255,255,0.15)';
 								}}>
 								<Send size={15} aria-hidden='true' /> Hire Me
@@ -334,7 +330,7 @@ export default function Footer() {
 							style={{
 								color: 'var(--on-dark-muted)',
 								fontSize: FONT.sm,
-								fontFamily: MONO,
+								fontFamily: SANS,
 								margin: 0,
 							}}>
 							&copy; {new Date().getFullYear()} {profile.name}. All rights
@@ -344,7 +340,7 @@ export default function Footer() {
 							style={{
 								color: 'var(--on-dark-muted)',
 								fontSize: FONT.sm,
-								fontFamily: MONO,
+								fontFamily: SANS,
 								margin: 0,
 							}}>
 							Built with Next.js, and a lot of Claude Code.

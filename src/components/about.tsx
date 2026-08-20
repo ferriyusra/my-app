@@ -11,7 +11,6 @@ import {
 	EASE,
 	FONT,
 	H2,
-	MONO,
 	RADIUS,
 	SANS,
 } from '@/lib/theme';
@@ -121,8 +120,7 @@ export default function About() {
 										background: 'var(--surface-chip)',
 										border: `1px solid var(--line-subtle)`,
 										color: 'var(--ink-secondary)',
-										fontFamily: MONO,
-										letterSpacing: '0.04em',
+										fontFamily: SANS,
 									}}>
 									{tag}
 								</span>
@@ -162,7 +160,7 @@ export default function About() {
 									boxShadow: 'var(--sh-1-hi)',
 									color: 'var(--accent-ink)',
 									fontSize: FONT.lg,
-									fontWeight: 800,
+									fontWeight: 600,
 									fontFamily: SANS,
 								}}>
 								{profile.initials}
@@ -170,11 +168,10 @@ export default function About() {
 							<div>
 								<div
 									style={{
-										fontWeight: 800,
+										fontWeight: 600,
 										fontSize: FONT.lg,
 										color: 'var(--ink)',
 										fontFamily: SANS,
-										letterSpacing: '-0.02em',
 									}}>
 									{profile.name}
 								</div>
@@ -182,7 +179,7 @@ export default function About() {
 									style={{
 										color: 'var(--accent)',
 										fontSize: FONT.sm,
-										fontFamily: MONO,
+										fontFamily: SANS,
 										fontWeight: 500,
 									}}>
 									{profile.role}
@@ -215,9 +212,7 @@ export default function About() {
 											style={{
 												fontSize: FONT.micro,
 												color: 'var(--ink-muted)',
-												fontFamily: MONO,
-												textTransform: 'uppercase',
-												letterSpacing: '0.12em',
+												fontFamily: SANS,
 												fontWeight: 600,
 												marginBottom: 3,
 											}}>
@@ -258,17 +253,15 @@ export default function About() {
 									fontSize: FONT.sm,
 									textDecoration: 'none',
 									fontFamily: SANS,
-									fontWeight: 700,
+									fontWeight: 600,
 									boxShadow: 'var(--sh-1)',
 									transition: 'transform 0.2s ease, box-shadow 0.2s ease',
 								}}
 								onMouseEnter={(e) => {
-									e.currentTarget.style.transform = 'translate(-1px,-1px)';
-									e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
+																		e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
 								}}
 								onMouseLeave={(e) => {
-									e.currentTarget.style.transform = 'translate(0,0)';
-									e.currentTarget.style.boxShadow = 'var(--sh-1)';
+																		e.currentTarget.style.boxShadow = 'var(--sh-1)';
 								}}>
 								<Download size={14} aria-hidden='true' />
 								View CV

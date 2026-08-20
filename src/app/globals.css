@@ -10,119 +10,143 @@
 :root {
   color-scheme: light;
 
-  /* ── Paper ──
-     Warm neutrals rather than pure #ffffff. Paper that is very slightly
-     off-white reads as printed rather than as a default canvas. */
-  --bg: #faf7f2;
-  --section-a: #f1ece3;
-  --section-b: #faf7f2;
-  --hero-bg: #faf7f2;   /* lighter than --section-a so Experience has an edge */
+  /* ── Neutrals — Fluent 2 (Fluent UI React v9 webLightTheme) ──
+     colorNeutralBackground3 / 2 / 1 respectively. The page sits on the
+     darkest of the three so cards read as raised layers, which is how
+     Windows 11 stacks Mica behind Layer behind Card. */
+  --bg: #f5f5f5;
+  --section-a: #f5f5f5;
+  --section-b: #fafafa;
+  --hero-bg: #f5f5f5;
 
-  --surface: #fffefb;
-  --surface-header: #f4efe6;
-  --surface-subtle: #f7f3ec;
-  --surface-chip: #f0ebe2;
+  --surface: #ffffff;         /* colorNeutralBackground1 — card */
+  --surface-header: #fafafa;  /* colorNeutralBackground2 */
+  --surface-subtle: #fafafa;
+  --surface-chip: #f0f0f0;    /* colorNeutralBackground4 */
+  --subtle-hover: #f5f5f5;    /* colorSubtleBackgroundHover */
+  --subtle-pressed: #e0e0e0;
 
-  /* ── Ink ──
-     Warm near-black. #0a0a0a is a screen colour; ink has a temperature. */
-  --ink: #1c1815;
-  --ink-secondary: #4d453d;   /* 8.0:1 on --section-a */
-  --ink-muted: #6f665c;       /* 4.8:1 on --section-a */
+  /* ── Foreground — colorNeutralForeground1 / 2 / 3 ── */
+  --ink: #242424;             /* 14.3:1 on --bg */
+  --ink-secondary: #424242;   /* 9.7:1 */
+  --ink-muted: #616161;       /* 5.9:1 */
+  --ink-disabled: #bdbdbd;
 
-  /* ── Rules ──
-     Hairlines carry the structure now; --line-strong is reserved for the few
-     rules that should read as deliberate architecture. */
-  --line: #ddd4c6;
-  --line-strong: #1c1815;
-  --line-soft: #e8e1d5;
-  --line-subtle: #efe9df;
+  /* ── Strokes — colorNeutralStroke1 / 2 ── */
+  --line: #d1d1d1;
+  --line-strong: #616161;
+  --line-soft: #e0e0e0;
+  --line-subtle: #ebebeb;
 
-  /* ── Accent ──
-     Burnt terracotta. Deliberately not Tailwind indigo-500. */
-  --accent: #a8432a;          /* 6.0:1 with white, 5.0:1 on paper */
-  --accent-ink: #fffefb;
-  --accent-soft: rgba(168, 67, 42, 0.08);
-  --accent-ring: rgba(168, 67, 42, 0.30);
+  /* ── Brand ──
+     Fluent separates the colour used for brand *text* from the colour used
+     for a brand *fill*. On light they coincide; on dark they must not, or
+     white-on-fill drops to 2.8:1. */
+  --accent: #0f6cbd;          /* brand text/link — 5.4:1 on --surface */
+  --accent-fill: #0f6cbd;     /* brand fill — 5.4:1 with white */
+  --accent-hover: #115ea3;
+  --accent-pressed: #0c3b5e;
+  --accent-ink: #ffffff;
+  --accent-soft: #ebf3fc;     /* colorBrandBackground2 */
+  --accent-ring: #b4d6fa;
 
-  /* ── Semantic — muted so they sit inside the palette ── */
-  --success: #3d7a5c;
-  --info: #3b6ea5;
-  --warn: #a8762b;
-  --danger: #b3261e;
+  /* ── Semantic — Fluent status palette ── */
+  --success: #0e700e;
+  --info: #0f6cbd;
+  --warn: #bc4b09;
+  --danger: #b10e1c;
 
-  /* ── Always-dark footer body ── */
-  --footer-bg: #1c1815;
-  --on-dark: #faf7f2;
-  --on-dark-muted: #a49a8d;
-  --on-dark-line: #3a332c;
+  --footer-bg: #242424;
+  --on-dark: #ffffff;
+  --on-dark-muted: #d6d6d6;
+  --on-dark-line: #525252;
 
-  /* ── Solid neutral button (404, Articles CTA) ──
-     Inverts with the theme so a primary button is always the opposite of the
-     paper it sits on. Used to be three --nav-* tokens; the navbar no longer
-     needs a solid fill at all. */
-  --solid: #1c1815;
-  --solid-ink: #faf7f2;
+  --solid: #242424;
+  --solid-ink: #ffffff;
 
-  /* ── Elevation ──
-     Soft and low. The 6px hard offset shadow was the single loudest
-     neo-brutalist marker; depth now comes from paper, not from outline. */
-  --sh-1: 0 1px 2px rgba(28, 24, 21, 0.05);
-  --sh-2: 0 2px 8px rgba(28, 24, 21, 0.06);
-  --sh-3: 0 6px 24px rgba(28, 24, 21, 0.07);
-  --sh-1-hi: 0 2px 6px rgba(28, 24, 21, 0.09);
-  --sh-2-hi: 0 4px 14px rgba(28, 24, 21, 0.10);
-  --sh-3-hi: 0 10px 32px rgba(28, 24, 21, 0.11);
+  /* ── Elevation — Fluent shadow2 / 4 / 8 / 16 ──
+     Two layers each: an ambient ring plus a directional drop. Windows 11
+     never uses a single hard offset. */
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
+  --sh-2: 0 2px 4px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
+  --sh-3: 0 4px 8px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
+  --sh-1-hi: 0 2px 4px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
+  --sh-2-hi: 0 4px 8px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
+  --sh-3-hi: 0 8px 16px rgba(0, 0, 0, 0.14), 0 0 2px rgba(0, 0, 0, 0.12);
+
+  /* ── Materials ── */
+  --acrylic: rgba(252, 252, 252, 0.72);
+  --acrylic-blur: blur(30px) saturate(125%);
+  --mica-tint: rgba(15, 108, 189, 0.024);
+
+  /* ── Motion — Fluent 2 duration and curve tokens ── */
+  --dur-faster: 100ms;
+  --dur-fast: 150ms;
+  --dur-normal: 200ms;
+  --dur-slow: 300ms;
+  --ease-standard: cubic-bezier(0.33, 0, 0.67, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-accelerate: cubic-bezier(1, 0, 1, 1);
 }
 
 html[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg: #14120f;
-  --section-a: #1a1714;
-  --section-b: #14120f;
-  --hero-bg: #14120f;
+  --bg: #141414;
+  --section-a: #141414;
+  --section-b: #1f1f1f;
+  --hero-bg: #141414;
 
-  --surface: #201c18;
-  --surface-header: #1a1714;
-  --surface-subtle: #1a1714;
-  --surface-chip: #272119;
+  --surface: #292929;
+  --surface-header: #1f1f1f;
+  --surface-subtle: #1f1f1f;
+  --surface-chip: #333333;
+  --subtle-hover: #3d3d3d;
+  --subtle-pressed: #1f1f1f;
 
-  --ink: #ece6dd;
-  --ink-secondary: #a89e92;
-  --ink-muted: #8a8075;       /* 4.6:1 on --section-a */
+  --ink: #ffffff;
+  --ink-secondary: #d6d6d6;
+  --ink-muted: #adadad;       /* 7.1:1 on --bg */
+  --ink-disabled: #5c5c5c;
 
-  --line: #342e27;
-  --line-strong: #ece6dd;
-  --line-soft: #3d362e;
-  --line-subtle: #2b2620;
+  --line: #666666;
+  --line-strong: #adadad;
+  --line-soft: #525252;
+  --line-subtle: #3d3d3d;
 
-  /* Lighter terracotta so it reads on dark paper; --accent-ink flips to dark
-     because white on this value would only reach 3.3:1. */
-  --accent: #d9714f;          /* 5.5:1 on dark paper */
-  --accent-ink: #14120f;
-  --accent-soft: rgba(217, 113, 79, 0.14);
-  --accent-ring: rgba(217, 113, 79, 0.35);
+  /* colorBrandForeground1 for text (6.6:1 on --bg); colorBrandBackground
+     stays dark for fills so white label text keeps 6.7:1. */
+  --accent: #479ef5;
+  --accent-fill: #115ea3;
+  --accent-hover: #0f6cbd;
+  --accent-pressed: #0c3b5e;
+  --accent-ink: #ffffff;
+  --accent-soft: #082338;
+  --accent-ring: #0e4775;
 
-  --success: #5f9e7e;
-  --info: #6d9ed4;
-  --warn: #cfa04e;
-  --danger: #e07a72;
+  --success: #54b054;
+  --info: #479ef5;
+  --warn: #e08c3f;
+  --danger: #dc626d;
 
-  --footer-bg: #0f0d0b;
-  --on-dark: #ece6dd;
-  --on-dark-muted: #978d80;
-  --on-dark-line: #342e27;
+  --footer-bg: #0a0a0a;
+  --on-dark: #ffffff;
+  --on-dark-muted: #adadad;
+  --on-dark-line: #3d3d3d;
 
-  --solid: #ece6dd;
-  --solid-ink: #14120f;
+  --solid: #ffffff;
+  --solid-ink: #141414;
 
-  /* Shadows barely register on dark paper — borders do the work instead. */
-  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --sh-2: 0 2px 8px rgba(0, 0, 0, 0.45);
-  --sh-3: 0 6px 24px rgba(0, 0, 0, 0.5);
-  --sh-1-hi: 0 2px 6px rgba(0, 0, 0, 0.5);
-  --sh-2-hi: 0 4px 14px rgba(0, 0, 0, 0.55);
-  --sh-3-hi: 0 10px 32px rgba(0, 0, 0, 0.6);
+  /* Fluent darkens its shadows rather than dropping them. */
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.28), 0 0 2px rgba(0, 0, 0, 0.22);
+  --sh-2: 0 2px 4px rgba(0, 0, 0, 0.28), 0 0 2px rgba(0, 0, 0, 0.22);
+  --sh-3: 0 4px 8px rgba(0, 0, 0, 0.28), 0 0 2px rgba(0, 0, 0, 0.22);
+  --sh-1-hi: 0 2px 4px rgba(0, 0, 0, 0.28), 0 0 2px rgba(0, 0, 0, 0.22);
+  --sh-2-hi: 0 4px 8px rgba(0, 0, 0, 0.28), 0 0 2px rgba(0, 0, 0, 0.22);
+  --sh-3-hi: 0 8px 16px rgba(0, 0, 0, 0.28), 0 0 2px rgba(0, 0, 0, 0.22);
+
+  --acrylic: rgba(44, 44, 44, 0.76);
+  --mica-tint: rgba(71, 158, 245, 0.035);
 }
 
 /* ═══════════════════════════════════════════════
@@ -142,14 +166,18 @@ html[data-theme="dark"] {
 * { box-sizing: border-box; }
 
 html {
-  scroll-padding-top: 80px;
+  scroll-padding-top: 64px;
   scroll-behavior: smooth;
 }
 
 body {
-  background: var(--bg);
+  /* Mica: the page tint bleeds a trace of the accent through the neutral
+     base, which is what stops a Windows 11 window looking like flat grey. */
+  background:
+    linear-gradient(var(--mica-tint), var(--mica-tint)),
+    var(--bg);
   color: var(--ink);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: 'Segoe UI Variable Text', 'Segoe UI', var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -178,9 +206,10 @@ html[data-theme="dark"] .dot-grid {
 
 /* Shared focus ring — every interactive element inherits this */
 :where(a, button, input, textarea, select, [tabindex]):focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 8px;
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px var(--bg);
 }
 
 section { padding: 96px 0; }
@@ -243,20 +272,17 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
   max-width: 340px;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: 8px;
   border: 1px solid var(--line);
   box-shadow: var(--sh-3);
   display: block;
 }
 
 /* ═══════════════════════════════════════════════
-   NAVBAR — editorial top bar
+   NAVBAR — Fluent command bar
 
-   Was a centred floating pill with a sliding near-black blob behind the
-   active link, plus a filled logo circle and a Mail button duplicating the
-   Contact link: three heavy dark shapes and three layers of chrome. The
-   active state is now colour plus a rule, which is what the rest of the
-   page does.
+   Acrylic: a blurred, saturated, semi-opaque sheet. Windows 11 uses this for
+   any surface that floats over scrolling content.
    ═══════════════════════════════════════════════ */
 
 .nav-bar {
@@ -267,16 +293,22 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
   z-index: 50;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 64px;
+  height: 48px;              /* Fluent command bar height */
   padding: 0;
   background: transparent;
   border-bottom: 1px solid transparent;
-  transition: background 0.25s ease, border-color 0.25s ease;
+  transition:
+    background var(--dur-normal) var(--ease-standard),
+    border-color var(--dur-normal) var(--ease-standard);
 }
 
-/* Same measure and gutter as every section, so the wordmark lines up with
-   the copy beneath it instead of hugging the viewport edge. */
+.nav-bar[data-scrolled='true'] {
+  background: var(--acrylic);
+  backdrop-filter: var(--acrylic-blur);
+  -webkit-backdrop-filter: var(--acrylic-blur);
+  border-bottom-color: var(--line-soft);
+}
+
 .nav-inner {
   width: 100%;
   max-width: 1200px;
@@ -288,31 +320,33 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
   gap: 24px;
 }
 
-.nav-bar[data-scrolled='true'] {
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom-color: var(--line);
-}
-
 .nav-link {
   position: relative;
-  padding: 6px 0;
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
   text-decoration: none;
   color: var(--ink-secondary);
-  transition: color 0.18s ease;
+  transition:
+    color var(--dur-faster) var(--ease-standard),
+    background var(--dur-faster) var(--ease-standard);
 }
-.nav-link:hover { color: var(--ink); }
-.nav-link[data-active='true'] { color: var(--accent); }
+.nav-link:hover { background: var(--subtle-hover); color: var(--ink); }
+.nav-link:active { background: var(--subtle-pressed); color: var(--ink-muted); }
+.nav-link[data-active='true'] { color: var(--ink); }
 
-/* Underline spans the text, not a padding box */
+/* The Windows 11 selection indicator: a short rounded accent bar pinned to
+   the edge of the item, sized to the content rather than the padding box. */
 .nav-link[data-active='true']::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 12px;
+  right: 12px;
   bottom: 0;
-  height: 1.5px;
+  height: 3px;
+  border-radius: 999px;
   background: var(--accent);
 }
 
@@ -388,28 +422,71 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
 .present-dot { animation: present-pulse 1.6s ease-out infinite; }
 
 /* ═══════════════════════════════════════════════
-   CARDS
+   FLUENT SURFACES & CONTROLS
    ═══════════════════════════════════════════════ */
 
 .card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow var(--dur-normal) var(--ease-standard),
+    background var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard);
 }
 
-.card:hover {
-  box-shadow: var(--sh-3-hi);
-  border-color: var(--line-soft);
+/* Fluent raises a card on hover; it never translates it. */
+.card:hover { box-shadow: var(--sh-3-hi); }
+.card-lift:hover { box-shadow: var(--sh-3-hi); }
+
+/* ── Buttons ──
+   Fluent's signature is the bottom stroke: the lower edge sits a shade
+   darker than the other three, which reads as a lit surface. */
+.fl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--dur-faster) var(--ease-standard),
+    border-color var(--dur-faster) var(--ease-standard);
 }
 
-.card-lift:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--sh-3-hi);
+.fl-btn-accent {
+  background: var(--accent-fill);
+  color: var(--accent-ink);
+  border: 1px solid transparent;
+  border-bottom-color: rgba(0, 0, 0, 0.18);
 }
+.fl-btn-accent:hover  { background: var(--accent-hover); }
+.fl-btn-accent:active {
+  background: var(--accent-pressed);
+  border-bottom-color: transparent;
+}
+
+.fl-btn-standard {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-bottom-color: var(--line-strong);
+}
+.fl-btn-standard:hover  { background: var(--subtle-hover); }
+.fl-btn-standard:active {
+  background: var(--subtle-pressed);
+  color: var(--ink-muted);
+  border-bottom-color: var(--line);
+}
+
+/* Fluent presses controls down slightly rather than moving them */
+.fl-btn:active { transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .card { transition: none; }
-  .card-lift:hover { transform: none; box-shadow: var(--sh-3); }
-  .present-dot { animation: none; }
-  .cursor-blink { animation: none; }
+  .card, .fl-btn { transition: none; }
 }
 
 /* ═══════════════════════════════════════════════

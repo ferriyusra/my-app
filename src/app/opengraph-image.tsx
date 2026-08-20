@@ -17,7 +17,7 @@ export default function OpengraphImage() {
 					display: 'flex',
 					flexDirection: 'column',
 					justifyContent: 'space-between',
-					background: '#f1ece3',
+					background: '#f5f5f5',
 					padding: 72,
 					/* Satori only ships a sans fallback, so the card does not pick up
 					   Instrument Serif the way the site does. Declaring `serif` here
@@ -38,13 +38,13 @@ export default function OpengraphImage() {
 							justifyContent: 'center',
 							width: 104,
 							height: 104,
-							borderRadius: 28,
-							background: '#a8432a',
-							border: '1px solid #1c1815',
-							boxShadow: '0 6px 24px rgba(28,24,21,0.10)',
+							borderRadius: 8,
+							background: '#0f6cbd',
+							border: '1px solid #d1d1d1',
+							boxShadow: '0 6px 24px rgba(0,0,0,0.14)',
 							color: '#ffffff',
 							fontSize: 44,
-							fontWeight: 800,
+							fontWeight: 600,
 						}}>
 						{profile.initials}
 					</div>
@@ -56,19 +56,19 @@ export default function OpengraphImage() {
 							gap: 12,
 							padding: '12px 24px',
 							borderRadius: 999,
-							background: '#fffefb',
+							background: '#ffffff',
 							border: '1px solid #ddd4c6',
-							boxShadow: '0 2px 8px rgba(28,24,21,0.07)',
+							boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
 							fontSize: 24,
-							fontWeight: 700,
-							color: '#1c1815',
+							fontWeight: 600,
+							color: '#242424',
 						}}>
 						<div
 							style={{
 								width: 14,
 								height: 14,
 								borderRadius: 999,
-								background: '#3d7a5c',
+								background: '#0e700e',
 							}}
 						/>
 						{profile.availabilityShort}
@@ -80,9 +80,8 @@ export default function OpengraphImage() {
 					<div
 						style={{
 							fontSize: 92,
-							fontWeight: 400,
-							letterSpacing: '-0.03em',
-							color: '#1c1815',
+							fontWeight: 600,
+							color: '#242424',
 							lineHeight: 1.05,
 						}}>
 						{profile.name}
@@ -91,9 +90,8 @@ export default function OpengraphImage() {
 						style={{
 							marginTop: 16,
 							fontSize: 40,
-							fontWeight: 700,
-							color: '#a8432a',
-							letterSpacing: '-0.02em',
+							fontWeight: 600,
+							color: '#0f6cbd',
 						}}>
 						{`${profile.role} — ${profile.roleDetail}`}
 					</div>
@@ -101,7 +99,7 @@ export default function OpengraphImage() {
 						style={{
 							marginTop: 20,
 							fontSize: 28,
-							color: '#4d453d',
+							color: '#616161',
 							maxWidth: 900,
 							lineHeight: 1.4,
 						}}>
@@ -117,13 +115,13 @@ export default function OpengraphImage() {
 						alignItems: 'center',
 						gap: 16,
 						fontSize: 26,
-						color: '#4d453d',
+						color: '#616161',
 					}}>
 					<div
 						style={{
 							width: 48,
 							height: 6,
-							background: '#a8432a',
+							background: '#0f6cbd',
 							borderRadius: 999,
 						}}
 					/>

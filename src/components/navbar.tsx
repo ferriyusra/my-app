@@ -91,29 +91,33 @@ export default function Navbar() {
 		<>
 			<nav aria-label='Main' className='nav-bar' data-scrolled={scrolled}>
 				<div className='nav-inner'>
-					{/* Wordmark — set in the display serif, no filled circle */}
+					{/* Fluent app titles sit at BodyLarge Semibold in the command
+					    bar — the same weight as an app name in Windows 11. */}
 					<a
 						href={isHomePage ? '#hero' : '/'}
-					style={{
-						textDecoration: 'none',
-						color: 'var(--ink)',
-						fontFamily: DISPLAY,
-						fontSize: 22,
-						letterSpacing: '-0.01em',
-						whiteSpace: 'nowrap',
-						flexShrink: 0,
-					}}>
-					{profile.name}
-				</a>
+						style={{
+							textDecoration: 'none',
+							color: 'var(--ink)',
+							fontFamily: DISPLAY,
+							fontSize: FONT.base,
+							fontWeight: 600,
+							letterSpacing: 0,
+							whiteSpace: 'nowrap',
+							flexShrink: 0,
+						}}>
+						{profile.name}
+					</a>
 
 				<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 					{!isMobile && (
 						<div
+							/* Fluent nav items carry their own padding and hover fill,
+							   so they sit almost flush against each other. */
 							style={{
 								display: 'flex',
 								alignItems: 'center',
-								gap: 26,
-								marginRight: 12,
+								gap: 2,
+								marginRight: 8,
 								fontSize: FONT.sm,
 								fontFamily: SANS,
 							}}>
@@ -125,7 +129,7 @@ export default function Navbar() {
 									className: 'nav-link',
 									'data-active': active,
 									'aria-current': active ? ('page' as const) : undefined,
-									style: { fontWeight: active ? 600 : 500 },
+									style: { fontWeight: active ? 600 : 400 },
 								};
 								return link.page ? (
 									<Link key={link.id} href={href} {...props}>
@@ -194,7 +198,7 @@ export default function Navbar() {
 				<div
 					style={{
 						position: 'fixed',
-						top: 64,
+						top: 48,
 						left: 0,
 						right: 0,
 						zIndex: 49,

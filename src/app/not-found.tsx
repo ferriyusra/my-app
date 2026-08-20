@@ -36,7 +36,6 @@ export default function NotFound() {
 								fontWeight: 900,
 								color: 'color-mix(in srgb, var(--ink) 7%, transparent)',
 								lineHeight: 1,
-								letterSpacing: '-0.04em',
 								userSelect: 'none',
 								fontFamily: SANS,
 							}}>
@@ -64,8 +63,8 @@ export default function NotFound() {
 									strokeWidth='5'
 									strokeLinejoin='round'
 								/>
-								<rect x='84' y='62' width='12' height='48' rx='6' fill='#1c1815' />
-								<rect x='84' y='120' width='12' height='12' rx='6' fill='#1c1815' />
+								<rect x='84' y='62' width='12' height='48' rx='6' fill='#242424' />
+								<rect x='84' y='120' width='12' height='12' rx='6' fill='#242424' />
 							</svg>
 						</div>
 					</div>
@@ -75,22 +74,20 @@ export default function NotFound() {
 						<h1
 							style={{
 								fontSize: 'clamp(32px, 5vw, 48px)',
-								fontWeight: 800,
+								fontWeight: 600,
 								color: 'var(--ink)',
 								margin: '0 0 4px',
 								lineHeight: 1.1,
-								letterSpacing: '-0.02em',
 							}}>
 							Oops!
 						</h1>
 						<p
 							style={{
 								fontSize: 'clamp(24px, 4vw, 36px)',
-								fontWeight: 800,
+								fontWeight: 600,
 								color: 'var(--ink)',
 								margin: '0 0 20px',
 								lineHeight: 1.2,
-								letterSpacing: '-0.02em',
 							}}>
 							Page Not Found
 						</p>
@@ -117,7 +114,7 @@ export default function NotFound() {
 								borderRadius: RADIUS.full,
 								textDecoration: 'none',
 								fontSize: FONT.base,
-								fontWeight: 700,
+								fontWeight: 600,
 								fontFamily: SANS,
 								transition: 'background 0.2s ease',
 								minWidth: 220,

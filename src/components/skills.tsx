@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import TextReveal from '@/components/text-reveal';
-import { BORDER, CONTAINER, EASE, FONT, H2, MONO, RADIUS, SANS } from '@/lib/theme';
+import { BORDER, CONTAINER, EASE, FONT, H2, RADIUS, SANS } from '@/lib/theme';
 
 type Category =
 	| 'All'
@@ -160,9 +160,6 @@ export default function Skills() {
 									background: isActive ? 'var(--accent)' : 'var(--surface)',
 									color: isActive ? 'var(--accent-ink)' : 'var(--ink)',
 									boxShadow: isActive ? 'var(--sh-1-hi)' : 'var(--sh-1)',
-									transform: isActive
-										? 'translate(-1px,-1px)'
-										: 'translate(0,0)',
 								}}>
 								{cat}
 							</button>
@@ -225,7 +222,7 @@ export default function Skills() {
 										fontSize: FONT.micro,
 										fontWeight: 600,
 										color: CATEGORY_COLOR[skill.category],
-										fontFamily: MONO,
+										fontFamily: SANS,
 									}}>
 									{skill.category}
 								</span>

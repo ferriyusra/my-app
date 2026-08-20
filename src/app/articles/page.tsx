@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, BookOpen, Clock, Rss, CheckCircle } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
-import { BORDER, CARD, EASE, FONT, MONO, RADIUS, SANS } from '@/lib/theme';
+import { BORDER, CARD, EASE, FONT, RADIUS, SANS } from '@/lib/theme';
 
 export default function ArticlesPage() {
 	const [toast, setToast] = useState(false);
@@ -54,12 +54,10 @@ export default function ArticlesPage() {
 							transition: 'transform 0.18s ease, box-shadow 0.18s ease',
 						}}
 						onMouseEnter={(e) => {
-							e.currentTarget.style.transform = 'translate(-1px, -1px)';
-							e.currentTarget.style.boxShadow = 'var(--sh-2)';
+														e.currentTarget.style.boxShadow = 'var(--sh-2)';
 						}}
 						onMouseLeave={(e) => {
-							e.currentTarget.style.transform = 'translate(0, 0)';
-							e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
+														e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
 						}}>
 						<ArrowLeft size={14} aria-hidden='true' />
 						Back to home
@@ -100,12 +98,10 @@ export default function ArticlesPage() {
 
 					<p
 						style={{
-							fontFamily: MONO,
+							fontFamily: SANS,
 							fontSize: FONT.micro,
 							color: 'var(--ink-muted)',
 							fontWeight: 600,
-							letterSpacing: '0.18em',
-							textTransform: 'uppercase',
 							marginBottom: 16,
 						}}>
 						Coming Soon
@@ -114,9 +110,8 @@ export default function ArticlesPage() {
 					<h1
 						style={{
 							fontSize: 'clamp(28px, 5vw, 42px)',
-							fontWeight: 800,
+							fontWeight: 600,
 							color: 'var(--ink)',
-							letterSpacing: '-0.03em',
 							lineHeight: 1.1,
 							marginBottom: 16,
 						}}>
@@ -194,7 +189,7 @@ export default function ArticlesPage() {
 							border: `${BORDER.hard} solid ${toast ? 'var(--success)' : 'var(--solid)'}`,
 							borderRadius: RADIUS.full,
 							fontSize: FONT.sm,
-							fontWeight: 700,
+							fontWeight: 600,
 							fontFamily: SANS,
 							boxShadow: 'var(--sh-1-hi)',
 							cursor: toast ? 'default' : 'pointer',
@@ -205,15 +200,13 @@ export default function ArticlesPage() {
 							if (toast) return;
 							e.currentTarget.style.background = 'var(--accent)';
 							e.currentTarget.style.borderColor = 'var(--accent)';
-							e.currentTarget.style.transform = 'translate(-1px, -1px)';
-							e.currentTarget.style.boxShadow = 'var(--sh-2)';
+														e.currentTarget.style.boxShadow = 'var(--sh-2)';
 						}}
 						onMouseLeave={(e) => {
 							if (toast) return;
 							e.currentTarget.style.background = 'var(--solid)';
 							e.currentTarget.style.borderColor = 'var(--solid)';
-							e.currentTarget.style.transform = 'translate(0, 0)';
-							e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
+														e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
 						}}>
 						{toast ? (
 							<CheckCircle size={15} aria-hidden='true' />

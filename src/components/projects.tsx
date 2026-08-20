@@ -13,7 +13,6 @@ import {
 	CONTAINER,
 	FONT,
 	H2,
-	MONO,
 	RADIUS,
 	SANS,
 } from '@/lib/theme';
@@ -45,7 +44,7 @@ const LINK_BASE: React.CSSProperties = {
 	border: `${BORDER.soft} solid var(--line)`,
 	borderRadius: RADIUS.sm,
 	fontSize: FONT.sm,
-	fontWeight: 700,
+	fontWeight: 600,
 	textDecoration: 'none',
 	fontFamily: SANS,
 	boxShadow: 'var(--sh-1)',
@@ -53,12 +52,10 @@ const LINK_BASE: React.CSSProperties = {
 };
 
 function liftOn(e: React.MouseEvent<HTMLElement>) {
-	e.currentTarget.style.transform = 'translate(-1px,-1px)';
-	e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
+		e.currentTarget.style.boxShadow = 'var(--sh-1-hi)';
 }
 function liftOff(e: React.MouseEvent<HTMLElement>) {
-	e.currentTarget.style.transform = 'translate(0,0)';
-	e.currentTarget.style.boxShadow = 'var(--sh-1)';
+		e.currentTarget.style.boxShadow = 'var(--sh-1)';
 }
 
 /* ── Generated Placeholder ────────────────────────── */
@@ -90,10 +87,9 @@ function CoverPlaceholder({ project }: { project: Project }) {
 				<span
 					style={{
 						fontSize: 24,
-						fontWeight: 800,
+						fontWeight: 600,
 						fontFamily: SANS,
 						color: project.color,
-						letterSpacing: '-0.02em',
 					}}>
 					{project.initial}
 				</span>
@@ -115,7 +111,7 @@ function CoverPlaceholder({ project }: { project: Project }) {
 							border: `1px solid var(--line-soft)`,
 							borderRadius: RADIUS.full,
 							fontSize: FONT.micro,
-							fontFamily: MONO,
+							fontFamily: SANS,
 							color: 'var(--ink-secondary)',
 						}}>
 						{t}
@@ -172,9 +168,9 @@ function BentoCard({ project }: { project: Project }) {
 						border: `${BORDER.soft} solid ${badge.border}`,
 						borderRadius: RADIUS.full,
 						fontSize: FONT.micro,
-						fontFamily: MONO,
+						fontFamily: SANS,
 						color: badge.color,
-						fontWeight: 700,
+						fontWeight: 600,
 					}}>
 					{badge.label}
 				</div>
@@ -190,9 +186,9 @@ function BentoCard({ project }: { project: Project }) {
 							border: `${BORDER.soft} solid var(--line)`,
 							borderRadius: RADIUS.full,
 							fontSize: FONT.micro,
-							fontFamily: MONO,
+							fontFamily: SANS,
 							color: project.color,
-							fontWeight: 700,
+							fontWeight: 600,
 							boxShadow: 'var(--sh-1)',
 						}}>
 						featured
@@ -218,10 +214,9 @@ function BentoCard({ project }: { project: Project }) {
 					<h3
 						style={{
 							fontSize: FONT.lg,
-							fontWeight: 800,
+							fontWeight: 600,
 							fontFamily: SANS,
 							color: 'var(--ink)',
-							letterSpacing: '-0.02em',
 							margin: 0,
 						}}>
 						{project.name}
@@ -234,7 +229,7 @@ function BentoCard({ project }: { project: Project }) {
 								gap: 4,
 								color: 'var(--warn)',
 								fontSize: FONT.micro,
-								fontFamily: MONO,
+								fontFamily: SANS,
 								flexShrink: 0,
 								marginLeft: 12,
 							}}>
@@ -278,7 +273,7 @@ function BentoCard({ project }: { project: Project }) {
 								border: `${BORDER.soft} solid var(--line)`,
 								borderRadius: RADIUS.full,
 								fontSize: FONT.micro,
-								fontFamily: MONO,
+								fontFamily: SANS,
 								color: 'var(--ink)',
 							}}>
 							{t}
