@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { Power, FileText } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Power, FileText, Search } from 'lucide-react';
 import { profile } from '@/data/profile';
 import { useWindows } from './window-store';
 import { APPS } from './apps/registry';
@@ -9,6 +9,10 @@ import { APPS } from './apps/registry';
 export default function StartMenu({ onClose }: { onClose: () => void }) {
 	const { open } = useWindows();
 	const ref = useRef<HTMLDivElement>(null);
+	const [q, setQ] = useState('');
+	const matches = APPS.filter((a) =>
+		a.title.toLowerCase().includes(q.trim().toLowerCase()),
+	);
 
 	/* Click-away and Escape both dismiss, as in Windows. */
 	useEffect(() => {
@@ -27,9 +31,23 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 
 	return (
 		<div className='start' ref={ref} role='dialog' aria-label='Start menu'>
-			<p className='start-label'>Pinned</p>
+			{/* Windows 11 opens Start with search focused. It also makes the
+			    menu usable from the keyboard without tabbing the whole grid. */}
+			<label className='start-search'>
+				<Search size={16} aria-hidden='true' />
+				<input
+					type='search'
+					value={q}
+					autoFocus
+					placeholder='Search apps'
+					aria-label='Search apps'
+					onChange={(e) => setQ(e.target.value)}
+				/>
+			</label>
+
+			<p className='start-label'>{q ? 'Results' : 'Pinned'}</p>
 			<div className='start-grid'>
-				{APPS.map(({ id, title, Icon, tint }) => (
+				{matches.map(({ id, title, Icon, tint }) => (
 					<button
 						key={id}
 						type='button'
@@ -44,6 +62,7 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 						{title}
 					</button>
 				))}
+				{!q && (
 				<a
 					className='start-tile'
 					href={profile.cvView}
@@ -55,6 +74,10 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 					</span>
 					Resume
 				</a>
+				)}
+				{q && matches.length === 0 && (
+					<p className='start-empty'>No apps match &ldquo;{q}&rdquo;.</p>
+				)}
 			</div>
 
 			<footer className='start-foot'>

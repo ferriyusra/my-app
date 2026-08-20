@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { WindowProvider, useWindows } from './window-store';
 import WindowFrame from './window-frame';
 import Taskbar from './taskbar';
@@ -10,13 +11,19 @@ import { profile } from '@/data/profile';
 
 function DesktopIcons() {
 	const { open } = useWindows();
+	const [selected, setSelected] = useState<string | null>(null);
 	return (
-		<ul className='desk-icons'>
+		<ul className='desk-icons' onPointerDown={() => setSelected(null)}>
 			{APPS.map(({ id, title, Icon, tint }) => (
 				<li key={id}>
 					<button
 						type='button'
 						className='desk-icon'
+						data-selected={selected === id}
+						onPointerDown={(e) => {
+							e.stopPropagation();
+							setSelected(id);
+						}}
 						onDoubleClick={() => open(id)}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
@@ -41,7 +48,9 @@ function Windows() {
 	const topZ = Math.max(0, ...windows.map((w) => w.z));
 
 	return (
-		<>
+		/* AnimatePresence lets a window play its exit animation when it is
+		   closed or minimised, instead of vanishing. */
+		<AnimatePresence>
 			{windows.map((w) => {
 				const app = APP_BY_ID[w.id];
 				const { Content, Icon, tint } = app;
@@ -63,7 +72,7 @@ function Windows() {
 					</WindowFrame>
 				);
 			})}
-		</>
+		</AnimatePresence>
 	);
 }
 

@@ -1,8 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Minus, Square, X, Copy } from 'lucide-react';
 import { useWindows, type AppId } from './window-store';
+import SnapFlyout from './snap-flyout';
 
 const TASKBAR = 56;
 
@@ -38,7 +40,9 @@ export default function WindowFrame({
 	focused,
 	children,
 }: Props) {
-	const { close, focus, minimise, toggleMax, move, resize } = useWindows();
+	const { close, focus, minimise, toggleMax, snap, move, resize } = useWindows();
+	const [snapOpen, setSnapOpen] = useState(false);
+	const shouldReduceMotion = useReducedMotion();
 	const dragRef = useRef<{ dx: number; dy: number } | null>(null);
 	const sizeRef = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
 	const frameRef = useRef<HTMLDivElement>(null);
@@ -70,8 +74,16 @@ export default function WindowFrame({
 	};
 
 	const endDrag = (e: React.PointerEvent) => {
+		const wasDragging = !!dragRef.current;
 		dragRef.current = null;
 		(e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+		if (!wasDragging) return;
+		// Dragging a window into an edge snaps it, as Windows 11 does.
+		const b = bounds();
+		const EDGE = 12;
+		if (e.clientY <= EDGE) snap(id, 'max', b);
+		else if (e.clientX <= EDGE) snap(id, 'left', b);
+		else if (e.clientX >= b.w - EDGE) snap(id, 'right', b);
 	};
 
 	/* ── Resize ── */
@@ -113,7 +125,7 @@ export default function WindowFrame({
 	}, [focused]);
 
 	return (
-		<div
+		<motion.div
 			ref={frameRef}
 			className='win'
 			role='dialog'
@@ -121,6 +133,13 @@ export default function WindowFrame({
 			tabIndex={-1}
 			data-focused={focused}
 			data-maximised={maximised}
+			/* Windows 11 scales a window up as it opens and back down as it
+			   closes or minimises. Only transform and opacity animate, so this
+			   never fights the left/top the drag handler writes. */
+			initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.94 }}
+			animate={{ opacity: 1, scale: 1 }}
+			exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 12 }}
+			transition={{ duration: shouldReduceMotion ? 0 : 0.18, ease: [0.33, 0, 0.67, 1] }}
 			style={{
 				left: x,
 				top: y,
@@ -150,16 +169,29 @@ export default function WindowFrame({
 						onClick={() => minimise(id)}>
 						<Minus size={14} aria-hidden='true' />
 					</button>
-					<button
-						type='button'
-						aria-label={maximised ? `Restore ${title}` : `Maximise ${title}`}
-						onClick={() => toggleMax(id, bounds())}>
-						{maximised ? (
-							<Copy size={12} aria-hidden='true' />
-						) : (
-							<Square size={11} aria-hidden='true' />
+					<span
+						className='win-max-wrap'
+						onMouseEnter={() => setSnapOpen(true)}
+						onMouseLeave={() => setSnapOpen(false)}>
+						<button
+							type='button'
+							aria-label={maximised ? `Restore ${title}` : `Maximise ${title}`}
+							aria-expanded={snapOpen}
+							onFocus={() => setSnapOpen(true)}
+							onClick={() => toggleMax(id, bounds())}>
+							{maximised ? (
+								<Copy size={12} aria-hidden='true' />
+							) : (
+								<Square size={11} aria-hidden='true' />
+							)}
+						</button>
+						{snapOpen && (
+							<SnapFlyout
+								onSnap={(zone) => snap(id, zone, bounds())}
+								onDismiss={() => setSnapOpen(false)}
+							/>
 						)}
-					</button>
+					</span>
 					<button
 						type='button'
 						className='win-close'
@@ -182,6 +214,6 @@ export default function WindowFrame({
 					onPointerCancel={endResize}
 				/>
 			)}
-		</div>
+		</motion.div>
 	);
 }

@@ -33,7 +33,7 @@ export const APPS: AppDef[] = [
 		Icon: User,
 		tint: '#0f6cbd',
 		w: 760,
-		h: 560,
+		h: 500,
 		Content: AboutApp,
 	},
 	{

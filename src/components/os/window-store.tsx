@@ -28,6 +28,23 @@ export type WindowState = {
 	restore?: { x: number; y: number; w: number; h: number };
 };
 
+/** The zones Windows 11 offers from its Snap Layouts flyout. */
+export type SnapZone = 'left' | 'right' | 'tl' | 'tr' | 'bl' | 'br' | 'max';
+
+function zoneRect(zone: SnapZone, b: { w: number; h: number }) {
+	const halfW = Math.round(b.w / 2);
+	const halfH = Math.round(b.h / 2);
+	switch (zone) {
+		case 'left':  return { x: 0, y: 0, w: halfW, h: b.h };
+		case 'right': return { x: halfW, y: 0, w: b.w - halfW, h: b.h };
+		case 'tl':    return { x: 0, y: 0, w: halfW, h: halfH };
+		case 'tr':    return { x: halfW, y: 0, w: b.w - halfW, h: halfH };
+		case 'bl':    return { x: 0, y: halfH, w: halfW, h: b.h - halfH };
+		case 'br':    return { x: halfW, y: halfH, w: b.w - halfW, h: b.h - halfH };
+		case 'max':   return { x: 0, y: 0, w: b.w, h: b.h };
+	}
+}
+
 type State = { windows: WindowState[]; nextZ: number };
 
 type Action =
@@ -36,6 +53,7 @@ type Action =
 	| { type: 'focus'; id: AppId }
 	| { type: 'minimise'; id: AppId }
 	| { type: 'toggleMax'; id: AppId; bounds: { w: number; h: number } }
+	| { type: 'snap'; id: AppId; zone: SnapZone; bounds: { w: number; h: number } }
 	| { type: 'move'; id: AppId; x: number; y: number }
 	| { type: 'resize'; id: AppId; w: number; h: number };
 
@@ -117,6 +135,24 @@ function reducer(state: State, action: Action): State {
 					};
 				}),
 			};
+		case 'snap': {
+			const rect = zoneRect(action.zone, action.bounds);
+			return {
+				...state,
+				nextZ: state.nextZ + 1,
+				windows: state.windows.map((w) =>
+					w.id === action.id
+						? {
+								...w,
+								restore: w.maximised ? w.restore : { x: w.x, y: w.y, w: w.w, h: w.h },
+								...rect,
+								maximised: action.zone === 'max',
+								z: state.nextZ,
+							}
+						: w,
+				),
+			};
+		}
 		case 'move':
 			return {
 				...state,
@@ -141,6 +177,7 @@ type Ctx = {
 	focus: (id: AppId) => void;
 	minimise: (id: AppId) => void;
 	toggleMax: (id: AppId, bounds: { w: number; h: number }) => void;
+	snap: (id: AppId, zone: SnapZone, bounds: { w: number; h: number }) => void;
 	move: (id: AppId, x: number, y: number) => void;
 	resize: (id: AppId, w: number, h: number) => void;
 	topZ: number;
@@ -170,6 +207,7 @@ export function WindowProvider({ children }: { children: React.ReactNode }) {
 			focus: (id) => dispatch({ type: 'focus', id }),
 			minimise: (id) => dispatch({ type: 'minimise', id }),
 			toggleMax: (id, bounds) => dispatch({ type: 'toggleMax', id, bounds }),
+			snap: (id, zone, bounds) => dispatch({ type: 'snap', id, zone, bounds }),
 			move: (id, x, y) => dispatch({ type: 'move', id, x, y }),
 			resize: (id, w, h) => dispatch({ type: 'resize', id, w, h }),
 			topZ: state.nextZ - 1,

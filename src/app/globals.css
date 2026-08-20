@@ -76,6 +76,7 @@
 
   /* ── Materials ── */
   --acrylic: rgba(252, 252, 252, 0.72);
+  --acrylic-taskbar: rgba(243, 243, 243, 0.66);
   --acrylic-blur: blur(30px) saturate(125%);
   --mica-tint: rgba(15, 108, 189, 0.024);
 
@@ -146,6 +147,7 @@ html[data-theme="dark"] {
   --sh-3-hi: 0 8px 16px rgba(0, 0, 0, 0.28), 0 0 2px rgba(0, 0, 0, 0.22);
 
   --acrylic: rgba(44, 44, 44, 0.76);
+  --acrylic-taskbar: rgba(28, 28, 28, 0.58);
   --mica-tint: rgba(71, 158, 245, 0.035);
 }
 
@@ -636,6 +638,10 @@ html[data-theme='dark'] .desktop {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.16);
 }
+.desk-icon[data-selected='true'] {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+}
 .desk-icon:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 1px;
@@ -685,8 +691,8 @@ html[data-theme='dark'] .desktop {
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 40px;
-  padding-left: 14px;
+  height: 32px;
+  padding-left: 12px;
   flex-shrink: 0;
   background: var(--surface-header);
   border-bottom: 1px solid var(--line-subtle);
@@ -749,10 +755,10 @@ html[data-theme='dark'] .desktop {
   align-items: center;
   justify-content: center;
   padding: 0 12px;
-  background: var(--acrylic);
-  backdrop-filter: var(--acrylic-blur);
-  -webkit-backdrop-filter: var(--acrylic-blur);
-  border-top: 1px solid var(--line-subtle);
+  background: var(--acrylic-taskbar);
+  backdrop-filter: blur(40px) saturate(140%);
+  -webkit-backdrop-filter: blur(40px) saturate(140%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   z-index: 9000;
 }
 
@@ -1269,4 +1275,93 @@ html[data-theme='dark'] .desktop {
   font-size: 14px;
   line-height: 20px;
   color: var(--ink-secondary);
+}
+
+/* ── Snap Layouts ──
+   Windows 11's flyout under the maximise button. Each miniature is a
+   picture of the screen with the target zone highlighted. */
+.win-max-wrap { position: relative; display: flex; height: 100%; }
+
+.snap-flyout {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--acrylic);
+  backdrop-filter: var(--acrylic-blur);
+  -webkit-backdrop-filter: var(--acrylic-blur);
+  border: 1px solid var(--line-soft);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+.snap-layout {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  width: 92px;
+  height: 62px;
+  padding: 3px;
+  border-radius: 4px;
+  background: var(--surface-chip);
+}
+/* A two-zone layout fills the full height with one row. */
+.snap-layout:first-child { grid-template-rows: 1fr; }
+.snap-cell {
+  border: none;
+  border-radius: 2px;
+  background: var(--line);
+  cursor: pointer;
+  transition: background var(--dur-faster) var(--ease-standard);
+}
+.snap-cell:hover,
+.snap-cell:focus-visible { background: var(--accent); }
+
+/* ── Start search ── */
+.start-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 12px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-bottom-color: var(--accent);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+.start-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+}
+.start-empty {
+  grid-column: 1 / -1;
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+/* ── Tray ── */
+.tb-trayicons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  color: var(--ink-secondary);
+}
+.tb-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  line-height: 14px;
+  font-size: 12px;
 }
