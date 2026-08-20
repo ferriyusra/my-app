@@ -90,12 +90,19 @@ export default function EditorApp() {
 		setActive(path);
 	};
 
+	/* Both pieces of state move together and neither moves inside an updater —
+	   a `setActive` call in there would be a setState during render. Closing
+	   the last tab reopens the first file rather than leaving an empty editor,
+	   which is what VS Code does with its welcome tab. */
 	const close = (path: string) => {
-		setOpenPaths((p) => {
-			const next = p.filter((x) => x !== path);
-			if (active === path && next.length) setActive(next[next.length - 1]);
-			return next.length ? next : [sourceFiles[0].path];
-		});
+		const next = openPaths.filter((x) => x !== path);
+		if (!next.length) {
+			setOpenPaths([sourceFiles[0].path]);
+			setActive(sourceFiles[0].path);
+			return;
+		}
+		setOpenPaths(next);
+		if (active === path) setActive(next[next.length - 1]);
 	};
 
 	/* Group the flat path list into a directory tree, one level deep — which

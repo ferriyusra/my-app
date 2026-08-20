@@ -273,15 +273,19 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 		persist(KEY.accent, a);
 	}, []);
 
-	const togglePin = useCallback((id: AppId) => {
-		setPinned((list) => {
-			const next = list.includes(id)
-				? list.filter((p) => p !== id)
-				: [...list, id];
+	/* The write stays out of the updater: React may run an updater during the
+	   render phase, and in development runs it twice, so a side effect in
+	   there is neither pure nor run once. */
+	const togglePin = useCallback(
+		(id: AppId) => {
+			const next = pinned.includes(id)
+				? pinned.filter((p) => p !== id)
+				: [...pinned, id];
+			setPinned(next);
 			persist(KEY.pinned, JSON.stringify(next));
-			return next;
-		});
-	}, []);
+		},
+		[pinned],
+	);
 
 	const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const seq = useRef(0);
