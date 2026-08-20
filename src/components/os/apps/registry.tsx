@@ -19,8 +19,13 @@ export type AppDef = {
 	id: AppId;
 	title: string;
 	Icon: LucideIcon;
-	/** Accent behind the icon, mirroring how Windows tiles brand their apps. */
+	/**
+	 * Windows app icons are solid coloured tiles with a white glyph, not line
+	 * art on a translucent plate. `grad` fills the tile; `tint` is the flat
+	 * colour for places too small for a gradient.
+	 */
 	tint: string;
+	grad: string;
 	w: number;
 	h: number;
 	Content: () => React.ReactElement;
@@ -31,7 +36,8 @@ export const APPS: AppDef[] = [
 		id: 'about',
 		title: 'About Me',
 		Icon: User,
-		tint: '#0f6cbd',
+		tint: '#3b82f6',
+		grad: 'linear-gradient(140deg, #4cc2ff 0%, #0f6cbd 100%)',
 		w: 760,
 		h: 500,
 		Content: AboutApp,
@@ -40,7 +46,8 @@ export const APPS: AppDef[] = [
 		id: 'experience',
 		title: 'Experience',
 		Icon: Briefcase,
-		tint: '#0e700e',
+		tint: '#12a594',
+		grad: 'linear-gradient(140deg, #4ad7c7 0%, #0e7c70 100%)',
 		w: 900,
 		h: 620,
 		Content: ExperienceApp,
@@ -49,7 +56,8 @@ export const APPS: AppDef[] = [
 		id: 'projects',
 		title: 'Projects',
 		Icon: FolderGit2,
-		tint: '#8764b8',
+		tint: '#f7b32b',
+		grad: 'linear-gradient(140deg, #ffd45e 0%, #e39b0b 100%)',
 		w: 940,
 		h: 640,
 		Content: ProjectsApp,
@@ -58,7 +66,8 @@ export const APPS: AppDef[] = [
 		id: 'skills',
 		title: 'Tech Stack',
 		Icon: Layers,
-		tint: '#bc4b09',
+		tint: '#8b5cf6',
+		grad: 'linear-gradient(140deg, #b18cff 0%, #6d3fd4 100%)',
 		w: 780,
 		h: 540,
 		Content: SkillsApp,
@@ -67,7 +76,8 @@ export const APPS: AppDef[] = [
 		id: 'contact',
 		title: 'Contact',
 		Icon: Mail,
-		tint: '#c239b3',
+		tint: '#0f6cbd',
+		grad: 'linear-gradient(140deg, #59b4f0 0%, #1454a8 100%)',
 		w: 720,
 		h: 620,
 		Content: ContactApp,

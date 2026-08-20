@@ -7,6 +7,7 @@ import WindowFrame from './window-frame';
 import Taskbar from './taskbar';
 import StartMenu from './start-menu';
 import { APPS, APP_BY_ID } from './apps/registry';
+import AppTile from './app-tile';
 import { profile } from '@/data/profile';
 
 function DesktopIcons() {
@@ -14,28 +15,26 @@ function DesktopIcons() {
 	const [selected, setSelected] = useState<string | null>(null);
 	return (
 		<ul className='desk-icons' onPointerDown={() => setSelected(null)}>
-			{APPS.map(({ id, title, Icon, tint }) => (
-				<li key={id}>
+			{APPS.map((app) => (
+				<li key={app.id}>
 					<button
 						type='button'
 						className='desk-icon'
-						data-selected={selected === id}
+						data-selected={selected === app.id}
 						onPointerDown={(e) => {
 							e.stopPropagation();
-							setSelected(id);
+							setSelected(app.id);
 						}}
-						onDoubleClick={() => open(id)}
+						onDoubleClick={() => open(app.id)}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
 								e.preventDefault();
-								open(id);
+								open(app.id);
 							}
 						}}
-						aria-label={`Open ${title}`}>
-						<span className='desk-icon-img' style={{ background: `${tint}26` }}>
-							<Icon size={26} aria-hidden='true' style={{ color: tint }} />
-						</span>
-						{title}
+						aria-label={`Open ${app.title}`}>
+						<AppTile app={app} size={46} />
+						{app.title}
 					</button>
 				</li>
 			))}
@@ -53,14 +52,14 @@ function Windows() {
 		<AnimatePresence>
 			{windows.map((w) => {
 				const app = APP_BY_ID[w.id];
-				const { Content, Icon, tint } = app;
+				const { Content } = app;
 				if (w.minimised) return null;
 				return (
 					<WindowFrame
 						key={w.id}
 						id={w.id}
 						title={app.title}
-						icon={<Icon size={14} style={{ color: tint }} />}
+						icon={<AppTile app={app} size={16} />}
 						x={w.x}
 						y={w.y}
 						w={w.w}
@@ -112,13 +111,13 @@ function Shell() {
 					</div>
 				</header>
 				<p className='mobile-intro'>{profile.headline}</p>
-				{APPS.map(({ id, title, Icon, tint, Content }) => (
-					<section key={id} className='mobile-card' aria-label={title}>
+				{APPS.map((app) => (
+					<section key={app.id} className='mobile-card' aria-label={app.title}>
 						<h2>
-							<Icon size={17} aria-hidden='true' style={{ color: tint }} />
-							{title}
+							<AppTile app={app} size={22} />
+							{app.title}
 						</h2>
-						<Content />
+						<app.Content />
 					</section>
 				))}
 			</div>

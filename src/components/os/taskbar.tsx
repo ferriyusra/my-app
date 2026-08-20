@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { LayoutGrid, Sun, Moon, Wifi, Volume2 } from 'lucide-react';
+import { Sun, Moon, Wifi, Volume2 } from 'lucide-react';
+import AppTile from './app-tile';
+import WindowsLogo from './windows-logo';
 import { useWindows } from './window-store';
 import { APPS } from './apps/registry';
 import { useTheme } from '../theme-provider';
@@ -52,10 +54,11 @@ export default function Taskbar({
 					aria-label='Start'
 					aria-expanded={startOpen}
 					onClick={onToggleStart}>
-					<LayoutGrid size={20} aria-hidden='true' />
+					<WindowsLogo size={19} />
 				</button>
 
-				{APPS.map(({ id, title, Icon, tint }) => {
+				{APPS.map((app) => {
+					const { id, title } = app;
 					const win = windows.find((w) => w.id === id);
 					const isTop = !!win && !win.minimised && win.z === topZ;
 					return (
@@ -72,7 +75,7 @@ export default function Taskbar({
 								if (isTop) return minimise(id);
 								focus(id);
 							}}>
-							<Icon size={19} aria-hidden='true' style={{ color: tint }} />
+							<AppTile app={app} size={26} />
 							<span className='tb-indicator' aria-hidden='true' />
 						</button>
 					);

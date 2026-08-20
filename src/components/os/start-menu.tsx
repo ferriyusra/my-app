@@ -5,6 +5,7 @@ import { Power, FileText, Search } from 'lucide-react';
 import { profile } from '@/data/profile';
 import { useWindows } from './window-store';
 import { APPS } from './apps/registry';
+import AppTile from './app-tile';
 
 export default function StartMenu({ onClose }: { onClose: () => void }) {
 	const { open } = useWindows();
@@ -47,19 +48,17 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 
 			<p className='start-label'>{q ? 'Results' : 'Pinned'}</p>
 			<div className='start-grid'>
-				{matches.map(({ id, title, Icon, tint }) => (
+				{matches.map((app) => (
 					<button
-						key={id}
+						key={app.id}
 						type='button'
 						className='start-tile'
 						onClick={() => {
-							open(id);
+							open(app.id);
 							onClose();
 						}}>
-						<span className='start-tile-icon' style={{ background: `${tint}1f` }}>
-							<Icon size={22} aria-hidden='true' style={{ color: tint }} />
-						</span>
-						{title}
+						<AppTile app={app} size={38} />
+						{app.title}
 					</button>
 				))}
 				{!q && (
@@ -69,8 +68,16 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 					target='_blank'
 					rel='noopener noreferrer'
 					onClick={onClose}>
-					<span className='start-tile-icon' style={{ background: '#6161611f' }}>
-						<FileText size={22} aria-hidden='true' />
+					<span
+						className='app-tile'
+						aria-hidden='true'
+						style={{
+							width: 38,
+							height: 38,
+							borderRadius: 8,
+							background: 'linear-gradient(140deg, #9aa4b2 0%, #5b6673 100%)',
+						}}>
+						<FileText size={20} color='#fff' strokeWidth={2.1} />
 					</span>
 					Resume
 				</a>

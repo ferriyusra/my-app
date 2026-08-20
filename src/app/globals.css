@@ -586,21 +586,75 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
   position: fixed;
   inset: 0;
   overflow: hidden;
-  /* Stand-in for the Windows 11 "Bloom" wallpaper: radial blooms over a
-     deep field, so nothing has to be shipped as an image. */
   background:
-    radial-gradient(1100px 800px at 26% 30%, rgba(64, 138, 220, 0.55), transparent 62%),
-    radial-gradient(900px 700px at 74% 62%, rgba(140, 92, 200, 0.48), transparent 60%),
-    radial-gradient(700px 620px at 52% 88%, rgba(26, 160, 190, 0.34), transparent 64%),
-    linear-gradient(150deg, #0a2a52 0%, #10143a 55%, #1a0f30 100%);
+    radial-gradient(120% 100% at 50% 46%, var(--wp-field-in) 0%, var(--wp-field-out) 68%);
+
+  /* Bloom palette, consumed by the wallpaper SVG. */
+  --wp-field-in: #1b4a8f;
+  --wp-field-out: #071634;
+  --wp-petal-a: #9ee0ff;
+  --wp-petal-b: #4f93f0;
+  --wp-petal-c: #2a2f8f;
 }
 
 html[data-theme='dark'] .desktop {
-  background:
-    radial-gradient(1100px 800px at 26% 30%, rgba(30, 84, 150, 0.5), transparent 62%),
-    radial-gradient(900px 700px at 74% 62%, rgba(84, 50, 130, 0.45), transparent 60%),
-    radial-gradient(700px 620px at 52% 88%, rgba(14, 92, 112, 0.32), transparent 64%),
-    linear-gradient(150deg, #05122a 0%, #080a20 55%, #0d0718 100%);
+  --wp-field-in: #12345f;
+  --wp-field-out: #030a1c;
+  --wp-petal-a: #6ec2f5;
+  --wp-petal-b: #3a74c8;
+  --wp-petal-c: #1d1f63;
+}
+
+/* Bloom, built from repeating conic gradients.
+   An SVG version kept showing its filter region as hard rectangles: a group
+   carrying both a filter and mix-blend-mode gets rasterised into a box, and
+   the box edge composites visibly. Conic wedges blurred in CSS have no such
+   region — the mask handles the falloff instead. */
+.desktop::before,
+.desktop::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+}
+
+.desktop::before {
+  background: repeating-conic-gradient(
+    from 8deg at 50% 46%,
+    var(--wp-petal-a) 0deg 7deg,
+    transparent 7deg 45deg
+  );
+  -webkit-mask-image: radial-gradient(closest-side at 50% 46%, #000 4%, rgba(0,0,0,0.55) 42%, transparent 74%);
+  mask-image: radial-gradient(closest-side at 50% 46%, #000 4%, rgba(0,0,0,0.55) 42%, transparent 74%);
+  filter: blur(18px);
+  opacity: 0.85;
+}
+
+/* A second rosette, rotated and tighter, gives the centre its density. */
+.desktop::after {
+  background: repeating-conic-gradient(
+    from 30deg at 50% 46%,
+    var(--wp-petal-b) 0deg 5deg,
+    transparent 5deg 30deg
+  );
+  -webkit-mask-image: radial-gradient(closest-side at 50% 46%, #000 0%, rgba(0,0,0,0.6) 26%, transparent 52%);
+  mask-image: radial-gradient(closest-side at 50% 46%, #000 0%, rgba(0,0,0,0.6) 26%, transparent 52%);
+  filter: blur(26px);
+  opacity: 0.7;
+}
+
+/* Desktop children must sit above the two bloom layers. */
+.desk-icons, .win, .taskbar, .start, .desk-hint { position: absolute; }
+
+/* Windows app icons: a filled tile with a white glyph, with the highlight
+   along the top edge that every Fluent icon carries. */
+.app-tile {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 /* ── Desktop icons ── */
@@ -646,15 +700,7 @@ html[data-theme='dark'] .desktop {
   outline: 2px solid #fff;
   outline-offset: 1px;
 }
-.desk-icon-img {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(8px);
-}
+
 
 .desk-hint {
   position: absolute;
@@ -679,7 +725,10 @@ html[data-theme='dark'] .desktop {
   overflow: hidden;
   background: var(--surface);
   border: 1px solid var(--line-soft);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.34), 0 0 2px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 16px 40px rgba(0, 0, 0, 0.34),
+    0 0 2px rgba(0, 0, 0, 0.25);
   outline: none;
 }
 .win[data-focused='false'] {
@@ -778,6 +827,7 @@ html[data-theme='dark'] .desktop {
   transition: background var(--dur-faster) var(--ease-standard);
 }
 .tb-btn:hover { background: var(--subtle-hover); }
+.tb-start { color: var(--accent); }
 .tb-btn[data-active='true'] { background: var(--subtle-pressed); }
 
 /* The running indicator: a short bar that widens when the app is focused. */
@@ -865,13 +915,7 @@ html[data-theme='dark'] .desktop {
   transition: background var(--dur-faster) var(--ease-standard);
 }
 .start-tile:hover { background: var(--subtle-hover); }
-.start-tile-icon {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-}
+
 .start-foot {
   display: flex;
   align-items: center;
