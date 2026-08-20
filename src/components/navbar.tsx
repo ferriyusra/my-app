@@ -90,9 +90,10 @@ export default function Navbar() {
 	return (
 		<>
 			<nav aria-label='Main' className='nav-bar' data-scrolled={scrolled}>
-				{/* Wordmark — set in the display serif, no filled circle */}
-				<a
-					href={isHomePage ? '#hero' : '/'}
+				<div className='nav-inner'>
+					{/* Wordmark — set in the display serif, no filled circle */}
+					<a
+						href={isHomePage ? '#hero' : '/'}
 					style={{
 						textDecoration: 'none',
 						color: 'var(--ink)',
@@ -173,6 +174,7 @@ export default function Navbar() {
 							)}
 						</button>
 					)}
+				</div>
 				</div>
 			</nav>
 

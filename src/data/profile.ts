@@ -25,6 +25,32 @@ export const profile = {
 	previously: 'SATUSEHAT · Peruri · Moladin',
 
 	/**
+	 * Three outcomes, drawn verbatim in substance from the Experience entries.
+	 * They fill the right half of the hero with proof rather than decoration —
+	 * a visitor now sees what the work actually produced before scrolling.
+	 */
+	highlights: [
+		{
+			outcome:
+				'Billing source of truth for ~160 ASO entities, replacing spreadsheet tracking',
+			at: 'Meditap',
+			year: '2025',
+		},
+		{
+			outcome:
+				'Event-driven billing and threshold alerts on Pub/Sub, ending manual monitoring',
+			at: 'Meditap',
+			year: '2025',
+		},
+		{
+			outcome:
+				'Tableau dashboards migrated to native API services, cutting licence costs',
+			at: 'SATUSEHAT',
+			year: '2024',
+		},
+	],
+
+	/**
 	 * Path to a portrait in `public/`, e.g. '/ferri.jpg'. Leave null and the
 	 * hero stays a single typographic column; set it and the hero becomes two
 	 * columns with the portrait beside the statement.

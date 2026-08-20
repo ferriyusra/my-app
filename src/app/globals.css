@@ -199,13 +199,25 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
   align-items: center;
 }
 
-/* Two columns only when there is a portrait and room for it. */
-@media (min-width: 900px) {
-  .hero-grid[data-portrait='true'] {
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 64px;
-  }
+@media (min-width: 1000px) {
+  /* Statement left, proof right. Without this the right half of a wide
+     viewport was simply empty. */
+  .hero-grid { grid-template-columns: 1.35fr 0.65fr; gap: 72px; }
+  .hero-grid[data-portrait='true'] { grid-template-columns: 1.1fr 0.9fr; gap: 64px; }
 }
+
+/* The highlights repeat Experience in condensed form, so on narrow screens
+   they are dropped rather than making the hero a long scroll of its own. */
+.hero-highlights { display: none; }
+@media (min-width: 1000px) {
+  .hero-highlights { display: block; }
+}
+
+.hero-highlight {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.hero-highlight:last-child { border-bottom: 1px solid var(--line); }
 
 .hero-portrait {
   width: 100%;
@@ -237,12 +249,24 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
   height: 64px;
-  padding: 0 24px;
+  padding: 0;
   background: transparent;
   border-bottom: 1px solid transparent;
   transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+/* Same measure and gutter as every section, so the wordmark lines up with
+   the copy beneath it instead of hugging the viewport edge. */
+.nav-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
 }
 
 .nav-bar[data-scrolled='true'] {

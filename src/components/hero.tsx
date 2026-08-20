@@ -7,6 +7,7 @@ import {
 	CONTAINER,
 	DISPLAY,
 	EASE,
+	EYEBROW,
 	FONT,
 	MONO,
 	RADIUS,
@@ -71,7 +72,7 @@ export default function Hero() {
 			}}>
 			<div style={{ ...CONTAINER, width: '100%' }}>
 				<div className='hero-grid' data-portrait={hasPortrait}>
-					<div style={{ maxWidth: hasPortrait ? 'none' : 820 }}>
+					<div>
 						{/* Eyebrow — the navbar wordmark already carries the name. */}
 						<motion.div
 							{...step(0)}
@@ -126,7 +127,7 @@ export default function Hero() {
 						<motion.h1
 							{...step(1)}
 							style={{
-								fontSize: 'clamp(38px, 6.4vw, 68px)',
+								fontSize: 'clamp(36px, 4.8vw, 58px)',
 								fontWeight: 400,
 								fontFamily: DISPLAY,
 								letterSpacing: '-0.02em',
@@ -137,7 +138,7 @@ export default function Hero() {
 								   and never auto-hyphenate a display face. */
 								textWrap: 'balance',
 								hyphens: 'none',
-								maxWidth: '17ch',
+								maxWidth: '20ch',
 							}}>
 							{profile.headline}
 						</motion.h1>
@@ -216,17 +217,52 @@ export default function Hero() {
 						</motion.p>
 					</div>
 
-					{/* Portrait renders only once profile.portrait is set. */}
-					{profile.portrait && (
-						<motion.div
-							{...step(2)}
-							style={{ justifySelf: 'center' }}>
+					{/* Right column: the portrait once one exists, otherwise proof.
+					    A wide viewport previously left this half empty. */}
+					{profile.portrait ? (
+						<motion.div {...step(2)} style={{ justifySelf: 'center' }}>
 							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img
 								src={profile.portrait}
 								alt={`${profile.name}, ${profile.role}`}
 								className='hero-portrait'
 							/>
+						</motion.div>
+					) : (
+						<motion.div {...step(3)} className='hero-highlights'>
+							<p
+								style={{
+									...EYEBROW,
+									margin: '0 0 4px',
+								}}>
+								Selected outcomes
+							</p>
+							<ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+								{profile.highlights.map((h) => (
+									<li key={h.outcome} className='hero-highlight'>
+										<p
+											style={{
+												margin: '0 0 6px',
+												fontSize: FONT.sm,
+												lineHeight: 1.6,
+												color: 'var(--ink-secondary)',
+												fontFamily: SANS,
+											}}>
+											{h.outcome}
+										</p>
+										<p
+											style={{
+												margin: 0,
+												fontFamily: MONO,
+												fontSize: FONT.micro,
+												color: 'var(--ink-muted)',
+												letterSpacing: '0.06em',
+											}}>
+											{h.at} · {h.year}
+										</p>
+									</li>
+								))}
+							</ul>
 						</motion.div>
 					)}
 				</div>
