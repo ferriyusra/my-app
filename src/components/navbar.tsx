@@ -143,7 +143,18 @@ export default function Navbar() {
 					<button
 						type='button'
 						onClick={toggle}
-						aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+						/* Must be gated on `mounted` exactly like the icon below.
+						   The theme is read from the DOM during the first client
+						   render, but the server has no DOM and always renders
+						   'light' — so an ungated label is an attribute that
+						   differs between the two, which is a hydration mismatch. */
+						aria-label={
+							mounted
+								? isDark
+									? 'Switch to light mode'
+									: 'Switch to dark mode'
+								: 'Toggle colour theme'
+						}
 						style={iconButton}
 						onMouseEnter={(e) => {
 							e.currentTarget.style.color = 'var(--accent)';

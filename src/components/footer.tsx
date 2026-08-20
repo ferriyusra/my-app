@@ -327,7 +327,10 @@ export default function Footer() {
 							flexWrap: 'wrap',
 							gap: 12,
 						}}>
+						{/* Server and client can straddle a year boundary across
+						    timezones, so this value is allowed to differ. */}
 						<p
+							suppressHydrationWarning
 							style={{
 								color: 'var(--on-dark-muted)',
 								fontSize: FONT.sm,
