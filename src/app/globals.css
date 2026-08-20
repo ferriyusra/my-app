@@ -1604,6 +1604,43 @@ input[type='range']::-moz-range-thumb {
   100% { opacity: 0; transform: translateY(-22px) scale(1.1); }
 }
 
+/* ── The house ──
+   Painted in front of the cat, so walking behind it reads as depth and the
+   doorway can swallow the cat rather than showing it shrink on top. */
+.cat-house {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--taskbar-h) - 2px);
+  z-index: 8010;
+  line-height: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+.cat-house-art { display: block; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.24)); }
+/* Somebody is home. */
+.cat-house-eyes { animation: cat-house-blink 4.2s step-end infinite; transform-origin: 46px 58px; }
+@keyframes cat-house-blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+/* ── Through the doorway ──
+   The scale lives on its own wrapper so it never has to be composed with the
+   scaleX that flips the cat around. */
+.cat-scale { display: block; transform-origin: 50% 100%; }
+.cat[data-mode='entering'] .cat-scale {
+  animation: cat-into-house 520ms var(--ease-standard) both;
+}
+.cat[data-mode='exiting'] .cat-scale {
+  animation: cat-out-of-house 520ms var(--ease-decel) both;
+}
+@keyframes cat-into-house {
+  to { transform: scale(0.18) translateY(10px); opacity: 0; }
+}
+@keyframes cat-out-of-house {
+  from { transform: scale(0.18) translateY(10px); opacity: 0; }
+}
+
 /* ── The bowl ── */
 .cat-food {
   position: absolute;
@@ -1621,9 +1658,21 @@ input[type='range']::-moz-range-thumb {
 
 .st-feed { margin-top: 14px; }
 
+/* A switch that cannot be flipped yet should look like it. */
+.sw-row[data-disabled] { opacity: 0.55; }
+.sw-row[data-disabled] .sw-track { cursor: not-allowed; }
+.sw-input:disabled { cursor: not-allowed; }
+
 @media (prefers-reduced-motion: reduce) {
-  .cat-art *, .cat-hearts i, .cat-zzz i, .cat-food { animation: none !important; }
+  .cat-art *, .cat-hearts i, .cat-zzz i, .cat-food,
+  .cat-house-eyes { animation: none !important; }
   .cat-hearts i { opacity: 1; }
+  /* The doorway still has to finish — it is what re-enables the switch —
+     so it collapses to a fade rather than being removed. */
+  .cat[data-mode='entering'] .cat-scale,
+  .cat[data-mode='exiting'] .cat-scale {
+    animation-duration: 120ms !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════

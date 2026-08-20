@@ -48,6 +48,7 @@ export default function SettingsApp() {
 		setWallpaper,
 		catOn,
 		setCatOn,
+		catBusy,
 		feedCat,
 		sound,
 		setSound,
@@ -145,13 +146,21 @@ export default function SettingsApp() {
 						<ToggleSwitch
 							checked={catOn}
 							onChange={setCatOn}
-							label='Let a cat wander the desktop'
-							description='It naps, grooms and comes when there is food. Click to pet it.'
+							disabled={catBusy}
+							label='Let the cat out'
+							description={
+								catBusy
+									? catOn
+										? 'Coming out of its house…'
+										: 'Walking home…'
+									: 'It naps, grooms and comes when there is food. Click to pet it.'
+							}
 						/>
 						{catOn && (
 							<button
 								type='button'
 								className='fl-btn fl-btn-standard st-feed'
+								disabled={catBusy}
 								onClick={feedCat}>
 								<Cat size={15} aria-hidden='true' /> Put food down
 							</button>

@@ -100,6 +100,7 @@ function Shell() {
 		booted,
 		catOn,
 		setCatOn,
+		catBusy,
 		feedCat,
 	} = useShell();
 	const icons = useDesktopIcons();
@@ -175,15 +176,24 @@ function Shell() {
 						kind: 'item',
 						label: 'Feed the cat',
 						Icon: Fish,
-						disabled: !catOn,
+						disabled: !catOn || catBusy,
 						onSelect: feedCat,
 					},
 					{ kind: 'separator' },
 					{
 						kind: 'item',
-						label: catOn ? 'Send it home' : 'Let it in',
+						/* Disabled until it has finished walking in or out —
+						   a second click mid-walk would strand it. */
+						label: catBusy
+							? catOn
+								? 'Coming out…'
+								: 'Heading home…'
+							: catOn
+								? 'Send it home'
+								: 'Let it out',
 						Icon: Cat,
 						checked: catOn,
+						disabled: catBusy,
 						onSelect: () => setCatOn(!catOn),
 					},
 				],
@@ -224,7 +234,7 @@ function Shell() {
 				onSelect: () => launch('about'),
 			},
 		],
-		[icons, launch, notify, catOn, setCatOn, feedCat],
+		[icons, launch, notify, catOn, setCatOn, catBusy, feedCat],
 	);
 
 	const iconMenu = useCallback(

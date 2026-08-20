@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useShell } from '@/context/shell-context';
 import CatArt, { CAT_W } from './cat-art';
+import CatHouse, { DOOR_CENTRE, HOUSE_W } from './cat-house';
 
 /**
  * A cat that lives on the desktop.
@@ -18,7 +19,18 @@ import CatArt, { CAT_W } from './cat-art';
  * are state, and those happen every few seconds.
  */
 
-type Mode = 'walk' | 'sit' | 'groom' | 'sleep' | 'toFood' | 'eat' | 'pet';
+type Mode =
+	| 'walk'
+	| 'sit'
+	| 'groom'
+	| 'sleep'
+	| 'toFood'
+	| 'eat'
+	| 'pet'
+	/* Heading for the front door, and the moment of going through it. */
+	| 'toHome'
+	| 'entering'
+	| 'exiting';
 
 /**
  * Pace in pixels per second. A wandering cat is in no hurry; a cat that has
@@ -29,13 +41,23 @@ const SPEED_FOOD = 125;
 /** Food lands within reach rather than anywhere, so dinner is not a hike. */
 const FOOD_REACH = 420;
 const MARGIN = 14;
+/** How long the shrink through the doorway takes; mirrors the CSS. */
+const DOORWAY_MS = 520;
+/**
+ * How far in from the right edge the house sits.
+ *
+ * Far enough to clear the notification toast, which is 348px wide with a 12px
+ * margin and would otherwise land straight on the roof — including the welcome
+ * toast, so the house would be half-hidden the first time anyone saw it.
+ */
+const HOUSE_INSET = 384;
 /** How close is close enough to have arrived. */
 const REACH = 3;
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
 
 export default function DesktopCat() {
-	const { catOn, feedTick } = useShell();
+	const { catPhase, catSettled, feedTick } = useShell();
 	const reduce = useReducedMotion();
 
 	const rootRef = useRef<HTMLButtonElement>(null);
@@ -60,10 +82,37 @@ export default function DesktopCat() {
 		asked.current = feedTick;
 	}, [feedTick]);
 
-	const floorRange = () => ({
-		min: MARGIN,
-		max: Math.max(MARGIN + 40, window.innerWidth - CAT_W - MARGIN),
-	});
+	/* Same shape for going in and out of the house: the phase is read in the
+	   loop rather than acted on from an effect body. */
+	const phaseRef = useRef(catPhase);
+	const handledPhase = useRef(catPhase);
+	useEffect(() => {
+		phaseRef.current = catPhase;
+	}, [catPhase]);
+
+	/* Geometry reads the live viewport, so these depend on nothing and stay
+	   stable — the animation loop lists them and must not restart each render. */
+	const floorRange = useCallback(
+		() => ({
+			min: MARGIN,
+			max: Math.max(MARGIN + 40, window.innerWidth - CAT_W - MARGIN),
+		}),
+		[],
+	);
+
+	const houseX = useCallback(
+		() => Math.max(MARGIN, window.innerWidth - HOUSE_W - HOUSE_INSET),
+		[],
+	);
+
+	/** Where the cat must stand for its middle to line up with the doorway. */
+	const doorX = useCallback(() => {
+		const { min, max } = floorRange();
+		return Math.min(
+			Math.max(houseX() + HOUSE_W * DOOR_CENTRE - CAT_W / 2, min),
+			max,
+		);
+	}, [floorRange, houseX]);
 
 	const later = useCallback((ms: number, fn: () => void) => {
 		if (timer.current) clearTimeout(timer.current);
@@ -93,7 +142,7 @@ export default function DesktopCat() {
 			setMode('sleep');
 			later(rand(6000, 11000), () => decideRef.current());
 		}
-	}, [later, reduce]);
+	}, [later, reduce, floorRange]);
 
 	useEffect(() => {
 		decideRef.current = decide;
@@ -102,7 +151,10 @@ export default function DesktopCat() {
 	/* ── The movement loop ───────────────────────────────────── */
 
 	useEffect(() => {
-		if (!catOn) return;
+		/* Nothing to animate while it is tucked up inside. The effect re-runs
+		   when the phase changes, which is what restarts the loop for the trip
+		   back out. */
+		if (catPhase === 'home') return;
 		let raf = 0;
 		let last = performance.now();
 
@@ -113,6 +165,45 @@ export default function DesktopCat() {
 			last = now;
 			const p = pos.current;
 			let m = modeRef.current;
+
+			if (handledPhase.current !== phaseRef.current) {
+				handledPhase.current = phaseRef.current;
+				if (phaseRef.current === 'leaving') {
+					setFood(null);
+					/* Someone who asked for less motion did not ask to watch a
+					   cat cross the screen, so it is simply at the door. */
+					if (reduce) {
+						p.x = doorX();
+						m = 'entering';
+						modeRef.current = m;
+						setMode(m);
+						later(DOORWAY_MS, catSettled);
+					} else {
+						p.target = doorX();
+						m = 'toHome';
+						modeRef.current = m;
+						setMode(m);
+					}
+				} else if (phaseRef.current === 'arriving') {
+					/* Step out of the doorway rather than fading in mid-floor. */
+					p.x = doorX();
+					p.facing = -1;
+					m = 'exiting';
+					modeRef.current = m;
+					setMode(m);
+					later(DOORWAY_MS, () => {
+						catSettled();
+						if (reduce) return decideRef.current();
+						/* Walk away from the doorway before picking a mood —
+						   stepping out and immediately napping on the porch
+						   reads as a bug rather than a cat. */
+						const { min } = floorRange();
+						pos.current.target = rand(min, Math.max(min, doorX() - 240));
+						modeRef.current = 'walk';
+						setMode('walk');
+					});
+				}
+			}
 
 			if (asked.current !== served.current) {
 				served.current = asked.current;
@@ -139,11 +230,17 @@ export default function DesktopCat() {
 				}
 			}
 
-			if (m === 'walk' || m === 'toFood') {
+			if (m === 'walk' || m === 'toFood' || m === 'toHome') {
 				const dx = p.target - p.x;
 				if (Math.abs(dx) <= REACH) {
 					p.x = p.target;
-					if (m === 'toFood') {
+					if (m === 'toHome') {
+						setMode('entering');
+						modeRef.current = 'entering';
+						/* Settling is what re-enables the switch, so it waits for
+						   the doorway animation rather than the arrival. */
+						later(DOORWAY_MS, catSettled);
+					} else if (m === 'toFood') {
 						setMode('eat');
 						later(2600, () => {
 							setFood(null);
@@ -155,7 +252,11 @@ export default function DesktopCat() {
 					}
 				} else {
 					const dir = Math.sign(dx);
-					p.x += dir * (m === 'toFood' ? SPEED_FOOD : SPEED_WANDER) * dt;
+					/* It trots for food and for its own front door; it saunters
+					   everywhere else. */
+					const speed =
+						m === 'toFood' || m === 'toHome' ? SPEED_FOOD : SPEED_WANDER;
+					p.x += dir * speed * dt;
 					p.facing = dir;
 				}
 			}
@@ -170,20 +271,24 @@ export default function DesktopCat() {
 
 		raf = requestAnimationFrame(frame);
 		return () => cancelAnimationFrame(raf);
-	}, [catOn, decide, later, reduce]);
+	}, [catPhase, decide, later, reduce, catSettled, doorX, floorRange]);
 
 	/* Start the loop of moods once, and stop every timer on the way out. */
 	useEffect(() => {
-		if (!catOn) return;
+		if (catPhase !== 'out') return;
+		/* A cat that has just stepped out of its house is already walking away
+		   from the door. Scheduling a mood here would land on the same single
+		   timer and cut that walk short — which is how it ended up dozing on
+		   its own porch. The loop calls `decide` when the walk arrives. */
+		if (modeRef.current === 'walk') return;
 		later(1200, decide);
 		return () => {
 			if (timer.current) clearTimeout(timer.current);
 		};
-	}, [catOn, later, decide]);
+	}, [catPhase, later, decide]);
 
 	/* Keep the cat on screen when the window is resized under it. */
 	useEffect(() => {
-		if (!catOn) return;
 		const onResize = () => {
 			const { min, max } = floorRange();
 			pos.current.x = Math.min(Math.max(pos.current.x, min), max);
@@ -191,31 +296,45 @@ export default function DesktopCat() {
 		};
 		window.addEventListener('resize', onResize, { passive: true });
 		return () => window.removeEventListener('resize', onResize);
-	}, [catOn]);
+	}, [floorRange]);
 
 	/* ── Petting ─────────────────────────────────────────────── */
 
 	const petCat = () => {
-		if (modeRef.current === 'eat' || modeRef.current === 'toFood') return;
+		const busy: Mode[] = ['eat', 'toFood', 'toHome', 'entering', 'exiting'];
+		if (busy.includes(modeRef.current)) return;
 		setPurr((n) => n + 1);
 		setMode('pet');
 		later(2400, decide);
 	};
 
-	if (!catOn) return null;
-
 	const label =
-		mode === 'sleep'
-			? 'The desktop cat is asleep. Activate to wake and pet it'
-			: mode === 'eat'
-				? 'The desktop cat is eating'
-				: mode === 'pet'
-					? 'The desktop cat is purring'
-					: 'Pet the desktop cat';
+		mode === 'toHome' || mode === 'entering'
+			? 'The desktop cat is going into its house'
+			: mode === 'exiting'
+				? 'The desktop cat is coming out of its house'
+				: mode === 'sleep'
+					? 'The desktop cat is asleep. Activate to wake and pet it'
+					: mode === 'eat'
+						? 'The desktop cat is eating'
+						: mode === 'pet'
+							? 'The desktop cat is purring'
+							: 'Pet the desktop cat';
+
+	const inside = catPhase === 'home';
 
 	return (
 		<>
-			{food !== null && (
+			{/* The house stays put whether or not anybody is in it — the cat
+			    having somewhere to be is the whole point of it. */}
+			<span
+				className='cat-house'
+				aria-hidden='true'
+				style={{ transform: `translate3d(${Math.round(houseX())}px, 0, 0)` }}>
+				<CatHouse occupied={inside} />
+			</span>
+
+			{food !== null && !inside && (
 				<span
 					className='cat-food'
 					aria-hidden='true'
@@ -230,31 +349,37 @@ export default function DesktopCat() {
 				</span>
 			)}
 
-			<button
-				ref={rootRef}
-				type='button'
-				className='cat'
-				data-mode={mode}
-				aria-label={label}
-				onClick={petCat}>
-				<CatArt />
-
-				{mode === 'sleep' && (
-					<span className='cat-zzz' aria-hidden='true'>
-						<i>z</i>
-						<i>z</i>
-						<i>z</i>
+			{!inside && (
+				<button
+					ref={rootRef}
+					type='button'
+					className='cat'
+					data-mode={mode}
+					aria-label={label}
+					onClick={petCat}>
+					{/* Facing lives on the art and the doorway scale on this wrapper,
+					    so the two transforms never have to be composed by hand. */}
+					<span className='cat-scale'>
+						<CatArt />
 					</span>
-				)}
 
-				{mode === 'pet' && (
-					<span className='cat-hearts' key={purr} aria-hidden='true'>
-						<i />
-						<i />
-						<i />
-					</span>
-				)}
-			</button>
+					{mode === 'sleep' && (
+						<span className='cat-zzz' aria-hidden='true'>
+							<i>z</i>
+							<i>z</i>
+							<i>z</i>
+						</span>
+					)}
+
+					{mode === 'pet' && (
+						<span className='cat-hearts' key={purr} aria-hidden='true'>
+							<i />
+							<i />
+							<i />
+						</span>
+					)}
+				</button>
+			)}
 		</>
 	);
 }

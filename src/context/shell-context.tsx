@@ -80,9 +80,18 @@ type ShellCtx = {
 	wallpaper: WallpaperId;
 	setWallpaper: (w: WallpaperId) => void;
 
-	/** The desktop cat. Off is one switch away, and remembered. */
+	/** The desktop cat. Off means it is in its house, and it walks there. */
 	catOn: boolean;
 	setCatOn: (on: boolean) => void;
+	/**
+	 * Where the cat is between those two states. Going in or coming out takes
+	 * a walk and an animation, and the switch stays disabled until it lands —
+	 * otherwise a second click mid-walk leaves the cat in two places at once.
+	 */
+	catPhase: CatPhase;
+	catBusy: boolean;
+	/** The cat reports it has finished going in or coming out. */
+	catSettled: () => void;
 	/** Bumped whenever something puts food down; the cat watches the count. */
 	feedTick: number;
 	feedCat: () => void;
@@ -107,6 +116,9 @@ type ShellCtx = {
 
 /** What the screen is doing: running, asleep, or off. */
 export type PowerState = 'on' | 'sleep' | 'off';
+
+/** Out and about, walking home, tucked up inside, or coming back out. */
+export type CatPhase = 'out' | 'leaving' | 'home' | 'arriving';
 
 const Ctx = createContext<ShellCtx | null>(null);
 
@@ -268,6 +280,11 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 	const [catOn, setCatOnState] = useState(
 		() => read(KEY.cat, 'on', ['on', 'off'] as const) === 'on',
 	);
+	/* A reload puts the cat straight into whichever state it was left in —
+	   no walking home on arrival. */
+	const [catPhase, setCatPhase] = useState<CatPhase>(() =>
+		read(KEY.cat, 'on', ['on', 'off'] as const) === 'on' ? 'out' : 'home',
+	);
 	const [feedTick, setFeedTick] = useState(0);
 
 
@@ -338,6 +355,13 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 	const setCatOn = useCallback((on: boolean) => {
 		setCatOnState(on);
 		persist(KEY.cat, on ? 'on' : 'off');
+		setCatPhase(on ? 'arriving' : 'leaving');
+	}, []);
+
+	const catSettled = useCallback(() => {
+		setCatPhase((p) =>
+			p === 'leaving' ? 'home' : p === 'arriving' ? 'out' : p,
+		);
 	}, []);
 
 	const feedCat = useCallback(() => setFeedTick((n) => n + 1), []);
@@ -422,6 +446,9 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			setAccent,
 			catOn,
 			setCatOn,
+			catPhase,
+			catBusy: catPhase === 'leaving' || catPhase === 'arriving',
+			catSettled,
 			feedTick,
 			feedCat,
 
@@ -465,6 +492,8 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			setAccent,
 			catOn,
 			setCatOn,
+			catPhase,
+			catSettled,
 			feedTick,
 			feedCat,
 			booted,

@@ -103,10 +103,17 @@ mounted — and `inert` — because unmounting would make both halves impossible
 rule as the window frame: **position never touches React**. A transform
 written sixty times a second through state would re-render the shell's whole
 context tree; only the cat's mood is state, and that changes every few
-seconds. Feeding arrives as a counter on the shell context and is answered
-inside the animation loop rather than an effect — which also lets the cat,
-the only thing that knows where it is standing, decide where the bowl goes
-under `prefers-reduced-motion`.
+seconds. Feeding and the house are both signalled through the shell context and
+answered *inside the animation loop* rather than an effect — which keeps the
+state change out of an effect body, and lets the cat, the only thing that knows
+where it is standing, decide where the bowl goes under
+`prefers-reduced-motion`.
+
+`catPhase` (`out` → `leaving` → `home` → `arriving`) is the reason the toggle
+can be disabled: going in or out takes a walk plus a doorway animation, and a
+second click mid-walk would strand the cat. `catBusy` is derived from it, and
+`catSettled()` is what the cat calls when it lands. A reload restores whichever
+end state was persisted — no walking home on arrival.
 
 ### Startup
 
