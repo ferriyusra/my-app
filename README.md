@@ -38,11 +38,17 @@ built from the same data and the same design tokens as the desktop.
 
 ## Configuration
 
-The contact form posts to `/api/contact`, which delivers over Resend when
-configured and otherwise falls back to a pre-filled `mailto:` draft.
+Every variable is optional — copy [.env.example](.env.example) to `.env` if you
+want to change something. Each one falls back to a working default in code, so
+the app runs with no `.env` at all and a deploy that forgets one does not break.
 
 ```bash
-RESEND_API_KEY=...          # optional; without it, mail falls back to mailto:
+# Music search — /api/music/search
+MUSIC_SEARCH_ENDPOINT=https://itunes.apple.com/search
+MUSIC_CACHE_SECONDS=3600     # 0 disables caching
+
+# Contact form — /api/contact
+RESEND_API_KEY=...           # without it, mail falls back to a mailto: draft
 CONTACT_FROM=portfolio@example.com
 CONTACT_TO=you@example.com
 ```

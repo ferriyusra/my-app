@@ -14,9 +14,25 @@ import { NextResponse } from 'next/server';
  * megabyte for a busy search.
  */
 
-const ENDPOINT = 'https://itunes.apple.com/search';
-/** How long Next may serve a repeated search from its own cache. */
-const CACHE_SECONDS = 3600;
+/**
+ * Both are configuration, not secrets, so both carry a working default:
+ * `.env*` is gitignored, and a deploy that never set them should still search
+ * rather than fail. Matches the pattern `contact/route.ts` already uses.
+ */
+const ENDPOINT =
+	process.env.MUSIC_SEARCH_ENDPOINT ?? 'https://itunes.apple.com/search';
+
+/**
+ * How long Next may serve a repeated search from its own cache. Zero is a
+ * legitimate setting — it means "never cache" — so it is read rather than
+ * treated as absent, which `Number(x) || default` would get wrong.
+ */
+const CACHE_SECONDS = (() => {
+	const raw = process.env.MUSIC_CACHE_SECONDS;
+	if (!raw) return 3600;
+	const n = Number(raw);
+	return Number.isFinite(n) && n >= 0 ? n : 3600;
+})();
 
 export type Track = {
 	id: number;

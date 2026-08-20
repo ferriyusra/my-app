@@ -151,6 +151,14 @@ All content is typed data under `src/data/` — `profile`, `experience`,
 role tenure) are computed from ISO dates rather than written down, so they stay
 true without anyone editing them.
 
+### Environment
+
+`.env*` is gitignored, so **every variable reads through a default in code**
+— see [.env.example](.env.example) for the full list. A deploy that never set
+one still works; nothing here is required to run. Keep it that way when adding
+more: a value that can strand a build belongs in the repository, not in an
+ignored file.
+
 ### Contact form
 
 [src/app/api/contact/route.ts](src/app/api/contact/route.ts) delivers over the
