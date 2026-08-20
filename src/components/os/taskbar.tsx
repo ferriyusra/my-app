@@ -1,40 +1,55 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Sun, Moon, Wifi, Volume2 } from 'lucide-react';
-import AppTile from './app-tile';
-import WindowsLogo from './windows-logo';
+import {
+	Sun,
+	Moon,
+	Wifi,
+	Volume2,
+	BatteryFull,
+	ChevronUp,
+	Search,
+	Copy,
+} from 'lucide-react';
 import { useWindows } from './window-store';
 import { APPS } from './apps/registry';
 import { useTheme } from '../theme-provider';
+import AppTile from './app-tile';
+import WindowsLogo from './windows-logo';
+import { profile } from '@/data/profile';
 
-/**
- * Windows 11 taskbar: centred cluster, acrylic sheet, and a running
- * indicator under each open app.
- */
+/** Windows 11 taskbar: a left widget, a centred cluster, and the tray. */
 export default function Taskbar({
 	startOpen,
 	onToggleStart,
+	taskViewOpen,
+	onToggleTaskView,
+	onSearch,
 }: {
 	startOpen: boolean;
 	onToggleStart: () => void;
+	taskViewOpen: boolean;
+	onToggleTaskView: () => void;
+	onSearch: () => void;
 }) {
 	const { windows, open, focus, minimise } = useWindows();
 	const { theme, toggle, mounted } = useTheme();
-	const [clock, setClock] = useState({ time: '', date: '' });
+	const [clock, setClock] = useState({ time: '', date: '', jakarta: '' });
 
 	useEffect(() => {
 		const tick = () => {
 			const d = new Date();
 			setClock({
-				time: `${d.getHours().toString().padStart(2, '0')}:${d
-					.getMinutes()
-					.toString()
-					.padStart(2, '0')}`,
-				date: d.toLocaleDateString(undefined, {
-					day: '2-digit',
-					month: '2-digit',
-					year: 'numeric',
+				/* Windows shows a 12-hour clock over a short date, stacked. */
+				time: d.toLocaleTimeString('en-US', {
+					hour: 'numeric',
+					minute: '2-digit',
+				}),
+				date: d.toLocaleDateString('en-GB'),
+				jakarta: d.toLocaleTimeString('en-US', {
+					timeZone: 'Asia/Jakarta',
+					hour: 'numeric',
+					minute: '2-digit',
 				}),
 			});
 		};
@@ -47,6 +62,16 @@ export default function Taskbar({
 
 	return (
 		<div className='taskbar'>
+			{/* Windows puts a weather widget here. Ours carries something a
+			    visitor can act on: what time it is where I am. */}
+			<div className='tb-widget' suppressHydrationWarning>
+				<span className='tb-widget-dot' aria-hidden='true' />
+				<span>
+					<strong>{clock.jakarta} in Jakarta</strong>
+					{profile.availability}
+				</span>
+			</div>
+
 			<div className='taskbar-centre'>
 				<button
 					type='button'
@@ -56,6 +81,26 @@ export default function Taskbar({
 					onClick={onToggleStart}>
 					<WindowsLogo size={19} />
 				</button>
+
+				<button
+					type='button'
+					className='tb-btn'
+					aria-label='Search apps'
+					onClick={onSearch}>
+					<Search size={19} aria-hidden='true' />
+				</button>
+
+				<button
+					type='button'
+					className='tb-btn'
+					aria-label='Task view'
+					aria-expanded={taskViewOpen}
+					data-active={taskViewOpen}
+					onClick={onToggleTaskView}>
+					<Copy size={18} aria-hidden='true' />
+				</button>
+
+				<span className='tb-sep' aria-hidden='true' />
 
 				{APPS.map((app) => {
 					const { id, title } = app;
@@ -83,11 +128,14 @@ export default function Taskbar({
 			</div>
 
 			<div className='taskbar-right'>
-				{/* Tray glyphs are decorative here — labelled as such rather than
-				    pretending to be controls that do nothing. */}
+				<span className='tb-chevron' aria-hidden='true'>
+					<ChevronUp size={14} />
+				</span>
+				{/* Decorative: labelled as such rather than posing as controls. */}
 				<span className='tb-trayicons' aria-hidden='true'>
 					<Wifi size={15} />
 					<Volume2 size={15} />
+					<BatteryFull size={15} />
 				</span>
 				<button
 					type='button'

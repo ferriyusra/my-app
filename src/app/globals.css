@@ -589,12 +589,14 @@ html[data-theme="dark"] .icon-adaptive { filter: invert(1) brightness(1.6); }
   background:
     radial-gradient(120% 100% at 50% 46%, var(--wp-field-in) 0%, var(--wp-field-out) 68%);
 
-  /* Bloom palette, consumed by the wallpaper SVG. */
-  --wp-field-in: #1b4a8f;
-  --wp-field-out: #071634;
-  --wp-petal-a: #9ee0ff;
-  --wp-petal-b: #4f93f0;
-  --wp-petal-c: #2a2f8f;
+  /* Bloom palette. Windows 11 ships a light desktop by default. */
+  --wp-field-in: #cfe0f5;
+  --wp-field-out: #9fbde2;
+  --wp-petal-a: #2f7ae0;
+  --wp-petal-b: #1c4fb0;
+  --wp-petal-c: #12307a;
+  --desk-label: #10233f;
+  --desk-label-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 html[data-theme='dark'] .desktop {
@@ -603,6 +605,8 @@ html[data-theme='dark'] .desktop {
   --wp-petal-a: #6ec2f5;
   --wp-petal-b: #3a74c8;
   --wp-petal-c: #1d1f63;
+  --desk-label: #ffffff;
+  --desk-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 /* Bloom, built from repeating conic gradients.
@@ -660,11 +664,12 @@ html[data-theme='dark'] .desktop {
 /* ── Desktop icons ── */
 .desk-icons {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  top: 12px;
+  left: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 92px);
+  grid-auto-rows: min-content;
+  gap: 2px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -681,20 +686,20 @@ html[data-theme='dark'] .desktop {
   border: 1px solid transparent;
   border-radius: 4px;
   background: transparent;
-  color: #fff;
+  color: var(--desk-label);
   font-size: 12px;
-  line-height: 16px;
+  line-height: 15px;
   text-align: center;
   cursor: pointer;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+  text-shadow: var(--desk-label-shadow);
 }
 .desk-icon:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.16);
 }
 .desk-icon[data-selected='true'] {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 .desk-icon:focus-visible {
   outline: 2px solid #fff;
@@ -709,8 +714,10 @@ html[data-theme='dark'] .desktop {
   transform: translateX(-50%);
   margin: 0;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.62);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  /* Was hard-coded white, which vanished on the light wallpaper. */
+  color: var(--desk-label);
+  opacity: 0.72;
+  text-shadow: var(--desk-label-shadow);
   pointer-events: none;
 }
 
@@ -803,7 +810,7 @@ html[data-theme='dark'] .desktop {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
+  padding: 0 10px;
   background: var(--acrylic-taskbar);
   backdrop-filter: blur(40px) saturate(140%);
   -webkit-backdrop-filter: blur(40px) saturate(140%);
@@ -811,7 +818,48 @@ html[data-theme='dark'] .desktop {
   z-index: 9000;
 }
 
-.taskbar-centre { display: flex; align-items: center; gap: 4px; }
+.taskbar-centre { display: flex; align-items: center; gap: 2px; }
+
+/* Windows' weather slot. Ours states the time where I am. */
+.tb-widget {
+  position: absolute;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 15px;
+  color: var(--ink-secondary);
+  transition: background var(--dur-faster) var(--ease-standard);
+}
+.tb-widget:hover { background: var(--subtle-hover); }
+.tb-widget span { display: flex; flex-direction: column; }
+.tb-widget strong { color: var(--ink); font-weight: 600; }
+.tb-widget-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--success);
+  flex-shrink: 0;
+}
+
+.tb-sep {
+  width: 1px;
+  height: 22px;
+  margin: 0 6px;
+  background: var(--line);
+  opacity: 0.7;
+}
+
+.tb-chevron {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  color: var(--ink-secondary);
+}
 
 .tb-btn {
   position: relative;
@@ -1409,3 +1457,74 @@ html[data-theme='dark'] .desktop {
   line-height: 14px;
   font-size: 12px;
 }
+
+/* ── Task view ── */
+.taskview {
+  position: absolute;
+  inset: 0 0 56px 0;
+  z-index: 8500;
+  display: grid;
+  place-items: center;
+  padding: 48px;
+  background: color-mix(in srgb, var(--bg) 58%, transparent);
+  backdrop-filter: blur(28px) saturate(130%);
+  -webkit-backdrop-filter: blur(28px) saturate(130%);
+}
+.taskview-empty { margin: 0; font-size: 14px; color: var(--ink-secondary); }
+.taskview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 220px));
+  gap: 20px;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.taskview-grid li { position: relative; }
+.taskview-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--sh-3);
+  cursor: pointer;
+  overflow: hidden;
+  transition: box-shadow var(--dur-normal) var(--ease-standard);
+}
+.taskview-card:hover { box-shadow: var(--sh-3-hi); }
+.taskview-preview {
+  display: grid;
+  place-items: center;
+  height: 108px;
+  background: var(--surface-header);
+  border-bottom: 1px solid var(--line-subtle);
+}
+.taskview-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.taskview-close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: var(--sh-2);
+}
+.taskview-close:hover { background: #c42b1c; color: #fff; border-color: transparent; }

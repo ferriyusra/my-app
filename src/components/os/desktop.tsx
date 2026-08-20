@@ -6,6 +6,7 @@ import { WindowProvider, useWindows } from './window-store';
 import WindowFrame from './window-frame';
 import Taskbar from './taskbar';
 import StartMenu from './start-menu';
+import TaskView from './task-view';
 import { APPS, APP_BY_ID } from './apps/registry';
 import AppTile from './app-tile';
 import { profile } from '@/data/profile';
@@ -81,6 +82,7 @@ const DESKTOP_MIN = 900;
 function Shell() {
 	const { open, windows } = useWindows();
 	const [startOpen, setStartOpen] = useState(false);
+	const [taskView, setTaskView] = useState(false);
 	const [narrow, setNarrow] = useState(false);
 
 	useEffect(() => {
@@ -128,10 +130,23 @@ function Shell() {
 		<div className='desktop' id='main'>
 			<DesktopIcons />
 			<Windows />
+			{taskView && <TaskView onClose={() => setTaskView(false)} />}
 			{startOpen && <StartMenu onClose={() => setStartOpen(false)} />}
 			<Taskbar
 				startOpen={startOpen}
-				onToggleStart={() => setStartOpen((v) => !v)}
+				onToggleStart={() => {
+					setTaskView(false);
+					setStartOpen((v) => !v);
+				}}
+				taskViewOpen={taskView}
+				onToggleTaskView={() => {
+					setStartOpen(false);
+					setTaskView((v) => !v);
+				}}
+				onSearch={() => {
+					setTaskView(false);
+					setStartOpen(true);
+				}}
 			/>
 			<p className='desk-hint' aria-hidden='true'>
 				{windows.length === 0
