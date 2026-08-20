@@ -7,31 +7,12 @@ import {
 	useMemo,
 	useReducer,
 } from 'react';
+import type { AppId, Bounds, SnapZone, WindowState } from '@/types/windows';
 
-export type AppId =
-	| 'about'
-	| 'experience'
-	| 'projects'
-	| 'skills'
-	| 'contact';
 
-export type WindowState = {
-	id: AppId;
-	x: number;
-	y: number;
-	w: number;
-	h: number;
-	z: number;
-	minimised: boolean;
-	maximised: boolean;
-	/** Position before maximising, so restore puts it back. */
-	restore?: { x: number; y: number; w: number; h: number };
-};
 
-/** The zones Windows 11 offers from its Snap Layouts flyout. */
-export type SnapZone = 'left' | 'right' | 'tl' | 'tr' | 'bl' | 'br' | 'max';
 
-function zoneRect(zone: SnapZone, b: { w: number; h: number }) {
+function zoneRect(zone: SnapZone, b: Bounds) {
 	const halfW = Math.round(b.w / 2);
 	const halfH = Math.round(b.h / 2);
 	switch (zone) {

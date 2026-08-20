@@ -1,6 +1,6 @@
 'use client';
 
-import type { SnapZone } from './window-store';
+import type { SnapZone } from '@/types/windows';
 
 /**
  * Windows 11's Snap Layouts: hovering (or focusing) the maximise button

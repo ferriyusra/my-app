@@ -1,9 +1,9 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { useWindows } from './window-store';
-import { APP_BY_ID } from './apps/registry';
-import AppTile from './app-tile';
+import { useWindows } from '@/context/window-context';
+import { APP_BY_ID } from '@/components/apps/registry';
+import AppTile from '@/components/ui/app-tile';
 
 /**
  * Task View: the overview Windows 11 opens from the taskbar, listing every

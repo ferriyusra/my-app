@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Power, FileText, Search } from 'lucide-react';
+import { Power, FileText, Search, Clock } from 'lucide-react';
+import { projects } from '@/data/projects';
 import { profile } from '@/data/profile';
-import { useWindows } from './window-store';
-import { APPS } from './apps/registry';
-import AppTile from './app-tile';
+import { useWindows } from '@/context/window-context';
+import { APPS } from '@/components/apps/registry';
+import AppTile from '@/components/ui/app-tile';
 
 export default function StartMenu({ onClose }: { onClose: () => void }) {
 	const { open } = useWindows();
@@ -86,6 +87,68 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 					<p className='start-empty'>No apps match &ldquo;{q}&rdquo;.</p>
 				)}
 			</div>
+
+			{/* Windows lists recently touched files under the pinned grid. */}
+			{!q && (
+				<>
+					<p className='start-label' style={{ marginTop: 20 }}>
+						Recommended
+					</p>
+					<div className='start-reco'>
+						{projects
+							.filter((p) => p.featured)
+							.slice(0, 2)
+							.map((p) => (
+								<button
+									key={p.id}
+									type='button'
+									className='start-reco-item'
+									onClick={() => {
+										open('projects');
+										onClose();
+									}}>
+									<span
+										className='app-tile'
+										aria-hidden='true'
+										style={{
+											width: 30,
+											height: 30,
+											borderRadius: 6,
+											background: p.color,
+										}}>
+										<Clock size={15} color='#fff' strokeWidth={2.1} />
+									</span>
+									<span>
+										<strong>{p.name}</strong>
+										{p.tech.slice(0, 2).join(' · ')}
+									</span>
+								</button>
+							))}
+						<a
+							className='start-reco-item'
+							href={profile.cvView}
+							target='_blank'
+							rel='noopener noreferrer'
+							onClick={onClose}>
+							<span
+								className='app-tile'
+								aria-hidden='true'
+								style={{
+									width: 30,
+									height: 30,
+									borderRadius: 6,
+									background: 'linear-gradient(140deg, #ff8a65 0%, #b3300f 100%)',
+								}}>
+								<FileText size={15} color='#fff' strokeWidth={2.1} />
+							</span>
+							<span>
+								<strong>Resume</strong>
+								PDF · opens in a new tab
+							</span>
+						</a>
+					</div>
+				</>
+			)}
 
 			<footer className='start-foot'>
 				<span className='start-user'>

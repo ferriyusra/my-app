@@ -1,4 +1,4 @@
-import type { AppDef } from './apps/registry';
+import type { LucideIcon } from 'lucide-react';
 
 /**
  * A Windows-style app icon: a rounded square filled with the app's colour
@@ -9,7 +9,9 @@ export default function AppTile({
 	app,
 	size = 40,
 }: {
-	app: AppDef;
+	/* Structural, not nominal: anything carrying a glyph and a gradient can
+	   render as a tile, which lets apps and shortcuts share this. */
+	app: { Icon: LucideIcon; grad: string };
 	size?: number;
 }) {
 	const { Icon, grad } = app;

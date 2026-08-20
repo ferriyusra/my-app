@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Desktop from '@/components/os/desktop';
+import Desktop from '@/components/desktop/desktop';
 import { profile } from '@/data/profile';
 
 const jsonLd = {

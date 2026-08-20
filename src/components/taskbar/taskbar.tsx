@@ -11,11 +11,11 @@ import {
 	Search,
 	Copy,
 } from 'lucide-react';
-import { useWindows } from './window-store';
-import { APPS } from './apps/registry';
-import { useTheme } from '../theme-provider';
-import AppTile from './app-tile';
-import WindowsLogo from './windows-logo';
+import { useWindows } from '@/context/window-context';
+import { APPS } from '@/components/apps/registry';
+import { useTheme } from '@/components/theme-provider';
+import AppTile from '@/components/ui/app-tile';
+import WindowsLogo from '@/components/ui/windows-logo';
 import { profile } from '@/data/profile';
 
 /** Windows 11 taskbar: a left widget, a centred cluster, and the tray. */

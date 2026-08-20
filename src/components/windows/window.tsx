@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Minus, Square, X, Copy } from 'lucide-react';
-import { useWindows, type AppId } from './window-store';
-import SnapFlyout from './snap-flyout';
+import { useWindows } from '@/context/window-context';
+import type { AppId } from '@/types/windows';
+import SnapFlyout from '@/components/windows/snap-flyout';
 
 const TASKBAR = 56;
 

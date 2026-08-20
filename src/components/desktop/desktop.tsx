@@ -2,43 +2,60 @@
 
 import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { WindowProvider, useWindows } from './window-store';
-import WindowFrame from './window-frame';
-import Taskbar from './taskbar';
-import StartMenu from './start-menu';
-import TaskView from './task-view';
-import { APPS, APP_BY_ID } from './apps/registry';
-import AppTile from './app-tile';
+import { WindowProvider, useWindows } from '@/context/window-context';
+import { useTheme } from '@/components/theme-provider';
+import WindowFrame from '@/components/windows/window';
+import Taskbar from '@/components/taskbar/taskbar';
+import StartMenu from '@/components/start-menu/start-menu';
+import TaskView from '@/components/windows/task-view';
+import { APPS, APP_BY_ID, RECYCLE, SHORTCUTS } from '@/components/apps/registry';
+import AppTile from '@/components/ui/app-tile';
+import DesktopIcon from './desktop-icon';
+import ContextMenu, { MENU_ICONS, type MenuItem } from './context-menu';
 import { profile } from '@/data/profile';
 
-function DesktopIcons() {
+function DesktopIcons({
+	selected,
+	setSelected,
+}: {
+	selected: string | null;
+	setSelected: (id: string | null) => void;
+}) {
 	const { open } = useWindows();
-	const [selected, setSelected] = useState<string | null>(null);
 	return (
-		<ul className='desk-icons' onPointerDown={() => setSelected(null)}>
+		<ul className='desk-icons'>
 			{APPS.map((app) => (
 				<li key={app.id}>
-					<button
-						type='button'
-						className='desk-icon'
-						data-selected={selected === app.id}
-						onPointerDown={(e) => {
-							e.stopPropagation();
-							setSelected(app.id);
-						}}
-						onDoubleClick={() => open(app.id)}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								open(app.id);
-							}
-						}}
-						aria-label={`Open ${app.title}`}>
-						<AppTile app={app} size={46} />
-						{app.title}
-					</button>
+					<DesktopIcon
+						title={app.title}
+						selected={selected === app.id}
+						onSelect={() => setSelected(app.id)}
+						onOpen={() => open(app.id)}
+						tile={<AppTile app={app} size={46} />}
+					/>
 				</li>
 			))}
+			{SHORTCUTS.map((sc) => (
+				<li key={sc.id}>
+					<DesktopIcon
+						title={sc.title}
+						href={sc.href}
+						selected={selected === sc.id}
+						onSelect={() => setSelected(sc.id)}
+						onOpen={() => window.open(sc.href, '_blank', 'noopener')}
+						tile={<AppTile app={sc} size={46} />}
+					/>
+				</li>
+			))}
+			<li>
+				<DesktopIcon
+					title={RECYCLE.title}
+					selected={selected === RECYCLE.id}
+					onSelect={() => setSelected(RECYCLE.id)}
+					onOpen={() => open(RECYCLE.id)}
+					tile={<AppTile app={RECYCLE} size={46} />}
+				/>
+			</li>
 		</ul>
 	);
 }
@@ -81,9 +98,51 @@ const DESKTOP_MIN = 900;
 
 function Shell() {
 	const { open, windows } = useWindows();
+	const { toggle: toggleTheme } = useTheme();
 	const [startOpen, setStartOpen] = useState(false);
 	const [taskView, setTaskView] = useState(false);
 	const [narrow, setNarrow] = useState(false);
+	const [selected, setSelected] = useState<string | null>(null);
+	const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+
+	/* Windows' desktop context menu. Every entry does something real —
+	   a menu of inert labels is worse than no menu. */
+	const menuItems: MenuItem[] = [
+		{
+			kind: 'item',
+			label: 'Open About Me',
+			Icon: MENU_ICONS.FolderOpen,
+			shortcut: 'Enter',
+			onSelect: () => open('about'),
+		},
+		{
+			kind: 'item',
+			label: 'Browse Projects',
+			Icon: MENU_ICONS.Pin,
+			onSelect: () => open('projects'),
+		},
+		{ kind: 'separator' },
+		{
+			kind: 'item',
+			label: 'Refresh',
+			Icon: MENU_ICONS.RefreshCw,
+			shortcut: 'F5',
+			onSelect: () => setSelected(null),
+		},
+		{
+			kind: 'item',
+			label: 'Personalise',
+			Icon: MENU_ICONS.Paintbrush,
+			onSelect: toggleTheme,
+		},
+		{ kind: 'separator' },
+		{
+			kind: 'item',
+			label: 'About this portfolio',
+			Icon: MENU_ICONS.Info,
+			onSelect: () => open('about'),
+		},
+	];
 
 	useEffect(() => {
 		const check = () => setNarrow(window.innerWidth < DESKTOP_MIN);
@@ -127,9 +186,28 @@ function Shell() {
 	}
 
 	return (
-		<div className='desktop' id='main'>
-			<DesktopIcons />
+		<div
+			className='desktop'
+			id='main'
+			onPointerDown={() => {
+				setSelected(null);
+				setMenu(null);
+			}}
+			onContextMenu={(e) => {
+				e.preventDefault();
+				setStartOpen(false);
+				setMenu({ x: e.clientX, y: e.clientY });
+			}}>
+			<DesktopIcons selected={selected} setSelected={setSelected} />
 			<Windows />
+			{menu && (
+				<ContextMenu
+					x={menu.x}
+					y={menu.y}
+					items={menuItems}
+					onClose={() => setMenu(null)}
+				/>
+			)}
 			{taskView && <TaskView onClose={() => setTaskView(false)} />}
 			{startOpen && <StartMenu onClose={() => setStartOpen(false)} />}
 			<Taskbar
