@@ -52,16 +52,24 @@ export const viewport = {
 };
 
 /**
- * Applies theme, accent and wallpaper before first paint.
+ * Applies theme, accent, wallpaper — and which shell is in charge — before
+ * first paint.
  *
- * All three are plain attributes on <html> that the stylesheet keys off, so
+ * All four are plain attributes on <html> that the stylesheet keys off, so
  * running this ahead of hydration is what stops a stored dark desktop from
- * flashing light — and it costs one synchronous localStorage read.
+ * flashing light.
+ *
+ * `data-shell` is the one that matters most: the portfolio document is in the
+ * server HTML, and on a wide screen it has to be out of the way before
+ * anything paints. Setting it here rather than in React also means it is only
+ * ever set when scripting is on — so a visitor without JavaScript keeps the
+ * document, and never sees the black holding screen meant for the desktop.
  */
 const BOOT = `try{var d=document.documentElement,g=function(k,f){try{return localStorage.getItem(k)||f}catch(e){return f}};
 var t=g('theme',null);if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))d.setAttribute('data-theme','dark');
 d.setAttribute('data-accent',g('shell:accent','blue'));
 d.setAttribute('data-wallpaper',g('shell:wallpaper','bloom'));
+d.setAttribute('data-shell',matchMedia('(min-width: 900px)').matches?'desktop':'document');
 var b=g('shell:brightness','1');if(b)d.style.setProperty('--screen-dim',String(Math.max(0,Math.min(0.65,1-parseFloat(b)||0))));}catch(e){}`;
 
 export default function RootLayout({

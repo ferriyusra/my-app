@@ -197,10 +197,8 @@ body {
   overflow: hidden;
 }
 
-/* Narrow screens fall back to a scrolling document. */
-@media (max-width: 899px) {
-  body { overflow: auto; }
-}
+/* Only the desktop shell owns the viewport. The document scrolls. */
+html:not([data-shell='desktop']) body { overflow: auto; }
 
 h1, h2, h3, h4 {
   font-family: var(--display);
@@ -396,12 +394,23 @@ html[data-theme='dark'] .icon-adaptive { filter: invert(1) brightness(1.7); }
   color: var(--accent);
 }
 
-/* Held while the viewport width is measured, before either shell mounts.
-   Black on wide screens so it runs straight into the startup sequence with
-   no flash; the narrow layout has no startup sequence, so it sits on the
-   page background instead. CSS knows the width before JavaScript does. */
-.boot { position: fixed; inset: 0; background: #000; }
-@media (max-width: 899px) { .boot { background: var(--bg); } }
+/* ── Which shell is in charge ──
+   The portfolio document is always in the server HTML. On a wide screen with
+   scripting on, the desktop takes over and the document steps aside; with
+   scripting off `data-shell` is never set, so the document simply stays and
+   the desktop's black holding screen never appears. */
+.boot { display: none; }
+html[data-shell='desktop'] .boot {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: #000;
+}
+html[data-shell='desktop'] .doc,
+html[data-shell='desktop'] .skip-link { display: none; }
+/* `data-shell` is only ever set by script, so its absence means scripting is
+   off — and a theme switch that cannot switch anything should not be there. */
+html:not([data-shell]) .mb-theme { display: none; }
 
 /* ═══════════════════════════════════════════════════════════
    DESKTOP + WALLPAPER
@@ -3304,7 +3313,12 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   background: var(--surface);
   color: var(--ink);
 }
-.mb-headline { margin: 20px 0 18px; font-size: 17px; line-height: 25px; color: var(--ink); }
+.mb-headline { margin: 20px 0 12px; font-size: 17px; line-height: 25px; color: var(--ink); }
+.mb-summary { margin: 0 0 20px; font-size: 14px; line-height: 22px; color: var(--ink-secondary); }
+.mb-points { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
+.mb-points li { font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
+.mb-points li::marker { color: var(--accent); }
+.mb-roles h3, .mb-projects h3 { display: inline; font-size: 14px; margin-right: 8px; }
 .mb-actions { display: flex; gap: 10px; margin-bottom: 18px; }
 .mb-note {
   margin: 0 0 22px;
@@ -3330,11 +3344,14 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   gap: 12px;
   width: 100%;
   padding: 14px 16px;
-  border: none;
-  background: transparent;
   color: var(--ink);
   text-align: left;
+  cursor: pointer;
+  list-style: none;
 }
+.mb-card-head::-webkit-details-marker { display: none; }
+.mb-card-head:hover { background: var(--subtle-hover); }
+.mb-card-head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
 .mb-card-icon {
   display: grid;
   place-items: center;
@@ -3347,13 +3364,16 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 .mb-card-title { flex: 1; display: flex; flex-direction: column; }
 .mb-card-title strong { font-size: 15px; }
 .mb-card-title small { font-size: 12px; color: var(--ink-muted); }
-.mb-card-head svg { transition: transform var(--dur-fast) var(--ease-standard); color: var(--ink-muted); }
-.mb-card-head svg[data-open] { transform: rotate(180deg); }
+.mb-card-head > svg {
+  flex-shrink: 0;
+  color: var(--ink-muted);
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+.mb-card[open] > .mb-card-head > svg { transform: rotate(180deg); }
 .mb-card-body { padding: 0 16px 18px; border-top: 1px solid var(--line-subtle); padding-top: 16px; }
 
 .mb-roles { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
 .mb-roles li { display: grid; gap: 3px; }
-.mb-roles strong { font-size: 14px; }
 .mb-company { font-size: 13px; color: var(--ink-secondary); }
 .mb-period { font-size: 12px; color: var(--ink-muted); }
 .mb-roles p { margin: 6px 0 0; font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
@@ -3379,7 +3399,6 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   flex-shrink: 0;
   border-radius: 99px;
 }
-.mb-projects strong { font-size: 14px; margin-right: 8px; }
 .mb-badge {
   display: inline-block;
   padding: 2px 8px;

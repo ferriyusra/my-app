@@ -30,8 +30,9 @@ Open <http://localhost:3000>.
 Every wallpaper is drawn in CSS and every system sound is synthesised with the
 Web Audio API, so the shell ships zero image and zero audio bytes.
 
-Below 900px the desktop is replaced by a stacked reading view built from the
-same design tokens.
+The whole portfolio also ships as plain HTML in the server response, and that
+document *is* the experience below 900px or with JavaScript switched off —
+built from the same data and the same design tokens as the desktop.
 
 ## Configuration
 

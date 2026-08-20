@@ -32,6 +32,25 @@ windows; a taskbar; Start; Quick Settings; a notification centre; and a File
 Explorer. Below 900px it swaps to a stacked reading view — a windowing
 metaphor needs a pointer and room to overlap.
 
+## Two renderings of the same data
+
+[src/components/content/portfolio-document.tsx](src/components/content/portfolio-document.tsx)
+is a **server component** holding the whole portfolio as plain semantic HTML.
+It ships in the response body, and it is the entire experience on a narrow
+screen — which is why its sections are `<details>`: native collapsing needs no
+JavaScript, so the page works with scripting off.
+
+The desktop shell is the enhancement layered on top. `data-shell` on `<html>`
+decides which is in charge, and the inline script in `layout.tsx` sets it
+**before first paint**, so a wide viewport never flashes the document. Because
+only script can set that attribute, its absence means scripting is off — which
+is how the document survives and the desktop's black holding screen stays away.
+
+Do not move the document behind a client boundary. Before it existed the
+response body was an empty div: every word only appeared after ~266KB of JS
+had run, so anything that does not execute scripts — ATS scrapers, social
+preview bots, LLM crawlers — saw a blank portfolio.
+
 ## Architecture
 
 ### State

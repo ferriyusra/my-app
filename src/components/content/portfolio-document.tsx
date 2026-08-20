@@ -1,41 +1,42 @@
-'use client';
-
-import { useState } from 'react';
 import {
 	Briefcase,
 	ChevronDown,
 	Download,
+	FolderGit2,
 	Github,
 	Layers,
 	Linkedin,
 	Mail,
-	Moon,
-	Sun,
-	FolderGit2,
 	MapPin,
 } from 'lucide-react';
-import { useTheme } from '@/components/theme-provider';
 import Meter from '@/components/ui/meter';
+import ThemeToggle from './theme-toggle';
 import { profile, yearsOfExperience } from '@/data/profile';
 import { experiences, tenureLabel } from '@/data/experience';
 import { MAX_YEARS, SKILL_CATEGORIES, skills } from '@/data/skills';
 import { projects } from '@/data/projects';
 
 /**
- * The narrow-screen view.
+ * The portfolio as a plain document.
  *
- * A windowing metaphor needs a pointer and room to overlap; below ~900px it
- * has neither, so a phone gets the same content as a Windows 11 widgets
- * board — stacked cards with the same tokens, radii and type as the desktop,
- * rather than a shrunken desktop nobody can drive.
+ * This is the page the server sends. Before it existed the response body was
+ * an empty div: every word of the work history, the projects and the stack
+ * only appeared after ~266KB of JavaScript had run, so anything that does not
+ * execute scripts — ATS scrapers, social preview bots, LLM crawlers — saw a
+ * blank portfolio. Now the content ships in the HTML and the desktop shell is
+ * the enhancement on top of it.
+ *
+ * It is also the narrow-screen experience outright, which is why the sections
+ * are `<details>`: native collapsing needs no JavaScript, so the whole page
+ * works with scripting switched off.
  */
 
-function Card({
+function Section({
 	icon,
 	title,
 	subtitle,
 	children,
-	open: initial = false,
+	open,
 }: {
 	icon: React.ReactNode;
 	title: string;
@@ -43,14 +44,9 @@ function Card({
 	children: React.ReactNode;
 	open?: boolean;
 }) {
-	const [open, setOpen] = useState(initial);
 	return (
-		<section className='mb-card' data-open={open || undefined}>
-			<button
-				type='button'
-				className='mb-card-head'
-				aria-expanded={open}
-				onClick={() => setOpen((v) => !v)}>
+		<details className='mb-card' open={open}>
+			<summary className='mb-card-head'>
 				<span className='mb-card-icon' aria-hidden='true'>
 					{icon}
 				</span>
@@ -58,20 +54,18 @@ function Card({
 					<strong>{title}</strong>
 					<small>{subtitle}</small>
 				</span>
-				<ChevronDown size={18} aria-hidden='true' data-open={open || undefined} />
-			</button>
-			{open && <div className='mb-card-body'>{children}</div>}
-		</section>
+				<ChevronDown size={18} aria-hidden='true' />
+			</summary>
+			<div className='mb-card-body'>{children}</div>
+		</details>
 	);
 }
 
-export default function MobileShell() {
-	const { theme, toggle, mounted } = useTheme();
+export default function PortfolioDocument() {
 	const years = yearsOfExperience();
-	const dark = mounted && theme === 'dark';
 
 	return (
-		<main className='mb-shell' id='main'>
+		<main className='mb-shell doc' id='main'>
 			<header className='mb-head'>
 				<span className='mb-avatar' aria-hidden='true'>
 					{profile.initials}
@@ -88,16 +82,11 @@ export default function MobileShell() {
 						{profile.availability}
 					</p>
 				</div>
-				<button
-					type='button'
-					className='mb-theme'
-					aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-					onClick={toggle}>
-					{mounted ? dark ? <Sun size={17} /> : <Moon size={17} /> : null}
-				</button>
+				<ThemeToggle />
 			</header>
 
 			<p className='mb-headline'>{profile.headline}</p>
+			<p className='mb-summary'>{profile.proof}</p>
 
 			<div className='mb-actions'>
 				<a
@@ -117,7 +106,7 @@ export default function MobileShell() {
 				windows, Start menu, File Explorer and all.
 			</p>
 
-			<Card
+			<Section
 				icon={<Briefcase size={17} />}
 				title='Experience'
 				subtitle={`${experiences.length} roles · ${years} years`}
@@ -125,19 +114,24 @@ export default function MobileShell() {
 				<ol className='mb-roles'>
 					{experiences.map((e) => (
 						<li key={e.company}>
-							<strong>{e.role}</strong>
+							<h3>{e.role}</h3>
 							<span className='mb-company'>{e.company}</span>
 							<span className='mb-period'>
-								{e.period} · {tenureLabel(e)}
+								{e.period} · {tenureLabel(e)} · {e.location}
 							</span>
 							<p>{e.description}</p>
-							<span className='mb-tech'>{e.tech.slice(0, 6).join(' · ')}</span>
+							<ul className='mb-points'>
+								{e.achievements.map((a) => (
+									<li key={a}>{a}</li>
+								))}
+							</ul>
+							<span className='mb-tech'>{e.tech.join(' · ')}</span>
 						</li>
 					))}
 				</ol>
-			</Card>
+			</Section>
 
-			<Card
+			<Section
 				icon={<Layers size={17} />}
 				title='Skills'
 				subtitle={`${skills.length} tools across ${SKILL_CATEGORIES.length} categories`}>
@@ -163,23 +157,27 @@ export default function MobileShell() {
 						</ul>
 					</div>
 				))}
-			</Card>
+			</Section>
 
-			<Card
+			<Section
 				icon={<FolderGit2 size={17} />}
 				title='Projects'
 				subtitle={`${projects.length} selected`}>
 				<ul className='mb-projects'>
 					{projects.map((p) => (
 						<li key={p.id}>
-							<span className='mb-project-dot' style={{ background: p.color }} aria-hidden='true' />
+							<span
+								className='mb-project-dot'
+								style={{ background: p.color }}
+								aria-hidden='true'
+							/>
 							<div>
-								<strong>{p.name}</strong>
+								<h3>{p.name}</h3>
 								<span className='mb-badge' data-type={p.type}>
 									{p.type === 'real' ? 'Production' : 'Case study'}
 								</span>
 								<p>{p.description}</p>
-								<span className='mb-tech'>{p.tech.slice(0, 4).join(' · ')}</span>
+								<span className='mb-tech'>{p.tech.join(' · ')}</span>
 								<span className='mb-project-links'>
 									{p.github && (
 										<a href={p.github} target='_blank' rel='noopener noreferrer'>
@@ -196,7 +194,7 @@ export default function MobileShell() {
 						</li>
 					))}
 				</ul>
-			</Card>
+			</Section>
 
 			<footer className='mb-foot'>
 				<a href={`mailto:${profile.email}`}>

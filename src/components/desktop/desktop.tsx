@@ -32,7 +32,6 @@ import type { AppId } from '@/types/windows';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
 import BootScreen from './boot-screen';
-import MobileShell from './mobile-shell';
 
 /** Below this width a windowing metaphor stops being usable. */
 const DESKTOP_MIN = 900;
@@ -393,7 +392,6 @@ function Shell() {
 	return (
 		<div
 			className='desktop'
-			id='main'
 			data-dimmed={power !== 'on' || undefined}
 			onPointerDown={(e) => {
 				/* A click on bare wallpaper clears the selection and any menu.
@@ -481,25 +479,39 @@ function Shell() {
  * both mount — a phone should not pay to hydrate a window manager it cannot
  * use. `null` on the first pass keeps the server and client markup identical.
  */
+/**
+ * Decides whether the desktop shell takes over from the document underneath.
+ *
+ * `data-shell` on <html> is the switch, and the inline script in layout.tsx
+ * has already set it before first paint — so the document is hidden and the
+ * black holding screen shown without waiting for React. This effect only keeps
+ * the attribute honest when the viewport changes afterwards.
+ */
 function Viewport() {
 	const [wide, setWide] = useState<boolean | null>(null);
 	const { booted } = useShell();
 
 	useEffect(() => {
 		const mq = window.matchMedia(`(min-width: ${DESKTOP_MIN}px)`);
-		const sync = () => setWide(mq.matches);
+		const sync = () => {
+			setWide(mq.matches);
+			document.documentElement.dataset.shell = mq.matches
+				? 'desktop'
+				: 'document';
+		};
 		sync();
 		mq.addEventListener('change', sync);
 		return () => mq.removeEventListener('change', sync);
 	}, []);
 
+	/* Narrow: the server-rendered document is already the page, and nothing
+	   here should draw over it. A Windows sign-in in front of a plain reading
+	   view would be a costume, not a shell. */
 	if (wide === null) return <div className='boot' aria-hidden='true' />;
-	if (!wide) return <MobileShell />;
+	if (!wide) return null;
 
 	/* The desktop mounts underneath the startup sequence, not after it, so the
-	   overlay is covering work the browser was doing regardless. The narrow
-	   layout skips it: a Windows sign-in in front of a plain reading view
-	   would be a costume, not a shell. */
+	   overlay is covering work the browser was doing regardless. */
 	return (
 		<>
 			<Shell />
