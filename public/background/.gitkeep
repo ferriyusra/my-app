@@ -1,0 +1,8 @@
+Wallpapers dropped in here — .jpg, .png, .webp or .avif — appear in
+Settings ▸ Personalisation ▸ Background alongside the four drawn ones.
+
+The filename becomes the label, so `sunset-cliffs.jpg` shows as "Sunset
+cliffs". Keep names plain: letters, digits, dots, dashes and underscores.
+
+The folder is read when the site is built, so a new image needs a rebuild to
+appear in production. `npm run dev` picks one up on the next refresh.

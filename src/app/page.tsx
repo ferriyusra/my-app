@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Desktop from '@/components/desktop/desktop';
+import { listCustomWallpapers } from '@/lib/wallpapers';
 import PortfolioDocument from '@/components/content/portfolio-document';
 import { profile } from '@/data/profile';
 
@@ -23,7 +24,11 @@ export const metadata: Metadata = {
 	title: `${profile.name} — ${profile.role}`,
 };
 
-export default function Home() {
+export default async function Home() {
+	/* Read here rather than from the client: this page is a server component
+	   and is prerendered, so the listing costs nothing at runtime. */
+	const customWallpapers = await listCustomWallpapers();
+
 	return (
 		<>
 			<script
@@ -34,7 +39,7 @@ export default function Home() {
 			    narrow screen. On a wide one the desktop shell covers it — see
 			    the `data-shell` switch in layout.tsx. */}
 			<PortfolioDocument />
-			<Desktop />
+			<Desktop customWallpapers={customWallpapers} />
 		</>
 	);
 }

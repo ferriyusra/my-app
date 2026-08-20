@@ -59,6 +59,10 @@ export const viewport = {
  * running this ahead of hydration is what stops a stored dark desktop from
  * flashing light.
  *
+ * A custom wallpaper is a filename rather than a fixed id, so the name is
+ * pattern-checked here before it reaches a CSS `url()` — anything that could
+ * close the quote is refused and the default stands.
+ *
  * `data-shell` is the one that matters most: the portfolio document is in the
  * server HTML, and on a wide screen it has to be out of the way before
  * anything paints. Setting it here rather than in React also means it is only
@@ -68,7 +72,9 @@ export const viewport = {
 const BOOT = `try{var d=document.documentElement,g=function(k,f){try{return localStorage.getItem(k)||f}catch(e){return f}};
 var t=g('theme',null);if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))d.setAttribute('data-theme','dark');
 d.setAttribute('data-accent',g('shell:accent','blue'));
-d.setAttribute('data-wallpaper',g('shell:wallpaper','bloom'));
+var w=g('shell:wallpaper','bloom'),cw=w.indexOf('custom:')===0?w.slice(7):'';
+if(cw&&/^[A-Za-z0-9][\\w.-]*$/.test(cw)){d.setAttribute('data-wallpaper','custom');d.style.setProperty('--wp-custom','url("/background/'+encodeURIComponent(cw)+'")');}
+else d.setAttribute('data-wallpaper',cw?'bloom':w);
 d.setAttribute('data-shell',matchMedia('(min-width: 900px)').matches?'desktop':'document');
 var b=g('shell:brightness','1');if(b)d.style.setProperty('--screen-dim',String(Math.max(0,Math.min(0.65,1-parseFloat(b)||0))));}catch(e){}`;
 

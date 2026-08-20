@@ -15,10 +15,30 @@ import type { AppId, ShellNotification, SnapZone } from '@/types/windows';
 /** Which single overlay owns the screen. Only one may be open at a time. */
 export type Flyout = 'start' | 'taskview' | 'quick' | 'notifications' | null;
 
-export type WallpaperId = 'bloom' | 'flow' | 'dusk' | 'solid';
+/** The four drawn in CSS, plus anything found in `public/background`. */
+export type BuiltInWallpaper = 'bloom' | 'flow' | 'dusk' | 'solid';
+export type WallpaperId = BuiltInWallpaper | `custom:${string}`;
+
+/** `custom:sunset.jpg` → `sunset.jpg`, or null for a built-in. */
+export function customWallpaperFile(id: string): string | null {
+	return id.startsWith('custom:') ? id.slice('custom:'.length) : null;
+}
+
+/**
+ * `sunset-cliffs.jpg` → `Sunset cliffs`.
+ *
+ * The filename is the only name a dropped-in image has, so it is what the
+ * picker shows. Nothing in the UI mentions where the file came from — a
+ * visitor cannot add one, and telling them how would be documentation
+ * addressed to the wrong person.
+ */
+export function wallpaperLabel(file: string): string {
+	const base = file.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim();
+	return base ? base[0].toUpperCase() + base.slice(1) : file;
+}
 export type AccentId = 'blue' | 'teal' | 'violet' | 'orange' | 'green' | 'plum';
 
-export const WALLPAPERS: { id: WallpaperId; label: string }[] = [
+export const WALLPAPERS: { id: BuiltInWallpaper; label: string }[] = [
 	{ id: 'bloom', label: 'Bloom' },
 	{ id: 'flow', label: 'Flow' },
 	{ id: 'dusk', label: 'Dusk' },
@@ -79,6 +99,8 @@ type ShellCtx = {
 	play: (name: SoundName) => void;
 	wallpaper: WallpaperId;
 	setWallpaper: (w: WallpaperId) => void;
+	/** Image files found in `public/background`, in name order. */
+	customWallpapers: string[];
 
 	/** The desktop cat. Off means it is in its house, and it walks there. */
 	catOn: boolean;
@@ -204,7 +226,13 @@ function readPins(): AppId[] {
 	}
 }
 
-export function ShellProvider({ children }: { children: React.ReactNode }) {
+export function ShellProvider({
+	children,
+	customWallpapers = [],
+}: {
+	children: React.ReactNode;
+	customWallpapers?: string[];
+}) {
 	const [flyout, setFlyout] = useState<Flyout>(null);
 	/* Stable identities: `closeFlyout` ends up in the dependency array of
 	   `launch`, which in turn gates the shell's one-shot boot effect. An
@@ -271,9 +299,23 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 	const [brightness, setBrightnessState] = useState(() =>
 		readNumber(KEY.brightness, 1, 0.35),
 	);
-	const [wallpaper, setWallpaperState] = useState<WallpaperId>(() =>
-		read(KEY.wallpaper, 'bloom', WALLPAPER_IDS),
-	);
+	const [wallpaper, setWallpaperState] = useState<WallpaperId>(() => {
+		if (typeof window === 'undefined') return 'bloom';
+		let stored: string | null = null;
+		try {
+			stored = localStorage.getItem(KEY.wallpaper);
+		} catch {
+			return 'bloom';
+		}
+		if (!stored) return 'bloom';
+		const file = customWallpaperFile(stored);
+		/* A custom choice is only honoured if that file is still there —
+		   otherwise a since-deleted image would leave a blank desktop. */
+		if (file) return customWallpapers.includes(file) ? (stored as WallpaperId) : 'bloom';
+		return (WALLPAPER_IDS as string[]).includes(stored)
+			? (stored as WallpaperId)
+			: 'bloom';
+	});
 	const [accent, setAccentState] = useState<AccentId>(() =>
 		read(KEY.accent, 'blue', ACCENT_IDS),
 	);
@@ -300,7 +342,20 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 	/* Wallpaper and accent are pure CSS switches: one attribute on <html>
 	   swaps every token, so nothing re-renders to repaint the shell. */
 	useEffect(() => {
-		document.documentElement.dataset.wallpaper = wallpaper;
+		const root = document.documentElement;
+		const file = customWallpaperFile(wallpaper);
+		if (file) {
+			/* One attribute for the stylesheet, one property for the image —
+			   the filename cannot be hard-coded in CSS. */
+			root.dataset.wallpaper = 'custom';
+			root.style.setProperty(
+				'--wp-custom',
+				`url("/background/${encodeURIComponent(file)}")`,
+			);
+		} else {
+			root.dataset.wallpaper = wallpaper;
+			root.style.removeProperty('--wp-custom');
+		}
 	}, [wallpaper]);
 
 	useEffect(() => {
@@ -442,6 +497,7 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			play,
 			wallpaper,
 			setWallpaper,
+			customWallpapers,
 			accent,
 			setAccent,
 			catOn,
@@ -488,6 +544,7 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
 			play,
 			wallpaper,
 			setWallpaper,
+			customWallpapers,
 			accent,
 			setAccent,
 			catOn,

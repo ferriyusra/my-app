@@ -11,7 +11,13 @@ import {
 	SunMedium,
 	Image as ImageIcon,
 } from 'lucide-react';
-import { useShell, WALLPAPERS } from '@/context/shell-context';
+import { useMemo } from 'react';
+import {
+	useShell,
+	WALLPAPERS,
+	wallpaperLabel,
+	type WallpaperId,
+} from '@/context/shell-context';
 import { useTheme } from '@/components/theme-provider';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import Flyout from '@/components/ui/flyout';
@@ -34,6 +40,7 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 		setBrightness,
 		wallpaper,
 		setWallpaper,
+		customWallpapers,
 		notifications,
 		openFlyout,
 	} = useShell();
@@ -41,9 +48,24 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 	const { launch } = useWindowManager();
 	const dark = mounted && theme === 'dark';
 
+	/* The cycle covers whatever is on offer, so an image dropped into
+	   public/background is reachable without opening Settings. */
+	const choices = useMemo(
+		() => [
+			...WALLPAPERS.map((w) => ({ id: w.id as WallpaperId, label: w.label })),
+			...customWallpapers.map((f) => ({
+				id: `custom:${f}` as WallpaperId,
+				label: wallpaperLabel(f),
+			})),
+		],
+		[customWallpapers],
+	);
+
+	const current = choices.find((w) => w.id === wallpaper);
+
 	const nextWallpaper = () => {
-		const i = WALLPAPERS.findIndex((w) => w.id === wallpaper);
-		setWallpaper(WALLPAPERS[(i + 1) % WALLPAPERS.length].id);
+		const i = choices.findIndex((w) => w.id === wallpaper);
+		setWallpaper(choices[(i + 1) % choices.length].id);
 	};
 
 	return (
@@ -86,9 +108,7 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 					<span className='qs-tile-icon' aria-hidden='true'>
 						<ImageIcon size={18} />
 					</span>
-					<span className='qs-tile-label'>
-						{WALLPAPERS.find((w) => w.id === wallpaper)?.label}
-					</span>
+					<span className='qs-tile-label'>{current?.label ?? 'Wallpaper'}</span>
 				</button>
 
 				<button

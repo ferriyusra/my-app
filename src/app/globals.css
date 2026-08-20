@@ -507,6 +507,27 @@ html[data-wallpaper='dusk'] .desktop {
   --desk-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
+/* ── Custom: an image dropped into public/background ──
+   The filename cannot be written into a stylesheet, so it arrives as a custom
+   property set alongside the attribute. */
+html[data-wallpaper='custom'] .wallpaper {
+  background: var(--wp-custom) center / cover no-repeat, #0d1626;
+}
+/* The drawn layers have nothing to add over a photograph. */
+html[data-wallpaper='custom'] .wp-layer { display: none; }
+/* A photograph can be any brightness, so icon labels stop taking their colour
+   from the theme and go white over a heavier vignette — the same treatment
+   Dusk already needed. */
+html[data-wallpaper='custom'] .desktop {
+  --desk-label: #ffffff;
+  --desk-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+html[data-wallpaper='custom'] .wp-vignette {
+  background:
+    radial-gradient(130% 95% at 18% 10%, rgba(0, 0, 0, 0.55), transparent 58%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.35), transparent 30%);
+}
+
 /* ── Solid: a flat accent-tinted field ── */
 html[data-wallpaper='solid'] .wallpaper {
   background: color-mix(in srgb, var(--accent) 18%, #e9edf3);
@@ -2390,6 +2411,11 @@ input[type='range']::-moz-range-thumb {
 }
 .sw-wall[data-wall='solid'] .sw-wall-art {
   background: color-mix(in srgb, var(--accent) 18%, #e9edf3);
+}
+/* Custom thumbnails carry their own image inline. */
+.sw-wall[data-wall='custom'] .sw-wall-art {
+  background-size: cover;
+  background-position: center;
 }
 html[data-theme='dark'] .sw-wall[data-wall='solid'] .sw-wall-art {
   background: color-mix(in srgb, var(--accent) 14%, #101216);

@@ -26,11 +26,19 @@ Open <http://localhost:3000>.
 | Start | Search across apps and links, pinned grid, all-apps list, Recommended from this session, power menu — sleep blanks the screen, restart replays the startup sequence, shut down leaves a way back |
 | Apps | About (System Properties), File Explorer (Projects), Skills, Experience, Mail (Contact), Media Player, Settings, Browser, VS Code, Recycle Bin |
 | Media Player | Type a song, artist or album and play it. Search goes through `/api/music/search`, which proxies Apple's catalogue so its rate limit lands on the server rather than each visitor. Previews are 30 seconds — that is what the public API serves — and the full track is one click away |
-| Personalisation | Light / dark, six accents, four wallpapers, brightness and volume — all persisted, all changing the running shell |
+| Personalisation | Light / dark, six accents, four built-in wallpapers plus any image you drop into `public/background`, brightness and volume — all persisted, all changing the running shell |
 | Desktop cat | Wanders the floor above the taskbar, sits, grooms and naps on its own. Click to pet it; put food down from the desktop menu or Settings and it will come and eat. It has a house: send it home and it trots over and goes inside — the switch stays disabled until it lands — and letting it out again brings it back through the door |
 
-Every wallpaper is drawn in CSS and every system sound is synthesised with the
-Web Audio API, so the shell ships zero image and zero audio bytes.
+The four built-in wallpapers are drawn in CSS and every system sound is
+synthesised with the Web Audio API, so the shell ships zero image and zero
+audio bytes of its own.
+
+**Adding your own wallpapers:** put `.jpg`, `.png`, `.webp` or `.avif` files in
+`public/background` and they join the list under Settings ▸ Personalisation ▸
+Background. The filename becomes the label, so `sunset-cliffs.jpg` shows as
+"Sunset cliffs". The folder is read at build time, so a new image needs a
+rebuild to appear in production; `npm run dev` picks one up on the next
+refresh.
 
 The whole portfolio also ships as plain HTML in the server response, and that
 document *is* the experience below 900px or with JavaScript switched off —

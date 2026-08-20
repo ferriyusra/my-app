@@ -97,6 +97,24 @@ window's taskbar button (`[data-app-id]`), so it drops into the taskbar and
 grows back out without a second set of coordinates. Minimised windows stay
 mounted — and `inert` — because unmounting would make both halves impossible.
 
+### Wallpapers
+
+Four are drawn in CSS and keyed off `data-wallpaper`. Anything in
+`public/background` is offered alongside them:
+[src/lib/wallpapers.ts](src/lib/wallpapers.ts) lists the directory on the
+server, `page.tsx` passes the result into `ShellProvider`, and the choice is
+stored as `custom:<file>`.
+
+It is read in a server component rather than an API route on purpose — the page
+is prerendered, so the listing happens at build time. A runtime `fs` read is not
+dependable on serverless hosts, and a browser cannot list a folder at all.
+
+The filename reaches a CSS `url()`, so it is pattern-checked in three places:
+the directory listing rejects anything but plain names, the provider only
+honours a file still present in the listing, and the inline boot script in
+`layout.tsx` re-checks before setting `--wp-custom` ahead of first paint.
+Dropping any of those re-opens a style-injection hole.
+
 ### The desktop cat
 
 [src/components/desktop/cat/](src/components/desktop/cat/) follows the same

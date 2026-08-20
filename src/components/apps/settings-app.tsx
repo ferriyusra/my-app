@@ -14,7 +14,13 @@ import {
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import SettingCard from '@/components/ui/setting-card';
 import ToggleSwitch from '@/components/ui/toggle-switch';
-import { useShell, ACCENTS, WALLPAPERS } from '@/context/shell-context';
+import {
+	useShell,
+	ACCENTS,
+	WALLPAPERS,
+	wallpaperLabel,
+	type WallpaperId,
+} from '@/context/shell-context';
 import { useTheme } from '@/components/theme-provider';
 import { profile } from '@/data/profile';
 
@@ -46,6 +52,7 @@ export default function SettingsApp() {
 		setAccent,
 		wallpaper,
 		setWallpaper,
+		customWallpapers,
 		catOn,
 		setCatOn,
 		catBusy,
@@ -59,6 +66,25 @@ export default function SettingsApp() {
 	} = useShell();
 	const { theme, toggle, mounted } = useTheme();
 	const dark = mounted && theme === 'dark';
+
+	/* Drawn and photographic backgrounds sit in one list. Which is which is an
+	   implementation detail, not something a visitor picking one needs told. */
+	const backgrounds = [
+		...WALLPAPERS.map((w) => ({
+			id: w.id as WallpaperId,
+			label: w.label,
+			wall: w.id as string,
+			art: undefined as React.CSSProperties | undefined,
+		})),
+		...customWallpapers.map((file) => ({
+			id: `custom:${file}` as WallpaperId,
+			label: wallpaperLabel(file),
+			wall: 'custom',
+			art: {
+				backgroundImage: `url("/background/${encodeURIComponent(file)}")`,
+			} as React.CSSProperties,
+		})),
+	];
 
 	return (
 		<SettingsShell
@@ -119,19 +145,23 @@ export default function SettingsApp() {
 					<SettingCard
 						Icon={Monitor}
 						title='Background'
-						description='Every wallpaper is drawn in CSS, so none of them cost a download.'>
+						description='The abstract ones are drawn in CSS rather than downloaded.'>
 						<div className='sw-walls' role='radiogroup' aria-label='Background'>
-							{WALLPAPERS.map((w) => (
+							{backgrounds.map((w) => (
 								<button
 									key={w.id}
 									type='button'
 									role='radio'
 									aria-checked={wallpaper === w.id}
 									className='sw-wall'
-									data-wall={w.id}
+									data-wall={w.wall}
 									data-active={wallpaper === w.id || undefined}
 									onClick={() => setWallpaper(w.id)}>
-									<span className='sw-wall-art' aria-hidden='true' />
+									<span
+										className='sw-wall-art'
+										aria-hidden='true'
+										style={w.art}
+									/>
 									{w.label}
 								</button>
 							))}

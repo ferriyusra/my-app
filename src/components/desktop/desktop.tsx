@@ -560,9 +560,14 @@ function Viewport() {
 	);
 }
 
-export default function Desktop() {
+export default function Desktop({
+	customWallpapers = [],
+}: {
+	/** Read from `public/background` by the server component that renders this. */
+	customWallpapers?: string[];
+}) {
 	return (
-		<ShellProvider>
+		<ShellProvider customWallpapers={customWallpapers}>
 			<WindowProvider>
 				<Viewport />
 			</WindowProvider>
