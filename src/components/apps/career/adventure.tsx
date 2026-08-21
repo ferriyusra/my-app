@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useShell } from '@/context/shell-context';
 import HeroArt, { HERO_H, HERO_W } from './hero-art';
 import {
 	CHAPTER_W,
@@ -10,7 +11,10 @@ import {
 	PICKUP_R,
 	SPEED,
 	WORLD_H,
+	chapterProgress,
 	chapters as buildChapters,
+	heroPct,
+	pipPct,
 } from './world';
 
 /**
@@ -30,6 +34,10 @@ import {
  */
 
 const CAM_EASE = 0.12;
+/** How long the landing squash is held, in ms. Cleared by the loop, not a timer. */
+const SQUASH_MS = 170;
+/** Standing still this long starts the idle breath. */
+const IDLE_MS = 1800;
 
 const LEFT_KEYS = new Set(['ArrowLeft', 'a', 'A']);
 const RIGHT_KEYS = new Set(['ArrowRight', 'd', 'D']);
@@ -41,9 +49,15 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 	const [chapters] = useState(buildChapters);
 	const worldW = chapters.length * CHAPTER_W;
 
+	const { play } = useShell();
+
 	const stageRef = useRef<HTMLDivElement>(null);
 	const camRef = useRef<HTMLDivElement>(null);
 	const heroRef = useRef<HTMLDivElement>(null);
+	const shadowRef = useRef<HTMLDivElement>(null);
+	/* The marker moves every frame, so it is written to the DOM like the
+	   character and the camera rather than rendered from state. */
+	const markRef = useRef<HTMLDivElement>(null);
 
 	/* Everything the loop mutates lives here, never in state. */
 	const body = useRef({
@@ -56,6 +70,10 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 	});
 	const held = useRef({ left: false, right: false });
 	const gotRef = useRef<Set<string>>(new Set());
+	/* Stamps the loop reads instead of setting timers. */
+	const marks = useRef({ landedAt: -1, stillSince: 0 });
+	/* Which gates have already been sounded, so the cue fires once each. */
+	const chimed = useRef<Set<number>>(new Set());
 
 	const [got, setGot] = useState<string[]>([]);
 	const [chapter, setChapter] = useState(0);
@@ -142,10 +160,13 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				b.facing = dir;
 			}
 
-			/* Jump and fall */
+			/* Jump and fall. The landing is the transition, not the state —
+			   `onGround` is true on every grounded frame, so testing it alone
+			   would squash the character for as long as it stood still. */
 			b.vy -= GRAVITY * dt;
 			b.y += b.vy * dt;
 			if (b.y <= 0) {
+				if (!b.onGround) marks.current.landedAt = now;
 				b.y = 0;
 				b.vy = 0;
 				b.onGround = true;
@@ -168,7 +189,22 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 					const dy = t.y - (b.y + HERO_H / 2);
 					if (dx * dx + dy * dy < PICKUP_R * PICKUP_R) {
 						gotRef.current.add(t.id);
+						/* Climb a whole tone per token within a chapter, then
+						   reset — a run of eight reads as a phrase rather than
+						   the same blip eight times. */
+						const done = ch.tokens.filter((x) =>
+							gotRef.current.has(x.id),
+						).length;
+						play('pickup', (done - 1) * 200);
 						setGot([...gotRef.current]);
+
+						if (
+							!chimed.current.has(ch.index) &&
+							done === ch.tokens.length
+						) {
+							chimed.current.add(ch.index);
+							play('unlock');
+						}
 					}
 				}
 			}
@@ -195,6 +231,32 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				if (b.onGround === (el.dataset.air === 'true')) {
 					el.dataset.air = String(!b.onGround);
 				}
+
+				const squashing = now - marks.current.landedAt < SQUASH_MS;
+				if (squashing !== (el.dataset.land === 'true')) {
+					el.dataset.land = String(squashing);
+				}
+
+				/* Idle only counts while standing on the ground doing nothing. */
+				if (!b.onGround || dir !== 0) marks.current.stillSince = now;
+				const idling = now - marks.current.stillSince > IDLE_MS;
+				if (idling !== (el.dataset.idle === 'true')) {
+					el.dataset.idle = String(idling);
+				}
+			}
+
+			/* The shadow stays on the ground and shrinks as the character
+			   rises — without it there is no way to judge where a jump lands. */
+			if (shadowRef.current) {
+				const lift = Math.min(1, b.y / 110);
+				shadowRef.current.style.transform =
+					`translate3d(${b.x}px,0,0) scale(${1 - lift * 0.45})`;
+				shadowRef.current.style.opacity = String(0.28 - lift * 0.2);
+			}
+
+			/* Marker on the minimap, in the chapter's own coordinates. */
+			if (markRef.current) {
+				markRef.current.style.left = `${heroPct(b.x + HERO_W / 2, chapters[here])}%`;
 			}
 
 			if (here !== chapterRef.current) {
@@ -213,12 +275,13 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 
 		raf = requestAnimationFrame(frame);
 		return () => cancelAnimationFrame(raf);
-	}, [chapters, clearedLive, worldW]);
+	}, [chapters, clearedLive, play, worldW]);
 
 	const total = chapters.reduce((n, c) => n + c.tokens.length, 0);
 	const ch = chapters[chapter];
 	/* What render is allowed to see: the state list, not the live ref. */
 	const have = new Set(got);
+	const here = chapterProgress(ch, have);
 
 	return (
 		<div className='cx-game'>
@@ -231,8 +294,31 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 					<span>{ch.exp.period}</span>
 				</div>
 				<span className='cx-hud-score'>
-					{got.length}/{total} skills
+					{/* Remounted on every pickup so the CSS bump replays — the
+					    same trick the desktop cat's hearts use. */}
+					<b key={got.length}>
+						{here.done}/{here.total}
+					</b>{' '}
+					here · {got.length}/{total} total
 				</span>
+			</div>
+
+			{/* One chapter's worth of pips. A chapter is wider than the stage can
+			    show, so without this a missed token means walking back and forth
+			    with nothing to aim at. */}
+			<div className='cx-map' aria-hidden='true'>
+				<span className='cx-map-line' />
+				{ch.tokens.map((t) => (
+					<span
+						key={t.id}
+						className='cx-map-pip'
+						data-got={have.has(t.id) || undefined}
+						data-high={t.y > PICKUP_R || undefined}
+						style={{ left: `${pipPct(t, ch)}%` }}
+						title={t.skill}
+					/>
+				))}
+				<div className='cx-map-you' ref={markRef} />
 			</div>
 
 			{/* The playfield. tabIndex so it can take the keys it listens for. */}
@@ -279,7 +365,12 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 									data-open={clearedIn(c.index, have) || undefined}
 									style={{ bottom: GROUND }}>
 									<span className='cx-gate-lock'>
-										{clearedIn(c.index, have) ? 'OPEN' : 'LOCKED'}
+										{(() => {
+											const p = chapterProgress(c, have);
+											return p.done === p.total
+												? 'OPEN'
+												: `LOCKED — ${p.total - p.done} left`;
+										})()}
 									</span>
 								</span>
 							)}
@@ -287,6 +378,13 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 					))}
 
 					<div className='cx-ground' style={{ height: GROUND }} />
+
+					<div
+						className='cx-shadow'
+						ref={shadowRef}
+						style={{ bottom: GROUND - 3, width: HERO_W }}
+						aria-hidden='true'
+					/>
 
 					<div
 						className='cx-hero'
@@ -299,7 +397,7 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				{!moved && (
 					<p className='cx-hint'>
 						Click here, then <kbd>←</kbd> <kbd>→</kbd> to walk and{' '}
-						<kbd>↑</kbd> to jump
+						<kbd>↑</kbd> to jump for the high ones
 					</p>
 				)}
 

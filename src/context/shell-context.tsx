@@ -97,7 +97,7 @@ type ShellCtx = {
 	/** Screen dimming, 0.35–1. Driven by the Quick Settings brightness slider. */
 	brightness: number;
 	setBrightness: (v: number) => void;
-	play: (name: SoundName) => void;
+	play: (name: SoundName, detune?: number) => void;
 	wallpaper: WallpaperId;
 	setWallpaper: (w: WallpaperId) => void;
 	/** Image files found in `public/background`, in name order. */
@@ -400,8 +400,8 @@ export function ShellProvider({
 		volumeRef.current = volume;
 	}, [sound, volume]);
 
-	const play = useCallback((name: SoundName) => {
-		if (soundRef.current) playSound(name, volumeRef.current);
+	const play = useCallback((name: SoundName, detune = 0) => {
+		if (soundRef.current) playSound(name, volumeRef.current, detune);
 	}, []);
 
 	const setSound = useCallback((on: boolean) => {

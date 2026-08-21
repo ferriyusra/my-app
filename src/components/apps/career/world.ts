@@ -90,3 +90,32 @@ export function chapters(): Chapter[] {
 }
 
 export const WORLD_W = () => chapters().length * CHAPTER_W;
+
+/** How much of one chapter has been picked up. Counts that chapter only. */
+export function chapterProgress(
+	chapter: Chapter,
+	have: Set<string>,
+): { done: number; total: number } {
+	return {
+		done: chapter.tokens.filter((t) => have.has(t.id)).length,
+		total: chapter.tokens.length,
+	};
+}
+
+/**
+ * Where a token sits along its own chapter, 0–100.
+ *
+ * The minimap draws one chapter at a time rather than the whole career: at the
+ * width the stage actually gets, five chapters' worth of pips collapse into an
+ * unreadable smear, and the thing a player is trying to find is always inside
+ * the chapter they are stuck in.
+ */
+export function pipPct(token: Token, chapter: Chapter): number {
+	const local = token.x - chapter.x;
+	return Math.max(0, Math.min(100, (local / CHAPTER_W) * 100));
+}
+
+/** Same mapping for the character, so the marker and the pips agree. */
+export function heroPct(heroX: number, chapter: Chapter): number {
+	return Math.max(0, Math.min(100, ((heroX - chapter.x) / CHAPTER_W) * 100));
+}

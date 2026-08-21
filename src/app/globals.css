@@ -4259,9 +4259,63 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   color: var(--accent);
 }
 .cx-hud-score { margin-left: auto; color: var(--ink-muted); }
+.cx-hud-score b { color: var(--accent); animation: cx-bump 300ms var(--ease-decel); }
+@keyframes cx-bump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
 .cx-hud-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .cx-hud-name strong { font-size: 13px; font-weight: 600; }
 .cx-hud-name span { font-size: 11px; color: var(--ink-muted); }
+
+/* ── Minimap ──
+   One chapter at a time. A chapter is wider than the stage can show, so
+   this is what turns "I missed one" from a search into a glance. */
+.cx-map {
+  position: relative;
+  height: 22px;
+  margin: -2px 2px 0;
+}
+.cx-map-line {
+  position: absolute;
+  left: 0; right: 0; bottom: 5px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--line-subtle);
+}
+.cx-map-pip {
+  position: absolute;
+  bottom: 2px;
+  width: 8px; height: 8px;
+  margin-left: -4px;
+  border-radius: 99px;
+  border: 1.5px solid var(--accent);
+  background: var(--surface);
+  transition: background 180ms var(--ease-standard), transform 180ms var(--ease-decel);
+}
+.cx-map-pip[data-got] { background: var(--accent); transform: scale(0.8); }
+/* Raised tokens sit raised on the map too. Otherwise someone walks straight
+   under one, nothing happens, and there is no clue that jumping is the answer. */
+.cx-map-pip[data-high] { bottom: 12px; }
+.cx-map-pip[data-high]::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 100%;
+  width: 1px; height: 7px;
+  margin-left: -0.5px;
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.cx-map-you {
+  position: absolute;
+  bottom: 0;
+  width: 0; height: 0;
+  margin-left: -5px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid var(--ink);
+  will-change: left;
+}
 
 /* ── The playfield ── */
 .cx-stage {
@@ -4353,7 +4407,17 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   color: var(--ink-secondary);
 }
 .cx-token[data-got] { opacity: 0.22; transform: translateX(-50%) scale(0.8); }
-.cx-token[data-got] i { animation: none; background: var(--ink-disabled); box-shadow: none; }
+.cx-token[data-got] i {
+  background: var(--ink-disabled);
+  box-shadow: none;
+  animation: cx-pop 260ms var(--ease-decel);
+}
+
+@keyframes cx-pop {
+  0%   { transform: scale(1); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+  40%  { transform: scale(1.9); box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
+  100% { transform: scale(1); box-shadow: none; }
+}
 
 @keyframes cx-bob {
   0%, 100% { transform: translateY(0); }
@@ -4387,7 +4451,31 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 
 /* ── The character ── */
 .cx-hero { position: absolute; left: 0; will-change: transform; }
-.cx-hero-svg { display: block; overflow: visible; }
+.cx-hero-svg { display: block; overflow: visible; transform-origin: 50% 100%; }
+
+/* Stays on the ground and shrinks with height, so a jump has a landing spot. */
+.cx-shadow {
+  position: absolute;
+  left: 0;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--ink);
+  opacity: 0.28;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.cx-hero[data-land='true'] .cx-hero-svg { animation: cx-squash 170ms var(--ease-decel); }
+@keyframes cx-squash {
+  0%   { transform: scaleY(0.82) scaleX(1.12); }
+  100% { transform: none; }
+}
+
+.cx-hero[data-idle='true'] .cx-hero-svg { animation: cx-breathe 3.2s ease-in-out infinite; }
+@keyframes cx-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(0.985) translateY(0.6px); }
+}
 
 /* Limbs swing only while walking on the ground. */
 .cx-hero[data-walking='true'] .cx-leg-front,
@@ -4471,9 +4559,14 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 .cx-pad button:active { background: var(--accent-soft); color: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
-  .cx-token i { animation: none; }
+  .cx-token i,
+  .cx-token[data-got] i,
+  .cx-hud-score b,
+  .cx-hero[data-land='true'] .cx-hero-svg,
+  .cx-hero[data-idle='true'] .cx-hero-svg { animation: none; }
   .cx-hero[data-walking='true'] .cx-leg,
   .cx-hero[data-walking='true'] .cx-arm { animation: none; }
+  .cx-map-pip { transition: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════
