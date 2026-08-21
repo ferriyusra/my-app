@@ -104,10 +104,37 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 		}
 	}, []);
 
-	/* Keys are bound to the stage, not the window: an app inside a fake desktop
-	   has no business swallowing the arrow keys of the page it sits in. */
-	const onKeyDown = useCallback(
-		(e: React.KeyboardEvent) => {
+	/**
+	 * Keys are read from `window`, but only while this app's own window is the
+	 * focused one.
+	 *
+	 * Binding them to the stage element was wrong in practice: opening the app
+	 * leaves focus on the window frame, not on the stage inside it, so arrows
+	 * and space did nothing until the playfield itself was clicked — which
+	 * reads as "the keyboard is broken", because it was.
+	 *
+	 * Listening globally without the guard would be the opposite mistake: an
+	 * app inside a fake desktop must not swallow the arrow keys of the page it
+	 * sits in, or of another window that happens to be on top.
+	 */
+	const focused = useCallback(() => {
+		const win = stageRef.current?.closest('.win');
+		/* No window frame at all (a test harness, a future embed): fall back to
+		   asking whether focus is somewhere inside the game. */
+		if (!win) return stageRef.current?.contains(document.activeElement) ?? false;
+		return win.getAttribute('data-focused') === 'true';
+	}, []);
+
+	useEffect(() => {
+		/* A control that does something with the key already owns it — Space on
+		   the Summary tab must switch mode, not make the character jump. */
+		const typing = (t: EventTarget | null) =>
+			t instanceof HTMLElement &&
+			(t.closest('button, a, input, textarea, select') !== null ||
+				t.isContentEditable);
+
+		const down = (e: KeyboardEvent) => {
+			if (!focused() || typing(e.target)) return;
 			const k = e.key;
 			if (LEFT_KEYS.has(k)) held.current.left = true;
 			else if (RIGHT_KEYS.has(k)) held.current.right = true;
@@ -118,17 +145,30 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				movedRef.current = true;
 				setMoved(true);
 			}
-		},
-		[jump],
-	);
+		};
 
-	const onKeyUp = useCallback((e: React.KeyboardEvent) => {
-		const k = e.key;
-		if (LEFT_KEYS.has(k)) held.current.left = false;
-		else if (RIGHT_KEYS.has(k)) held.current.right = false;
-		else return;
-		e.preventDefault();
-	}, []);
+		const up = (e: KeyboardEvent) => {
+			const k = e.key;
+			if (LEFT_KEYS.has(k)) held.current.left = false;
+			else if (RIGHT_KEYS.has(k)) held.current.right = false;
+		};
+
+		/* Let go of everything if the window loses focus mid-stride, or the
+		   character walks on for ever with nobody holding the key. */
+		const release = () => {
+			held.current.left = false;
+			held.current.right = false;
+		};
+
+		window.addEventListener('keydown', down);
+		window.addEventListener('keyup', up);
+		window.addEventListener('blur', release);
+		return () => {
+			window.removeEventListener('keydown', down);
+			window.removeEventListener('keyup', up);
+			window.removeEventListener('blur', release);
+		};
+	}, [focused, jump]);
 
 	/* Touch and mouse get the same three verbs the keyboard has. */
 	const press = useCallback(
@@ -328,8 +368,6 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				tabIndex={0}
 				role='application'
 				aria-label='Career adventure. Arrow keys to walk, up to jump.'
-				onKeyDown={onKeyDown}
-				onKeyUp={onKeyUp}
 				style={{ height: WORLD_H }}>
 				<div
 					className='cx-cam'
@@ -396,8 +434,8 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 
 				{!moved && (
 					<p className='cx-hint'>
-						Click here, then <kbd>←</kbd> <kbd>→</kbd> to walk and{' '}
-						<kbd>↑</kbd> to jump for the high ones
+						<kbd>←</kbd> <kbd>→</kbd> to walk, <kbd>↑</kbd> to jump for the
+						high ones
 					</p>
 				)}
 
@@ -414,19 +452,24 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				)}
 			</div>
 
+			{/* Pointer-only, and aria-hidden — so they are kept out of the tab
+			    order rather than being focusable things a screen reader cannot
+			    see. The keyboard has its own path above. */}
 			<div className='cx-pad' aria-hidden='true'>
 				<button
 					type='button'
+					tabIndex={-1}
 					onPointerDown={() => press('left', true)}
 					onPointerUp={() => press('left', false)}
 					onPointerLeave={() => press('left', false)}>
 					←
 				</button>
-				<button type='button' onPointerDown={jump}>
+				<button type='button' tabIndex={-1} onPointerDown={jump}>
 					Jump
 				</button>
 				<button
 					type='button'
+					tabIndex={-1}
 					onPointerDown={() => press('right', true)}
 					onPointerUp={() => press('right', false)}
 					onPointerLeave={() => press('right', false)}>

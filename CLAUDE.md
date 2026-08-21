@@ -220,8 +220,16 @@ finish.
 
 **Summary mode is not a fallback, it is the same content.** It is the default
 under `prefers-reduced-motion`, and anything the game says must be sayable
-there too. Keys bind to the stage element, never to `window` — an app inside a
-fake desktop has no business swallowing the page's arrow keys.
+there too.
+
+Keys are read from `window`, but only while the app's own `.win` ancestor
+carries `data-focused`. Binding them to the stage element was tried first and
+was wrong: opening the app leaves focus on the window frame, not the stage
+inside it, so nothing responded until the playfield was clicked. Listening
+globally without the guard is the opposite mistake — an app inside a fake
+desktop must not swallow the arrow keys of the page or of whatever window is on
+top. The handler also stands down when the event target is a button or field,
+so Space on the Summary tab switches mode instead of jumping.
 
 ### The Recycle Bin and the case study
 
