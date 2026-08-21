@@ -60,6 +60,31 @@ highlights: [
 	tagline:
 		'4+ years building production APIs and event-driven systems across fintech, GovTech health, and automotive. Currently going deeper on system design and DSA.',
 
+	/**
+	 * What is true right now, in the "/now page" sense.
+	 *
+	 * A CV says what someone has done; this says what they are doing this
+	 * month, which is the question an interested reader actually has. Every
+	 * line is drawn from something already recorded elsewhere in `src/data` —
+	 * nothing here is aspirational. `updated` is shown, so a stale entry
+	 * admits it rather than quietly implying it is current.
+	 */
+	nowUpdated: '2026-08',
+	now: [
+		{
+			label: 'Building',
+			text: 'Finance infrastructure at Meditap — the ASO billing services and threshold notifications that ~160 entities are invoiced from, in Go and PostgreSQL on Pub/Sub.',
+		},
+		{
+			label: 'Learning',
+			text: 'System design and data structures and algorithms, deliberately rather than incidentally — the gap between shipping a service that works and knowing why it holds at the next order of magnitude.',
+		},
+		{
+			label: 'Open to',
+			text: 'Freelance and full-time backend work, hybrid in Jakarta or remote. GMT+7 overlaps most of the EU morning and all of APAC.',
+		},
+	],
+
 	bio: 'Backend engineer with 4+ years building scalable API systems across fintech, GovTech health, and automotive industries.',
 
 	location: 'Jakarta, Indonesia',

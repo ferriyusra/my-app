@@ -14,6 +14,7 @@ import {
 	MapPin,
 	Monitor,
 	Briefcase,
+	Radar,
 } from 'lucide-react';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import SettingCard from '@/components/ui/setting-card';
@@ -37,6 +38,11 @@ export default function AboutApp() {
 	const [page, setPage] = useState('overview');
 	const years = yearsOfExperience();
 	const current = experiences.find((e) => e.current) ?? experiences[0];
+	const [ny, nm] = profile.nowUpdated.split('-').map(Number);
+	const nowStamp = new Date(ny, nm - 1, 1).toLocaleDateString('en-GB', {
+		month: 'long',
+		year: 'numeric',
+	});
 
 	const deviceSpecs: [string, string][] = [
 		['Name', profile.name],
@@ -91,6 +97,18 @@ export default function AboutApp() {
 						title='Summary'
 						description={profile.proof}
 					/>
+
+					<SettingCard Icon={Radar} title='Now'>
+						<dl className='ab-now'>
+							{profile.now.map((n) => (
+								<div key={n.label}>
+									<dt>{n.label}</dt>
+									<dd>{n.text}</dd>
+								</div>
+							))}
+						</dl>
+						<p className='ab-now-stamp'>Updated {nowStamp}</p>
+					</SettingCard>
 
 					<SettingCard Icon={Briefcase} title='What I actually ship'>
 						<p className='st-prose'>

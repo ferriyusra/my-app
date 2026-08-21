@@ -2645,35 +2645,13 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   position: relative;
   list-style: none;
   margin: 0;
-  padding: 0 0 0 26px;
+  padding: 0;
   display: grid;
   gap: 12px;
 }
-/* The spine, drawn behind the markers. */
-.xp-timeline::before {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 10px;
-  bottom: 10px;
-  width: 2px;
-  border-radius: 99px;
-  background: linear-gradient(var(--accent), var(--line));
-}
+/* No spine and no dots: the career bar above encodes the duration these
+   drew a picture of without measuring. Two timelines is one too many. */
 .xp-entry { position: relative; }
-.xp-marker {
-  position: absolute;
-  left: -26px;
-  top: 20px;
-  width: 12px; height: 12px;
-  border: 2px solid var(--surface);
-  border-radius: 99px;
-  background: var(--line);
-}
-.xp-entry[data-current] .xp-marker {
-  background: var(--accent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent);
-}
 .xp-card {
   padding: 16px 18px;
   border: 1px solid var(--line-subtle);
@@ -2704,8 +2682,21 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   font-size: 11px;
   font-weight: 600;
 }
-.xp-desc { margin: 12px 0 0; font-size: 13px; line-height: 20px; color: var(--ink-secondary); }
-.xp-points { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 7px; }
+.xp-desc {
+  margin: 0 0 2px;
+  font-size: 12px;
+  line-height: 19px;
+  color: var(--ink-muted);
+}
+.xp-points {
+  /* Preflight sets list-style:none on every ul, which silently killed the
+     accent markers below — the outcomes read as one grey block without them. */
+  list-style: disc outside;
+  margin: 12px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+}
 .xp-points li { font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
 .xp-points li::marker { color: var(--accent); }
 .xp-toggle {
@@ -3232,6 +3223,22 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   font-weight: 600;
 }
 .ml-reply:hover { text-decoration: underline; }
+
+/* Shown while a window's contents are being fetched. */
+.app-loading {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: 160px;
+}
+.app-loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--line-soft);
+  border-top-color: var(--accent);
+  border-radius: 99px;
+  animation: spin 0.8s linear infinite;
+}
 
 /* ═══════════════════════════════════════════════════════════
    MEDIA PLAYER
@@ -3824,22 +3831,846 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 }
 .vs-status-left, .vs-status-right { display: flex; align-items: center; gap: 14px; }
 
+/* ── Career bar ──────────────────────────────────────────────
+   Segment width grows with months served, so the shape of the career
+   reads before the words do — with a floor, so a four-month role is
+   still wide enough to carry its name. Roughly to scale, not exactly. */
+.xp-bar-wrap { margin: 0 0 22px; }
+
+.xp-bar {
+  display: flex;
+  gap: 3px;
+  height: 52px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.xp-seg {
+  position: relative;
+  flex: 1 1 0;
+  /* The readability floor. Without it the shortest role lands near 48px
+     and its label is a truncated stub. */
+  min-width: 58px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--surface-chip);
+  font: inherit;
+  color: var(--ink-secondary);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
+}
+.xp-seg:hover { background: var(--subtle-hover); transform: translateY(-1px); }
+.xp-seg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* The role still running is the one the eye should land on. */
+.xp-seg[data-current] {
+  background: var(--accent-fill);
+  color: #fff;
+}
+.xp-seg[data-current]:hover { background: var(--accent-hover); }
+
+.xp-seg-label {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.xp-seg-len {
+  font-size: 10px;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xp-bar-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.xp-bar-axis span:nth-child(2) { font-variant-numeric: tabular-nums; }
+
+/* ── Role stats ──────────────────────────────────────────────
+   Three figures, pulled out of the prose that used to bury them. */
+.xp-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  background: var(--line-subtle);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.xp-stats li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--surface);
+}
+.xp-stats strong {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+.xp-stats span { font-size: 11px; line-height: 15px; color: var(--ink-muted); }
+
+/* The first three are what the role ran on; the rest are context. */
+.xp-tech li[data-lead] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 620px) {
+  .xp-stats { grid-template-columns: minmax(0, 1fr); }
+  .xp-seg-len { display: none; }
+}
+
+/* ── Case study ──────────────────────────────────────────────
+   Rendered by one component in two places: the Experience window and
+   the server document. */
+.cs { max-width: 72ch; }
+.cs-summary {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--ink-secondary);
+}
+
+.cs-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+.cs-stack li {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-chip);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-secondary);
+}
+
+.cs-section + .cs-section { margin-top: 20px; }
+.cs-section h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.cs-section p { margin: 0 0 10px; font-size: 13px; line-height: 21px; }
+.cs-section p:last-child { margin-bottom: 0; }
+.cs-section strong { font-weight: 600; }
+
+/* The gaps are set apart rather than buried at the end of the prose —
+   the point is that they are visible. */
+.cs-open {
+  margin-top: 24px;
+  padding: 14px 16px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface-subtle);
+}
+.cs-open ul { margin: 10px 0 0; padding-left: 18px; }
+.cs-open li { font-size: 13px; line-height: 21px; margin-bottom: 7px; }
+.cs-open li:last-child { margin-bottom: 0; }
+
+/* In the Experience window it is a disclosure on the current role. */
+.xp-case { margin-top: 14px; border-top: 1px solid var(--line-subtle); padding-top: 12px; }
+.xp-case > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  margin: -6px -8px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.xp-case > summary::-webkit-details-marker { display: none; }
+.xp-case > summary:hover { background: var(--subtle-hover); }
+.xp-case > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.xp-case-chev {
+  margin-left: auto;
+  flex: none;
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+.xp-case[open] .xp-case-chev { transform: rotate(180deg); }
+.xp-case[open] > summary { margin-bottom: 12px; }
+
+.mb-cs-title { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
+
+/* ── Now ─────────────────────────────────────────────────────
+   The same two-column definition list in both renderings: the About
+   window and the server document. */
+.ab-now, .mb-now { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+.ab-now div, .mb-now div {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 4px 16px;
+  align-items: baseline;
+}
+.ab-now dt, .mb-now dt {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+.ab-now dd, .mb-now dd { margin: 0; font-size: 13px; line-height: 20px; }
+.ab-now-stamp {
+  margin: 14px 0 0;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 560px) {
+  .ab-now div, .mb-now div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+
 /* ═══════════════════════════════════════════════════════════
-   RECYCLE BIN
+   CAREER.EXE
+   The one window that admits to being a toy. It still uses the
+   shell's tokens, so it follows the accent and the theme like
+   everything else — a game skin, not a second design system.
    ═══════════════════════════════════════════════════════════ */
 
-.rb-empty {
+.cx { padding: 18px 20px 22px; }
+
+.cx-head {
+  padding: 16px 18px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-lg);
+  background: var(--surface-header);
+  margin-bottom: 18px;
+}
+
+.cx-id { display: flex; align-items: center; gap: 12px; }
+.cx-avatar {
+  display: grid;
+  place-items: center;
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: var(--accent-fill);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.cx-id h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.cx-id p { margin: 1px 0 0; font-size: 12px; color: var(--ink-muted); }
+.cx-lv {
+  margin-left: auto;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.cx-xp { margin-top: 14px; }
+.cx-xp-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-chip);
+  overflow: hidden;
+}
+.cx-xp-fill {
+  --fill: 0%;
+  width: var(--fill);
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-fill), var(--accent));
+  transition: width 1100ms var(--ease-decel);
+}
+.cx-xp-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+.cx-levels { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+
+.cx-level {
+  padding: 13px 15px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  /* Dealt out one at a time; the effect is set here so reduced motion
+     can drop it in one place. */
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 320ms var(--ease-decel),
+    transform 320ms var(--ease-decel);
+}
+.cx-level[data-in] { opacity: 1; transform: none; }
+.cx-level[data-current] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.cx-level-head { display: flex; align-items: center; gap: 11px; }
+.cx-badge {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: var(--r-sm);
+  background: var(--surface-chip);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+}
+.cx-level[data-current] .cx-badge { background: var(--accent-fill); color: #fff; }
+.cx-level-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cx-level-name strong { font-size: 13px; font-weight: 600; }
+.cx-level-name span { font-size: 11px; color: var(--ink-muted); }
+.cx-active {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  color: var(--success);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.cx-quest {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 19px;
+  color: var(--ink-secondary);
+}
+.cx-quest span { color: var(--accent); margin-right: 4px; }
+
+.cx-unlock { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+.cx-unlock-n {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+.cx-unlock ul { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; margin: 0; padding: 0; }
+.cx-unlock li {
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+
+.cx-foot {
+  margin: 18px 0 0;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--ink-muted);
+}
+.cx-foot code { font-family: var(--mono); font-size: 10.5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-xp-fill { transition: none; }
+  .cx-level { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Career.exe : adventure mode ─────────────────────────────
+   A side-scroller inside a window. It still uses the shell's tokens,
+   so it follows the accent and the theme like everything else. */
+
+.cx-app { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+.cx-modes {
+  display: flex;
+  gap: 4px;
+  padding: 10px 14px 0;
+}
+.cx-modes button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.cx-modes button:hover { background: var(--subtle-hover); }
+.cx-modes button[data-on] {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.cx-game { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px; }
+
+/* ── HUD ── */
+.cx-hud {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface-header);
+}
+.cx-hud-ch, .cx-hud-score {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+.cx-hud-score { margin-left: auto; color: var(--ink-muted); }
+.cx-hud-score b { color: var(--accent); animation: cx-bump 300ms var(--ease-decel); }
+@keyframes cx-bump {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+.cx-hud-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cx-hud-name strong { font-size: 13px; font-weight: 600; }
+.cx-hud-name span { font-size: 11px; color: var(--ink-muted); }
+
+/* ── Minimap ──
+   One chapter at a time. A chapter is wider than the stage can show, so
+   this is what turns "I missed one" from a search into a glance. */
+.cx-map {
+  position: relative;
+  height: 22px;
+  margin: -2px 2px 0;
+}
+.cx-map-line {
+  position: absolute;
+  left: 0; right: 0; bottom: 5px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--line-subtle);
+}
+.cx-map-pip {
+  position: absolute;
+  bottom: 2px;
+  width: 8px; height: 8px;
+  margin-left: -4px;
+  border-radius: 99px;
+  border: 1.5px solid var(--accent);
+  background: var(--surface);
+  transition: background 180ms var(--ease-standard), transform 180ms var(--ease-decel);
+}
+.cx-map-pip[data-got] { background: var(--accent); transform: scale(0.8); }
+/* Raised tokens sit raised on the map too. Otherwise someone walks straight
+   under one, nothing happens, and there is no clue that jumping is the answer. */
+.cx-map-pip[data-high] { bottom: 12px; }
+.cx-map-pip[data-high]::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 100%;
+  width: 1px; height: 7px;
+  margin-left: -0.5px;
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+.cx-map-you {
+  position: absolute;
+  bottom: 0;
+  width: 0; height: 0;
+  margin-left: -5px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid var(--ink);
+  will-change: left;
+}
+
+/* ── The playfield ── */
+.cx-stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  /* Sky. Two stops rather than a flat fill so the ground reads as ground. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 12%, var(--surface)) 0%,
+    var(--surface) 62%
+  );
+  cursor: default;
+}
+.cx-stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.cx-cam { position: absolute; inset: 0; will-change: transform; }
+
+.cx-chapter { position: absolute; top: 0; bottom: 0; }
+/* A hairline between eras, so the chapters read as separate places. */
+.cx-chapter + .cx-chapter { border-left: 1px dashed var(--line-subtle); }
+
+.cx-ground {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  /* Sparse ticks, not stripes — at 26px apart it read as a fence. */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent) 13%, transparent) 0 1px,
+      transparent 1px 64px
+    ),
+    color-mix(in srgb, var(--accent) 8%, var(--surface-chip));
+  border-top: 2px solid color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+/* ── The signpost that opens each chapter ── */
+.cx-sign {
+  position: absolute;
+  left: 28px;
+  top: 22px;
+  width: 168px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--sh-4);
+}
+.cx-sign-lv {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.cx-sign strong { font-size: 12.5px; font-weight: 600; }
+.cx-sign-quest { font-size: 10.5px; line-height: 15px; color: var(--ink-muted); }
+
+/* ── Collectables ── */
+.cx-token {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transform: translateX(-50%);
+  transition: opacity 220ms var(--ease-standard), transform 220ms var(--ease-decel);
+}
+.cx-token i {
+  width: 16px; height: 16px;
+  border-radius: 5px;
+  background: var(--accent-fill);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  animation: cx-bob 1.9s ease-in-out infinite;
+}
+.cx-token b {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--line-subtle);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ink-secondary);
+}
+.cx-token[data-got] { opacity: 0.22; transform: translateX(-50%) scale(0.8); }
+.cx-token[data-got] i {
+  background: var(--ink-disabled);
+  box-shadow: none;
+  animation: cx-pop 260ms var(--ease-decel);
+}
+
+@keyframes cx-pop {
+  0%   { transform: scale(1); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent); }
+  40%  { transform: scale(1.9); box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+
+@keyframes cx-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
+/* ── The gate between chapters ── */
+.cx-gate {
+  position: absolute;
+  right: 18px;
+  width: 12px;
+  height: 108px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--danger) 55%, transparent);
+  transition: opacity 260ms var(--ease-standard), height 260ms var(--ease-decel);
+}
+.cx-gate-lock {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--danger);
+  white-space: nowrap;
+}
+.cx-gate[data-open] { height: 8px; opacity: 0.35; background: var(--success); }
+.cx-gate[data-open] .cx-gate-lock { color: var(--success); }
+
+/* ── The character ── */
+.cx-hero { position: absolute; left: 0; will-change: transform; }
+.cx-hero-svg { display: block; overflow: visible; transform-origin: 50% 100%; }
+
+/* Stays on the ground and shrinks with height, so a jump has a landing spot. */
+.cx-shadow {
+  position: absolute;
+  left: 0;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--ink);
+  opacity: 0.28;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.cx-hero[data-land='true'] .cx-hero-svg { animation: cx-squash 170ms var(--ease-decel); }
+@keyframes cx-squash {
+  0%   { transform: scaleY(0.82) scaleX(1.12); }
+  100% { transform: none; }
+}
+
+.cx-hero[data-idle='true'] .cx-hero-svg { animation: cx-breathe 3.2s ease-in-out infinite; }
+@keyframes cx-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(0.985) translateY(0.6px); }
+}
+
+/* Limbs swing only while walking on the ground. */
+.cx-hero[data-walking='true'] .cx-leg-front,
+.cx-hero[data-walking='true'] .cx-arm-back { animation: cx-swing 420ms linear infinite; }
+.cx-hero[data-walking='true'] .cx-leg-back,
+.cx-hero[data-walking='true'] .cx-arm-front { animation: cx-swing 420ms linear infinite reverse; }
+.cx-leg, .cx-arm { transform-origin: 15px 34px; }
+.cx-arm { transform-origin: 15px 22px; }
+.cx-hero[data-air='true'] .cx-leg-front { transform: rotate(-16deg); }
+.cx-hero[data-air='true'] .cx-leg-back { transform: rotate(12deg); }
+
+@keyframes cx-swing {
+  0%   { transform: rotate(-22deg); }
+  50%  { transform: rotate(22deg); }
+  100% { transform: rotate(-22deg); }
+}
+
+/* ── Overlays ── */
+.cx-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 82%, transparent);
+  color: var(--surface);
+  font-size: 11.5px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.cx-hint kbd {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--surface) 26%, transparent);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+
+.cx-win {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  height: 100%;
-  padding: 40px;
+  gap: 8px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
   text-align: center;
 }
-.rb-empty h2 { font-size: 17px; }
-.rb-empty p { margin: 0; max-width: 380px; font-size: 13px; line-height: 20px; color: var(--ink-muted); }
+.cx-win strong { font-size: 15px; }
+.cx-win span { font-size: 12.5px; color: var(--ink-muted); }
+.cx-win button {
+  margin-top: 6px;
+  padding: 7px 16px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--accent-fill);
+  color: #fff;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+/* ── Touch controls ── */
+.cx-pad { display: flex; gap: 8px; justify-content: center; }
+.cx-pad button {
+  min-width: 66px;
+  padding: 9px 14px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-sm);
+  background: var(--surface-chip);
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+.cx-pad button:active { background: var(--accent-soft); color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-token i,
+  .cx-token[data-got] i,
+  .cx-hud-score b,
+  .cx-hero[data-land='true'] .cx-hero-svg,
+  .cx-hero[data-idle='true'] .cx-hero-svg { animation: none; }
+  .cx-hero[data-walking='true'] .cx-leg,
+  .cx-hero[data-walking='true'] .cx-arm { animation: none; }
+  .cx-map-pip { transition: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RECYCLE BIN
+   ═══════════════════════════════════════════════════════════ */
+
+.rb { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+.rb-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--line-subtle);
+}
+.rb-head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.rb-head p { margin: 2px 0 0; font-size: 12px; color: var(--ink-muted); }
+
+/* List above, details below: a window this size cannot give a side pane
+   enough width for either half to read well. */
+.rb-body {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 0;
+  flex: 1;
+}
+
+.rb-list { overflow-y: auto; padding: 6px 8px 10px; }
+
+.rb-cols, .rb-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.3fr) minmax(0, 0.8fr);
+  gap: 12px;
+  align-items: center;
+}
+.rb-cols {
+  padding: 6px 12px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+  border-bottom: 1px solid var(--line-subtle);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+
+.rb-row {
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.rb-row:hover { background: var(--subtle-hover); }
+.rb-row[data-on] { background: var(--accent-soft); }
+.rb-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.rb-name { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.rb-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rb-origin, .rb-date {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.rb-origin { font-family: var(--mono); }
+
+.rb-detail {
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--line-subtle);
+  background: var(--surface-subtle);
+}
+.rb-detail h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.rb-summary { margin: 4px 0 0; font-size: 13px; color: var(--ink-muted); }
+
+.rb-meta { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 14px 0; }
+.rb-meta div { display: flex; flex-direction: column; gap: 2px; }
+.rb-meta dt {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+.rb-meta dd { margin: 0; font-size: 12px; }
+.rb-meta code {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
+  background: var(--fill-strong, var(--line-subtle));
+}
+.rb-nocommit { font-style: italic; color: var(--ink-muted); }
+
+.rb-reason { margin: 0; font-size: 13px; line-height: 21px; max-width: 68ch; }
 
 /* ═══════════════════════════════════════════════════════════
    MOBILE SHELL
@@ -4010,6 +4841,62 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   text-decoration: none;
 }
 .mb-foot a:hover { color: var(--accent); }
+
+/* ═══════════════════════════════════════════════════════════
+   PRINT
+   A desktop shell cannot be printed. The document can, and it
+   is already in the page — so printing swaps which one is
+   in charge, exactly as a narrow screen does.
+   ═══════════════════════════════════════════════════════════ */
+
+@media print {
+  html[data-shell='desktop'] .doc { display: block !important; }
+  .desktop,
+  .boot,
+  .bootscreen,
+  .skip-link { display: none !important; }
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000;
+  }
+
+  .mb-shell { max-width: none; padding: 0; }
+  /* Controls and asides that mean nothing on paper. */
+  .mb-theme,
+  .mb-note,
+  .mb-actions,
+  .mb-card-head > svg { display: none !important; }
+
+  .mb-card {
+    border: none;
+    border-radius: 0;
+    background: none;
+    margin-bottom: 4mm;
+  }
+  .mb-card-head { padding: 0 0 2mm; }
+  .mb-card-body { padding: 0; border-top: none; }
+  .mb-card-icon { display: none; }
+
+  /* Keep a role or a project from being split across two pages. */
+  .mb-roles > li,
+  .mb-projects > li,
+  .mb-skill-group { break-inside: avoid; }
+  .mb-card-title strong { font-size: 15pt; }
+
+  /* A printed link is useless without its destination. */
+  .mb-foot a[href]::after,
+  .mb-project-links a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 8pt;
+    font-weight: 400;
+    color: #444;
+  }
+  a[href^='mailto:']::after { content: none; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    REDUCED MOTION

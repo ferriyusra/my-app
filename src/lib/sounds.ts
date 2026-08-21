@@ -7,7 +7,13 @@
  * created until the first play, so a muted visitor never builds a context.
  */
 
-export type SoundName = 'open' | 'close' | 'notify' | 'error';
+export type SoundName =
+	| 'open'
+	| 'close'
+	| 'notify'
+	| 'error'
+	| 'pickup'
+	| 'unlock';
 
 type Voice = { freq: number; at: number; dur: number; gain: number };
 
@@ -29,6 +35,18 @@ const CUES: Record<SoundName, Voice[]> = {
 	error: [
 		{ freq: 415.3, at: 0, dur: 0.2, gain: 0.13 },
 		{ freq: 293.66, at: 0.1, dur: 0.3, gain: 0.11 },
+	],
+	/* Career.exe. Short and bright — it fires up to eight times in a chapter,
+	   so anything with a tail would smear into the next one. */
+	pickup: [
+		{ freq: 1174.66, at: 0, dur: 0.07, gain: 0.09 },
+		{ freq: 1567.98, at: 0.035, dur: 0.1, gain: 0.07 },
+	],
+	/* A gate opening: the same two notes the other way up, and allowed a tail. */
+	unlock: [
+		{ freq: 587.33, at: 0, dur: 0.14, gain: 0.1 },
+		{ freq: 880.0, at: 0.07, dur: 0.18, gain: 0.09 },
+		{ freq: 1174.66, at: 0.14, dur: 0.3, gain: 0.08 },
 	],
 };
 
@@ -54,7 +72,7 @@ function audio(): AudioContext | null {
  * Play one cue at `volume` (0–1). Silently does nothing where Web Audio is
  * unavailable, so callers never have to feature-detect.
  */
-export function playSound(name: SoundName, volume = 1) {
+export function playSound(name: SoundName, volume = 1, detune = 0) {
 	const ac = audio();
 	if (!ac) return;
 	const vol = Math.max(0, Math.min(1, volume));
@@ -65,6 +83,9 @@ export function playSound(name: SoundName, volume = 1) {
 		const amp = ac.createGain();
 		osc.type = 'sine';
 		osc.frequency.value = v.freq;
+		/* Cents, so a run of pickups can climb rather than repeat. Clamped
+		   because an unbounded caller would eventually reach dog-whistle. */
+		if (detune) osc.detune.value = Math.max(-1200, Math.min(1200, detune));
 		/* Attack fast, decay exponentially — a bell, not a beep. */
 		amp.gain.setValueAtTime(0.0001, now + v.at);
 		amp.gain.exponentialRampToValueAtTime(v.gain * vol, now + v.at + 0.012);
