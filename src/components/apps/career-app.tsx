@@ -1,130 +1,61 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { career, levels } from '@/data/career-game';
-import { profile } from '@/data/profile';
-import { tenureLabel } from '@/data/experience';
+import { useState } from 'react';
+import { Gamepad2, List } from 'lucide-react';
+import Adventure from './career/adventure';
+import CareerSummary from './career/summary';
 
 /**
- * Career.exe — the work history as a progression.
+ * Career.exe — the same work history in two registers.
  *
- * It exists as its own window rather than as a redesign of Experience, because
- * the Experience window is the surface a recruiter needs to work quickly. This
- * one can afford to be slow and playful; nothing is lost if it is never opened.
+ * **Adventure** is a small side-scroller: you walk a character left to right
+ * through five chapters, one per role, collecting the skills that role was the
+ * first to use. A gate holds each chapter shut until its skills are picked up,
+ * so you cannot arrive at 2025 without having walked through 2021.
  *
- * The XP bar animates through a CSS custom property rather than React state,
- * for the same reason the window frame keeps geometry out of the reducer: a
- * value that changes every frame should not be publishing a new render.
+ * **Summary** is the same content as a list, and it is the default when the
+ * visitor has asked for reduced motion. That is the rule this window is built
+ * on: nothing is only reachable by playing. The Experience window remains the
+ * surface for anyone who came here to read a CV quickly — this one is allowed
+ * to be slow, because nothing is lost if it is never opened.
  */
-function prefersReducedMotion(): boolean {
-	return (
-		typeof window !== 'undefined' &&
-		window.matchMedia('(prefers-reduced-motion: reduce)').matches
-	);
-}
+
+type Mode = 'play' | 'read';
 
 export default function CareerApp() {
-	const all = levels();
-	const totals = career();
-	const barRef = useRef<HTMLDivElement>(null);
-
-	/* Start fully revealed when motion is unwelcome, rather than revealing from
-	   an effect — a lazy initialiser keeps the first paint correct and keeps
-	   this off the set-state-in-effect path the rest of the shell avoids. */
-	const [revealed, setRevealed] = useState(() =>
-		prefersReducedMotion() ? levels().length : 0,
+	const [mode, setMode] = useState<Mode>(() =>
+		typeof window !== 'undefined' &&
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches
+			? 'read'
+			: 'play',
 	);
 
-	/* Fill the bar, then deal the levels out one at a time. */
-	useEffect(() => {
-		const bar = barRef.current;
-		if (bar) requestAnimationFrame(() => bar.style.setProperty('--fill', '100%'));
-		if (prefersReducedMotion()) return;
-
-		let n = 0;
-		const id = setInterval(() => {
-			n += 1;
-			setRevealed(n);
-			if (n >= all.length) clearInterval(id);
-		}, 180);
-		return () => clearInterval(id);
-	}, [all.length]);
-
-	const years = Math.floor(totals.months / 12);
-	const months = totals.months % 12;
-
 	return (
-		<div className='cx'>
-			<header className='cx-head'>
-				<div className='cx-id'>
-					<span className='cx-avatar' aria-hidden='true'>
-						{profile.initials}
-					</span>
-					<div>
-						<h2>{profile.name}</h2>
-						<p>{profile.role}</p>
-					</div>
-					<span className='cx-lv'>LV.{all.length}</span>
-				</div>
+		<div className='cx-app'>
+			<div className='cx-modes' role='tablist' aria-label='Career.exe mode'>
+				<button
+					type='button'
+					role='tab'
+					aria-selected={mode === 'play'}
+					data-on={mode === 'play' || undefined}
+					onClick={() => setMode('play')}>
+					<Gamepad2 size={14} aria-hidden='true' /> Adventure
+				</button>
+				<button
+					type='button'
+					role='tab'
+					aria-selected={mode === 'read'}
+					data-on={mode === 'read' || undefined}
+					onClick={() => setMode('read')}>
+					<List size={14} aria-hidden='true' /> Summary
+				</button>
+			</div>
 
-				<div className='cx-xp'>
-					<div className='cx-xp-track'>
-						<div className='cx-xp-fill' ref={barRef} />
-					</div>
-					<div className='cx-xp-meta'>
-						<span>
-							{years} yrs {months ? `${months} mos` : ''} served
-						</span>
-						<span>
-							{totals.skills} skills · {totals.roles} roles
-						</span>
-					</div>
-				</div>
-			</header>
-
-			<ol className='cx-levels'>
-				{all.map((l, i) => (
-					<li
-						key={l.exp.company}
-						className='cx-level'
-						data-in={i < revealed || undefined}
-						data-current={l.exp.current || undefined}
-						style={{ ['--i' as string]: i }}>
-						<div className='cx-level-head'>
-							<span className='cx-badge'>LV.{l.level}</span>
-							<div className='cx-level-name'>
-								<strong>{l.exp.short}</strong>
-								<span>
-									{l.exp.period} · {tenureLabel(l.exp)}
-								</span>
-							</div>
-							{l.exp.current && <span className='cx-active'>ACTIVE</span>}
-						</div>
-
-						<p className='cx-quest'>
-							<span aria-hidden='true'>◈</span> {l.quest}
-						</p>
-
-						<div className='cx-unlock'>
-							<span className='cx-unlock-n'>
-								+{l.unlocked.length} unlocked
-							</span>
-							<ul>
-								{l.unlocked.map((t) => (
-									<li key={t}>{t}</li>
-								))}
-							</ul>
-						</div>
-					</li>
-				))}
-			</ol>
-
-			<p className='cx-foot'>
-				Levels are the roles in{' '}
-				<code>src/data/experience.ts</code>, oldest first. A skill unlocks at
-				the earliest role that used it — computed, not written down, so the
-				shape of it is real.
-			</p>
+			{mode === 'play' ? (
+				<Adventure onDone={() => setMode('read')} />
+			) : (
+				<CareerSummary />
+			)}
 		</div>
 	);
 }

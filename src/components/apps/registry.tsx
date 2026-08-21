@@ -162,10 +162,10 @@ export const APPS: AppDef[] = [
 	{
 		id: 'career',
 		title: 'Career.exe',
-		blurb: 'The CV, as a progression',
+		blurb: 'Walk the CV',
 		tile: { Art: CareerIcon },
-		w: 720,
-		h: 640,
+		w: 880,
+		h: 560,
 		Content: CareerApp,
 	},
 ];

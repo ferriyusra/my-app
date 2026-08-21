@@ -4206,6 +4206,276 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   .cx-level { opacity: 1; transform: none; transition: none; }
 }
 
+/* ── Career.exe : adventure mode ─────────────────────────────
+   A side-scroller inside a window. It still uses the shell's tokens,
+   so it follows the accent and the theme like everything else. */
+
+.cx-app { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+.cx-modes {
+  display: flex;
+  gap: 4px;
+  padding: 10px 14px 0;
+}
+.cx-modes button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.cx-modes button:hover { background: var(--subtle-hover); }
+.cx-modes button[data-on] {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.cx-game { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px; }
+
+/* ── HUD ── */
+.cx-hud {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface-header);
+}
+.cx-hud-ch, .cx-hud-score {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+.cx-hud-score { margin-left: auto; color: var(--ink-muted); }
+.cx-hud-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cx-hud-name strong { font-size: 13px; font-weight: 600; }
+.cx-hud-name span { font-size: 11px; color: var(--ink-muted); }
+
+/* ── The playfield ── */
+.cx-stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  /* Sky. Two stops rather than a flat fill so the ground reads as ground. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 12%, var(--surface)) 0%,
+    var(--surface) 62%
+  );
+  cursor: default;
+}
+.cx-stage:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.cx-cam { position: absolute; inset: 0; will-change: transform; }
+
+.cx-chapter { position: absolute; top: 0; bottom: 0; }
+/* A hairline between eras, so the chapters read as separate places. */
+.cx-chapter + .cx-chapter { border-left: 1px dashed var(--line-subtle); }
+
+.cx-ground {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  /* Sparse ticks, not stripes — at 26px apart it read as a fence. */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--accent) 13%, transparent) 0 1px,
+      transparent 1px 64px
+    ),
+    color-mix(in srgb, var(--accent) 8%, var(--surface-chip));
+  border-top: 2px solid color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+/* ── The signpost that opens each chapter ── */
+.cx-sign {
+  position: absolute;
+  left: 28px;
+  top: 22px;
+  width: 168px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--sh-4);
+}
+.cx-sign-lv {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.cx-sign strong { font-size: 12.5px; font-weight: 600; }
+.cx-sign-quest { font-size: 10.5px; line-height: 15px; color: var(--ink-muted); }
+
+/* ── Collectables ── */
+.cx-token {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transform: translateX(-50%);
+  transition: opacity 220ms var(--ease-standard), transform 220ms var(--ease-decel);
+}
+.cx-token i {
+  width: 16px; height: 16px;
+  border-radius: 5px;
+  background: var(--accent-fill);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  animation: cx-bob 1.9s ease-in-out infinite;
+}
+.cx-token b {
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--line-subtle);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ink-secondary);
+}
+.cx-token[data-got] { opacity: 0.22; transform: translateX(-50%) scale(0.8); }
+.cx-token[data-got] i { animation: none; background: var(--ink-disabled); box-shadow: none; }
+
+@keyframes cx-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
+/* ── The gate between chapters ── */
+.cx-gate {
+  position: absolute;
+  right: 18px;
+  width: 12px;
+  height: 108px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--danger) 55%, transparent);
+  transition: opacity 260ms var(--ease-standard), height 260ms var(--ease-decel);
+}
+.cx-gate-lock {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--danger);
+  white-space: nowrap;
+}
+.cx-gate[data-open] { height: 8px; opacity: 0.35; background: var(--success); }
+.cx-gate[data-open] .cx-gate-lock { color: var(--success); }
+
+/* ── The character ── */
+.cx-hero { position: absolute; left: 0; will-change: transform; }
+.cx-hero-svg { display: block; overflow: visible; }
+
+/* Limbs swing only while walking on the ground. */
+.cx-hero[data-walking='true'] .cx-leg-front,
+.cx-hero[data-walking='true'] .cx-arm-back { animation: cx-swing 420ms linear infinite; }
+.cx-hero[data-walking='true'] .cx-leg-back,
+.cx-hero[data-walking='true'] .cx-arm-front { animation: cx-swing 420ms linear infinite reverse; }
+.cx-leg, .cx-arm { transform-origin: 15px 34px; }
+.cx-arm { transform-origin: 15px 22px; }
+.cx-hero[data-air='true'] .cx-leg-front { transform: rotate(-16deg); }
+.cx-hero[data-air='true'] .cx-leg-back { transform: rotate(12deg); }
+
+@keyframes cx-swing {
+  0%   { transform: rotate(-22deg); }
+  50%  { transform: rotate(22deg); }
+  100% { transform: rotate(-22deg); }
+}
+
+/* ── Overlays ── */
+.cx-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 82%, transparent);
+  color: var(--surface);
+  font-size: 11.5px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.cx-hint kbd {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--surface) 26%, transparent);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+
+.cx-win {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  text-align: center;
+}
+.cx-win strong { font-size: 15px; }
+.cx-win span { font-size: 12.5px; color: var(--ink-muted); }
+.cx-win button {
+  margin-top: 6px;
+  padding: 7px 16px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--accent-fill);
+  color: #fff;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+/* ── Touch controls ── */
+.cx-pad { display: flex; gap: 8px; justify-content: center; }
+.cx-pad button {
+  min-width: 66px;
+  padding: 9px 14px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-sm);
+  background: var(--surface-chip);
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+.cx-pad button:active { background: var(--accent-soft); color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-token i { animation: none; }
+  .cx-hero[data-walking='true'] .cx-leg,
+  .cx-hero[data-walking='true'] .cx-arm { animation: none; }
+}
+
 /* ═══════════════════════════════════════════════════════════
    RECYCLE BIN
    ═══════════════════════════════════════════════════════════ */

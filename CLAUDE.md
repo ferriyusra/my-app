@@ -196,6 +196,33 @@ explicit standard + prefixed pair down to the prefixed property alone, which
 Chrome no longer honours — every acrylic surface silently goes opaque. Declare
 `backdrop-filter` only and let the build add prefixes.
 
+### Career.exe
+
+[src/components/apps/career/](src/components/apps/career/) is a small
+side-scroller: you walk a character through five chapters, one per role,
+collecting the skills that role was the first to use. A gate holds each chapter
+shut until its skills are picked up, so 2025 cannot be reached without walking
+through 2021.
+
+It follows the same rule as the window frame and the desktop cat — **position
+never touches React**. The loop writes `translate3d` onto the character and the
+camera, and even "am I walking" is a `data-` attribute written from the loop
+rather than a prop, because it flips on almost every frame. Only three things
+are state: skills collected, current chapter, and whether the controls have
+been found.
+
+Two constraints are load-bearing and covered by tests in `world.test.ts`: every
+raised token must sit within a jump of the ground (`reachable()` checks it
+against the actual `JUMP_V`/`GRAVITY`, which is why those live in `world.ts`
+and not in the component), and the first token of every chapter must be
+collectable without jumping. Break either and a chapter becomes impossible to
+finish.
+
+**Summary mode is not a fallback, it is the same content.** It is the default
+under `prefers-reduced-motion`, and anything the game says must be sayable
+there too. Keys bind to the stage element, never to `window` — an app inside a
+fake desktop has no business swallowing the page's arrow keys.
+
 ### The Recycle Bin and the case study
 
 Two windows carry content that a portfolio usually leaves out.
