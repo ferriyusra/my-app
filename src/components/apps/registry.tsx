@@ -222,6 +222,7 @@ export const DESKTOP_ITEMS: { id: AppId | ShortcutId; label: string }[] = [
 	{ id: 'experience', label: 'Experience' },
 	{ id: 'contact', label: 'Contact' },
 	{ id: 'media', label: 'Media Player' },
+	{ id: 'career', label: 'Career.exe' },
 	{ id: 'resume', label: 'Resume' },
 	{ id: 'github', label: 'GitHub' },
 	{ id: 'linkedin', label: 'LinkedIn' },
