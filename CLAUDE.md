@@ -203,8 +203,8 @@ Two windows carry content that a portfolio usually leaves out.
 [src/data/discarded.ts](src/data/discarded.ts) holds decisions this repository
 reversed — the progress bars, the glyph tiles, ScrollSmoother, `/articles`,
 YouTube full-track playback — each with the commit that removed it. Every entry
-is real and checkable; the two without a hash were reverted before they were
-ever committed, and say so. Do not add an entry that did not happen.
+is real and checkable; the one without a hash (YouTube full-track playback) was
+reverted before it was ever committed, and says so. Do not add an entry that did not happen.
 
 [src/data/case-study.ts](src/data/case-study.ts) is the Meditap ASO billing
 system at more than bullet-point depth. Everything in it traces to the Meditap
