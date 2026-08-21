@@ -2645,35 +2645,13 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   position: relative;
   list-style: none;
   margin: 0;
-  padding: 0 0 0 26px;
+  padding: 0;
   display: grid;
   gap: 12px;
 }
-/* The spine, drawn behind the markers. */
-.xp-timeline::before {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 10px;
-  bottom: 10px;
-  width: 2px;
-  border-radius: 99px;
-  background: linear-gradient(var(--accent), var(--line));
-}
+/* No spine and no dots: the career bar above encodes the duration these
+   drew a picture of without measuring. Two timelines is one too many. */
 .xp-entry { position: relative; }
-.xp-marker {
-  position: absolute;
-  left: -26px;
-  top: 20px;
-  width: 12px; height: 12px;
-  border: 2px solid var(--surface);
-  border-radius: 99px;
-  background: var(--line);
-}
-.xp-entry[data-current] .xp-marker {
-  background: var(--accent);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent);
-}
 .xp-card {
   padding: 16px 18px;
   border: 1px solid var(--line-subtle);
@@ -2704,8 +2682,21 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   font-size: 11px;
   font-weight: 600;
 }
-.xp-desc { margin: 12px 0 0; font-size: 13px; line-height: 20px; color: var(--ink-secondary); }
-.xp-points { margin: 12px 0 0; padding-left: 18px; display: grid; gap: 7px; }
+.xp-desc {
+  margin: 0 0 2px;
+  font-size: 12px;
+  line-height: 19px;
+  color: var(--ink-muted);
+}
+.xp-points {
+  /* Preflight sets list-style:none on every ul, which silently killed the
+     accent markers below — the outcomes read as one grey block without them. */
+  list-style: disc outside;
+  margin: 12px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 7px;
+}
 .xp-points li { font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
 .xp-points li::marker { color: var(--accent); }
 .xp-toggle {
@@ -3840,6 +3831,120 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 }
 .vs-status-left, .vs-status-right { display: flex; align-items: center; gap: 14px; }
 
+/* ── Career bar ──────────────────────────────────────────────
+   Segment width grows with months served, so the shape of the career
+   reads before the words do — with a floor, so a four-month role is
+   still wide enough to carry its name. Roughly to scale, not exactly. */
+.xp-bar-wrap { margin: 0 0 22px; }
+
+.xp-bar {
+  display: flex;
+  gap: 3px;
+  height: 52px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.xp-seg {
+  position: relative;
+  flex: 1 1 0;
+  /* The readability floor. Without it the shortest role lands near 48px
+     and its label is a truncated stub. */
+  min-width: 58px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--surface-chip);
+  font: inherit;
+  color: var(--ink-secondary);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background var(--dur-fast) var(--ease-standard),
+    color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
+}
+.xp-seg:hover { background: var(--subtle-hover); transform: translateY(-1px); }
+.xp-seg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* The role still running is the one the eye should land on. */
+.xp-seg[data-current] {
+  background: var(--accent-fill);
+  color: #fff;
+}
+.xp-seg[data-current]:hover { background: var(--accent-hover); }
+
+.xp-seg-label {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.xp-seg-len {
+  font-size: 10px;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.xp-bar-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.xp-bar-axis span:nth-child(2) { font-variant-numeric: tabular-nums; }
+
+/* ── Role stats ──────────────────────────────────────────────
+   Three figures, pulled out of the prose that used to bury them. */
+.xp-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+  background: var(--line-subtle);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.xp-stats li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--surface);
+}
+.xp-stats strong {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+.xp-stats span { font-size: 11px; line-height: 15px; color: var(--ink-muted); }
+
+/* The first three are what the role ran on; the rest are context. */
+.xp-tech li[data-lead] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 620px) {
+  .xp-stats { grid-template-columns: minmax(0, 1fr); }
+  .xp-seg-len { display: none; }
+}
+
 /* ── Case study ──────────────────────────────────────────────
    Rendered by one component in two places: the Experience window and
    the server document. */
@@ -3945,6 +4050,160 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 
 @media (max-width: 560px) {
   .ab-now div, .mb-now div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CAREER.EXE
+   The one window that admits to being a toy. It still uses the
+   shell's tokens, so it follows the accent and the theme like
+   everything else — a game skin, not a second design system.
+   ═══════════════════════════════════════════════════════════ */
+
+.cx { padding: 18px 20px 22px; }
+
+.cx-head {
+  padding: 16px 18px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-lg);
+  background: var(--surface-header);
+  margin-bottom: 18px;
+}
+
+.cx-id { display: flex; align-items: center; gap: 12px; }
+.cx-avatar {
+  display: grid;
+  place-items: center;
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: var(--accent-fill);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.cx-id h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.cx-id p { margin: 1px 0 0; font-size: 12px; color: var(--ink-muted); }
+.cx-lv {
+  margin-left: auto;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.cx-xp { margin-top: 14px; }
+.cx-xp-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-chip);
+  overflow: hidden;
+}
+.cx-xp-fill {
+  --fill: 0%;
+  width: var(--fill);
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-fill), var(--accent));
+  transition: width 1100ms var(--ease-decel);
+}
+.cx-xp-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 7px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+.cx-levels { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+
+.cx-level {
+  padding: 13px 15px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  /* Dealt out one at a time; the effect is set here so reduced motion
+     can drop it in one place. */
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 320ms var(--ease-decel),
+    transform 320ms var(--ease-decel);
+}
+.cx-level[data-in] { opacity: 1; transform: none; }
+.cx-level[data-current] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.cx-level-head { display: flex; align-items: center; gap: 11px; }
+.cx-badge {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: var(--r-sm);
+  background: var(--surface-chip);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+}
+.cx-level[data-current] .cx-badge { background: var(--accent-fill); color: #fff; }
+.cx-level-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cx-level-name strong { font-size: 13px; font-weight: 600; }
+.cx-level-name span { font-size: 11px; color: var(--ink-muted); }
+.cx-active {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--success) 16%, transparent);
+  color: var(--success);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.cx-quest {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 19px;
+  color: var(--ink-secondary);
+}
+.cx-quest span { color: var(--accent); margin-right: 4px; }
+
+.cx-unlock { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+.cx-unlock-n {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+.cx-unlock ul { display: flex; flex-wrap: wrap; gap: 5px; list-style: none; margin: 0; padding: 0; }
+.cx-unlock li {
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 10.5px;
+}
+
+.cx-foot {
+  margin: 18px 0 0;
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--ink-muted);
+}
+.cx-foot code { font-family: var(--mono); font-size: 10.5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-xp-fill { transition: none; }
+  .cx-level { opacity: 1; transform: none; transition: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════

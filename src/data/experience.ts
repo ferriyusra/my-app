@@ -1,6 +1,13 @@
 /**
  * Work history, lifted out of the Experience component so the desktop's
  * Experience window can render it without importing a page section.
+ *
+ * `stats` is the headline figure trio each role card leads with. Every value
+ * is countable from that role's own `description` / `achievements` — the ~160
+ * entities and the 20–30% are stated there outright; the service, dashboard
+ * and product-line counts are the named items in those sentences, counted.
+ * Nothing in `stats` is an estimate. If a number is not already in the prose
+ * below it does not belong here.
  */
 
 export const experiences = [
@@ -16,6 +23,11 @@ export const experiences = [
 		location: 'Jakarta, Indonesia',
 		description:
 			'Designed and developed backend systems for finance-related platforms using Go (Gin Framework) and PostgreSQL, delivering core services (ASO Database, ASO Notification Below Threshold) that replaced manual spreadsheet-based tracking and became the single source of truth for finance operations.',
+		stats: [
+			{ value: '~160', label: 'entities billed' },
+			{ value: '2', label: 'core services' },
+			{ value: '20–30%', label: 'faster routine work' },
+		],
 		achievements: [
 			'Built and maintained RESTful API services powering financial workflows for ~160 ASO entities, enabling the Finance Team to manage and monitor structured, real-time data used directly for billing and payment collection.',
 			'Automated threshold-based financial notifications and scheduled billing processes with an event-driven architecture using Google Pub/Sub and Cloud Scheduler, eliminating recurring manual monitoring tasks previously done by the Finance Team.',
@@ -48,6 +60,11 @@ export const experiences = [
 		location: 'Jakarta, Indonesia',
 		description:
 			"Primary backend engineer on multiple health data products under SATUSEHAT — Indonesia's national health data interoperability platform — collaborating with Product Managers, Technical Program Managers, and cross-functional stakeholders to deliver backend systems supporting national-scale health data initiatives.",
+		stats: [
+			{ value: 'National', label: 'scale — SATUSEHAT' },
+			{ value: '4', label: 'data stores integrated' },
+			{ value: 'Tableau', label: 'licence costs cut' },
+		],
 		achievements: [
 			'Maintained and extended API services for the SATUSEHAT Data Product in Node.js (NestJS) and PostgreSQL, developing new endpoints and improvements to ensure reliable data exchange and support evolving requirements for nationwide health data integration.',
 			'Built dedicated API layers in Go (Gin Framework) integrating PostgreSQL, Google BigQuery, MongoDB, and Redis caching to power web-based dashboards for the Business Intelligence team, enabling near real-time access to large-scale health datasets.',
@@ -80,6 +97,11 @@ export const experiences = [
 		location: 'Jakarta, Indonesia',
 		description:
 			'Primary backend engineer on multiple data-driven products under the Health Technology Transformation initiative, collaborating with Product Managers, Data Analysts, and frontend engineers to deliver internal web-based dashboard solutions for operational teams.',
+		stats: [
+			{ value: '5', label: 'dashboards delivered' },
+			{ value: '3', label: 'data sources joined' },
+			{ value: 'MoH', label: 'stakeholders served' },
+		],
 		achievements: [
 			'Designed and developed scalable API services in Go (Gin Framework) integrating PostgreSQL, Google BigQuery, and MongoDB to power interactive dashboards used by analysts and operational stakeholders, complemented by a Next.js API endpoint built to proxy requests to an external data source.',
 			"Contributed to the initial migration of legacy Tableau dashboards into fully native, in-house dashboard solutions by developing the backend services that replaced Tableau's data layer — reducing Tableau dependency, lowering licensing costs, and improving performance and long-term maintainability.",
@@ -111,6 +133,11 @@ export const experiences = [
 		location: 'Jakarta, Indonesia',
 		description:
 			'Implemented backend systems alongside Engineering Managers and Senior Software Engineers, translating technical designs and product requirements into reliable and scalable engineering solutions across multiple product lines.',
+		stats: [
+			{ value: '7', label: 'product lines' },
+			{ value: 'Kafka', label: 'event-driven processing' },
+			{ value: 'On-call', label: 'weekly rotation' },
+		],
 		achievements: [
 			'Contributed to backend API services across multiple core product lines — including Crash Program, Referral Program, Survey Program, Academy Program, Banner Program, Second Inspection Program, and Open Production Issue Tools — using Node.js (Express.js) and Go with MySQL, PostgreSQL, and MongoDB integrations to support diverse business and operational workflows.',
 			'Improved system reliability and maintainability by increasing test coverage and implementing unit tests using Mocha, Chai, and Jest for Express-based services, helping reduce regressions across backend services.',
@@ -142,6 +169,11 @@ export const experiences = [
 		location: 'Jakarta, Indonesia',
 		description:
 			'Implemented backend systems alongside System Analysts based on technical designs and business processes defined by the Product Team, contributing to backend development for banking-related web applications.',
+		stats: [
+			{ value: 'First', label: 'engineering role' },
+			{ value: 'PHP', label: 'Lumen and MySQL' },
+			{ value: 'Go', label: 'first exposure' },
+		],
 		achievements: [
 			'Developed RESTful API services using PHP (Lumen framework) with MySQL for data persistence, supporting core application workflows.',
 			'Contributed minor Go-based features during system integration tasks, gaining early hands-on experience with Go that supported later backend development in subsequent roles.',

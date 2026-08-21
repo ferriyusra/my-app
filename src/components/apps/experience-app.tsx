@@ -8,6 +8,7 @@ import { caseStudy } from '@/data/case-study';
 import {
 	experiences,
 	tenureLabel,
+	tenureMonths,
 	type Experience,
 } from '@/data/experience';
 
@@ -37,8 +38,6 @@ function Role({
 
 	return (
 		<li className='xp-entry' data-current={exp.current || undefined}>
-			<span className='xp-marker' aria-hidden='true' />
-
 			<article className='xp-card'>
 				<header className='xp-card-head'>
 					<div>
@@ -57,6 +56,17 @@ function Role({
 						{exp.current && <span className='xp-now'>Current</span>}
 					</div>
 				</header>
+
+				{/* The numbers lead. They were the strongest thing on the card
+				    and were sunk inside four lines of prose. */}
+				<ul className='xp-stats'>
+					{exp.stats.map((st) => (
+						<li key={st.label}>
+							<strong>{st.value}</strong>
+							<span>{st.label}</span>
+						</li>
+					))}
+				</ul>
 
 				<p className='xp-desc'>{exp.description}</p>
 
@@ -81,9 +91,13 @@ function Role({
 					</button>
 				)}
 
+				{/* All of them stay visible — they are what a keyword scan looks
+				    for — but the first three are what the role actually ran on. */}
 				<ul className='xp-tech'>
-					{exp.tech.map((t) => (
-						<li key={t}>{t}</li>
+					{exp.tech.map((t, i) => (
+						<li key={t} data-lead={i < 3 || undefined}>
+							{t}
+						</li>
 					))}
 				</ul>
 
@@ -102,6 +116,66 @@ function Role({
 				)}
 			</article>
 		</li>
+	);
+}
+
+/**
+ * The career as one proportional bar.
+ *
+ * The old rail drew a line and a dot, which looked like a timeline without
+ * being one — it encoded nothing. Each segment here grows with the months the
+ * role lasted, so five years reads as a shape before a word of it is read: two
+ * short early roles, then the run that is still going.
+ *
+ * Not strictly to scale: a four-month role would come out around 48px, too
+ * narrow to label, so segments carry a floor. Short roles are therefore a
+ * little wider than their share. The ordering and the rough proportions are
+ * the honest part; do not read exact durations off the widths.
+ */
+function CareerBar({
+	roles,
+	active,
+	onPick,
+}: {
+	roles: Experience[];
+	active: string | null;
+	onPick: (short: string) => void;
+}) {
+	/* Oldest first, so the bar runs left-to-right like every other timeline. */
+	const ordered = [...roles].reverse();
+	const total = ordered.reduce((sum, e) => sum + tenureMonths(e), 0);
+	const firstYear = ordered[0]?.startISO.slice(0, 4);
+
+	return (
+		<div className='xp-bar-wrap'>
+			<div className='xp-bar' role='group' aria-label='Career timeline'>
+				{ordered.map((e) => {
+					const months = tenureMonths(e);
+					return (
+						<button
+							key={e.company}
+							type='button'
+							className='xp-seg'
+							style={{ flexGrow: months }}
+							data-on={active === e.short || undefined}
+							data-current={e.current || undefined}
+							onClick={() => onPick(e.short)}
+							title={`${e.short} · ${tenureLabel(e)}`}
+							aria-label={`${e.short}, ${tenureLabel(e)}`}>
+							<span className='xp-seg-label'>{e.short}</span>
+							<span className='xp-seg-len'>{tenureLabel(e)}</span>
+						</button>
+					);
+				})}
+			</div>
+			<div className='xp-bar-axis' aria-hidden='true'>
+				<span>{firstYear}</span>
+				<span>
+					{Math.floor(total / 12)} yrs {total % 12 ? `${total % 12} mos` : ''}
+				</span>
+				<span>Now</span>
+			</div>
+		</div>
 	);
 }
 
@@ -128,6 +202,17 @@ export default function ExperienceApp() {
 					? `${experiences.length} roles, most recent first`
 					: shown[0]?.company
 			}>
+			{page === 'all' && (
+				<CareerBar
+					roles={experiences}
+					active={null}
+					onPick={(short) => {
+						setPage(short);
+						setOpen(null);
+					}}
+				/>
+			)}
+
 			<ol className='xp-timeline'>
 				{shown.map((exp) => (
 					<Role

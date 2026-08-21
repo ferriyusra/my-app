@@ -278,6 +278,42 @@ export function BriefcaseIcon({ size = 32 }: IconProps) {
 	);
 }
 
+/**
+ * Career.exe: a retro handheld, because the window it opens is the one place
+ * on this desktop that admits to being a toy. Shaped, not line art — the same
+ * rule every other icon here follows.
+ */
+export function CareerIcon({ size = 32 }: IconProps) {
+	const id = 'cx';
+	return (
+		<svg {...box(size)}>
+			<defs>
+				<linearGradient id={`${id}-a`} x1='0.15' y1='0' x2='0.85' y2='1'>
+					<stop offset='0' stopColor='#8b7bf0' />
+					<stop offset='1' stopColor='#4c3ab5' />
+				</linearGradient>
+			</defs>
+			{/* Body */}
+			<rect x='5.4' y='3' width='21.2' height='26' rx='3.4' fill={`url(#${id}-a)`} />
+			{/* Screen */}
+			<rect x='8.4' y='6.2' width='15.2' height='11' rx='1.6' fill='#12103a' />
+			{/* Two bars on the screen, the XP the app is about */}
+			<rect x='10.2' y='9' width='11.6' height='1.9' rx='0.95' fill='#5fe3d0' />
+			<rect x='10.2' y='12.2' width='7.2' height='1.9' rx='0.95' fill='#5fe3d0' fillOpacity='0.5' />
+			{/* D-pad */}
+			<path
+				d='M11.6 21.4h1.9v-1.9h1.9v1.9h1.9v1.9h-1.9v1.9h-1.9v-1.9h-1.9z'
+				fill='#1d1a4d'
+			/>
+			{/* Two buttons */}
+			<circle cx='21.4' cy='21' r='1.7' fill='#ff6b8a' />
+			<circle cx='24.4' cy='24' r='1.7' fill='#ffd36b' />
+			{/* The sheen every other icon in this set carries */}
+			<path d='M5.4 6.4A3.4 3.4 0 0 1 8.8 3h14.4a3.4 3.4 0 0 1 3.4 3.4Z' fill='#fff' fillOpacity='0.18' />
+		</svg>
+	);
+}
+
 /** Contact: the Mail envelope, flap closed. */
 export function MailIcon({ size = 32 }: IconProps) {
 	const id = 'mal';

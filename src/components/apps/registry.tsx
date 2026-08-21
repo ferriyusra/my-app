@@ -16,6 +16,7 @@ import {
 	MediaIcon,
 	PersonIcon,
 	RecycleIcon,
+	CareerIcon,
 } from '@/components/icons/app-icons';
 import type { TileArt } from '@/components/ui/app-tile';
 import type { AppId, ShortcutId } from '@/types/windows';
@@ -52,6 +53,7 @@ const SettingsApp = lazy(() => import('./settings-app'));
 const BrowserApp = lazy(() => import('./browser-app'));
 const EditorApp = lazy(() => import('./editor-app'));
 const RecycleBinApp = lazy(() => import('./recycle-bin-app'));
+const CareerApp = lazy(() => import('./career-app'));
 
 export type AppDef = {
 	id: AppId;
@@ -157,6 +159,15 @@ export const APPS: AppDef[] = [
 		h: 620,
 		Content: RecycleBinApp,
 	},
+	{
+		id: 'career',
+		title: 'Career.exe',
+		blurb: 'The CV, as a progression',
+		tile: { Art: CareerIcon },
+		w: 720,
+		h: 640,
+		Content: CareerApp,
+	},
 ];
 
 export const APP_BY_ID = Object.fromEntries(
@@ -225,6 +236,7 @@ export const START_PINNED: AppId[] = [
 	'experience',
 	'contact',
 	'media',
+	'career',
 	'vscode',
 	'edge',
 	'settings',
