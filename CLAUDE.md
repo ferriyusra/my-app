@@ -9,9 +9,13 @@ npm run dev      # Start development server
 npm run build    # Build for production
 npm run start    # Start production server
 npm run lint     # Run ESLint
+npm test         # Run the unit tests
 ```
 
-No test runner is configured yet.
+Tests run on Node's built-in runner with native type stripping — there is no
+test dependency and no config. `src/context/window-reducer.test.ts` covers the
+window state machine. Adding a file matching `src/**/*.test.ts` is enough for
+`npm test` to pick it up.
 
 ## Stack
 
@@ -58,6 +62,16 @@ preview bots, LLM crawlers — saw a blank portfolio.
 ## Architecture
 
 ### State
+
+The window state machine lives in
+[src/context/window-reducer.ts](src/context/window-reducer.ts), split out of the
+provider so it can be exercised without React. It is where the non-obvious rules
+are: `focus` returns the *identical* state object when the target is already on
+top (a new object would re-render every open window on every pointer-down), and
+`snap` keeps the original floating geometry across a chain of snaps so restore
+returns to where the window actually was, not to the previous snap. Both are
+covered by tests, and both were verified by breaking them on purpose and
+watching the right test fail.
 
 Two contexts, both mounted in [src/components/desktop/desktop.tsx](src/components/desktop/desktop.tsx):
 
@@ -182,10 +196,32 @@ explicit standard + prefixed pair down to the prefixed property alone, which
 Chrome no longer honours — every acrylic surface silently goes opaque. Declare
 `backdrop-filter` only and let the build add prefixes.
 
+### The Recycle Bin and the case study
+
+Two windows carry content that a portfolio usually leaves out.
+
+[src/data/discarded.ts](src/data/discarded.ts) holds decisions this repository
+reversed — the progress bars, the glyph tiles, ScrollSmoother, `/articles`,
+YouTube full-track playback — each with the commit that removed it. Every entry
+is real and checkable; the two without a hash were reverted before they were
+ever committed, and say so. Do not add an entry that did not happen.
+
+[src/data/case-study.ts](src/data/case-study.ts) is the Meditap ASO billing
+system at more than bullet-point depth. Everything in it traces to the Meditap
+entry in `experience.ts`. Where a design decision is not recorded anywhere in
+this repository it is **not claimed** — those sit in `openQuestions`, which is
+rendered rather than hidden. Keep that discipline: the section is worth more for
+naming its gaps than it would be for filling them with plausible invention.
+
+It renders through one component,
+[case-study-body.tsx](src/components/content/case-study-body.tsx), with no
+`'use client'` — so the Experience window and the server document show the same
+prose and cannot drift.
+
 ### Data
 
 All content is typed data under `src/data/` — `profile`, `experience`,
-`projects`, `skills`, `source-excerpts`. Derived figures (years of experience,
+`projects`, `skills`, `source-excerpts`, `case-study`, `discarded`. Derived figures (years of experience,
 role tenure) are computed from ISO dates rather than written down, so they stay
 true without anyone editing them.
 

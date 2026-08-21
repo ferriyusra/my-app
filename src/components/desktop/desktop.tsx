@@ -20,6 +20,7 @@ import { WindowProvider, useWindows } from '@/context/window-context';
 import { ShellProvider, useShell } from '@/context/shell-context';
 import { useWindowManager, useSnapReflow } from '@/hooks/use-window-manager';
 import { useDesktopIcons, type DeskItem } from '@/hooks/use-desktop-icons';
+import { useAppUrl } from '@/hooks/use-app-url';
 import { APP_BY_ID, isAppId } from '@/components/apps/registry';
 import WindowFrame from '@/components/windows/window';
 import SnapAssist from '@/components/windows/snap-assist';
@@ -396,19 +397,10 @@ function Shell() {
 		launch,
 	]);
 
-	/* Open About once the visitor has signed in, so the desktop is never
-	   blank — and so the window animates in where they can see it. The ref
-	   resets when Restart replays the boot sequence. */
-	const opened = useRef(false);
-	useEffect(() => {
-		if (!booted) {
-			opened.current = false;
-			return;
-		}
-		if (opened.current) return;
-		opened.current = true;
-		launch('about');
-	}, [booted, launch]);
+	/* Opens whatever `?app=` names once the visitor has signed in, falling
+	   back to About so the desktop is never blank, and keeps the address bar
+	   pointed at the frontmost window from then on. */
+	useAppUrl();
 
 	/* Greet the visitor the way Windows greets a fresh sign-in.
 	   Deliberately not ref-guarded: React's development double-invoke tears an

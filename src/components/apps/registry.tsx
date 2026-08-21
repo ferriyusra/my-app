@@ -1,5 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+
 import {
 	BriefcaseIcon,
 	BrowserIcon,
@@ -19,16 +21,37 @@ import type { TileArt } from '@/components/ui/app-tile';
 import type { AppId, ShortcutId } from '@/types/windows';
 import { profile } from '@/data/profile';
 
-import AboutApp from './about-app';
-import ExplorerApp from './explorer-app';
-import SkillsApp from './skills-app';
-import ExperienceApp from './experience-app';
-import ContactApp from './contact-app';
-import MediaApp from './media-app';
-import SettingsApp from './settings-app';
-import BrowserApp from './browser-app';
-import EditorApp from './editor-app';
-import RecycleBinApp from './recycle-bin-app';
+/**
+ * App bodies are split out of the initial bundle.
+ *
+ * Every one of them used to ship on first load even though the desktop opens
+ * with a single window — 802KB of script for one visible app. A window mounts
+ * its content when it opens, which is exactly the moment to fetch it.
+ *
+ * `ssr: false` because none of this renders on the server anyway: the desktop
+ * shell only mounts once the viewport has been measured on the client.
+ */
+const lazy = (load: () => Promise<{ default: React.ComponentType }>) =>
+	dynamic(load, {
+		ssr: false,
+		loading: () => (
+			<div className='app-loading' role='status'>
+				<span className='app-loading-spinner' aria-hidden='true' />
+				<span className='sr-only'>Loading</span>
+			</div>
+		),
+	});
+
+const AboutApp = lazy(() => import('./about-app'));
+const ExplorerApp = lazy(() => import('./explorer-app'));
+const SkillsApp = lazy(() => import('./skills-app'));
+const ExperienceApp = lazy(() => import('./experience-app'));
+const ContactApp = lazy(() => import('./contact-app'));
+const MediaApp = lazy(() => import('./media-app'));
+const SettingsApp = lazy(() => import('./settings-app'));
+const BrowserApp = lazy(() => import('./browser-app'));
+const EditorApp = lazy(() => import('./editor-app'));
+const RecycleBinApp = lazy(() => import('./recycle-bin-app'));
 
 export type AppDef = {
 	id: AppId;
@@ -40,7 +63,7 @@ export type AppDef = {
 	/** Default window size. Clamped to the desktop when it opens. */
 	w: number;
 	h: number;
-	Content: () => React.ReactElement;
+	Content: React.ComponentType;
 };
 
 export const APPS: AppDef[] = [
@@ -128,10 +151,10 @@ export const APPS: AppDef[] = [
 	{
 		id: 'recycle',
 		title: 'Recycle Bin',
-		blurb: 'Empty',
+		blurb: 'Decisions this project reversed',
 		tile: { Art: RecycleIcon },
-		w: 720,
-		h: 440,
+		w: 860,
+		h: 620,
 		Content: RecycleBinApp,
 	},
 ];

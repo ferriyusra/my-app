@@ -2,18 +2,23 @@ import {
 	Briefcase,
 	ChevronDown,
 	Download,
+	FileCode2,
 	FolderGit2,
 	Github,
 	Layers,
 	Linkedin,
 	Mail,
 	MapPin,
+	Radar,
 } from 'lucide-react';
 import ThemeToggle from './theme-toggle';
+import PrintExpander from './print-expander';
+import CaseStudyBody from './case-study-body';
 import { profile, yearsOfExperience } from '@/data/profile';
 import { experiences, tenureLabel } from '@/data/experience';
 import { SKILL_CATEGORIES, skills } from '@/data/skills';
 import { projects } from '@/data/projects';
+import { caseStudy } from '@/data/case-study';
 
 /**
  * The portfolio as a plain document.
@@ -62,9 +67,15 @@ function Section({
 
 export default function PortfolioDocument() {
 	const years = yearsOfExperience();
+	const [ny, nm] = profile.nowUpdated.split('-').map(Number);
+	const nowStamp = new Date(ny, nm - 1, 1).toLocaleDateString('en-GB', {
+		month: 'long',
+		year: 'numeric',
+	});
 
 	return (
 		<main className='mb-shell doc' id='main'>
+			<PrintExpander />
 			<header className='mb-head'>
 				<span className='mb-avatar' aria-hidden='true'>
 					{profile.initials}
@@ -105,6 +116,22 @@ export default function PortfolioDocument() {
 				windows, Start menu, File Explorer and all.
 			</p>
 
+			{/* First, because it is the only section that answers "and today?" */}
+			<Section
+				icon={<Radar size={17} />}
+				title='Now'
+				subtitle={`Updated ${nowStamp}`}
+				open>
+				<dl className='mb-now'>
+					{profile.now.map((n) => (
+						<div key={n.label}>
+							<dt>{n.label}</dt>
+							<dd>{n.text}</dd>
+						</div>
+					))}
+				</dl>
+			</Section>
+
 			<Section
 				icon={<Briefcase size={17} />}
 				title='Experience'
@@ -128,6 +155,16 @@ export default function PortfolioDocument() {
 						</li>
 					))}
 				</ol>
+			</Section>
+
+			{/* The deepest technical content on the site, so it ships in the
+			    response body rather than behind the shell. */}
+			<Section
+				icon={<FileCode2 size={17} />}
+				title='Case study'
+				subtitle={`${caseStudy.at} · ${caseStudy.period}`}>
+				<h3 className='mb-cs-title'>{caseStudy.title}</h3>
+				<CaseStudyBody />
 			</Section>
 
 			<Section

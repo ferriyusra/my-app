@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, ChevronDown, History, MapPin } from 'lucide-react';
+import { Building2, ChevronDown, FileCode2, History, MapPin } from 'lucide-react';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
+import CaseStudyBody from '@/components/content/case-study-body';
+import { caseStudy } from '@/data/case-study';
 import {
 	experiences,
 	tenureLabel,
@@ -84,6 +86,20 @@ function Role({
 						<li key={t}>{t}</li>
 					))}
 				</ul>
+
+				{/* Only the role the case study is about carries it. `<details>`
+				    rather than state: it is long, and it should be closed by
+				    default without another toggle to wire up. */}
+				{exp.short === caseStudy.at && (
+					<details className='xp-case'>
+						<summary>
+							<FileCode2 size={14} aria-hidden='true' />
+							Case study — {caseStudy.title}
+							<ChevronDown size={14} aria-hidden='true' className='xp-case-chev' />
+						</summary>
+						<CaseStudyBody />
+					</details>
+				)}
 			</article>
 		</li>
 	);
