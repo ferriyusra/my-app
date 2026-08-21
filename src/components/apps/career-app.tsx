@@ -16,24 +16,31 @@ import { tenureLabel } from '@/data/experience';
  * for the same reason the window frame keeps geometry out of the reducer: a
  * value that changes every frame should not be publishing a new render.
  */
+function prefersReducedMotion(): boolean {
+	return (
+		typeof window !== 'undefined' &&
+		window.matchMedia('(prefers-reduced-motion: reduce)').matches
+	);
+}
+
 export default function CareerApp() {
 	const all = levels();
 	const totals = career();
 	const barRef = useRef<HTMLDivElement>(null);
-	const [revealed, setRevealed] = useState(0);
 
-	/* Fill the bar and deal the levels out one at a time. Under
-	   prefers-reduced-motion the CSS drops the transitions and this just
-	   arrives, which is why the end state is set the same way either path. */
+	/* Start fully revealed when motion is unwelcome, rather than revealing from
+	   an effect — a lazy initialiser keeps the first paint correct and keeps
+	   this off the set-state-in-effect path the rest of the shell avoids. */
+	const [revealed, setRevealed] = useState(() =>
+		prefersReducedMotion() ? levels().length : 0,
+	);
+
+	/* Fill the bar, then deal the levels out one at a time. */
 	useEffect(() => {
 		const bar = barRef.current;
 		if (bar) requestAnimationFrame(() => bar.style.setProperty('--fill', '100%'));
+		if (prefersReducedMotion()) return;
 
-		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		if (reduced) {
-			setRevealed(all.length);
-			return;
-		}
 		let n = 0;
 		const id = setInterval(() => {
 			n += 1;
