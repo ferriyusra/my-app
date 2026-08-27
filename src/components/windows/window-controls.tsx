@@ -1,7 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Minus, Square, X, Copy } from 'lucide-react';
+/* The title bar stays entirely Lucide. LineIcons has no minimise or restore
+   glyph, so mixing families here put a heavy LineIcons X beside a light Lucide
+   minus — the three controls sit 4px apart and read as one set, or they read as
+   a mistake. */
+import { Copy, Minus, Square, X } from 'lucide-react';
 import SnapFlyout from './snap-flyout';
 import type { SnapZone } from '@/types/windows';
 

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { ExternalLink, Github, Star } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
+import { LiGithub, LiStar } from '@/components/icons/line-icons';
 import type { Project } from '@/data/projects';
 
 /** The pane Explorer shows once a project folder is opened. */
@@ -38,7 +39,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
 				</div>
 				{project.stars > 0 && (
 					<span className='xp-stars'>
-						<Star size={13} fill='currentColor' aria-hidden='true' />
+						<LiStar size={13} aria-hidden='true' />
 						<span aria-label={`${project.stars} GitHub stars`}>{project.stars}</span>
 					</span>
 				)}
@@ -71,7 +72,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
 							target='_blank'
 							rel='noopener noreferrer'
 							className='fl-btn fl-btn-standard'>
-							<Github size={14} aria-hidden='true' /> Code
+							<LiGithub size={14} aria-hidden='true' /> Code
 						</a>
 					)}
 					{project.demo && (

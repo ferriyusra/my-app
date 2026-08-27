@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Power } from 'lucide-react';
+import { LiPower } from '@/components/icons/line-icons';
 import { useShell } from '@/context/shell-context';
 import WindowsLogo from '@/components/ui/windows-logo';
 
@@ -55,7 +55,7 @@ export default function PowerScreen() {
 							replayBoot();
 							setPower('on');
 						}}>
-						<Power size={18} aria-hidden='true' />
+						<LiPower size={18} aria-hidden='true' />
 						Turn on
 					</button>
 				</>

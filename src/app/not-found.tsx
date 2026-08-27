@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+import { LiArrowLeft } from '@/components/icons/line-icons';
 
 export default function NotFound() {
 	return (
@@ -14,7 +15,7 @@ export default function NotFound() {
 					desktop.
 				</p>
 				<Link href='/' className='fl-btn fl-btn-accent'>
-					<ArrowLeft size={15} aria-hidden='true' />
+					<LiArrowLeft size={15} aria-hidden='true' />
 					Back to desktop
 				</Link>
 			</div>

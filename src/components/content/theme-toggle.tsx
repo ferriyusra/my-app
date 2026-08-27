@@ -1,6 +1,6 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
+import { LiMoon, LiSun } from '@/components/icons/line-icons';
 import { useTheme } from '@/components/theme-provider';
 
 /**
@@ -19,7 +19,7 @@ export default function ThemeToggle() {
 			className='mb-theme'
 			aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
 			onClick={toggle}>
-			{mounted ? dark ? <Sun size={17} /> : <Moon size={17} /> : null}
+			{mounted ? dark ? <LiSun size={17} /> : <LiMoon size={17} /> : null}
 		</button>
 	);
 }

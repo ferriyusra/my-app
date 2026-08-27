@@ -1,17 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {
-	ArrowLeft,
-	ArrowRight,
-	ExternalLink,
-	Lock,
-	Plus,
-	RotateCw,
-	Search,
-	Star,
-	X,
-} from 'lucide-react';
+import { ExternalLink, RotateCw, X } from 'lucide-react';
+import { LiArrowLeft, LiArrowRight, LiLock, LiPlus, LiSearch, LiStar } from '@/components/icons/line-icons';
 import { BrowserIcon } from '@/components/icons/app-icons';
 import { APPS } from '@/components/apps/registry';
 import AppTile from '@/components/ui/app-tile';
@@ -114,16 +105,16 @@ export default function BrowserApp() {
 					className='br-newtab'
 					aria-label='New tab'
 					onClick={() => setActiveId(START_TAB.id)}>
-					<Plus size={14} aria-hidden='true' />
+					<LiPlus size={14} aria-hidden='true' />
 				</button>
 			</div>
 
 			<div className='br-bar'>
 				<button type='button' className='xp-icon-btn' aria-label='Back' disabled>
-					<ArrowLeft size={16} aria-hidden='true' />
+					<LiArrowLeft size={16} aria-hidden='true' />
 				</button>
 				<button type='button' className='xp-icon-btn' aria-label='Forward' disabled>
-					<ArrowRight size={16} aria-hidden='true' />
+					<LiArrowRight size={16} aria-hidden='true' />
 				</button>
 				<button
 					type='button'
@@ -134,23 +125,23 @@ export default function BrowserApp() {
 				</button>
 
 				<label className='br-omnibox'>
-					<Lock size={13} aria-hidden='true' />
+					<LiLock size={13} aria-hidden='true' />
 					<input
 						type='search'
 						value={query}
 						placeholder={active.url}
-						aria-label='Search this desktop or pick a link'
+						aria-label='LiSearch this desktop or pick a link'
 						onChange={(e) => {
 							setQuery(e.target.value);
 							setActiveId(START_TAB.id);
 						}}
 					/>
-					<Search size={14} aria-hidden='true' />
+					<LiSearch size={14} aria-hidden='true' />
 				</label>
 			</div>
 
 			<div className='br-favs'>
-				<Star size={13} aria-hidden='true' />
+				<LiStar size={13} aria-hidden='true' />
 				{BOOKMARKS.map((b) => (
 					<button
 						key={b.label}

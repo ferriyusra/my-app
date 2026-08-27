@@ -1,13 +1,14 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Bell, X } from 'lucide-react';
+import { LiBell } from '@/components/icons/line-icons';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { APP_BY_ID } from '@/components/apps/registry';
 import AppTile from '@/components/ui/app-tile';
 import Flyout from '@/components/ui/flyout';
 import { useClock } from '@/hooks/use-clock';
+import { X } from 'lucide-react';
 
 const WEEK = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
@@ -63,7 +64,7 @@ export default function NotificationCenter({ onClose }: { onClose: () => void })
 
 			{notifications.length === 0 ? (
 				<p className='nc-empty'>
-					<Bell size={22} aria-hidden='true' />
+					<LiBell size={22} aria-hidden='true' />
 					No new notifications
 				</p>
 			) : (
@@ -73,7 +74,7 @@ export default function NotificationCenter({ onClose }: { onClose: () => void })
 						return (
 							<li key={n.id} className='nc-item'>
 								<span className='nc-item-icon' aria-hidden='true'>
-									{app ? <AppTile tile={app.tile} size={22} /> : <Bell size={18} />}
+									{app ? <AppTile tile={app.tile} size={22} /> : <LiBell size={18} />}
 								</span>
 								<span className='nc-item-text'>
 									<strong>{n.title}</strong>
@@ -132,7 +133,7 @@ export function Toast() {
 	return (
 		<div className='toast' role='status' aria-live='polite'>
 			<span className='toast-icon' aria-hidden='true'>
-				{app ? <AppTile tile={app.tile} size={26} /> : <Bell size={20} />}
+				{app ? <AppTile tile={app.tile} size={26} /> : <LiBell size={20} />}
 			</span>
 			<span className='toast-text'>
 				<strong>{toast.title}</strong>

@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, ChevronDown, FileCode2, History, MapPin } from 'lucide-react';
+import { Building2, FileCode2, History } from 'lucide-react';
+import { LiChevronDown, LiMapPin } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import CaseStudyBody from '@/components/content/case-study-body';
 import { caseStudy } from '@/data/case-study';
@@ -45,7 +46,7 @@ function Role({
 						<p className='xp-company'>
 							{exp.company}
 							<span className='xp-loc'>
-								<MapPin size={12} aria-hidden='true' />
+								<LiMapPin size={12} aria-hidden='true' />
 								{exp.location}
 							</span>
 						</p>
@@ -83,7 +84,7 @@ function Role({
 						aria-expanded={expanded}
 						onClick={onToggle}>
 						{expanded ? 'Show less' : `${hidden} more outcome${hidden > 1 ? 's' : ''}`}
-						<ChevronDown
+						<LiChevronDown
 							size={14}
 							aria-hidden='true'
 							data-open={expanded || undefined}
@@ -109,7 +110,7 @@ function Role({
 						<summary>
 							<FileCode2 size={14} aria-hidden='true' />
 							Case study — {caseStudy.title}
-							<ChevronDown size={14} aria-hidden='true' className='xp-case-chev' />
+							<LiChevronDown size={14} aria-hidden='true' className='xp-case-chev' />
 						</summary>
 						<CaseStudyBody />
 					</details>

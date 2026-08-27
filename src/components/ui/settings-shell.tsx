@@ -1,9 +1,9 @@
 'use client';
 
-import type { LucideIcon } from 'lucide-react';
 import { profile } from '@/data/profile';
+import type { IconLike } from '@/components/icons/line-icons';
 
-export type SettingsPage = { key: string; label: string; Icon: LucideIcon };
+export type SettingsPage = { key: string; label: string; Icon: IconLike };
 
 /**
  * The Windows 11 Settings chrome: an account card over a nav rail on the

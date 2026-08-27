@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { Briefcase, Layers, Mail, User } from 'lucide-react';
+import { LiBriefcase, LiLayers, LiMail, LiUser } from '@/components/icons/line-icons';
 import {
 	DocumentIcon,
 	FolderIcon,
@@ -98,7 +98,7 @@ export default function ExplorerApp() {
 			name: string,
 			type: string,
 			meta: string,
-			Icon: typeof User,
+			Icon: typeof LiUser,
 			tint: string,
 		): FsEntry => ({
 			id,
@@ -127,16 +127,16 @@ export default function ExplorerApp() {
 			case 'documents':
 				return [
 					resume,
-					appFile('about', 'About-Me', 'Profile', 'Bio and specifications', User, '#0f6cbd'),
+					appFile('about', 'About-Me', 'Profile', 'Bio and specifications', LiUser, '#0f6cbd'),
 					appFile(
 						'experience',
 						'Experience',
 						'Work history',
 						`${experiences.length} roles since 2021`,
-						Briefcase,
+						LiBriefcase,
 						'#0e7c70',
 					),
-					appFile('skills', 'Skills', 'Tech stack', `${skills.length} tools by category`, Layers, '#6d3fd4'),
+					appFile('skills', 'Skills', 'Tech stack', `${skills.length} tools by category`, LiLayers, '#6d3fd4'),
 				];
 
 			case 'downloads':
@@ -144,7 +144,7 @@ export default function ExplorerApp() {
 
 			case 'desktop':
 				return [
-					appFile('about', 'About Me', 'Application', 'System properties', User, '#0f6cbd'),
+					appFile('about', 'About Me', 'Application', 'System properties', LiUser, '#0f6cbd'),
 					{
 						id: 'portfolio',
 						name: 'Projects',
@@ -153,9 +153,9 @@ export default function ExplorerApp() {
 						icon: <FolderIcon size={40} />,
 						onOpen: () => go({ nav: 'portfolio' }),
 					},
-					appFile('skills', 'Skills', 'Application', 'Tech stack', Layers, '#6d3fd4'),
-					appFile('experience', 'Experience', 'Application', 'Roles and outcomes', Briefcase, '#0e7c70'),
-					appFile('contact', 'Contact', 'Application', 'Send a message', Mail, '#1454a8'),
+					appFile('skills', 'Skills', 'Application', 'Tech stack', LiLayers, '#6d3fd4'),
+					appFile('experience', 'Experience', 'Application', 'Roles and outcomes', LiBriefcase, '#0e7c70'),
+					appFile('contact', 'Contact', 'Application', 'Send a message', LiMail, '#1454a8'),
 				];
 
 			case 'home':

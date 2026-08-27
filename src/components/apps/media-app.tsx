@@ -1,19 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-	AlertCircle,
-	ExternalLink,
-	Loader2,
-	Music,
-	Pause,
-	Play,
-	Search,
-	SkipBack,
-	SkipForward,
-	Volume2,
-	VolumeX,
-} from 'lucide-react';
+import { AlertCircle, ExternalLink, Loader2, Music, Pause, Play, SkipBack, SkipForward } from 'lucide-react';
+import { LiSearch, LiVolume2, LiVolumeX } from '@/components/icons/line-icons';
 import type { Track } from '@/app/api/music/search/route';
 
 /**
@@ -63,7 +52,7 @@ export default function MediaApp() {
 
 	const current = index === null ? null : (tracks[index] ?? null);
 
-	/* ── Search ──────────────────────────────────────────────── */
+	/* ── LiSearch ──────────────────────────────────────────────── */
 
 	const search = useCallback(async (term: string, signal: AbortSignal) => {
 		if (!term.trim()) {
@@ -78,12 +67,12 @@ export default function MediaApp() {
 				signal,
 			});
 			const data: { tracks?: Track[]; error?: string } = await res.json();
-			if (!res.ok) throw new Error(data.error ?? 'Search failed.');
+			if (!res.ok) throw new Error(data.error ?? 'LiSearch failed.');
 			setTracks(data.tracks ?? []);
 			setStatus('done');
 		} catch (err) {
 			if ((err as Error).name === 'AbortError') return;
-			setError((err as Error).message || 'Search failed.');
+			setError((err as Error).message || 'LiSearch failed.');
 			setStatus('error');
 		}
 	}, []);
@@ -159,12 +148,12 @@ export default function MediaApp() {
 		<div className='mp'>
 			<header className='mp-head'>
 				<label className='mp-search'>
-					<Search size={16} aria-hidden='true' />
+					<LiSearch size={16} aria-hidden='true' />
 					<input
 						type='search'
 						value={query}
-						placeholder='Search for a song, artist or album'
-						aria-label='Search for music'
+						placeholder='LiSearch for a song, artist or album'
+						aria-label='LiSearch for music'
 						onChange={(e) => setQuery(e.target.value)}
 					/>
 					{status === 'loading' && (
@@ -178,7 +167,7 @@ export default function MediaApp() {
 					<div className='mp-empty'>
 						<Music size={30} aria-hidden='true' />
 						<p>
-							Search Apple&rsquo;s catalogue and play a track.
+							LiSearch Apple&rsquo;s catalogue and play a track.
 							<br />
 							Previews are 30 seconds — the full song is one click away.
 						</p>
@@ -203,7 +192,7 @@ export default function MediaApp() {
 				)}
 
 				{tracks.length > 0 && (
-					<ul className='mp-list' aria-label='Search results'>
+					<ul className='mp-list' aria-label='LiSearch results'>
 						{tracks.map((t, i) => (
 							<li key={t.id}>
 								<button
@@ -306,9 +295,9 @@ export default function MediaApp() {
 					aria-label={muted ? 'Unmute' : 'Mute'}
 					onClick={toggleMute}>
 					{muted ? (
-						<VolumeX size={16} aria-hidden='true' />
+						<LiVolumeX size={16} aria-hidden='true' />
 					) : (
-						<Volume2 size={16} aria-hidden='true' />
+						<LiVolume2 size={16} aria-hidden='true' />
 					)}
 				</button>
 

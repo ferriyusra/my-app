@@ -4,17 +4,20 @@ import { useId, useState } from 'react';
 import {
 	AlertCircle,
 	Archive,
-	CheckCircle,
 	FileText,
-	Github,
 	Inbox,
-	Linkedin,
 	Loader2,
-	Mail,
 	PenSquare,
-	Send,
-	Trash2,
 } from 'lucide-react';
+import {
+	LiCheckCircle,
+	LiGithub,
+	LiLinkedin,
+	LiMail,
+	LiSend,
+	LiTrash2,
+	type IconLike,
+} from '@/components/icons/line-icons';
 import { useShell } from '@/context/shell-context';
 import { profile } from '@/data/profile';
 
@@ -29,7 +32,7 @@ type Channel = {
 	from: string;
 	subject: string;
 	preview: string;
-	Icon: typeof Mail;
+	Icon: IconLike;
 	tint: string;
 	href: string;
 	action: string;
@@ -42,7 +45,7 @@ const CHANNELS: Channel[] = [
 		from: 'Email',
 		subject: profile.email,
 		preview: 'The fastest way to reach me — I read everything.',
-		Icon: Mail,
+		Icon: LiMail,
 		tint: 'linear-gradient(140deg, #59b4f0 0%, #1454a8 100%)',
 		href: `mailto:${profile.email}`,
 		action: 'Compose in your mail app',
@@ -53,7 +56,7 @@ const CHANNELS: Channel[] = [
 		from: 'GitHub',
 		subject: profile.github.replace('https://', ''),
 		preview: 'Source for the case studies, and this desktop.',
-		Icon: Github,
+		Icon: LiGithub,
 		tint: 'linear-gradient(140deg, #5b636d 0%, #1c2128 100%)',
 		href: profile.github,
 		action: 'Open GitHub profile',
@@ -64,7 +67,7 @@ const CHANNELS: Channel[] = [
 		from: 'LinkedIn',
 		subject: profile.linkedin.replace('https://', ''),
 		preview: 'Full work history and the occasional post.',
-		Icon: Linkedin,
+		Icon: LiLinkedin,
 		tint: 'linear-gradient(140deg, #4aa3f0 0%, #0a66c2 100%)',
 		href: profile.linkedin,
 		action: 'Open LinkedIn profile',
@@ -85,12 +88,12 @@ const CHANNELS: Channel[] = [
 
 const FOLDERS = [
 	{ key: 'inbox', label: 'Inbox', Icon: Inbox },
-	{ key: 'sent', label: 'Sent', Icon: Send },
+	{ key: 'sent', label: 'Sent', Icon: LiSend },
 	{ key: 'archive', label: 'Archive', Icon: Archive },
-	{ key: 'deleted', label: 'Deleted', Icon: Trash2 },
+	{ key: 'deleted', label: 'Deleted', Icon: LiTrash2 },
 ] as const;
 
-/** Contact, presented as the Windows Mail app: rail, list, reading pane. */
+/** Contact, presented as the Windows LiMail app: rail, list, reading pane. */
 export default function ContactApp() {
 	const uid = useId();
 	const { notify } = useShell();
@@ -141,7 +144,7 @@ export default function ContactApp() {
 
 	return (
 		<div className='ml-shell'>
-			<nav className='ml-rail' aria-label='Mail folders'>
+			<nav className='ml-rail' aria-label='LiMail folders'>
 				<button
 					type='button'
 					className='ml-compose'
@@ -185,7 +188,10 @@ export default function ContactApp() {
 							className='ml-item'
 							data-active={pane === c.id || undefined}
 							onClick={() => setPane(c.id)}>
-							<span className='ml-avatar' aria-hidden='true' style={{ background: c.tint }}>
+							<span
+								className='ml-avatar'
+								aria-hidden='true'
+								style={{ background: c.tint }}>
 								<c.Icon size={16} color='#fff' strokeWidth={2.1} />
 							</span>
 							<span className='ml-item-text'>
@@ -249,24 +255,30 @@ export default function ContactApp() {
 									placeholder='What are you building?'
 									required
 									disabled={busy}
-									onChange={(e) => setForm({ ...form, message: e.target.value })}
+									onChange={(e) =>
+										setForm({ ...form, message: e.target.value })
+									}
 								/>
 							</div>
 						</div>
 
 						<footer className='ml-form-foot'>
-							<button type='submit' className='fl-btn fl-btn-accent' disabled={busy}>
+							<button
+								type='submit'
+								className='fl-btn fl-btn-accent'
+								disabled={busy}>
 								{busy ? (
 									<>
-										<Loader2 size={15} className='spin' aria-hidden='true' /> Sending…
+										<Loader2 size={15} className='spin' aria-hidden='true' />{' '}
+										Sending…
 									</>
 								) : status === 'sent' ? (
 									<>
-										<CheckCircle size={15} aria-hidden='true' /> Sent
+										<LiCheckCircle size={15} aria-hidden='true' /> Sent
 									</>
 								) : (
 									<>
-										<Send size={15} aria-hidden='true' /> Send
+										<LiSend size={15} aria-hidden='true' /> Send
 									</>
 								)}
 							</button>
@@ -280,8 +292,8 @@ export default function ContactApp() {
 								}>
 								{status === 'sent' && (
 									<>
-										<CheckCircle size={14} aria-hidden='true' /> Thanks — I&rsquo;ll
-										reply shortly.
+										<LiCheckCircle size={14} aria-hidden='true' /> Thanks —
+										I&rsquo;ll reply shortly.
 									</>
 								)}
 								{status === 'fallback' && (
@@ -305,7 +317,10 @@ export default function ContactApp() {
 				) : (
 					<article className='ml-message'>
 						<header className='ml-message-head'>
-							<span className='ml-avatar ml-avatar-lg' aria-hidden='true' style={{ background: active.tint }}>
+							<span
+								className='ml-avatar ml-avatar-lg'
+								aria-hidden='true'
+								style={{ background: active.tint }}>
 								<active.Icon size={22} color='#fff' strokeWidth={2.1} />
 							</span>
 							<div>

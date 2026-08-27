@@ -1,16 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { Boxes, LayoutTemplate, Server, Sparkles, Wrench } from 'lucide-react';
 import {
-	Boxes,
-	Cloud,
-	Database,
-	LayoutTemplate,
-	Server,
-	Sparkles,
-	Wrench,
-	type LucideIcon,
-} from 'lucide-react';
+	LiCloud,
+	LiDatabase,
+	type IconLike,
+} from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import {
 	SKILL_CATEGORIES,
@@ -19,12 +15,12 @@ import {
 	type SkillCategory,
 } from '@/data/skills';
 
-const CATEGORY_ICON: Record<SkillCategory, LucideIcon> = {
+const CATEGORY_ICON: Record<SkillCategory, IconLike> = {
 	Backend: Server,
 	Frontend: LayoutTemplate,
-	Database: Database,
+	Database: LiDatabase,
 	DevOps: Wrench,
-	Cloud: Cloud,
+	Cloud: LiCloud,
 	'AI Tools': Sparkles,
 };
 
