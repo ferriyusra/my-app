@@ -1,10 +1,10 @@
 'use client';
 
-import { X } from 'lucide-react';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { useShell } from '@/context/shell-context';
 import { APP_BY_ID } from '@/components/apps/registry';
 import AppTile from '@/components/ui/app-tile';
+import { X } from 'lucide-react';
 
 /**
  * Task View: the overview Windows opens from the taskbar, listing every open

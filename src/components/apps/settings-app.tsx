@@ -1,18 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import {
-	BadgeCheck,
-	Cat,
-	Info,
-	Monitor,
-	ShieldAlert,
-	Moon,
-	Paintbrush,
-	Sun,
-	SunMedium,
-	Volume2,
-} from 'lucide-react';
+import { BadgeCheck, Cat, Info, Paintbrush, ShieldAlert, SunMedium } from 'lucide-react';
+import { LiMonitor, LiMoon, LiSun, LiVolume2 } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import SettingCard from '@/components/ui/setting-card';
 import ToggleSwitch from '@/components/ui/toggle-switch';
@@ -28,7 +18,7 @@ import { profile } from '@/data/profile';
 
 const PAGES: SettingsPage[] = [
 	{ key: 'personalisation', label: 'Personalisation', Icon: Paintbrush },
-	{ key: 'system', label: 'System', Icon: Monitor },
+	{ key: 'system', label: 'System', Icon: LiMonitor },
 	{ key: 'about', label: 'About', Icon: Info },
 ];
 
@@ -101,7 +91,7 @@ export default function SettingsApp() {
 			{page === 'personalisation' && (
 				<>
 					<SettingCard
-						Icon={dark ? Moon : Sun}
+						Icon={dark ? LiMoon : LiSun}
 						title='Colour mode'
 						description='Light and dark both ship a full Fluent palette.'
 						control={
@@ -111,14 +101,14 @@ export default function SettingsApp() {
 									data-active={!dark || undefined}
 									aria-pressed={!dark}
 									onClick={() => dark && toggle()}>
-									<Sun size={14} aria-hidden='true' /> Light
+									<LiSun size={14} aria-hidden='true' /> Light
 								</button>
 								<button
 									type='button'
 									data-active={dark || undefined}
 									aria-pressed={dark}
 									onClick={() => !dark && toggle()}>
-									<Moon size={14} aria-hidden='true' /> Dark
+									<LiMoon size={14} aria-hidden='true' /> Dark
 								</button>
 							</div>
 						}
@@ -147,7 +137,7 @@ export default function SettingsApp() {
 					</SettingCard>
 
 					<SettingCard
-						Icon={Monitor}
+						Icon={LiMonitor}
 						title='Background'
 						description='The abstract ones are drawn in CSS rather than downloaded.'>
 						<div className='sw-walls' role='radiogroup' aria-label='Background'>
@@ -231,7 +221,7 @@ export default function SettingsApp() {
 						)}
 					</SettingCard>
 
-					<SettingCard Icon={Volume2} title='Sound'>
+					<SettingCard Icon={LiVolume2} title='Sound'>
 						<ToggleSwitch
 							checked={sound}
 							onChange={setSound}
@@ -276,7 +266,7 @@ export default function SettingsApp() {
 						title='About this desktop'
 						description={`A portfolio for ${profile.name}, built as a Windows 11 shell rather than a scrolling page. Every window, menu and flyout is real UI — nothing here is a screenshot.`}
 					/>
-					<SettingCard Icon={Monitor} title='Specifications'>
+					<SettingCard Icon={LiMonitor} title='Specifications'>
 						<dl className='st-specs'>
 							{STACK.map(([k, v]) => (
 								<div key={k}>

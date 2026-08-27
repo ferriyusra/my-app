@@ -1,16 +1,8 @@
 'use client';
 
 import { Fragment, useMemo, useState } from 'react';
-import {
-	Bug,
-	ChevronDown,
-	FileCode2,
-	GitBranch,
-	Package,
-	Search,
-	Settings2,
-	X,
-} from 'lucide-react';
+import { FileCode2, GitBranch, Package, X } from 'lucide-react';
+import { LiBug, LiChevronDown, LiSearch, LiSettings2 } from '@/components/icons/line-icons';
 import { sourceFiles, type SourceFile } from '@/data/source-excerpts';
 
 /**
@@ -123,7 +115,7 @@ export default function EditorApp() {
 					<FileCode2 size={20} aria-hidden='true' />
 				</button>
 				<button type='button' aria-label='Search' disabled>
-					<Search size={20} aria-hidden='true' />
+					<LiSearch size={20} aria-hidden='true' />
 				</button>
 				<button type='button' aria-label='Source control' disabled>
 					<GitBranch size={20} aria-hidden='true' />
@@ -132,20 +124,20 @@ export default function EditorApp() {
 					<Package size={20} aria-hidden='true' />
 				</button>
 				<button type='button' className='vs-activity-end' aria-label='Settings' disabled>
-					<Settings2 size={20} aria-hidden='true' />
+					<LiSettings2 size={20} aria-hidden='true' />
 				</button>
 			</nav>
 
 			<aside className='vs-side'>
 				<p className='vs-side-head'>Explorer</p>
 				<p className='vs-side-project'>
-					<ChevronDown size={13} aria-hidden='true' />
+					<LiChevronDown size={13} aria-hidden='true' />
 					PORTFOLIO-DESKTOP
 				</p>
 				{tree.map(([dir, files]) => (
 					<div key={dir} className='vs-folder'>
 						<p className='vs-folder-name'>
-							<ChevronDown size={12} aria-hidden='true' />
+							<LiChevronDown size={12} aria-hidden='true' />
 							{dir}
 						</p>
 						{files.map((f) => (
@@ -200,7 +192,7 @@ export default function EditorApp() {
 				<footer className='vs-status'>
 					<span className='vs-status-left'>
 						<GitBranch size={13} aria-hidden='true' /> main
-						<Bug size={13} aria-hidden='true' /> 0
+						<LiBug size={13} aria-hidden='true' /> 0
 					</span>
 					<span className='vs-status-right'>
 						<span>{file.code.split('\n').length} lines</span>

@@ -25,12 +25,29 @@ window state machine. Adding a file matching `src/**/*.test.ts` is enough for
   `@theme`; all component styling is hand-written CSS in
   [src/app/globals.css](src/app/globals.css)
 - **Framer Motion** for window, flyout and toast transitions
-- **Lucide** for system glyphs only — Start, Search, Task view, toolbar
-  buttons. **Every app icon is hand-drawn SVG** in
-  [src/components/icons/app-icons.tsx](src/components/icons/app-icons.tsx),
-  because that is what Windows 11 ships: shaped compositions, not line art on
-  a tinted square. `TileArt` deliberately has no glyph variant, so a new app
-  cannot quietly reintroduce one.
+- **Two icon families**, and the split is deliberate:
+  - **LineIcons**, vendored as generated components in
+    [src/components/icons/line-icons.tsx](src/components/icons/line-icons.tsx).
+    Neither npm package works here: `lineicons-react` bundles its own React 18,
+    so its elements carry `Symbol(react.element)` where React 19 wants
+    `Symbol(react.transitional.element)`; `react-lineicons` reaches for
+    `document` at import time, so a server component cannot import it at all.
+    Taking the artwork and leaving the packaging fixes both, makes every fill
+    `currentColor`, and ships only what is used. Regenerate from
+    `scratchpad/gen` — do not hand-edit the file.
+  - **Lucide** for the 60-odd glyphs LineIcons has no answer for: window
+    minimise and restore, battery and its charging states, wifi on and off,
+    pin and unpin, skip back and forward, the alert and warning marks.
+
+  The rule when they meet: **a tight group of controls uses one family.** The
+  title bar, the system tray and the media transport are each all-Lucide,
+  because in each case at least one glyph in the group has no LineIcons
+  equivalent and a heavier LineIcons mark beside a lighter Lucide one reads as
+  a mistake. The close mark is Lucide everywhere for the same reason.
+
+  Every app icon is LineIcons. They were hand-drawn shaped compositions until
+  the owner asked for the swap; that history, and the fact it reversed an
+  earlier decision, is recorded in `discarded.ts` rather than quietly dropped.
 
 ## What this is
 

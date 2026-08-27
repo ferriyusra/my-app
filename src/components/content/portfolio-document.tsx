@@ -1,16 +1,5 @@
-import {
-	Briefcase,
-	ChevronDown,
-	Download,
-	FileCode2,
-	FolderGit2,
-	Github,
-	Layers,
-	Linkedin,
-	Mail,
-	MapPin,
-	Radar,
-} from 'lucide-react';
+import { FileCode2, FolderGit2, Radar } from 'lucide-react';
+import { LiBriefcase, LiChevronDown, LiDownload, LiGithub, LiLayers, LiLinkedin, LiMail, LiMapPin } from '@/components/icons/line-icons';
 import ThemeToggle from './theme-toggle';
 import PrintExpander from './print-expander';
 import CaseStudyBody from './case-study-body';
@@ -58,7 +47,7 @@ function Section({
 					<strong>{title}</strong>
 					<small>{subtitle}</small>
 				</span>
-				<ChevronDown size={18} aria-hidden='true' />
+				<LiChevronDown size={18} aria-hidden='true' />
 			</summary>
 			<div className='mb-card-body'>{children}</div>
 		</details>
@@ -86,7 +75,7 @@ export default function PortfolioDocument() {
 						{profile.role} — {profile.roleDetail}
 					</p>
 					<p className='mb-loc'>
-						<MapPin size={12} aria-hidden='true' />
+						<LiMapPin size={12} aria-hidden='true' />
 						{profile.location}
 						<span className='mb-dot' aria-hidden='true' />
 						{profile.availability}
@@ -104,10 +93,10 @@ export default function PortfolioDocument() {
 					href={profile.cvView}
 					target='_blank'
 					rel='noopener noreferrer'>
-					<Download size={15} aria-hidden='true' /> Resume
+					<LiDownload size={15} aria-hidden='true' /> Resume
 				</a>
 				<a className='fl-btn fl-btn-standard' href={`mailto:${profile.email}`}>
-					<Mail size={15} aria-hidden='true' /> Email
+					<LiMail size={15} aria-hidden='true' /> Email
 				</a>
 			</div>
 
@@ -133,7 +122,7 @@ export default function PortfolioDocument() {
 			</Section>
 
 			<Section
-				icon={<Briefcase size={17} />}
+				icon={<LiBriefcase size={17} />}
 				title='Experience'
 				subtitle={`${experiences.length} roles · ${years} years`}
 				open>
@@ -168,7 +157,7 @@ export default function PortfolioDocument() {
 			</Section>
 
 			<Section
-				icon={<Layers size={17} />}
+				icon={<LiLayers size={17} />}
 				title='Skills'
 				subtitle={`${skills.length} tools across ${SKILL_CATEGORIES.length} categories`}>
 				{SKILL_CATEGORIES.map((c) => (
@@ -225,13 +214,13 @@ export default function PortfolioDocument() {
 
 			<footer className='mb-foot'>
 				<a href={`mailto:${profile.email}`}>
-					<Mail size={16} aria-hidden='true' /> {profile.email}
+					<LiMail size={16} aria-hidden='true' /> {profile.email}
 				</a>
 				<a href={profile.github} target='_blank' rel='noopener noreferrer'>
-					<Github size={16} aria-hidden='true' /> GitHub
+					<LiGithub size={16} aria-hidden='true' /> GitHub
 				</a>
 				<a href={profile.linkedin} target='_blank' rel='noopener noreferrer'>
-					<Linkedin size={16} aria-hidden='true' /> LinkedIn
+					<LiLinkedin size={16} aria-hidden='true' /> LinkedIn
 				</a>
 			</footer>
 		</main>

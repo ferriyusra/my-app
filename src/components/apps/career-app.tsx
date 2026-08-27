@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Gamepad2, List } from 'lucide-react';
+import { List } from 'lucide-react';
+import { LiGamepad2 } from '@/components/icons/line-icons';
 import Adventure from './career/adventure';
 import CareerSummary from './career/summary';
 
@@ -39,7 +40,7 @@ export default function CareerApp() {
 					aria-selected={mode === 'play'}
 					data-on={mode === 'play' || undefined}
 					onClick={() => setMode('play')}>
-					<Gamepad2 size={14} aria-hidden='true' /> Adventure
+					<LiGamepad2 size={14} aria-hidden='true' /> Adventure
 				</button>
 				<button
 					type='button'

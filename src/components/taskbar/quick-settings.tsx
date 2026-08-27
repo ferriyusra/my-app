@@ -1,16 +1,7 @@
 'use client';
 
-import {
-	Bell,
-	Moon,
-	Settings as SettingsGlyph,
-	Sun,
-	Volume2,
-	VolumeX,
-	Wifi,
-	SunMedium,
-	Image as ImageIcon,
-} from 'lucide-react';
+import { Image as ImageIcon, Settings as SettingsGlyph, SunMedium, Wifi } from 'lucide-react';
+import { LiBell, LiMoon, LiSun, LiVolume2, LiVolumeX } from '@/components/icons/line-icons';
 import { useMemo } from 'react';
 import {
 	useShell,
@@ -83,7 +74,7 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 					aria-pressed={dark}
 					onClick={toggle}>
 					<span className='qs-tile-icon' aria-hidden='true'>
-						{dark ? <Moon size={18} /> : <Sun size={18} />}
+						{dark ? <LiMoon size={18} /> : <LiSun size={18} />}
 					</span>
 					<span className='qs-tile-label'>
 						{dark ? 'Dark mode' : 'Light mode'}
@@ -97,7 +88,7 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 					aria-pressed={sound}
 					onClick={() => setSound(!sound)}>
 					<span className='qs-tile-icon' aria-hidden='true'>
-						{sound ? <Volume2 size={18} /> : <VolumeX size={18} />}
+						{sound ? <LiVolume2 size={18} /> : <LiVolumeX size={18} />}
 					</span>
 					<span className='qs-tile-label'>
 						{sound ? 'Sounds on' : 'Sounds off'}
@@ -120,7 +111,7 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 						openFlyout('notifications');
 					}}>
 					<span className='qs-tile-icon' aria-hidden='true'>
-						<Bell size={18} />
+						<LiBell size={18} />
 					</span>
 					<span className='qs-tile-label'>
 						{notifications.length
@@ -144,9 +135,9 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 
 			<label className='qs-slider'>
 				{volume > 0 ? (
-					<Volume2 size={17} aria-hidden='true' />
+					<LiVolume2 size={17} aria-hidden='true' />
 				) : (
-					<VolumeX size={17} aria-hidden='true' />
+					<LiVolumeX size={17} aria-hidden='true' />
 				)}
 				<input
 					type='range'

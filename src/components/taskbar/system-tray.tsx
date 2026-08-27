@@ -1,17 +1,7 @@
 'use client';
 
-import {
-	Battery,
-	BatteryCharging,
-	BatteryFull,
-	Bell,
-	ChevronUp,
-	Volume1,
-	Volume2,
-	VolumeX,
-	Wifi,
-	WifiOff,
-} from 'lucide-react';
+import { Battery, BatteryCharging, BatteryFull, Volume1, Volume2, VolumeX, Wifi, WifiOff } from 'lucide-react';
+import { LiBell, LiChevronUp } from '@/components/icons/line-icons';
 import { useShell } from '@/context/shell-context';
 import { useSystemStatus } from '@/hooks/use-system-status';
 import { useClock } from '@/hooks/use-clock';
@@ -42,7 +32,7 @@ export default function SystemTray({ onShowDesktop }: { onShowDesktop: () => voi
 				className='tb-tray tb-chevron'
 				aria-label='Show hidden icons'
 				onClick={() => toggleFlyout('quick')}>
-				<ChevronUp size={14} aria-hidden='true' />
+				<LiChevronUp size={14} aria-hidden='true' />
 			</button>
 
 			<button
@@ -76,7 +66,7 @@ export default function SystemTray({ onShowDesktop }: { onShowDesktop: () => voi
 			</button>
 
 			<span className='tb-bell' aria-hidden='true' data-has={notifications.length > 0 || undefined}>
-				<Bell size={14} />
+				<LiBell size={14} />
 			</span>
 
 			{/* Windows keeps a sliver at the far edge that minimises everything. */}

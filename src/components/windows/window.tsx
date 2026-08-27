@@ -2,14 +2,8 @@
 
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { animate, motion, useMotionValue, useReducedMotion } from 'framer-motion';
-import {
-	Maximize2,
-	Minimize2,
-	Minus,
-	Move,
-	X,
-	type LucideIcon,
-} from 'lucide-react';
+import { Maximize2, Minimize2, Move, X } from 'lucide-react';
+import { LiMinus } from '@/components/icons/line-icons';
 import { MIN_H, MIN_W, zoneRect } from '@/context/window-context';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
@@ -18,6 +12,7 @@ import WindowHeader from './window-header';
 import WindowControls from './window-controls';
 import type { AppDef } from '@/components/apps/registry';
 import type { Bounds, ResizeEdge, SnapZone, WindowState } from '@/types/windows';
+import type { IconLike } from '@/components/icons/line-icons';
 
 /** Distance from a screen edge that arms a snap while dragging. */
 const EDGE = 10;
@@ -336,28 +331,28 @@ function WindowFrame({
 		{
 			kind: 'item',
 			label: 'Restore',
-			Icon: Minimize2 as LucideIcon,
+			Icon: Minimize2 as IconLike,
 			disabled: !maximised && !snapped,
 			onSelect: () => toggleMax(id, bounds()),
 		},
 		{
 			kind: 'item',
 			label: 'Move',
-			Icon: Move as LucideIcon,
+			Icon: Move as IconLike,
 			disabled: true,
 			shortcut: 'Drag title',
 		},
 		{
 			kind: 'item',
 			label: 'Minimise',
-			Icon: Minus as LucideIcon,
+			Icon: LiMinus as IconLike,
 			shortcut: '⊞ ↓',
 			onSelect: () => minimise(id),
 		},
 		{
 			kind: 'item',
 			label: 'Maximise',
-			Icon: Maximize2 as LucideIcon,
+			Icon: Maximize2 as IconLike,
 			disabled: maximised,
 			shortcut: '⊞ ↑',
 			onSelect: () => snap(id, 'max', bounds()),
@@ -366,7 +361,7 @@ function WindowFrame({
 		{
 			kind: 'item',
 			label: 'Close',
-			Icon: X as LucideIcon,
+			Icon: X as IconLike,
 			shortcut: 'Esc',
 			danger: true,
 			onSelect: () => closeWindow(id),

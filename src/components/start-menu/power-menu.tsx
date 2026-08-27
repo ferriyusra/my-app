@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Moon, Power, RotateCw } from 'lucide-react';
+import { RotateCw } from 'lucide-react';
+import { LiMoon, LiPower } from '@/components/icons/line-icons';
 
 /**
  * The little sheet that flies up from Start's power button. Sleep and Restart
@@ -34,13 +35,13 @@ export default function PowerMenu({
 	return (
 		<div ref={ref} className='power-menu' role='menu' aria-label='Power'>
 			<button type='button' role='menuitem' onClick={onSleep}>
-				<Moon size={16} aria-hidden='true' /> Sleep
+				<LiMoon size={16} aria-hidden='true' /> Sleep
 			</button>
 			<button type='button' role='menuitem' onClick={onRestart}>
 				<RotateCw size={16} aria-hidden='true' /> Restart
 			</button>
 			<button type='button' role='menuitem' onClick={onShutdown}>
-				<Power size={16} aria-hidden='true' /> Shut down
+				<LiPower size={16} aria-hidden='true' /> Shut down
 			</button>
 		</div>
 	);

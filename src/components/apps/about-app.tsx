@@ -1,21 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import {
-	BadgeCheck,
-	Clock,
-	Cpu,
-	Download,
-	Github,
-	Info,
-	Linkedin,
-	Link as LinkIcon,
-	Mail,
-	MapPin,
-	Monitor,
-	Briefcase,
-	Radar,
-} from 'lucide-react';
+import { BadgeCheck, Clock, Cpu, Info, Link as LinkIcon, Radar } from 'lucide-react';
+import { LiBriefcase, LiDownload, LiGithub, LiLinkedin, LiMail, LiMapPin, LiMonitor } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import SettingCard from '@/components/ui/setting-card';
 import { profile, yearsOfExperience } from '@/data/profile';
@@ -83,7 +70,7 @@ export default function AboutApp() {
 									<BadgeCheck size={13} aria-hidden='true' /> {years} yrs experience
 								</span>
 								<span className='ab-badge'>
-									<MapPin size={13} aria-hidden='true' /> {profile.location}
+									<LiMapPin size={13} aria-hidden='true' /> {profile.location}
 								</span>
 								<span className='ab-badge' data-live>
 									<Clock size={13} aria-hidden='true' /> {profile.availability}
@@ -110,7 +97,7 @@ export default function AboutApp() {
 						<p className='ab-now-stamp'>Updated {nowStamp}</p>
 					</SettingCard>
 
-					<SettingCard Icon={Briefcase} title='What I actually ship'>
+					<SettingCard Icon={LiBriefcase} title='What I actually ship'>
 						<p className='st-prose'>
 							Most of what I have shipped replaced something manual: spreadsheet
 							tracking that became a billing source of truth, Tableau dashboards
@@ -134,7 +121,7 @@ export default function AboutApp() {
 
 			{page === 'specs' && (
 				<>
-					<SettingCard Icon={Monitor} title='Engineer specifications'>
+					<SettingCard Icon={LiMonitor} title='Engineer specifications'>
 						<dl className='st-specs'>
 							{deviceSpecs.map(([k, v]) => (
 								<div key={k}>
@@ -165,14 +152,14 @@ export default function AboutApp() {
 						href={profile.cvView}
 						target='_blank'
 						rel='noopener noreferrer'>
-						<Download size={17} aria-hidden='true' />
+						<LiDownload size={17} aria-hidden='true' />
 						<span>
 							<strong>Resume</strong>
 							<small>PDF · opens in a new tab</small>
 						</span>
 					</a>
 					<a className='ab-link' href={`mailto:${profile.email}`}>
-						<Mail size={17} aria-hidden='true' />
+						<LiMail size={17} aria-hidden='true' />
 						<span>
 							<strong>Email</strong>
 							<small>{profile.email}</small>
@@ -183,7 +170,7 @@ export default function AboutApp() {
 						href={profile.github}
 						target='_blank'
 						rel='noopener noreferrer'>
-						<Github size={17} aria-hidden='true' />
+						<LiGithub size={17} aria-hidden='true' />
 						<span>
 							<strong>GitHub</strong>
 							<small>{profile.github.replace('https://', '')}</small>
@@ -194,7 +181,7 @@ export default function AboutApp() {
 						href={profile.linkedin}
 						target='_blank'
 						rel='noopener noreferrer'>
-						<Linkedin size={17} aria-hidden='true' />
+						<LiLinkedin size={17} aria-hidden='true' />
 						<span>
 							<strong>LinkedIn</strong>
 							<small>{profile.linkedin.replace('https://', '')}</small>

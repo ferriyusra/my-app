@@ -2,20 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import {
-	ArrowUpDown,
-	ExternalLink,
-	Info,
-	LayoutGrid,
-	Monitor,
-	Paintbrush,
-	Pin,
-	PinOff,
-	RefreshCw,
-	Settings as SettingsGlyph,
-	Cat,
-	Fish,
-} from 'lucide-react';
+import { ArrowUpDown, Cat, ExternalLink, Fish, Info, LayoutGrid, Paintbrush, Pin, PinOff, RefreshCw, Settings as SettingsGlyph } from 'lucide-react';
+import { LiMonitor } from '@/components/icons/line-icons';
 import { WindowProvider, useWindows } from '@/context/window-context';
 import { ShellProvider, useShell } from '@/context/shell-context';
 import { useWindowManager, useSnapReflow } from '@/hooks/use-window-manager';
@@ -220,7 +208,7 @@ function Shell() {
 			{
 				kind: 'item',
 				label: 'Display settings',
-				Icon: Monitor,
+				Icon: LiMonitor,
 				onSelect: () => launch('settings'),
 			},
 			{

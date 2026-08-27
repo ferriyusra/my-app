@@ -1,16 +1,7 @@
 'use client';
 
-import {
-	ArrowLeft,
-	ArrowRight,
-	ArrowUp,
-	LayoutGrid,
-	List,
-	RefreshCw,
-	Rows3,
-	Search,
-	SortAsc,
-} from 'lucide-react';
+import { LayoutGrid, List, RefreshCw, Rows3, SortAsc } from 'lucide-react';
+import { LiArrowLeft, LiArrowRight, LiArrowUp, LiSearch } from '@/components/icons/line-icons';
 
 export type ViewMode = 'grid' | 'list' | 'details';
 export type SortKey = 'name' | 'type';
@@ -65,7 +56,7 @@ export default function ExplorerToolbar({
 					aria-label='Back'
 					disabled={!canBack}
 					onClick={onBack}>
-					<ArrowLeft size={16} aria-hidden='true' />
+					<LiArrowLeft size={16} aria-hidden='true' />
 				</button>
 				<button
 					type='button'
@@ -73,7 +64,7 @@ export default function ExplorerToolbar({
 					aria-label='Forward'
 					disabled={!canForward}
 					onClick={onForward}>
-					<ArrowRight size={16} aria-hidden='true' />
+					<LiArrowRight size={16} aria-hidden='true' />
 				</button>
 				<button
 					type='button'
@@ -81,7 +72,7 @@ export default function ExplorerToolbar({
 					aria-label='Up one level'
 					disabled={!canUp}
 					onClick={onUp}>
-					<ArrowUp size={16} aria-hidden='true' />
+					<LiArrowUp size={16} aria-hidden='true' />
 				</button>
 				<button
 					type='button'
@@ -93,7 +84,7 @@ export default function ExplorerToolbar({
 			</div>
 
 			<label className='xp-search'>
-				<Search size={14} aria-hidden='true' />
+				<LiSearch size={14} aria-hidden='true' />
 				<input
 					type='search'
 					value={query}

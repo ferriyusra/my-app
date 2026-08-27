@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ChevronRight, Power, Search } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { LiPower, LiSearch } from '@/components/icons/line-icons';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { APPS, APP_BY_ID, SHORTCUTS, START_PINNED } from '@/components/apps/registry';
@@ -89,13 +90,13 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 			onClose={onClose}
 			ignoreSelector='.tb-start'>
 			<label className='start-search'>
-				<Search size={16} aria-hidden='true' />
+				<LiSearch size={16} aria-hidden='true' />
 				<input
 					type='search'
 					value={query}
 					autoFocus
-					placeholder='Search apps, projects and links'
-					aria-label='Search apps'
+					placeholder='LiSearch apps, projects and links'
+					aria-label='LiSearch apps'
 					onChange={(e) => setQuery(e.target.value)}
 				/>
 			</label>
@@ -213,7 +214,7 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 						aria-expanded={powerOpen}
 						aria-haspopup='menu'
 						onClick={() => setPowerOpen((v) => !v)}>
-						<Power size={16} aria-hidden='true' />
+						<LiPower size={16} aria-hidden='true' />
 					</button>
 					{powerOpen && (
 						<PowerMenu

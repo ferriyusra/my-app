@@ -1,6 +1,7 @@
 'use client';
 
-import type { LucideIcon } from 'lucide-react';
+import type { IconLike } from '@/components/icons/line-icons';
+
 
 /**
  * One Settings row: a tinted glyph, a title over a description, and whatever
@@ -14,7 +15,7 @@ export default function SettingCard({
 	control,
 	children,
 }: {
-	Icon?: LucideIcon;
+	Icon?: IconLike;
 	/** Background for the glyph plate. Defaults to the accent. */
 	tint?: string;
 	title: React.ReactNode;

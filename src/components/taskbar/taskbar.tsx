@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { LayoutGrid, Pin, PinOff, Search, SquareStack, X } from 'lucide-react';
+import { LayoutGrid, Pin, PinOff, SquareStack, X } from 'lucide-react';
+import { LiSearch } from '@/components/icons/line-icons';
 import { GitHubIcon } from '@/components/icons/app-icons';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
@@ -94,9 +95,9 @@ export default function Taskbar() {
 				<button
 					type='button'
 					className='tb-btn'
-					aria-label='Search apps'
+					aria-label='LiSearch apps'
 					onClick={() => openFlyout('start')}>
-					<Search size={19} aria-hidden='true' />
+					<LiSearch size={19} aria-hidden='true' />
 				</button>
 
 				<button
@@ -136,7 +137,7 @@ export default function Taskbar() {
 					rel='noopener noreferrer'
 					aria-label='GitHub profile — opens in a new tab'>
 					{/* Its own mark, like every other app icon on the strip. The
-					    Start, Search and Task view glyphs stay line art because
+					    Start, LiSearch and Task view glyphs stay line art because
 					    those are system controls, which is what Windows does. */}
 					<GitHubIcon size={22} />
 				</a>

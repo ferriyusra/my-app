@@ -1,13 +1,15 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Check, ChevronRight, type LucideIcon } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { LiCheck } from '@/components/icons/line-icons';
+import type { IconLike } from '@/components/icons/line-icons';
 
 export type MenuEntry =
 	| {
 			kind: 'item';
 			label: string;
-			Icon?: LucideIcon;
+			Icon?: IconLike;
 			shortcut?: string;
 			disabled?: boolean;
 			/** Renders red, as Windows does for Delete. */
@@ -93,7 +95,7 @@ function Submenu({
 							onClick={() => !sub.disabled && onRun(sub.onSelect)}>
 							<span className='menu-gutter' aria-hidden='true'>
 								{sub.checked ? (
-									<Check size={15} />
+									<LiCheck size={15} />
 								) : sub.Icon ? (
 									<sub.Icon size={16} />
 								) : null}
@@ -127,7 +129,7 @@ export default function ContextMenu({
 	items: MenuEntry[];
 	onClose: () => void;
 	/** The icon strip Windows 11 puts above the list (cut / copy / rename …). */
-	commands?: { label: string; Icon: LucideIcon; onSelect: () => void }[];
+	commands?: { label: string; Icon: IconLike; onSelect: () => void }[];
 	/** Space to leave at the bottom of the screen, e.g. for the taskbar. */
 	bottomGutter?: number;
 	label?: string;
@@ -269,7 +271,7 @@ export default function ContextMenu({
 								}}>
 								<span className='menu-gutter' aria-hidden='true'>
 									{item.checked ? (
-										<Check size={15} />
+										<LiCheck size={15} />
 									) : item.Icon ? (
 										<item.Icon size={16} />
 									) : null}

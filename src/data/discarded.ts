@@ -46,9 +46,9 @@ export const discarded: Discarded[] = [
 		origin: 'src/components/icons',
 		commit: '9b493ee',
 		date: '2026-08',
-		summary: 'Lucide outlines on tinted gradient squares.',
+		summary: 'Lucide outlines on tinted gradient squares — then brought back.',
 		reason:
-			'Half the app icons were free-form artwork — the folder, the bin, the browser, the editor — and half were a line-art glyph centred on a coloured square. Sitting in one column on the desktop, that split was the loudest thing on screen. Windows 11 ships no line-art app icons; its icons are shaped compositions. So the remaining six were drawn: a figure on a disc, three isometric plates, a briefcase with a clasp, a folded envelope, an eight-tooth gear. `TileArt` deliberately has no glyph variant now, so a new app cannot quietly reintroduce one.',
+			'Half the app icons were free-form artwork — the folder, the bin, the browser, the editor — and half were a line-art glyph centred on a coloured square. Sitting in one column on the desktop, that split was the loudest thing on screen. Windows 11 ships no line-art app icons; its icons are shaped compositions. So the remaining six were drawn: a figure on a disc, three isometric plates, a briefcase with a clasp, a folded envelope, an eight-tooth gear. This entry stays because the reasoning was sound and the drawings were real — but it no longer describes what ships. The hand-drawn set was replaced with LineIcons on request, so the app icons are line art again, and single-colour: GitHub is no longer black, LinkedIn no longer blue. The drawings are in git history at the commit that replaced app-icons.tsx. A reversal that gets reversed is still worth recording; pretending the first decision held would be the dishonest version.',
 	},
 	{
 		name: 'custom-cursor.tsx',
