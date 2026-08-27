@@ -248,6 +248,38 @@ desktop must not swallow the arrow keys of the page or of whatever window is on
 top. The handler also stands down when the event target is a button or field,
 so Space on the Summary tab switches mode instead of jumping.
 
+### Four ways into the same content
+
+The shell holds one set of typed data and offers several routes through it. All
+of them derive; none of them keep a second copy.
+
+- **Search** ([src/lib/search.ts](src/lib/search.ts)) indexes roles, projects,
+  skills, the case study, the discarded decisions and the profile — 51 entries
+  built from `src/data`. Start used to filter fourteen app names, so "Pub/Sub"
+  and "Kafka" returned nothing while sitting in the data. A title match outranks
+  a body match, and a result quotes the sentence it matched in.
+- **Terminal** ([src/lib/terminal.ts](src/lib/terminal.ts)) is a pure
+  `(command) → lines` function, which is why it can be tested without a DOM.
+  `open <app>` hands a real `AppId` back to the window manager rather than
+  drawing a fake window.
+- **Skill evidence** ([src/lib/skill-evidence.ts](src/lib/skill-evidence.ts))
+  answers "used where, for how long" by walking the roles that name the tool.
+  Nine skills are named by no role; the UI says so rather than padding them.
+- **Desktop gestures** ([src/hooks/use-desktop-gestures.ts](src/hooks/use-desktop-gestures.ts))
+  — marquee select and drag-to-rearrange. Same rule as the window frame and the
+  cat: the gesture writes to the DOM and dispatches once, on pointer-up. The
+  arrangement persists as an *order*, not pixels, so it survives a resize and a
+  change of icon size.
+
+**Focus is the thing to get right in a fake desktop.** The frame takes focus
+when a window is raised, which means an app whose whole point is typing must
+claim it back — on mount, on mousedown (with `preventDefault`, or the browser's
+own focus-follows-mousedown overrides the call), and on `focusin` when the frame
+itself is refocused. Career.exe has the mirror problem and solves it the other
+way: it reads keys from `window`, guarded on its own `.win` carrying
+`data-focused`. Both bugs shipped once because the tests drove the UI through
+`fill()` and synthetic events instead of typing.
+
 ### The Recycle Bin and the case study
 
 Two windows carry content that a portfolio usually leaves out.

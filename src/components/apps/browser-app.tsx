@@ -130,7 +130,7 @@ export default function BrowserApp() {
 						type='search'
 						value={query}
 						placeholder={active.url}
-						aria-label='LiSearch this desktop or pick a link'
+						aria-label='Search this desktop or pick a link'
 						onChange={(e) => {
 							setQuery(e.target.value);
 							setActiveId(START_TAB.id);

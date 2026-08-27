@@ -17,6 +17,7 @@ import {
 	PersonIcon,
 	RecycleIcon,
 	CareerIcon,
+	TerminalIcon,
 } from '@/components/icons/app-icons';
 import type { TileArt } from '@/components/ui/app-tile';
 import type { AppId, ShortcutId } from '@/types/windows';
@@ -54,6 +55,7 @@ const BrowserApp = lazy(() => import('./browser-app'));
 const EditorApp = lazy(() => import('./editor-app'));
 const RecycleBinApp = lazy(() => import('./recycle-bin-app'));
 const CareerApp = lazy(() => import('./career-app'));
+const TerminalApp = lazy(() => import('./terminal-app'));
 
 export type AppDef = {
 	id: AppId;
@@ -168,6 +170,15 @@ export const APPS: AppDef[] = [
 		h: 560,
 		Content: CareerApp,
 	},
+	{
+		id: 'terminal',
+		title: 'Terminal',
+		blurb: 'The same work, on a prompt',
+		tile: { Art: TerminalIcon },
+		w: 760,
+		h: 520,
+		Content: TerminalApp,
+	},
 ];
 
 export const APP_BY_ID = Object.fromEntries(
@@ -223,6 +234,7 @@ export const DESKTOP_ITEMS: { id: AppId | ShortcutId; label: string }[] = [
 	{ id: 'contact', label: 'Contact' },
 	{ id: 'media', label: 'Media Player' },
 	{ id: 'career', label: 'Career.exe' },
+	{ id: 'terminal', label: 'Terminal' },
 	{ id: 'resume', label: 'Resume' },
 	{ id: 'github', label: 'GitHub' },
 	{ id: 'linkedin', label: 'LinkedIn' },
@@ -238,6 +250,7 @@ export const START_PINNED: AppId[] = [
 	'contact',
 	'media',
 	'career',
+	'terminal',
 	'vscode',
 	'edge',
 	'settings',

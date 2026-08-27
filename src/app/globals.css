@@ -2616,14 +2616,11 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 
 .sk-list { list-style: none; margin: 0; padding: 6px 8px; display: grid; gap: 1px; }
 .sk-row {
-  display: grid;
-  grid-template-columns: 24px 1fr;
-  align-items: center;
-  gap: 14px;
   padding: 9px 8px;
   border-radius: var(--r-sm);
 }
 .sk-row:hover { background: var(--subtle-hover); }
+.sk-row[data-open] { background: var(--subtle-hover); }
 .sk-mark { width: 22px; height: 22px; object-fit: contain; }
 .sk-mark-letter {
   display: grid;
@@ -4051,6 +4048,198 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 @media (max-width: 560px) {
   .ab-now div, .mb-now div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
 }
+
+/* ── Desktop: marquee and dragging ───────────────────────────
+   Both gestures write straight to these nodes; React only hears about
+   it on pointer-up. */
+.desk-band {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-radius: 2px;
+  will-change: transform, width, height;
+}
+.desk-band[data-on='true'] { opacity: 1; }
+
+/* The icon being dragged rides above the rest and stops swallowing the
+   pointer, so the drop lands on what is underneath it. */
+.desk-icons > li[data-dragging] {
+  position: relative;
+  z-index: 3;
+  opacity: 0.85;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ── Skills: the evidence behind a name ──────────────────────
+   The list used to be 28 names and nothing else. A row now opens to
+   show where the tool was actually used, computed from the roles. */
+.sk-row-btn {
+  /* The grid the row itself used to carry, so the marks stay in a column. */
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.sk-row-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.sk-chev {
+  margin-left: auto;
+  flex: none;
+  color: var(--ink-muted);
+  transition: transform var(--dur-fast) var(--ease-standard);
+}
+.sk-row[data-open] .sk-chev { transform: rotate(180deg); }
+
+.sk-evidence {
+  margin: 10px 0 2px;
+  padding: 11px 13px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface-subtle);
+}
+.sk-evidence-lead { margin: 0 0 8px; font-size: 12.5px; color: var(--ink-secondary); }
+.sk-evidence-lead strong { color: var(--accent); font-variant-numeric: tabular-nums; }
+.sk-since { margin-left: 8px; font-size: 11px; color: var(--ink-muted); }
+
+.sk-evidence-roles { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.sk-evidence-roles li { display: flex; gap: 10px; font-size: 12px; }
+.sk-evidence-roles strong { min-width: 110px; font-weight: 600; }
+.sk-evidence-roles span { color: var(--ink-muted); }
+
+.sk-evidence-built { margin: 9px 0 0; font-size: 12px; color: var(--ink-muted); }
+.sk-evidence-none { margin: 0; font-size: 12px; line-height: 18px; color: var(--ink-muted); }
+
+@media (max-width: 560px) {
+  .sk-evidence-roles li { flex-direction: column; gap: 0; }
+  .sk-evidence-roles strong { min-width: 0; }
+}
+
+/* ── Terminal ────────────────────────────────────────────────
+   A prompt is the one surface where a monospace slab is correct, so
+   this leans darker than the rest of the shell on purpose. */
+.tm {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  background: #10141c;
+  cursor: text;
+}
+html[data-theme='dark'] .tm { background: #0b0e14; }
+
+.tm-screen {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 16px 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 19px;
+  color: #cbd5e4;
+}
+
+.tm-line { margin: 0; white-space: pre-wrap; word-break: break-word; }
+.tm-line[data-tone='dim'] { color: #6b7a90; }
+.tm-line[data-tone='accent'] { color: #6fd3c7; }
+.tm-line[data-tone='error'] { color: #ff8a8a; }
+
+.tm-echo { color: #eef2f8; margin-top: 8px; }
+.tm-prompt { color: #6fd3c7; margin-right: 6px; user-select: none; }
+
+.tm-input { display: flex; align-items: baseline; margin-top: 8px; }
+.tm-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: #eef2f8;
+  caret-color: #6fd3c7;
+  padding: 0;
+}
+/* The shell draws a focus ring on every input; a prompt is the one place it
+   is wrong — the caret already says where you are typing, and a box around
+   the whole line does not read as a terminal. The screen keeps a ring of its
+   own so keyboard users still see the app take focus. */
+.tm-input input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.tm:focus-within .tm-prompt { color: #8ce8db; }
+
+/* ── Start: content results ──────────────────────────────────
+   Apps answer "what can I open"; these answer "where did they use Go". */
+.start-label-sub { margin-top: 14px; }
+
+.start-hits { display: grid; gap: 2px; }
+
+.start-hit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.start-hit:hover { background: var(--subtle-hover); }
+.start-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+.start-hit-kind {
+  flex: none;
+  /* Wide enough for "Case study", the longest kind, without truncating. */
+  width: 86px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.start-hit-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.start-hit-body strong {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.start-hit-body span {
+  font-size: 11.5px;
+  line-height: 16px;
+  color: var(--ink-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.start-hit svg { flex: none; color: var(--ink-muted); }
 
 /* ═══════════════════════════════════════════════════════════
    CAREER.EXE

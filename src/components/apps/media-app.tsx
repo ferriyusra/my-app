@@ -67,12 +67,12 @@ export default function MediaApp() {
 				signal,
 			});
 			const data: { tracks?: Track[]; error?: string } = await res.json();
-			if (!res.ok) throw new Error(data.error ?? 'LiSearch failed.');
+			if (!res.ok) throw new Error(data.error ?? 'Search failed.');
 			setTracks(data.tracks ?? []);
 			setStatus('done');
 		} catch (err) {
 			if ((err as Error).name === 'AbortError') return;
-			setError((err as Error).message || 'LiSearch failed.');
+			setError((err as Error).message || 'Search failed.');
 			setStatus('error');
 		}
 	}, []);
@@ -152,8 +152,8 @@ export default function MediaApp() {
 					<input
 						type='search'
 						value={query}
-						placeholder='LiSearch for a song, artist or album'
-						aria-label='LiSearch for music'
+						placeholder='Search for a song, artist or album'
+						aria-label='Search for music'
 						onChange={(e) => setQuery(e.target.value)}
 					/>
 					{status === 'loading' && (
@@ -192,7 +192,7 @@ export default function MediaApp() {
 				)}
 
 				{tracks.length > 0 && (
-					<ul className='mp-list' aria-label='LiSearch results'>
+					<ul className='mp-list' aria-label='Search results'>
 						{tracks.map((t, i) => (
 							<li key={t.id}>
 								<button

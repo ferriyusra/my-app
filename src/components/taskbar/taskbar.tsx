@@ -95,7 +95,7 @@ export default function Taskbar() {
 				<button
 					type='button'
 					className='tb-btn'
-					aria-label='LiSearch apps'
+					aria-label='Search apps'
 					onClick={() => openFlyout('start')}>
 					<LiSearch size={19} aria-hidden='true' />
 				</button>
