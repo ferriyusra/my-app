@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { ArrowUpDown, Cat, ExternalLink, Fish, Info, LayoutGrid, Paintbrush, Pin, PinOff, RefreshCw, Settings as SettingsGlyph } from 'lucide-react';
 import { LiMonitor } from '@/components/icons/line-icons';
 import { WindowProvider, useWindows } from '@/context/window-context';
 import { ShellProvider, useShell } from '@/context/shell-context';
 import { useWindowManager, useSnapReflow } from '@/hooks/use-window-manager';
+import { arrange, useDesktopGestures } from '@/hooks/use-desktop-gestures';
 import { useDesktopIcons, type DeskItem } from '@/hooks/use-desktop-icons';
 import { useAppUrl } from '@/hooks/use-app-url';
 import { APP_BY_ID, isAppId } from '@/components/apps/registry';
@@ -95,6 +96,19 @@ function Shell() {
 		activated,
 	} = useShell();
 	const icons = useDesktopIcons();
+	const [marked, setMarked] = useState<string[]>([]);
+	const gestures = useDesktopGestures({
+		ids: icons.items.map((i) => i.id),
+		rows: icons.rows,
+		metrics: icons.metrics,
+		onSelectMany: setMarked,
+	});
+	/* The stored arrangement reorders the flow; everything else about the grid
+	   is unchanged, so the arrow keys still walk it column-first. */
+	const ordered = useMemo(() => {
+		const by = arrange(gestures.order, icons.items.map((i) => i.id));
+		return [...icons.items].sort((a, b) => by.indexOf(a.id) - by.indexOf(b.id));
+	}, [gestures.order, icons.items]);
 	const [menu, setMenu] = useState<{
 		x: number;
 		y: number;
@@ -416,12 +430,14 @@ function Shell() {
 			data-activated={activated || undefined}
 			data-dimmed={power !== 'on' || undefined}
 			onPointerDown={(e) => {
-				/* A click on bare wallpaper clears the selection and any menu.
-				   The wallpaper is a child element, so "bare" means the event
-				   did not come from any shell surface. */
+				/* A press on bare wallpaper clears the selection and any menu,
+				   and begins a marquee. The wallpaper is a child element, so
+				   "bare" means the event did not come from any shell surface. */
 				if (!onBareDesktop(e)) return;
 				icons.setSelected(null);
+				setMarked([]);
 				setMenu(null);
+				gestures.marquee(e);
 			}}
 			onContextMenu={(e) => {
 				if (!onBareDesktop(e)) return;
@@ -437,9 +453,14 @@ function Shell() {
 			}}>
 			<Wallpaper />
 
+			{/* The marquee. One node, written to directly by the gesture. */}
+			<div className='desk-band' data-on='false' aria-hidden='true' />
+
 			<DesktopIcons
-				items={icons.items}
+				items={ordered}
 				selected={icons.selected}
+				marked={marked}
+				onDragStart={gestures.dragIcon}
 				rows={icons.rows}
 				metrics={icons.metrics}
 				onSelect={icons.setSelected}

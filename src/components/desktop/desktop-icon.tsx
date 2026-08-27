@@ -17,6 +17,8 @@ type Props = {
 	onOpen: () => void;
 	onKeyDown: (e: React.KeyboardEvent) => void;
 	onContextMenu: (e: React.MouseEvent) => void;
+	/** Begins a drag; the press has already been stopped from bubbling. */
+	onDragStart: (e: React.PointerEvent) => void;
 };
 
 /**
@@ -35,6 +37,7 @@ function DesktopIcon({
 	onOpen,
 	onKeyDown,
 	onContextMenu,
+	onDragStart,
 }: Props) {
 	const common = {
 		'data-icon-id': id,
@@ -43,9 +46,13 @@ function DesktopIcon({
 		tabIndex: tabbable ? 0 : -1,
 		onPointerDown: (e: React.PointerEvent) => {
 			/* Stop the desktop's own pointerdown from clearing the selection
-			   this click is about to make. */
+			   this click is about to make — and from starting a marquee, since
+			   the press landed on an icon rather than bare wallpaper. */
 			e.stopPropagation();
 			onSelect();
+			/* Which is also why the drag begins here rather than on the <li>:
+			   the event never gets that far. */
+			onDragStart(e);
 		},
 		onDoubleClick: onOpen,
 		onKeyDown: (e: React.KeyboardEvent) => {

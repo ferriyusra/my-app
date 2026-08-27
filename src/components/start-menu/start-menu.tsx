@@ -11,6 +11,7 @@ import StartApp from './start-app';
 import RecommendedSection from './recommended-section';
 import PowerMenu from './power-menu';
 import { profile } from '@/data/profile';
+import { excerpt, search, type Hit } from '@/lib/search';
 
 type Entry = {
 	key: string;
@@ -59,6 +60,12 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 			)
 		: [];
 
+	/* Apps answer "what can I open"; content answers "where did they use Go".
+	   Start shows both, apps first, because a name match is the stronger
+	   intent when someone types one. */
+	const hits = useMemo<Hit[]>(() => (q ? search(query) : []), [q, query]);
+	const total = results.length + hits.length;
+
 	/* Start pins the apps first, then the three web shortcuts. */
 	const pinned = useMemo<Entry[]>(
 		() => [
@@ -104,30 +111,62 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 			{q ? (
 				<section className='start-section'>
 					<p className='start-label'>
-						{results.length} result{results.length === 1 ? '' : 's'}
+						{total} result{total === 1 ? '' : 's'}
 					</p>
-					{results.length === 0 ? (
+					{total === 0 ? (
 						<p className='start-empty'>
-							Nothing matches &ldquo;{query}&rdquo;. Try &ldquo;projects&rdquo; or
-							&ldquo;resume&rdquo;.
+							Nothing matches &ldquo;{query}&rdquo;. Try &ldquo;Meditap&rdquo;,
+							&ldquo;Pub/Sub&rdquo; or &ldquo;Kafka&rdquo;.
 						</p>
 					) : (
-						<div className='start-rows'>
-							{results.map((e) => (
-								<StartApp
-									key={e.key}
-									variant='row'
-									title={e.title}
-									blurb={e.blurb}
-									tile={e.tile}
-									href={e.href}
-									onSelect={() => {
-										e.open();
-										onClose();
-									}}
-								/>
-							))}
-						</div>
+						<>
+							{results.length > 0 && (
+								<div className='start-rows'>
+									{results.map((e) => (
+										<StartApp
+											key={e.key}
+											variant='row'
+											title={e.title}
+											blurb={e.blurb}
+											tile={e.tile}
+											href={e.href}
+											onSelect={() => {
+												e.open();
+												onClose();
+											}}
+										/>
+									))}
+								</div>
+							)}
+
+							{hits.length > 0 && (
+								<>
+									<p className='start-label start-label-sub'>In your work</p>
+									<div className='start-hits'>
+										{hits.map((h) => {
+											const quote = excerpt(h, query);
+											return (
+												<button
+													key={h.id}
+													type='button'
+													className='start-hit'
+													onClick={() => {
+														launch(h.app);
+														onClose();
+													}}>
+													<span className='start-hit-kind'>{h.kind}</span>
+													<span className='start-hit-body'>
+														<strong>{h.title}</strong>
+														<span>{quote ?? h.subtitle}</span>
+													</span>
+													<ChevronRight size={14} aria-hidden='true' />
+												</button>
+											);
+										})}
+									</div>
+								</>
+							)}
+						</>
 					)}
 				</section>
 			) : allApps ? (

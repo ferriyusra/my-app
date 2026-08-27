@@ -12,7 +12,8 @@ export type AppId =
 	| 'edge'
 	| 'vscode'
 	| 'recycle'
-	| 'career';
+	| 'career'
+	| 'terminal';
 
 /**
  * A desktop item is either an app that opens in a window, or a shortcut that

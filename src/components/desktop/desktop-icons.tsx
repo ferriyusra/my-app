@@ -14,6 +14,8 @@ import type { DeskItem } from '@/hooks/use-desktop-icons';
 export default function DesktopIcons({
 	items,
 	selected,
+	marked,
+	onDragStart,
 	rows,
 	metrics,
 	onSelect,
@@ -23,6 +25,9 @@ export default function DesktopIcons({
 }: {
 	items: DeskItem[];
 	selected: string | null;
+	/** Everything a marquee picked up; the focused one stays `selected`. */
+	marked: string[];
+	onDragStart: (e: React.PointerEvent, id: string) => void;
 	rows: number;
 	metrics: { tile: number; cellW: number; cellH: number };
 	onSelect: (id: string) => void;
@@ -61,7 +66,7 @@ export default function DesktopIcons({
 						tile={item.tile}
 						href={item.href}
 						tileSize={metrics.tile}
-						selected={selected === item.id}
+						selected={selected === item.id || marked.includes(item.id)}
 						/* Exactly one cell is in the tab order: the selected one, or
 						   the first when nothing is selected. */
 						tabbable={selected ? selected === item.id : i === 0}
@@ -75,6 +80,7 @@ export default function DesktopIcons({
 							pending.current = next;
 						}}
 						onContextMenu={(e) => onContextMenu(e, item)}
+						onDragStart={(e) => onDragStart(e, item.id)}
 					/>
 				</li>
 			))}
