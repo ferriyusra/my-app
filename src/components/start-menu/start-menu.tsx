@@ -95,8 +95,8 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 					type='search'
 					value={query}
 					autoFocus
-					placeholder='LiSearch apps, projects and links'
-					aria-label='LiSearch apps'
+					placeholder='Search apps, projects and links'
+					aria-label='Search apps'
 					onChange={(e) => setQuery(e.target.value)}
 				/>
 			</label>

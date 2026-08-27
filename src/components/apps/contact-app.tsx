@@ -144,7 +144,7 @@ export default function ContactApp() {
 
 	return (
 		<div className='ml-shell'>
-			<nav className='ml-rail' aria-label='LiMail folders'>
+			<nav className='ml-rail' aria-label='Mail folders'>
 				<button
 					type='button'
 					className='ml-compose'
