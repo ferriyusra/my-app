@@ -17,6 +17,7 @@ import {
 	PersonIcon,
 	RecycleIcon,
 	CareerIcon,
+	TerminalIcon,
 } from '@/components/icons/app-icons';
 import type { TileArt } from '@/components/ui/app-tile';
 import type { AppId, ShortcutId } from '@/types/windows';
@@ -173,7 +174,7 @@ export const APPS: AppDef[] = [
 		id: 'terminal',
 		title: 'Terminal',
 		blurb: 'The same work, on a prompt',
-		tile: { Art: CodeIcon },
+		tile: { Art: TerminalIcon },
 		w: 760,
 		h: 520,
 		Content: TerminalApp,

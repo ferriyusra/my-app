@@ -34,4 +34,5 @@ export {
 	GitHubIcon,
 	LinkedInIcon,
 	MediaIcon,
+	TerminalIcon,
 } from './line-icons';
