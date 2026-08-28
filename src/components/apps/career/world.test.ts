@@ -5,6 +5,7 @@ import { levels } from '../../../data/career-game.ts';
 import {
 	CHAPTER_W,
 	PICKUP_R,
+	canClimb,
 	chapterProgress,
 	chapters,
 	heroPct,
@@ -45,13 +46,61 @@ test('tokens stay clear of the signpost and the gate', () => {
 	}
 });
 
-test('every raised token can actually be reached by jumping', () => {
-	/* The one rule that would make a chapter impossible to finish. */
+test('every token is reachable from the ground or from a ledge beneath it', () => {
+	/* The one rule that would make a chapter impossible to finish. Tokens used
+	   to have to clear a jump from the ground; now a token may stand on a ledge,
+	   so the question is whether it is within reach of *some* surface the
+	   character can actually be standing on. */
 	for (const c of chapters()) {
 		for (const t of c.tokens) {
+			const under = c.ledges.filter(
+				(l) => t.x >= l.x && t.x <= l.x + l.w && l.y <= t.y,
+			);
+			const surfaces = [0, ...under.map((l) => l.y)];
 			assert.ok(
-				reachable(t.y),
-				`${t.skill} at y=${t.y} is above a ${maxJump().toFixed(0)}px jump`,
+				surfaces.some((s) => reachable(t.y - s)),
+				`${t.skill} at y=${t.y} is out of reach of ground (${surfaces.join(', ')}) with a ${maxJump().toFixed(0)}px jump`,
+			);
+		}
+	}
+});
+
+test('every ledge can be climbed to, in order', () => {
+	/* A ledge nothing can reach is a ledge that hides whatever stands on it. */
+	for (const c of chapters()) {
+		const sorted = [...c.ledges].sort((a, b) => a.y - b.y);
+		let from = 0;
+		for (const l of sorted) {
+			assert.ok(
+				canClimb(from, l.y),
+				`${l.id} at y=${l.y} cannot be climbed from y=${from}`,
+			);
+			from = l.y;
+		}
+	}
+});
+
+test('the high ledge is a climb, not a hop from the floor', () => {
+	/* Otherwise the second ledge is decoration and the world is flat again. */
+	for (const c of chapters()) {
+		const highest = c.ledges.reduce((a, b) => (a.y > b.y ? a : b));
+		assert.ok(
+			!canClimb(0, highest.y),
+			`${highest.id} is reachable straight from the ground — no climb needed`,
+		);
+	}
+});
+
+test('a ledge never blocks the way through a chapter', () => {
+	/* Ledges are one-way platforms, but they must not sit where the gate or
+	   the signpost is, or the route reads as broken. */
+	for (const c of chapters()) {
+		for (const l of c.ledges) {
+			const local = l.x - c.x;
+			assert.ok(local >= 200, `${l.id} overlaps the signpost (${local})`);
+			assert.ok(
+				local + l.w <= CHAPTER_W - 140,
+				`${l.id} runs into the gate (${local + l.w})`,
 			);
 		}
 	}

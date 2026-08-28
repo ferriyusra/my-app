@@ -4458,6 +4458,166 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 .cx-hud-name strong { font-size: 13px; font-weight: 600; }
 .cx-hud-name span { font-size: 11px; color: var(--ink-muted); }
 
+/* ── Depth ───────────────────────────────────────────────────
+   CSS 3D rather than a library: a perspective on the stage, the world
+   in preserve-3d, and two layers pushed back on Z. The parallax then
+   falls out of the single camera transform the loop already writes —
+   no second transform, nothing extra per frame, no bytes shipped.
+
+   Each layer is scaled by (perspective + |z|) / perspective so pushing
+   it back does not also shrink it. */
+.cx-stage { perspective: 900px; perspective-origin: 50% 62%; }
+.cx-cam { transform-style: preserve-3d; }
+
+.cx-far, .cx-mid { position: absolute; left: 0; bottom: 0; pointer-events: none; }
+
+/* z = -600 → scale 1.667 */
+.cx-far {
+  height: 190px;
+  transform: translateZ(-600px) scale(1.6667);
+  transform-origin: 0 100%;
+  background:
+    radial-gradient(60px 46px at 14% 100%, color-mix(in srgb, var(--accent) 13%, transparent) 99%, transparent 100%),
+    radial-gradient(90px 62px at 33% 100%, color-mix(in srgb, var(--accent) 11%, transparent) 99%, transparent 100%),
+    radial-gradient(70px 50px at 56% 100%, color-mix(in srgb, var(--accent) 13%, transparent) 99%, transparent 100%),
+    radial-gradient(110px 70px at 79% 100%, color-mix(in srgb, var(--accent) 10%, transparent) 99%, transparent 100%);
+  background-repeat: repeat-x;
+  background-size: 1100px 100%;
+}
+
+/* z = -200 → scale 1.222 */
+.cx-mid {
+  height: 120px;
+  transform: translateZ(-200px) scale(1.2222);
+  transform-origin: 0 100%;
+  background:
+    radial-gradient(80px 40px at 22% 100%, color-mix(in srgb, var(--accent) 20%, transparent) 99%, transparent 100%),
+    radial-gradient(120px 54px at 62% 100%, color-mix(in srgb, var(--accent) 17%, transparent) 99%, transparent 100%);
+  background-repeat: repeat-x;
+  background-size: 760px 100%;
+}
+
+/* The floor, laid down flat so it recedes instead of standing up. */
+.cx-floor {
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 300px;
+  transform: rotateX(76deg);
+  transform-origin: 50% 0;
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--accent) 30%, transparent) 0 1.5px, transparent 1.5px 58px),
+    repeating-linear-gradient(0deg,  color-mix(in srgb, var(--accent) 24%, transparent) 0 1.5px, transparent 1.5px 40px);
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.35) 45%, transparent 82%);
+}
+
+/* ── Standing at a signpost ──────────────────────────────────
+   Forward of the hills but behind the character: in a 3D context paint
+   order follows Z, not DOM order, so a sign further forward covered the
+   person standing at it. The slight turn makes it a board planted in the
+   world rather than a card pasted over it. */
+.cx-sign {
+  transform: translateZ(4px) rotateY(-7deg);
+  transform-origin: left center;
+  transition:
+    width 220ms var(--ease-decel),
+    box-shadow 220ms var(--ease-standard),
+    border-color 220ms var(--ease-standard);
+}
+.cx-sign[data-open] {
+  width: 240px;
+  border-color: var(--accent);
+  box-shadow: var(--sh-16);
+}
+
+/* Kept short on purpose: the panel must not reach the ground, or standing
+   at a sign hides the character you are standing there with. */
+.cx-sign-more {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line-subtle);
+}
+.cx-sign-stats { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.cx-sign-stats li { display: flex; align-items: baseline; gap: 7px; }
+.cx-sign-stats strong {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  min-width: 52px;
+}
+.cx-sign-stats span { font-size: 10.5px; line-height: 14px; color: var(--ink-secondary); }
+.cx-sign-key { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--ink-muted); }
+.cx-sign-key kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--line-subtle);
+  border-radius: 4px;
+  background: var(--surface-chip);
+  font-family: var(--mono);
+  font-size: 9.5px;
+}
+
+/* ── What you just picked up ─────────────────────────────────
+   Remounted on each pickup so the fade replays; never cleared, because
+   the animation ends invisible and no timer is needed. */
+.cx-pick {
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 12px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  box-shadow: var(--sh-8);
+  pointer-events: none;
+  animation: cx-pick-out 2600ms var(--ease-standard) forwards;
+}
+.cx-pick strong { font-size: 12px; color: var(--accent); }
+.cx-pick span { font-size: 10.5px; color: var(--ink-muted); white-space: nowrap; }
+
+@keyframes cx-pick-out {
+  0%   { opacity: 0; transform: translateY(-6px); }
+  12%  { opacity: 1; transform: none; }
+  76%  { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+/* ── The wall at the end ─────────────────────────────────────── */
+.cx-win-wall {
+  list-style: none;
+  margin: 12px 0 4px;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+  max-width: 560px;
+  width: 100%;
+}
+.cx-win-wall li { display: flex; align-items: baseline; gap: 10px; }
+.cx-win-role {
+  flex: none;
+  width: 104px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+.cx-win-skills { display: flex; flex-wrap: wrap; gap: 4px; }
+.cx-win-skills b {
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+}
+
 /* ── Minimap ──
    One chapter at a time. A chapter is wider than the stage can show, so
    this is what turns "I missed one" from a search into a glance. */
@@ -4528,17 +4688,52 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 /* A hairline between eras, so the chapters read as separate places. */
 .cx-chapter + .cx-chapter { border-left: 1px dashed var(--line-subtle); }
 
+/* The era's light, occupying exactly this chapter's stretch of the world.
+   Walking right walks into it — there is no transition to write because the
+   change is spatial, not temporal. `--era` is a neutral, never a hue, so the
+   visitor's accent still drives the colour and all six keep working. */
+.cx-chapter {
+  /* Accent first, era neutral second — the accent is the through-line, the
+     era only moves the temperature along it. */
+  --era-lit: color-mix(in srgb, var(--accent) 42%, var(--era));
+}
+.cx-chapter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* The era light is the accent *shifted*, never a colour of its own: mix the
+     visitor's accent into the era neutral first, then lay that on at low
+     alpha. Six accents times five eras all work, and switching accent in
+     Settings still repaints the whole world. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--era-lit) 36%, transparent) 0%,
+    color-mix(in srgb, var(--era-lit) 11%, transparent) 46%,
+    transparent 72%
+  );
+  /* Feathered at both edges so one era bleeds into the next. A hard vertical
+     seam in the sky reads as a rendering artefact, not as a border — and the
+     point is that you walk into an era rather than step over a line. */
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+}
+
 .cx-ground {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  /* Sparse ticks, not stripes — at 26px apart it read as a fence. */
-  background:
-    repeating-linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--accent) 13%, transparent) 0 1px,
-      transparent 1px 64px
-    ),
-    color-mix(in srgb, var(--accent) 8%, var(--surface-chip));
+  /* Flat fill only: the receding grid supplies the texture now, and two
+     grids fighting each other read as neither. */
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface-chip));
+  /* Must pass the 3D context through, or the floor's rotateX flattens into a
+     vertical squash and the grid stays parallel. `overflow` anything but
+     visible would force that flattening too, so the stage does the clipping. */
+  transform-style: preserve-3d;
   border-top: 2px solid color-mix(in srgb, var(--accent) 38%, transparent);
 }
 
@@ -4578,10 +4773,13 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   transition: opacity 220ms var(--ease-standard), transform 220ms var(--ease-decel);
 }
 .cx-token i {
-  width: 16px; height: 16px;
-  border-radius: 5px;
-  background: var(--accent-fill);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  display: grid;
+  place-items: center;
+  width: 26px; height: 26px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent);
   animation: cx-bob 1.9s ease-in-out infinite;
 }
 .cx-token b {
@@ -4597,7 +4795,8 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 }
 .cx-token[data-got] { opacity: 0.22; transform: translateX(-50%) scale(0.8); }
 .cx-token[data-got] i {
-  background: var(--ink-disabled);
+  background: var(--surface-chip);
+  border-color: transparent;
   box-shadow: none;
   animation: cx-pop 260ms var(--ease-decel);
 }
@@ -4611,6 +4810,65 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 @keyframes cx-bob {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-7px); }
+}
+
+.cx-token-mark { width: 17px; height: 17px; object-fit: contain; display: block; }
+.cx-token-mark-letter {
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Lies flat on the tilted floor rather than hovering in front of it. `--lift`
+   is how high the token floats, so a raised one casts a smaller, fainter mark
+   the way a real one would. */
+.cx-token-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: calc(-1 * var(--lift, 0px) - 4px);
+  width: 24px;
+  height: 8px;
+  margin-left: -12px;
+  border-radius: 99px;
+  background: var(--ink);
+  opacity: calc(0.2 - var(--lift, 0px) / 700);
+  transform: rotateX(76deg);
+  text-decoration: none;
+  pointer-events: none;
+}
+
+/* ── Ledges ──────────────────────────────────────────────────
+   One-way platforms: you pass up through them and land on top. Drawn
+   as a slab with a lit top edge and a shaded face, so which surface
+   you can stand on is obvious before you try it. */
+.cx-ledge {
+  position: absolute;
+  height: 12px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--era-lit, var(--accent)) 42%, var(--surface));
+  border-top: 2px solid color-mix(in srgb, var(--accent) 62%, transparent);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--ink) 10%, transparent);
+  pointer-events: none;
+}
+/* Lies on the floor plane beneath, the way the tokens and the character do. */
+.cx-ledge::after {
+  content: '';
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 100%;
+  height: 7px;
+  margin-top: 4px;
+  border-radius: 99px;
+  background: var(--ink);
+  opacity: 0.1;
+  transform: rotateX(76deg);
 }
 
 /* ── The gate between chapters ── */
@@ -4636,6 +4894,17 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   white-space: nowrap;
 }
 .cx-gate[data-open] { height: 8px; opacity: 0.35; background: var(--success); }
+/* A second face, so the barrier has a side rather than being a sticker. */
+.cx-gate::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 100%;
+  width: 9px;
+  background: inherit;
+  filter: brightness(0.72);
+  transform: rotateY(58deg);
+  transform-origin: left center;
+}
 .cx-gate[data-open] .cx-gate-lock { color: var(--success); }
 
 /* ── The character ── */
@@ -4680,6 +4949,26 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   0%   { transform: rotate(-22deg); }
   50%  { transform: rotate(22deg); }
   100% { transform: rotate(-22deg); }
+}
+
+/* Crossing into a new era. One shot, then it is invisible — no timer, the
+   remount on `key={chapter}` is what replays it. */
+.cx-threshold {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 22%, transparent) 45%,
+    transparent 100%
+  );
+  animation: cx-threshold 620ms var(--ease-decel) forwards;
+}
+@keyframes cx-threshold {
+  0%   { opacity: 0; transform: translateX(-30%); }
+  35%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(30%); }
 }
 
 /* ── Overlays ── */
@@ -4756,6 +5045,11 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   .cx-hero[data-walking='true'] .cx-leg,
   .cx-hero[data-walking='true'] .cx-arm { animation: none; }
   .cx-map-pip { transition: none; }
+  /* Depth is not motion: the layers, the floor and the perspective all stay.
+     Only the things that actually move stand down. */
+  .cx-threshold { animation: none; opacity: 0; }
+  .cx-sign { transition: none; }
+  .cx-pick { animation: none; opacity: 1; }
 }
 
 /* ═══════════════════════════════════════════════════════════
