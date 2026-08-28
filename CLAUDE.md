@@ -217,9 +217,13 @@ Chrome no longer honours — every acrylic surface silently goes opaque. Declare
 
 [src/components/apps/career/](src/components/apps/career/) is a small
 side-scroller: you walk a character through five chapters, one per role,
-collecting the skills that role was the first to use. A gate holds each chapter
-shut until its skills are picked up, so 2025 cannot be reached without walking
-through 2021.
+collecting the skills that role was the first to use, and climbing two one-way
+ledges per chapter to reach the ones held above the floor.
+
+Chapters were gated on collecting everything, and that gate has been removed:
+it shut a visitor who could not or would not platform out of the later roles,
+which in a portfolio means out of the CV. The post at the end of a chapter
+reports what is still out there; it does not stop anyone.
 
 It follows the same rule as the window frame and the desktop cat — **position
 never touches React**. The loop writes `translate3d` onto the character and the

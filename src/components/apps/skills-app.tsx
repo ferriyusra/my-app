@@ -9,6 +9,7 @@ import {
 } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import { evidenceFor, monthsLabel } from '@/lib/skill-evidence';
+import SkillMark from './career/token-mark';
 import {
 	SKILL_CATEGORIES,
 	skills,
@@ -33,28 +34,6 @@ const PAGES: SettingsPage[] = [
 		Icon: CATEGORY_ICON[key],
 	})),
 ];
-
-/** A lettered plate for the handful of tools with no brand mark on disk. */
-function SkillMark({ skill }: { skill: Skill }) {
-	if (!skill.icon)
-		return (
-			<span className='sk-mark sk-mark-letter' aria-hidden='true'>
-				{skill.name.slice(0, 2)}
-			</span>
-		);
-	return (
-		// eslint-disable-next-line @next/next/no-img-element
-		<img
-			className={`sk-mark${skill.adaptive ? ' icon-adaptive' : ''}`}
-			src={skill.icon}
-			alt=''
-			aria-hidden='true'
-			width={22}
-			height={22}
-			loading='lazy'
-		/>
-	);
-}
 
 /**
  * The answer to "used where, and for how long" — computed from the roles and
