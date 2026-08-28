@@ -3,7 +3,8 @@
 import { Fragment, useMemo, useState } from 'react';
 import { FileCode2, GitBranch, Package, X } from 'lucide-react';
 import { LiBug, LiChevronDown, LiSearch, LiSettings2 } from '@/components/icons/line-icons';
-import { sourceFiles, type SourceFile } from '@/data/source-excerpts';
+import { useShell } from '@/context/shell-context';
+import type { SourceFile } from '@/lib/source';
 
 /**
  * A minimal TypeScript highlighter.
@@ -73,6 +74,9 @@ function CodePane({ file }: { file: SourceFile }) {
  * the module it names.
  */
 export default function EditorApp() {
+	/* Read from the real files when the page was built, not copied into a data
+	   module — see lib/source.ts for why that mattered. */
+	const { sources: sourceFiles } = useShell();
 	const [openPaths, setOpenPaths] = useState<string[]>([sourceFiles[0].path]);
 	const [active, setActive] = useState(sourceFiles[0].path);
 	const file = sourceFiles.find((f) => f.path === active) ?? sourceFiles[0];
@@ -98,7 +102,7 @@ export default function EditorApp() {
 	};
 
 	/* Group the flat path list into a directory tree, one level deep — which
-	   is as much structure as five files justify. */
+	   is as much structure as six files justify. */
 	const tree = useMemo(() => {
 		const dirs = new Map<string, SourceFile[]>();
 		for (const f of sourceFiles) {
@@ -106,7 +110,7 @@ export default function EditorApp() {
 			dirs.set(dir, [...(dirs.get(dir) ?? []), f]);
 		}
 		return [...dirs.entries()];
-	}, []);
+	}, [sourceFiles]);
 
 	return (
 		<div className='vs-shell'>
