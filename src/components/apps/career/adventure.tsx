@@ -31,9 +31,12 @@ import {
  * have been collected, which chapter you are standing in, and whether the
  * controls have been discovered yet.
  *
- * A gate closes each chapter until its skills are collected. That is what makes
- * it a game rather than a scrolling list: you cannot reach 2025 without having
- * walked through 2021.
+ * Chapters used to be gated: you could not leave one until every skill in it
+ * was collected. That gate is gone. It meant a visitor who could not or would
+ * not platform was shut out of the later roles — which in a portfolio means
+ * shut out of the CV — and Summary mode was always a way round it anyway, so
+ * the gate only ever punished the people who chose to play. The post at the end
+ * of a chapter still reports what is left; it no longer stops anyone.
  */
 
 /**
@@ -288,13 +291,16 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				b.onGround = true;
 			}
 
-			/* The gate: you cannot leave a chapter you have not finished. */
+			/* The marker at the end of a chapter reports what is left; it no
+			   longer blocks. Requiring every token to advance meant a visitor
+			   who could not or would not platform was locked out of the later
+			   roles — which is to say, locked out of the CV. Summary mode was
+			   always a way round it anyway, so the gate only ever punished the
+			   people who chose to play. */
 			const here = Math.min(
 				chapters.length - 1,
 				Math.max(0, Math.floor((b.x + HERO_W / 2) / CHAPTER_W)),
 			);
-			const wall = (here + 1) * CHAPTER_W - HERO_W - 26;
-			if (!clearedLive(here) && b.x > wall) b.x = wall;
 			b.x = Math.max(0, Math.min(b.x, worldW - HERO_W));
 
 			/* Pick up anything within reach */
@@ -595,8 +601,8 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 										{(() => {
 											const p = chapterProgress(c, have);
 											return p.done === p.total
-												? 'OPEN'
-												: `LOCKED — ${p.total - p.done} left`;
+												? 'CLEARED'
+												: `${p.total - p.done} still out there`;
 										})()}
 									</span>
 								</span>
