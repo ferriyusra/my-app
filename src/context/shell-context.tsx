@@ -10,6 +10,7 @@ import {
 	useState,
 } from 'react';
 import { playSound, type SoundName } from '@/lib/sounds';
+import type { SourceFile } from '@/lib/source';
 import { DEFAULT_WALLPAPER, FALLBACK_WALLPAPER } from '@/lib/shell-defaults';
 import type { AppId, ShellNotification, SnapZone } from '@/types/windows';
 
@@ -102,6 +103,8 @@ type ShellCtx = {
 	setWallpaper: (w: WallpaperId) => void;
 	/** Image files found in `public/background`, in name order. */
 	customWallpapers: string[];
+	/** Source excerpts, read from the real files when the page was built. */
+	sources: SourceFile[];
 
 	/**
 	 * Whether this "copy of Windows" is activated. It is not, to begin with,
@@ -239,9 +242,11 @@ function readPins(): AppId[] {
 export function ShellProvider({
 	children,
 	customWallpapers = [],
+	sources = [],
 }: {
 	children: React.ReactNode;
 	customWallpapers?: string[];
+	sources?: SourceFile[];
 }) {
 	const [flyout, setFlyout] = useState<Flyout>(null);
 	/* Stable identities: `closeFlyout` ends up in the dependency array of
@@ -521,6 +526,7 @@ export function ShellProvider({
 			wallpaper,
 			setWallpaper,
 			customWallpapers,
+			sources,
 			accent,
 			setAccent,
 			activated,
@@ -571,6 +577,7 @@ export function ShellProvider({
 			wallpaper,
 			setWallpaper,
 			customWallpapers,
+			sources,
 			accent,
 			setAccent,
 			activated,

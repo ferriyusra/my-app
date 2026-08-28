@@ -309,7 +309,16 @@ prose and cannot drift.
 ### Data
 
 All content is typed data under `src/data/` — `profile`, `experience`,
-`projects`, `skills`, `source-excerpts`, `case-study`, `discarded`. Derived figures (years of experience,
+`projects`, `skills`, `case-study`, `discarded`.
+
+The editor window is the exception, and deliberately so: its excerpts are
+**read from the real files at build time** by
+[src/lib/source.ts](src/lib/source.ts), never copied. They used to be copies,
+and three of the five had silently stopped matching — `zoneRect` had moved to
+another module, `playSound` had grown a parameter — so the window went on
+labelling that code with paths it was no longer in. A manifest names a file and
+a symbol; a missing symbol throws, so the build stops rather than shipping a
+window that lies, and `source.test.ts` catches it before the build does. Derived figures (years of experience,
 role tenure) are computed from ISO dates rather than written down, so they stay
 true without anyone editing them.
 

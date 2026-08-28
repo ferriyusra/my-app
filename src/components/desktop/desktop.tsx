@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { SourceFile } from '@/lib/source';
 import { AnimatePresence } from 'framer-motion';
 import { ArrowUpDown, Cat, ExternalLink, Fish, Info, LayoutGrid, Paintbrush, Pin, PinOff, RefreshCw, Settings as SettingsGlyph } from 'lucide-react';
 import { LiMonitor } from '@/components/icons/line-icons';
@@ -567,12 +568,15 @@ function Viewport() {
 
 export default function Desktop({
 	customWallpapers = [],
+	sources = [],
 }: {
 	/** Read from `public/background` by the server component that renders this. */
 	customWallpapers?: string[];
+	/** Read from disk at build time; the editor window renders them. */
+	sources?: SourceFile[];
 }) {
 	return (
-		<ShellProvider customWallpapers={customWallpapers}>
+		<ShellProvider customWallpapers={customWallpapers} sources={sources}>
 			<WindowProvider>
 				<Viewport />
 			</WindowProvider>
