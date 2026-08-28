@@ -4,7 +4,11 @@
       "Bash(git add:*)",
       "Bash(git push:*)",
       "Bash(grep -n \"example.com\\\\|github.com$\" src/data/projects.ts)",
-      "Bash(git commit -m ':*)"
+      "Bash(git commit -m ':*)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(awk '/CAREER.EXE/,/RECYCLE BIN/' src/app/globals.css)",
+      "Bash(npm test *)"
     ]
   }
 }
