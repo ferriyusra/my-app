@@ -1,4 +1,4 @@
-import { FileCode2, FolderGit2, Radar } from 'lucide-react';
+import { FileCode2, FolderGit2, Radar, Undo2 } from 'lucide-react';
 import { LiBriefcase, LiChevronDown, LiDownload, LiGithub, LiLayers, LiLinkedin, LiMail, LiMapPin } from '@/components/icons/line-icons';
 import ThemeToggle from './theme-toggle';
 import PrintExpander from './print-expander';
@@ -8,6 +8,9 @@ import { experiences, tenureLabel } from '@/data/experience';
 import { SKILL_CATEGORIES, skills } from '@/data/skills';
 import { projects } from '@/data/projects';
 import { caseStudy } from '@/data/case-study';
+import { discarded } from '@/data/discarded';
+import { BUILT_SUMMARY } from '@/data/tips';
+import DiscardedDetail from './discarded-detail';
 
 /**
  * The portfolio as a plain document.
@@ -100,10 +103,11 @@ export default function PortfolioDocument() {
 				</a>
 			</div>
 
-			<p className='mb-note'>
-				Open this on a wider screen for the full Windows 11 desktop — draggable
-				windows, Start menu, File Explorer and all.
-			</p>
+			{/* This used to name what the reader was missing and stop there,
+			    which is an apology. The sentence from tips.ts says what the thing
+			    actually is, and cannot drift from what Tips ▸ How it's built says
+			    inside the shell. */}
+			<p className='mb-note'>{BUILT_SUMMARY}</p>
 
 			{/* First, because it is the only section that answers "and today?" */}
 			<Section
@@ -134,6 +138,16 @@ export default function PortfolioDocument() {
 							<span className='mb-period'>
 								{e.period} · {tenureLabel(e)} · {e.location}
 							</span>
+							{e.stats.length > 0 && (
+								<ul className='mb-stats'>
+									{e.stats.map((s) => (
+										<li key={s.label}>
+											<strong>{s.value}</strong>
+											<span>{s.label}</span>
+										</li>
+									))}
+								</ul>
+							)}
 							<p>{e.description}</p>
 							<ul className='mb-points'>
 								{e.achievements.map((a) => (
@@ -163,14 +177,17 @@ export default function PortfolioDocument() {
 				{SKILL_CATEGORIES.map((c) => (
 					<div key={c.key} className='mb-skill-group'>
 						<h3>{c.key}</h3>
-						<ul>
+						<dl className='mb-skills'>
 							{skills
 								.filter((s) => s.category === c.key)
 								.sort((a, b) => b.years - a.years)
 								.map((s) => (
-									<li key={s.name}>{s.name}</li>
+									<div key={s.name}>
+										<dt>{s.name}</dt>
+										<dd>{s.note}</dd>
+									</div>
 								))}
-						</ul>
+						</dl>
 					</div>
 				))}
 			</Section>
@@ -210,6 +227,22 @@ export default function PortfolioDocument() {
 						</li>
 					))}
 				</ul>
+			</Section>
+
+			{/* Absent from this document until now, so a phone, a crawler and a
+			    printed page all saw a portfolio with no reversals in it. Closed by
+			    default because it is long; print-expander opens it for print. */}
+			<Section
+				icon={<Undo2 size={17} />}
+				title='Decisions reversed'
+				subtitle={`${discarded.length} things built and thrown away`}>
+				<ol className='mb-discarded'>
+					{discarded.map((d) => (
+						<li key={d.name}>
+							<DiscardedDetail item={d} />
+						</li>
+					))}
+				</ol>
 			</Section>
 
 			<footer className='mb-foot'>

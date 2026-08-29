@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import { experiences } from '../data/experience.ts';
@@ -14,7 +15,17 @@ test('the index covers every role, project and skill without being hand-written'
 });
 
 test('every hit names a window that can actually answer it', () => {
-	const apps = new Set(['about', 'explorer', 'skills', 'experience', 'recycle']);
+	/* Read from the AppId union rather than listed here: a hand-kept copy of
+	   it passes for exactly as long as nobody adds a window, and the registry
+	   cannot be imported into a test with no JSX runtime. */
+	const source = readFileSync('src/types/windows.ts', 'utf8');
+	const union = source.slice(
+		source.indexOf('export type AppId ='),
+		source.indexOf(';', source.indexOf('export type AppId =')),
+	);
+	const apps = new Set([...union.matchAll(/'([a-z]+)'/g)].map((m) => m[1]));
+	assert.ok(apps.size > 5, 'the AppId union did not parse');
+
 	for (const h of index()) {
 		assert.ok(apps.has(h.app), `${h.title} points at ${h.app}`);
 	}

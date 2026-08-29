@@ -1,10 +1,10 @@
 /**
  * Things that were built and then thrown away, with the reason.
  *
- * Every entry is real: the commit hashes are in this repository's history, and
- * the two without one were reverted before they were ever committed. A
- * portfolio shows what shipped; this shows what was cut, which is the half of
- * engineering judgement a finished product hides.
+ * Every entry is real: the commit hashes are in this repository's history,
+ * and the single entry that lacks one was reverted before it ever reached a
+ * commit. A portfolio shows what shipped; this shows what was cut, which is
+ * the half of engineering judgement a finished product hides.
  */
 
 export type Discarded = {

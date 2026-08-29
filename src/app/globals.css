@@ -34,7 +34,6 @@
 
   /* ── Semantic ── */
   --success: #0e700e;
-  --warn: #bc4b09;
   --danger: #b10e1c;
   --danger-fill: #c42b1c;     /* the red Windows paints behind Close */
 
@@ -69,7 +68,6 @@
      grain simply disappears on the light theme. */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.16'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   --mica: #f9f9f9;
-  --mica-tint: rgba(15, 108, 189, 0.03);
   --caption-hover: rgba(0, 0, 0, 0.055);
 
   /* ── Motion — Fluent duration and curve tokens ── */
@@ -85,7 +83,6 @@
   --r-sm: 4px;
   --r-md: 6px;
   --r-lg: 8px;
-  --r-xl: 12px;
   --taskbar-h: 48px;
 
   /* Set by the Quick Settings brightness slider. */
@@ -122,7 +119,6 @@ html[data-theme='dark'] {
   --line-subtle: #363636;
 
   --success: #54b054;
-  --warn: #e08c3f;
   --danger: #ff99a4;
   --danger-fill: #c42b1c;
 
@@ -139,7 +135,6 @@ html[data-theme='dark'] {
   --taskbar-edge: rgba(255, 255, 255, 0.16);
   --taskbar-lift: 0 -1px 16px rgba(0, 0, 0, 0.35);
   --mica: #282828;
-  --mica-tint: rgba(71, 158, 245, 0.04);
   --caption-hover: rgba(255, 255, 255, 0.07);
 }
 
@@ -157,13 +152,12 @@ html[data-accent='blue'] {
   --accent-hover: #115ea3;
   --accent-pressed: #0c3b5e;
   --accent-soft: #ebf3fc;
-  --accent-ring: #b4d6fa;
 }
-html[data-accent='teal']   { --accent: #026d71; --accent-fill: #026d71; --accent-hover: #01595c; --accent-pressed: #01494c; --accent-soft: #e3f7f7; --accent-ring: #9dd9d9; }
-html[data-accent='violet'] { --accent: #6b45a3; --accent-fill: #6b45a3; --accent-hover: #5b3a8b; --accent-pressed: #4f3479; --accent-soft: #f2edfa; --accent-ring: #cdbceb; }
-html[data-accent='plum']   { --accent: #93379f; --accent-fill: #93379f; --accent-hover: #7d2f88; --accent-pressed: #6b2775; --accent-soft: #fbecfd; --accent-ring: #e6b3ee; }
-html[data-accent='orange'] { --accent: #a4400d; --accent-fill: #a4400d; --accent-hover: #8b360b; --accent-pressed: #6e2b09; --accent-soft: #fdefe7; --accent-ring: #f5c3a5; }
-html[data-accent='green']  { --accent: #0b6a0b; --accent-fill: #0b6a0b; --accent-hover: #095609; --accent-pressed: #063b06; --accent-soft: #e7f7e7; --accent-ring: #a7dfa7; }
+html[data-accent='teal']   { --accent: #026d71; --accent-fill: #026d71; --accent-hover: #01595c; --accent-pressed: #01494c; --accent-soft: #e3f7f7; }
+html[data-accent='violet'] { --accent: #6b45a3; --accent-fill: #6b45a3; --accent-hover: #5b3a8b; --accent-pressed: #4f3479; --accent-soft: #f2edfa; }
+html[data-accent='plum']   { --accent: #93379f; --accent-fill: #93379f; --accent-hover: #7d2f88; --accent-pressed: #6b2775; --accent-soft: #fbecfd; }
+html[data-accent='orange'] { --accent: #a4400d; --accent-fill: #a4400d; --accent-hover: #8b360b; --accent-pressed: #6e2b09; --accent-soft: #fdefe7; }
+html[data-accent='green']  { --accent: #0b6a0b; --accent-fill: #0b6a0b; --accent-hover: #095609; --accent-pressed: #063b06; --accent-soft: #e7f7e7; }
 
 html[data-theme='dark'],
 html[data-theme='dark'][data-accent='blue'] {
@@ -172,13 +166,30 @@ html[data-theme='dark'][data-accent='blue'] {
   --accent-hover: #0f6cbd;
   --accent-pressed: #0c3b5e;
   --accent-soft: #0a2740;
-  --accent-ring: #0e4775;
 }
-html[data-theme='dark'][data-accent='teal']   { --accent: #4ad7c7; --accent-fill: #026d71; --accent-hover: #038387; --accent-pressed: #01494c; --accent-soft: #05292b; --accent-ring: #0a5a5e; }
-html[data-theme='dark'][data-accent='violet'] { --accent: #b18cff; --accent-fill: #6b45a3; --accent-hover: #7d54bd; --accent-pressed: #4f3479; --accent-soft: #241a37; --accent-ring: #4f3479; }
-html[data-theme='dark'][data-accent='plum']   { --accent: #d69ee0; --accent-fill: #93379f; --accent-hover: #a642b4; --accent-pressed: #6b2775; --accent-soft: #32163a; --accent-ring: #6b2775; }
-html[data-theme='dark'][data-accent='orange'] { --accent: #f7955d; --accent-fill: #a4400d; --accent-hover: #c04c10; --accent-pressed: #6e2b09; --accent-soft: #341809; --accent-ring: #6e2b09; }
-html[data-theme='dark'][data-accent='green']  { --accent: #6cbb6c; --accent-fill: #0b6a0b; --accent-hover: #0e700e; --accent-pressed: #063b06; --accent-soft: #0d240d; --accent-ring: #063b06; }
+html[data-theme='dark'][data-accent='teal']   { --accent: #4ad7c7; --accent-fill: #026d71; --accent-hover: #038387; --accent-pressed: #01494c; --accent-soft: #05292b; }
+html[data-theme='dark'][data-accent='violet'] { --accent: #b18cff; --accent-fill: #6b45a3; --accent-hover: #7d54bd; --accent-pressed: #4f3479; --accent-soft: #241a37; }
+html[data-theme='dark'][data-accent='plum']   { --accent: #d69ee0; --accent-fill: #93379f; --accent-hover: #a642b4; --accent-pressed: #6b2775; --accent-soft: #32163a; }
+html[data-theme='dark'][data-accent='orange'] { --accent: #f7955d; --accent-fill: #a4400d; --accent-hover: #c04c10; --accent-pressed: #6e2b09; --accent-soft: #341809; }
+html[data-theme='dark'][data-accent='green']  { --accent: #6cbb6c; --accent-fill: #0b6a0b; --accent-hover: #0e700e; --accent-pressed: #063b06; --accent-soft: #0d240d; }
+
+/* ── Picker swatches ─────────────────────────────────────────
+   All six show at once while only one accent is live, so
+   var(--accent-fill) cannot serve here — every swatch would
+   paint the active accent. They are written out instead, three
+   lines under the definitions they have to agree with, and
+   repo.test.ts fails the moment the two drift. The picker used
+   to carry its own hex over in shell-context.tsx, where it had
+   already drifted from four of these six. */
+.sw-swatch[data-accent='blue']   { background: #0f6cbd; }
+.sw-swatch[data-accent='teal']   { background: #026d71; }
+.sw-swatch[data-accent='violet'] { background: #6b45a3; }
+.sw-swatch[data-accent='plum']   { background: #93379f; }
+.sw-swatch[data-accent='orange'] { background: #a4400d; }
+.sw-swatch[data-accent='green']  { background: #0b6a0b; }
+/* Only blue's fill moves between themes. The other five are the
+   same colour in both, so they need no counterpart. */
+html[data-theme='dark'] .sw-swatch[data-accent='blue'] { background: #115ea3; }
 
 /* ═══════════════════════════════════════════════════════════
    BASE
@@ -2226,13 +2237,6 @@ input[type='range']::-moz-range-thumb {
 }
 .power-title { margin: 0; font-size: 18px; font-weight: 400; }
 .power-hint { margin: 0; font-size: 13px; color: #9a9a9a; }
-.power-spinner {
-  width: 28px; height: 28px;
-  border: 3px solid rgba(255, 255, 255, 0.18);
-  border-top-color: #f2f2f2;
-  border-radius: 99px;
-  animation: spin 0.9s linear infinite;
-}
 .power-btn {
   display: inline-flex;
   align-items: center;
@@ -2506,6 +2510,49 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
     linear-gradient(180deg, #070c1c, #17173a 45%, #3d2244 78%, #6d3a30);
 }
 
+/* ── Tips ────────────────────────────────────────────────────
+   Tips wears the Settings chrome, so this is three additions to
+   it rather than a section of its own. */
+
+/* Which window proves the tip, sitting where a Settings control would. */
+.tp-where {
+  padding: 3px 9px;
+  border: 1px solid var(--line-subtle);
+  border-radius: 99px;
+  background: var(--surface-subtle);
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--ink-muted);
+}
+
+/* The shortcut table is a spec list whose left column holds keys, so it
+   needs the room a key cap takes and none of the 190px a label wanted. */
+.tp-keys > div { grid-template-columns: 200px 1fr; align-items: baseline; }
+.tp-keys dt { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.tp-keys kbd {
+  padding: 2px 7px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  box-shadow: var(--sh-2);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+/* The binding the visitor's own platform does not answer to. Shown, never
+   hidden — a reader told only about the half that fails concludes the site
+   is broken rather than that the OS took the key. */
+.tp-alt {
+  border-style: dashed !important;
+  border-bottom-width: 1px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--ink-muted) !important;
+}
+
+
 /* ═══════════════════════════════════════════════════════════
    ABOUT
    ═══════════════════════════════════════════════════════════ */
@@ -2638,7 +2685,7 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
    EXPERIENCE
    ═══════════════════════════════════════════════════════════ */
 
-.xp-timeline {
+.ex-timeline {
   position: relative;
   list-style: none;
   margin: 0;
@@ -2648,16 +2695,16 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 }
 /* No spine and no dots: the career bar above encodes the duration these
    drew a picture of without measuring. Two timelines is one too many. */
-.xp-entry { position: relative; }
-.xp-card {
+.ex-entry { position: relative; }
+.ex-card {
   padding: 16px 18px;
   border: 1px solid var(--line-subtle);
   border-radius: var(--r-lg);
   background: var(--surface-header);
 }
-.xp-card-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.xp-card-head h3 { font-size: 15px; }
-.xp-company {
+.ex-card-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.ex-card-head h3 { font-size: 15px; }
+.ex-company {
   margin: 3px 0 0;
   font-size: 13px;
   color: var(--ink-secondary);
@@ -2666,11 +2713,11 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   align-items: center;
   gap: 8px;
 }
-.xp-loc { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: var(--ink-muted); }
-.xp-when { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; }
-.xp-when time { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-.xp-when small { font-size: 11px; color: var(--ink-muted); }
-.xp-now {
+.ex-loc { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: var(--ink-muted); }
+.ex-when { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; }
+.ex-when time { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.ex-when small { font-size: 11px; color: var(--ink-muted); }
+.ex-now {
   margin-top: 2px;
   padding: 2px 8px;
   border-radius: 99px;
@@ -2679,13 +2726,13 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   font-size: 11px;
   font-weight: 600;
 }
-.xp-desc {
+.ex-desc {
   margin: 0 0 2px;
   font-size: 12px;
   line-height: 19px;
   color: var(--ink-muted);
 }
-.xp-points {
+.ex-points {
   /* Preflight sets list-style:none on every ul, which silently killed the
      accent markers below — the outcomes read as one grey block without them. */
   list-style: disc outside;
@@ -2694,9 +2741,9 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   display: grid;
   gap: 7px;
 }
-.xp-points li { font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
-.xp-points li::marker { color: var(--accent); }
-.xp-toggle {
+.ex-points li { font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
+.ex-points li::marker { color: var(--accent); }
+.ex-toggle {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -2709,10 +2756,10 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   font-size: 12px;
   font-weight: 600;
 }
-.xp-toggle:hover { background: var(--subtle-hover); }
-.xp-toggle svg { transition: transform var(--dur-fast) var(--ease-standard); }
-.xp-toggle svg[data-open] { transform: rotate(180deg); }
-.xp-tech {
+.ex-toggle:hover { background: var(--subtle-hover); }
+.ex-toggle svg { transition: transform var(--dur-fast) var(--ease-standard); }
+.ex-toggle svg[data-open] { transform: rotate(180deg); }
+.ex-tech {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
@@ -2721,7 +2768,7 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   padding: 12px 0 0;
   border-top: 1px solid var(--line-subtle);
 }
-.xp-tech li {
+.ex-tech li {
   padding: 2px 9px;
   border-radius: 99px;
   background: var(--surface-chip);
@@ -2988,6 +3035,10 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 
 /* ── Project detail ── */
 .xp-detail { max-width: 720px; margin: 0 auto; padding: 6px 4px 20px; }
+/* Explorer opens the discarded decisions too, and its detail pane is a
+   page rather than the Recycle Bin's bottom pane — the shared component
+   brings the typography, not the chrome around it. */
+.xp-detail > h3 { font-size: 20px; }
 .xp-detail-cover {
   display: block;
   width: 100%;
@@ -3478,177 +3529,6 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   BROWSER
-   ═══════════════════════════════════════════════════════════ */
-
-.br-shell { display: flex; flex-direction: column; height: 100%; min-height: 0; background: var(--surface); }
-
-.br-tabs {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  padding: 6px 8px 0;
-  background: var(--surface-header);
-  overflow-x: auto;
-}
-.br-tab {
-  display: flex;
-  align-items: center;
-  max-width: 220px;
-  border-radius: var(--r-md) var(--r-md) 0 0;
-  background: transparent;
-}
-.br-tab[data-active] { background: var(--surface); box-shadow: var(--sh-2); }
-.br-tab-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  padding: 9px 6px 9px 12px;
-  border: none;
-  background: transparent;
-  color: var(--ink);
-  font-size: 12px;
-}
-.br-tab-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.br-tab-close {
-  display: grid;
-  place-items: center;
-  width: 20px; height: 20px;
-  margin-right: 8px;
-  border: none;
-  border-radius: var(--r-sm);
-  background: transparent;
-  color: var(--ink-muted);
-}
-.br-tab-close:hover { background: var(--subtle-pressed); }
-.br-newtab {
-  display: grid;
-  place-items: center;
-  width: 28px; height: 28px;
-  margin-bottom: 4px;
-  border: none;
-  border-radius: var(--r-sm);
-  background: transparent;
-  color: var(--ink);
-}
-.br-newtab:hover { background: var(--subtle-hover); }
-
-.br-bar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  background: var(--surface);
-}
-.br-omnibox {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 32px;
-  margin-left: 6px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
-  border-radius: 99px;
-  background: var(--surface-subtle);
-  color: var(--ink-muted);
-}
-.br-omnibox:focus-within { border-color: var(--accent); background: var(--surface); }
-.br-omnibox input {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  background: transparent;
-  color: var(--ink);
-  font-size: 13px;
-  outline: none;
-}
-
-.br-favs {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 14px 8px;
-  color: var(--ink-muted);
-  border-bottom: 1px solid var(--line-subtle);
-}
-.br-fav {
-  padding: 4px 10px;
-  border: none;
-  border-radius: var(--r-sm);
-  background: transparent;
-  color: var(--ink-secondary);
-  font-size: 12px;
-}
-.br-fav:hover { background: var(--subtle-hover); color: var(--ink); }
-
-.br-page { flex: 1; min-height: 0; overflow: auto; padding: 28px 32px 36px; }
-.br-start h2 { font-size: 24px; }
-.br-start-sub { margin: 8px 0 26px; font-size: 13px; color: var(--ink-muted); max-width: 520px; }
-.br-start h3 {
-  margin: 26px 0 12px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--ink-muted);
-}
-.br-start h3:first-of-type { margin-top: 0; }
-.br-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; }
-.br-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 9px;
-  padding: 16px 8px;
-  border: 1px solid var(--line-subtle);
-  border-radius: var(--r-lg);
-  background: var(--surface-header);
-  color: var(--ink);
-  font-size: 12px;
-  text-align: center;
-  transition: transform var(--dur-fast) var(--ease-decel),
-              box-shadow var(--dur-fast) var(--ease-standard);
-}
-.br-tile:hover { transform: translateY(-2px); box-shadow: var(--sh-8); }
-
-.br-links, .br-results { display: grid; gap: 4px; }
-.br-results h2 { margin-bottom: 14px; font-size: 16px; }
-.br-link, .br-result {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border: none;
-  border-radius: var(--r-md);
-  background: transparent;
-  color: var(--ink);
-  text-align: left;
-}
-.br-link:hover, .br-result:hover { background: var(--subtle-hover); }
-.br-link > span:nth-child(2), .br-result > span:nth-child(2) {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 0;
-}
-.br-link strong, .br-result strong { font-size: 13px; }
-.br-link small, .br-result small {
-  font-size: 12px;
-  color: var(--accent);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.br-result-dot {
-  width: 26px; height: 26px;
-  flex-shrink: 0;
-  border-radius: var(--r-md);
-}
-.br-empty { font-size: 13px; color: var(--ink-muted); }
-
-/* ═══════════════════════════════════════════════════════════
    EDITOR
    ═══════════════════════════════════════════════════════════ */
 
@@ -3832,9 +3712,9 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
    Segment width grows with months served, so the shape of the career
    reads before the words do — with a floor, so a four-month role is
    still wide enough to carry its name. Roughly to scale, not exactly. */
-.xp-bar-wrap { margin: 0 0 22px; }
+.ex-bar-wrap { margin: 0 0 22px; }
 
-.xp-bar {
+.ex-bar {
   display: flex;
   gap: 3px;
   height: 52px;
@@ -3842,7 +3722,7 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   overflow: hidden;
 }
 
-.xp-seg {
+.ex-seg {
   position: relative;
   flex: 1 1 0;
   /* The readability floor. Without it the shortest role lands near 48px
@@ -3866,24 +3746,24 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
     color var(--dur-fast) var(--ease-standard),
     transform var(--dur-fast) var(--ease-standard);
 }
-.xp-seg:hover { background: var(--subtle-hover); transform: translateY(-1px); }
-.xp-seg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ex-seg:hover { background: var(--subtle-hover); transform: translateY(-1px); }
+.ex-seg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* The role still running is the one the eye should land on. */
-.xp-seg[data-current] {
+.ex-seg[data-current] {
   background: var(--accent-fill);
   color: #fff;
 }
-.xp-seg[data-current]:hover { background: var(--accent-hover); }
+.ex-seg[data-current]:hover { background: var(--accent-hover); }
 
-.xp-seg-label {
+.ex-seg-label {
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.xp-seg-len {
+.ex-seg-len {
   font-size: 10px;
   opacity: 0.75;
   white-space: nowrap;
@@ -3891,18 +3771,18 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   text-overflow: ellipsis;
 }
 
-.xp-bar-axis {
+.ex-bar-axis {
   display: flex;
   justify-content: space-between;
   margin-top: 6px;
   font-size: 11px;
   color: var(--ink-muted);
 }
-.xp-bar-axis span:nth-child(2) { font-variant-numeric: tabular-nums; }
+.ex-bar-axis span:nth-child(2) { font-variant-numeric: tabular-nums; }
 
 /* ── Role stats ──────────────────────────────────────────────
    Three figures, pulled out of the prose that used to bury them. */
-.xp-stats {
+.ex-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1px;
@@ -3914,32 +3794,32 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   border-radius: var(--r-md);
   overflow: hidden;
 }
-.xp-stats li {
+.ex-stats li {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 10px 12px;
   background: var(--surface);
 }
-.xp-stats strong {
+.ex-stats strong {
   font-size: 17px;
   font-weight: 600;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
   color: var(--accent);
 }
-.xp-stats span { font-size: 11px; line-height: 15px; color: var(--ink-muted); }
+.ex-stats span { font-size: 11px; line-height: 15px; color: var(--ink-muted); }
 
 /* The first three are what the role ran on; the rest are context. */
-.xp-tech li[data-lead] {
+.ex-tech li[data-lead] {
   background: var(--accent-soft);
   color: var(--accent);
   font-weight: 600;
 }
 
 @media (max-width: 620px) {
-  .xp-stats { grid-template-columns: minmax(0, 1fr); }
-  .xp-seg-len { display: none; }
+  .ex-stats { grid-template-columns: minmax(0, 1fr); }
+  .ex-seg-len { display: none; }
 }
 
 /* ── Case study ──────────────────────────────────────────────
@@ -3995,8 +3875,8 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 .cs-open li:last-child { margin-bottom: 0; }
 
 /* In the Experience window it is a disclosure on the current role. */
-.xp-case { margin-top: 14px; border-top: 1px solid var(--line-subtle); padding-top: 12px; }
-.xp-case > summary {
+.ex-case { margin-top: 14px; border-top: 1px solid var(--line-subtle); padding-top: 12px; }
+.ex-case > summary {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -4009,16 +3889,16 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   list-style: none;
   transition: background var(--dur-fast) var(--ease-standard);
 }
-.xp-case > summary::-webkit-details-marker { display: none; }
-.xp-case > summary:hover { background: var(--subtle-hover); }
-.xp-case > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.xp-case-chev {
+.ex-case > summary::-webkit-details-marker { display: none; }
+.ex-case > summary:hover { background: var(--subtle-hover); }
+.ex-case > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ex-case-chev {
   margin-left: auto;
   flex: none;
   transition: transform var(--dur-fast) var(--ease-standard);
 }
-.xp-case[open] .xp-case-chev { transform: rotate(180deg); }
-.xp-case[open] > summary { margin-bottom: 12px; }
+.ex-case[open] .ex-case-chev { transform: rotate(180deg); }
+.ex-case[open] > summary { margin-bottom: 12px; }
 
 .mb-cs-title { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
 
@@ -5149,7 +5029,7 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   font-size: 12px;
   padding: 1px 6px;
   border-radius: var(--r-sm);
-  background: var(--fill-strong, var(--line-subtle));
+  background: var(--surface-chip);
 }
 .rb-nocommit { font-style: italic; color: var(--ink-muted); }
 
@@ -5181,14 +5061,15 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 }
 .mb-head-text { flex: 1; min-width: 0; }
 .mb-head-text h1 { font-size: 22px; }
-.mb-head-text p { margin: 3px 0 0; font-size: 13px; color: var(--ink-secondary); }
+.mb-head-text > p:not(.mb-loc) { margin: 3px 0 0; font-size: 13px; color: var(--ink-secondary); }
 .mb-loc {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-  font-size: 12px !important;
-  color: var(--ink-muted) !important;
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--ink-muted);
 }
 .mb-dot { width: 4px; height: 4px; border-radius: 99px; background: var(--ink-disabled); }
 .mb-theme {
@@ -5222,7 +5103,7 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 .mb-card {
   margin-bottom: 10px;
   border: 1px solid var(--line-subtle);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   background: var(--surface);
   overflow: hidden;
 }
@@ -5269,14 +5150,21 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 
 .mb-skill-group { margin-bottom: 18px; }
 .mb-skill-group h3 { margin-bottom: 8px; font-size: 13px; }
-.mb-skill-group ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+/* Was a wrapped row of pills, which is a list of 28 names a reader has to
+   take on faith — the problem skill-evidence.ts exists to answer inside the
+   shell. A pill cannot carry the note, so this carries it instead. */
+.mb-skills { margin: 0; display: grid; gap: 0; }
+.mb-skills > div {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 4px 14px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line-subtle);
 }
+.mb-skills > div:last-child { border-bottom: none; }
+.mb-skills dt { font-size: 13px; font-weight: 600; }
+.mb-skills dd { margin: 0; font-size: 12.5px; line-height: 18px; color: var(--ink-muted); }
+
 .mb-skill-group li {
   padding: 4px 11px;
   border: 1px solid var(--line-subtle);
@@ -5324,6 +5212,55 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   text-decoration: none;
 }
 .mb-foot a:hover { color: var(--accent); }
+
+
+/* The numbers lead on the Experience card in the shell, and were sunk inside
+   four lines of prose here — the exact thing that card was changed to fix. */
+.mb-stats {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+}
+.mb-stats li {
+  padding: 8px 10px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface-subtle);
+}
+.mb-stats strong {
+  display: block;
+  font-size: 15px;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.mb-stats span { font-size: 11px; line-height: 15px; color: var(--ink-muted); }
+
+/* The reversed decisions. Long by nature, so each one is separated rather
+   than boxed — a card per entry would read as eight cards, not one argument. */
+.mb-discarded { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+.mb-discarded > li + li { padding-top: 22px; border-top: 1px solid var(--line-subtle); }
+.mb-discarded h3 { margin: 0; font-size: 14px; }
+
+/* ── The document's own widths ────────────────────────────────
+   There were none. `data-shell` decides which tree renders and that stays in
+   JavaScript — a phone must not pay to hydrate a window manager — but the
+   document's layout has to answer to the viewport on its own, or it renders
+   the same 680px column at 360px and at 2560px with scripting off. */
+@media (max-width: 620px) {
+  .mb-shell { padding: 18px 14px 44px; }
+  .mb-skills > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+
+@media (max-width: 420px) {
+  .mb-head { flex-wrap: wrap; }
+  .mb-head-text { flex-basis: 100%; order: 3; }
+  .mb-actions { flex-direction: column; }
+  /* Fluent's 32px button is a mouse target; a thumb needs the whole row. */
+  .mb-actions .fl-btn { justify-content: center; height: 40px; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    PRINT
@@ -5396,5 +5333,5 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
     scroll-behavior: auto !important;
   }
   .tb-btn:active, .fl-btn:active, .start-tile:active { transform: none; }
-  .taskview-card:hover, .br-tile:hover, .sw-swatch:hover { transform: none; }
+  .taskview-card:hover, .sw-swatch:hover { transform: none; }
 }

@@ -47,13 +47,18 @@ export const WALLPAPERS: { id: BuiltInWallpaper; label: string }[] = [
 	{ id: 'solid', label: 'Solid colour' },
 ];
 
-export const ACCENTS: { id: AccentId; label: string; swatch: string }[] = [
-	{ id: 'blue', label: 'Windows blue', swatch: '#0f6cbd' },
-	{ id: 'teal', label: 'Teal', swatch: '#038387' },
-	{ id: 'violet', label: 'Violet', swatch: '#8764b8' },
-	{ id: 'plum', label: 'Plum', swatch: '#b146c2' },
-	{ id: 'orange', label: 'Orange', swatch: '#ca5010' },
-	{ id: 'green', label: 'Green', swatch: '#0b6a0b' },
+/**
+ * The swatch each id paints is not here: it lives beside the accent tokens
+ * in globals.css, so the picker cannot show a colour the theme never
+ * produces. It did for four of these six.
+ */
+export const ACCENTS: { id: AccentId; label: string }[] = [
+	{ id: 'blue', label: 'Windows blue' },
+	{ id: 'teal', label: 'Teal' },
+	{ id: 'violet', label: 'Violet' },
+	{ id: 'plum', label: 'Plum' },
+	{ id: 'orange', label: 'Orange' },
+	{ id: 'green', label: 'Green' },
 ];
 
 type ShellCtx = {
@@ -143,6 +148,8 @@ type ShellCtx = {
 	 * and the welcome toast.
 	 */
 	booted: boolean;
+	/** Which arrival this is, for the two things shown only once. */
+	arrival: 'first' | 'second' | 'returning';
 	finishBoot: () => void;
 	/** Replays the sequence. Start's Restart is the only caller. */
 	replayBoot: () => void;
@@ -174,6 +181,11 @@ const KEY = {
 	   once per machine, and not on every in-session reload. */
 	booted: 'shell:booted',
 	activated: 'shell:activated',
+	/* Local, not session: Tips must open once per browser and never again,
+	   which is exactly the defect in a welcome toast keyed to the boot flag —
+	   that one fires on every reload. */
+	seen: 'shell:seen',
+	greeted: 'shell:greeted',
 } as const;
 
 /**
@@ -208,8 +220,9 @@ const WALLPAPER_IDS = WALLPAPERS.map((w) => w.id);
 const ACCENT_IDS = ACCENTS.map((a) => a.id);
 
 /** Taskbar pins before the visitor has changed any. */
-const DEFAULT_PINNED: AppId[] = ['explorer', 'edge', 'vscode', 'about'];
+const DEFAULT_PINNED: AppId[] = ['explorer', 'recycle', 'vscode', 'about'];
 const PINNABLE: AppId[] = [
+	'tips',
 	'about',
 	'explorer',
 	'skills',
@@ -217,7 +230,6 @@ const PINNABLE: AppId[] = [
 	'contact',
 	'media',
 	'settings',
-	'edge',
 	'vscode',
 	'recycle',
 ];
@@ -281,6 +293,33 @@ export function ShellProvider({
 			/* Private mode — the sequence simply plays again next reload. */
 		}
 	}, []);
+
+	/**
+	 * Two idempotent markers rather than a counter: a lazy initialiser and an
+	 * effect both run twice under React's development double-invoke, and
+	 * setting a constant twice is harmless where incrementing is not.
+	 */
+	const [arrival] = useState<'first' | 'second' | 'returning'>(() => {
+		if (typeof window === 'undefined') return 'returning';
+		try {
+			if (!localStorage.getItem(KEY.seen)) return 'first';
+			if (!localStorage.getItem(KEY.greeted)) return 'second';
+			return 'returning';
+		} catch {
+			/* Private mode: never greet rather than greet on every visit. */
+			return 'returning';
+		}
+	});
+
+	useEffect(() => {
+		if (!booted) return;
+		try {
+			localStorage.setItem(KEY.seen, '1');
+			if (arrival !== 'first') localStorage.setItem(KEY.greeted, '1');
+		} catch {
+			/* Nothing to remember it with; the next visit starts over. */
+		}
+	}, [booted, arrival]);
 
 	const replayBoot = useCallback(() => {
 		setFlyout(null);
@@ -541,6 +580,7 @@ export function ShellProvider({
 			feedCat,
 
 			booted,
+			arrival,
 			finishBoot,
 			replayBoot,
 
@@ -589,6 +629,7 @@ export function ShellProvider({
 			feedTick,
 			feedCat,
 			booted,
+			arrival,
 			finishBoot,
 			replayBoot,
 			power,

@@ -93,7 +93,7 @@ const FOLDERS = [
 	{ key: 'deleted', label: 'Deleted', Icon: LiTrash2 },
 ] as const;
 
-/** Contact, presented as the Windows LiMail app: rail, list, reading pane. */
+/** Contact, presented as the Windows Mail app: rail, list, reading pane. */
 export default function ContactApp() {
 	const uid = useId();
 	const { notify } = useShell();

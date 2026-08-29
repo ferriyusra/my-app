@@ -38,29 +38,29 @@ function Role({
 	const hidden = exp.achievements.length - COLLAPSED;
 
 	return (
-		<li className='xp-entry' data-current={exp.current || undefined}>
-			<article className='xp-card'>
-				<header className='xp-card-head'>
+		<li className='ex-entry' data-current={exp.current || undefined}>
+			<article className='ex-card'>
+				<header className='ex-card-head'>
 					<div>
 						<h3>{exp.role}</h3>
-						<p className='xp-company'>
+						<p className='ex-company'>
 							{exp.company}
-							<span className='xp-loc'>
+							<span className='ex-loc'>
 								<LiMapPin size={12} aria-hidden='true' />
 								{exp.location}
 							</span>
 						</p>
 					</div>
-					<div className='xp-when'>
+					<div className='ex-when'>
 						<time dateTime={exp.startISO}>{exp.period}</time>
 						<small>{tenureLabel(exp)}</small>
-						{exp.current && <span className='xp-now'>Current</span>}
+						{exp.current && <span className='ex-now'>Current</span>}
 					</div>
 				</header>
 
 				{/* The numbers lead. They were the strongest thing on the card
 				    and were sunk inside four lines of prose. */}
-				<ul className='xp-stats'>
+				<ul className='ex-stats'>
 					{exp.stats.map((st) => (
 						<li key={st.label}>
 							<strong>{st.value}</strong>
@@ -69,9 +69,9 @@ function Role({
 					))}
 				</ul>
 
-				<p className='xp-desc'>{exp.description}</p>
+				<p className='ex-desc'>{exp.description}</p>
 
-				<ul className='xp-points'>
+				<ul className='ex-points'>
 					{shown.map((a) => (
 						<li key={a}>{a}</li>
 					))}
@@ -80,7 +80,7 @@ function Role({
 				{hidden > 0 && (
 					<button
 						type='button'
-						className='xp-toggle'
+						className='ex-toggle'
 						aria-expanded={expanded}
 						onClick={onToggle}>
 						{expanded ? 'Show less' : `${hidden} more outcome${hidden > 1 ? 's' : ''}`}
@@ -94,7 +94,7 @@ function Role({
 
 				{/* All of them stay visible — they are what a keyword scan looks
 				    for — but the first three are what the role actually ran on. */}
-				<ul className='xp-tech'>
+				<ul className='ex-tech'>
 					{exp.tech.map((t, i) => (
 						<li key={t} data-lead={i < 3 || undefined}>
 							{t}
@@ -106,11 +106,11 @@ function Role({
 				    rather than state: it is long, and it should be closed by
 				    default without another toggle to wire up. */}
 				{exp.short === caseStudy.at && (
-					<details className='xp-case'>
+					<details className='ex-case'>
 						<summary>
 							<FileCode2 size={14} aria-hidden='true' />
 							Case study — {caseStudy.title}
-							<LiChevronDown size={14} aria-hidden='true' className='xp-case-chev' />
+							<LiChevronDown size={14} aria-hidden='true' className='ex-case-chev' />
 						</summary>
 						<CaseStudyBody />
 					</details>
@@ -148,28 +148,28 @@ function CareerBar({
 	const firstYear = ordered[0]?.startISO.slice(0, 4);
 
 	return (
-		<div className='xp-bar-wrap'>
-			<div className='xp-bar' role='group' aria-label='Career timeline'>
+		<div className='ex-bar-wrap'>
+			<div className='ex-bar' role='group' aria-label='Career timeline'>
 				{ordered.map((e) => {
 					const months = tenureMonths(e);
 					return (
 						<button
 							key={e.company}
 							type='button'
-							className='xp-seg'
+							className='ex-seg'
 							style={{ flexGrow: months }}
 							data-on={active === e.short || undefined}
 							data-current={e.current || undefined}
 							onClick={() => onPick(e.short)}
 							title={`${e.short} · ${tenureLabel(e)}`}
 							aria-label={`${e.short}, ${tenureLabel(e)}`}>
-							<span className='xp-seg-label'>{e.short}</span>
-							<span className='xp-seg-len'>{tenureLabel(e)}</span>
+							<span className='ex-seg-label'>{e.short}</span>
+							<span className='ex-seg-len'>{tenureLabel(e)}</span>
 						</button>
 					);
 				})}
 			</div>
-			<div className='xp-bar-axis' aria-hidden='true'>
+			<div className='ex-bar-axis' aria-hidden='true'>
 				<span>{firstYear}</span>
 				<span>
 					{Math.floor(total / 12)} yrs {total % 12 ? `${total % 12} mos` : ''}
@@ -214,7 +214,7 @@ export default function ExperienceApp() {
 				/>
 			)}
 
-			<ol className='xp-timeline'>
+			<ol className='ex-timeline'>
 				{shown.map((exp) => (
 					<Role
 						key={exp.company}

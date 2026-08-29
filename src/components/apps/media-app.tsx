@@ -52,7 +52,7 @@ export default function MediaApp() {
 
 	const current = index === null ? null : (tracks[index] ?? null);
 
-	/* ── LiSearch ──────────────────────────────────────────────── */
+	/* ── Search ──────────────────────────────────────────────── */
 
 	const search = useCallback(async (term: string, signal: AbortSignal) => {
 		if (!term.trim()) {
@@ -167,7 +167,7 @@ export default function MediaApp() {
 					<div className='mp-empty'>
 						<Music size={30} aria-hidden='true' />
 						<p>
-							LiSearch Apple&rsquo;s catalogue and play a track.
+							Search Apple&rsquo;s catalogue and play a track.
 							<br />
 							Previews are 30 seconds — the full song is one click away.
 						</p>

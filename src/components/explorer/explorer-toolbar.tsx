@@ -4,7 +4,25 @@ import { LayoutGrid, List, RefreshCw, Rows3, SortAsc } from 'lucide-react';
 import { LiArrowLeft, LiArrowRight, LiArrowUp, LiSearch } from '@/components/icons/line-icons';
 
 export type ViewMode = 'grid' | 'list' | 'details';
-export type SortKey = 'name' | 'type';
+/**
+ * 'default' is the order the folder is in — featured projects first,
+ * roles newest first, decisions in the order they were reversed. The folder
+ * used to compute that order and then throw it away on an alphabetical sort
+ * it could never be turned off.
+ */
+export type SortKey = 'default' | 'name' | 'type';
+
+const NEXT_SORT: Record<SortKey, SortKey> = {
+	default: 'name',
+	name: 'type',
+	type: 'default',
+};
+
+const SORT_LABEL: Record<SortKey, string> = {
+	default: 'folder order',
+	name: 'name',
+	type: 'type',
+};
 
 const VIEWS: { key: ViewMode; label: string; Icon: typeof LayoutGrid }[] = [
 	{ key: 'grid', label: 'Large icons', Icon: LayoutGrid },
@@ -98,9 +116,10 @@ export default function ExplorerToolbar({
 				<button
 					type='button'
 					className='xp-icon-btn'
-					aria-label={`Sort by ${sort === 'name' ? 'type' : 'name'}`}
-					title={`Sorted by ${sort}`}
-					onClick={() => onSort(sort === 'name' ? 'type' : 'name')}>
+					aria-label={`Sort by ${SORT_LABEL[NEXT_SORT[sort]]}`}
+					title={`Sorted by ${SORT_LABEL[sort]}`}
+					data-active={sort !== 'default' || undefined}
+					onClick={() => onSort(NEXT_SORT[sort])}>
 					<SortAsc size={16} aria-hidden='true' />
 				</button>
 				{VIEWS.map(({ key, label, Icon }) => (
