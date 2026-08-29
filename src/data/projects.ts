@@ -4,8 +4,6 @@ export interface Project {
 	description: string;
 	/** Cover image shown in the card */
 	cover: string;
-	/** All screenshots / gallery images */
-	images: string[];
 	tech: string[];
 	/** Set to null to hide the button */
 	github: string | null;
@@ -23,15 +21,16 @@ export interface Project {
 /**
  * Static project data.
  *
- * To migrate to an API, replace this export with a fetch call:
+ * A `tech` entry must spell a tool exactly as `skills.ts` names it. The join
+ * is `includes()` — in `evidenceFor()`, and again in `search.ts`,
+ * `terminal.ts` and `career-game.ts` — so a near miss does not fail, it
+ * silently drops the project from that skill's evidence. Writing "Golang"
+ * while `skills.ts` said "Go" is how the two headline tools here, Go and
+ * NestJS, came to claim no projects at all while shipping in two.
  *
- *   export async function getProjects(): Promise<Project[]> {
- *     const res = await fetch('/api/projects');
- *     return res.json();
- *   }
- *
- * Then update `projects.tsx` to `await getProjects()` (server component)
- * or `useSWR('/api/projects', fetcher)` (client component).
+ * Naming something `skills.ts` does not carry is fine — a framework used
+ * once, a payment provider. `data.test.ts` keeps that allowlist, so adding
+ * one is a decision rather than a typo.
  */
 export const projects: Project[] = [
 	{
@@ -40,8 +39,7 @@ export const projects: Project[] = [
 		description:
 			'SATUSEHAT Data Portal is a portal with a vision to unite all health data distribution and its processed results in one integrated portal access (SATU Health Data) which can be a tool to support decision making and transparency through interactive data/dashboards with trusted data sources. SATUSEHAT Data Portal consists of: Dashboard, Dataset, Metadata and Data Services.',
 		cover: '/projects/ssd/ssd-1.png',
-		images: ['/projects/ssd/ssd-1.png'],
-		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'Nest.js'],
+		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'NestJS'],
 		github: null,
 		demo: 'https://satusehat.kemkes.go.id/data',
 		featured: true,
@@ -56,12 +54,11 @@ export const projects: Project[] = [
 		description:
 			'A full-stack HRIS (Human Resource Information System) that centralizes employee management, attendance tracking (clock-in/out with auto status detection), leave request & approval workflows, payroll processing with payslip generation, and online salary disbursement via Midtrans. Features real-time dashboards powered by Supabase Realtime, role-based access control, dual-layer validation, dark mode, and an employee self-service portal.',
 		cover: '',
-		images: [],
 		tech: [
-			'Next.js 15',
-			'React 19',
+			'Next.js',
+			'React',
 			'TypeScript',
-			'Tailwind CSS v4',
+			'Tailwind CSS',
 			'shadcn/ui',
 			'Supabase',
 			'Zustand',
@@ -84,13 +81,7 @@ export const projects: Project[] = [
 		description:
 			'Learning to fullstack development using MERN Stack.',
 		cover: '',
-		images: [
-			'/projects/acara/ac-1.webp',
-			'/projects/acara/ac-2.webp',
-			'/projects/acara/ac-3.webp',
-			'/projects/acara/ac-4.webp',
-		],
-		tech: ['React.Js', 'Next.Js', 'Express.Js', 'Node.js', 'MongoDB'],
+		tech: ['React', 'Next.js', 'Express.js', 'Node.js', 'MongoDB'],
 		github: 'https://github.com/ferriyusra/back-end-acara',
 		demo: 'https://front-end-acara-lac.vercel.app/',
 		featured: false,
@@ -105,8 +96,7 @@ export const projects: Project[] = [
 		description:
 			'Migrating from dashboard tableau to native dashboard to reduce cost, loaded data and performance. handle the backend api to delivered data from database like postgresql, big query and mongodb.',
 		cover: '/projects/native/native-1.png',
-		images: ['/projects/native/native-1.png'],
-		tech: ['Golang', 'Gin Framework', 'PostgreSQL', 'React.Js', 'Next.Js'],
+		tech: ['Go', 'Gin Framework', 'PostgreSQL', 'React', 'Next.js'],
 		github: null,
 		demo: 'https://satusehat.kemkes.go.id/data/dashboard/3678097d-d11e-4b2c-8552-310d782a905b',
 		featured: true,
@@ -121,11 +111,6 @@ export const projects: Project[] = [
 		description:
 			'Create website for tracing the student after graduate to tracking data by using quisionare and give them information about job vaccanies and redirect to the third party job portal to easly apply.',
 		cover: '',
-		images: [
-			'/projects/layanan-karir/lk-1.webp',
-			'/projects/layanan-karir/lk-2.webp',
-			'/projects/layanan-karir/lk-3.webp',
-		],
 		tech: ['PHP', 'Laravel 7', 'MySQL'],
 		github: 'https://github.com/ferriyusra/e-career/issues/1',
 		demo: null,
@@ -141,12 +126,7 @@ export const projects: Project[] = [
 		description:
 			'Create Mini Crowdfunding Website for implementation MERN Stack to implement after finish course MERN Stack.',
 		cover: '',
-		images: [
-			'/projects/crowdfounding/cf-1.webp',
-			'/projects/crowdfounding/cf-2.webp',
-			'/projects/crowdfounding/cf-3.webp',
-		],
-		tech: ['React.Js', 'Next.Js', 'Express.Js', 'Node.js', 'MongoDB'],
+		tech: ['React', 'Next.js', 'Express.js', 'Node.js', 'MongoDB'],
 		github: 'https://github.com/ferriyusra/crowdfunding-be',
 		demo: 'https://crowdfunding-fe-dun.vercel.app/',
 		featured: false,
@@ -161,7 +141,6 @@ export const projects: Project[] = [
 		description:
 			'Create the web application to integrate GIS to the web app using minimum library map, and showing the data base on lang and lat coordinate.',
 		cover: '',
-		images: ['/projects/gis/gis-1.webp'],
 		tech: ['PHP', 'Codeigniter 3', 'Leaflet', 'MySQL'],
 		github: null,
 		demo: null,
@@ -177,7 +156,6 @@ export const projects: Project[] = [
 		description:
 			'The epidemic of a new disease caused by the coronavirus (2019-nCoV), commonly referred to as COVID- 19, has been declared a global virus epidemic by the World Health Organization(WHO). President Joko Widodo has officially ratified Presidential Decree No. 99 of 2020 concerning the provision of vaccines and the implementation of vaccination activities.',
 		cover: '/projects/as/as-1.png',
-		images: ['/projects/as/as-1.png'],
 		tech: ['Python', 'Implement Algorithm TF-IDF', 'Implement Algorithm Naive Bayes Classifier'],
 		github: 'https://github.com/ferriyusra/Analisis-Sentimen-Naive-Bayes/issues/1',
 		demo: 'https://www.researchgate.net/publication/368490963_Application_of_the_Naive_Bayes_Classifier_Algorithm_to_Analyze_Sentiment_for_the_Covid-19_Vaccine_on_Twitter_in_Jakarta',

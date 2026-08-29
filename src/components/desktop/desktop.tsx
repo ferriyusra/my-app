@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { SourceFile } from '@/lib/source';
 import { AnimatePresence } from 'framer-motion';
-import { ArrowUpDown, Cat, ExternalLink, Fish, Info, LayoutGrid, Paintbrush, Pin, PinOff, RefreshCw, Settings as SettingsGlyph } from 'lucide-react';
+import { ArrowUpDown, Cat, ExternalLink, Fish, Info, LayoutGrid, Lightbulb, Paintbrush, Pin, PinOff, RefreshCw, Settings as SettingsGlyph, Undo2 } from 'lucide-react';
 import { LiMonitor } from '@/components/icons/line-icons';
 import { WindowProvider, useWindows } from '@/context/window-context';
 import { ShellProvider, useShell } from '@/context/shell-context';
@@ -95,6 +95,8 @@ function Shell() {
 		catBusy,
 		feedCat,
 		activated,
+		arrival,
+		snapAssist,
 	} = useShell();
 	const icons = useDesktopIcons();
 	const [marked, setMarked] = useState<string[]>([]);
@@ -104,6 +106,10 @@ function Shell() {
 		metrics: icons.metrics,
 		onSelectMany: setMarked,
 	});
+	/* Destructured rather than passed whole: both are stable, and putting the
+	   gestures object in the menu's dependency array would rebuild it on
+	   every render. */
+	const { reset: resetIcons, rearranged } = gestures;
 	/* The stored arrangement reorders the flow; everything else about the grid
 	   is unchanged, so the arrow keys still walk it column-first. */
 	const ordered = useMemo(() => {
@@ -204,6 +210,19 @@ function Shell() {
 					},
 				],
 			},
+			{
+				kind: 'item',
+				/* useDesktopGestures has returned this since it was written and
+				   nothing called it, so a visitor who scrambled the grid had no way
+				   back. "Put it back" means the order too, not just the positions. */
+				label: 'Reset icon positions',
+				Icon: Undo2,
+				disabled: !rearranged,
+				onSelect: () => {
+					resetIcons();
+					icons.setSort('default');
+				},
+			},
 			{ kind: 'separator' },
 			{
 				kind: 'item',
@@ -235,12 +254,19 @@ function Shell() {
 			{ kind: 'separator' },
 			{
 				kind: 'item',
+				label: 'Tips and shortcuts',
+				Icon: Lightbulb,
+				shortcut: 'F1',
+				onSelect: () => launch('tips'),
+			},
+			{
+				kind: 'item',
 				label: 'About this portfolio',
 				Icon: Info,
 				onSelect: () => launch('about'),
 			},
 		],
-		[icons, launch, notify, catOn, setCatOn, catBusy, feedCat],
+		[icons, launch, notify, catOn, setCatOn, catBusy, feedCat, resetIcons, rearranged],
 	);
 
 	const iconMenu = useCallback(
@@ -317,6 +343,14 @@ function Shell() {
 			if (e.key === 'Meta' || e.key === 'OS') metaAlone.current = true;
 			else metaAlone.current = false;
 
+			/* F1 is the help key on the operating system this imitates, and
+			   unlike '?' it needs no guard for whether a field has focus. */
+			if (e.key === 'F1') {
+				e.preventDefault();
+				launch('tips');
+				return;
+			}
+
 			if (e.key === 'F5' && !e.ctrlKey) {
 				e.preventDefault();
 				icons.setSelected(null);
@@ -342,9 +376,17 @@ function Shell() {
 			}
 
 			/* The ⊞ shortcuts. On Windows itself the OS claims these before the
-			   browser ever sees them, so in practice they serve macOS and Linux
-			   visitors — which is most of anyone reading a portfolio. */
-			if (!e.metaKey || e.altKey || e.ctrlKey) return;
+			   browser ever sees them, so there they do nothing at all — Ctrl+Alt
+			   is bound alongside them to give that half of the audience the
+			   arrows back.
+
+			   Only the arrows. Ctrl+Alt is AltGr on many keyboard layouts, where
+			   Ctrl+Alt+E types €, so D and E are deliberately left alone; both
+			   already have several other routes. Tips ▸ Keyboard says all of
+			   this rather than leaving it in a comment only I can read. */
+			const win = e.metaKey && !e.altKey && !e.ctrlKey;
+			const alt = e.ctrlKey && e.altKey && !e.metaKey;
+			if (!win && !alt) return;
 			const b = bounds();
 			const top = topWindow();
 
@@ -361,6 +403,9 @@ function Shell() {
 				e.preventDefault();
 				if (top.maximised || top.snapped) toggleMax(top.id, b);
 				else minimise(top.id);
+			} else if (alt) {
+				/* Ctrl+Alt covers the arrows and stops there. */
+				return;
 			} else if (e.key.toLowerCase() === 'd') {
 				e.preventDefault();
 				showDesktop();
@@ -405,25 +450,33 @@ function Shell() {
 	   pointed at the frontmost window from then on. */
 	useAppUrl();
 
-	/* Greet the visitor the way Windows greets a fresh sign-in.
-	   Deliberately not ref-guarded: React's development double-invoke tears an
-	   effect down and re-runs it, so a guard here would clear the timer on the
-	   way out and then refuse to set another on the way back in — the toast
-	   would simply never appear while developing. */
+	/**
+	 * The second visit gets one line pointing at F1, and no visit after that
+	 * gets anything.
+	 *
+	 * The first visit needs no toast: Tips opens by itself. This used to fire
+	 * on every arrival, including every reload, and said the same three things
+	 * for six seconds each time — while a returning visitor, who had already
+	 * dismissed it once, was the only person who still had nothing to read.
+	 *
+	 * Deliberately not ref-guarded: React's development double-invoke tears an
+	 * effect down and re-runs it, so a guard here would clear the timer on the
+	 * way out and refuse to set another on the way back in.
+	 */
 	useEffect(() => {
-		if (!booted) return;
+		if (!booted || arrival !== 'second') return;
 		const t = setTimeout(
 			() =>
 				notify({
 					app: 'system',
-					title: 'Welcome',
-					body: 'Double-click a desktop icon, or press Start. Right-click anywhere.',
-					action: { label: 'Browse projects', appId: 'explorer' },
+					title: 'Welcome back',
+					body: 'Press F1 for what this desktop does, and the keys it answers to.',
+					action: { label: 'Open Tips', appId: 'tips' },
 				}),
 			1600,
 		);
 		return () => clearTimeout(t);
-	}, [booted, notify]);
+	}, [booted, arrival, notify]);
 
 	return (
 		<div
@@ -484,10 +537,10 @@ function Shell() {
 			<WindowLayer />
 			<DesktopCat />
 			<AnimatePresence>
-				<SnapAssist key='snap-assist' />
-			</AnimatePresence>
-
-			<AnimatePresence>
+				{/* Mounted only while there is an offer to make. It used to sit here
+						unconditionally and return null internally, so AnimatePresence never
+						saw a child leave and its exit animation never ran once. */}
+				{snapAssist && <SnapAssist key='snap-assist' />}
 				{flyout === 'start' && <StartMenu key='start' onClose={closeFlyout} />}
 				{flyout === 'quick' && <QuickSettings key='quick' onClose={closeFlyout} />}
 				{flyout === 'notifications' && (
@@ -495,6 +548,10 @@ function Shell() {
 				)}
 			</AnimatePresence>
 
+			{/* Deliberately outside the block above: Task View is a full-screen
+					scrim, and fading one out leaves the whole desktop washed for the
+					length of the transition. It renders a plain div, so there is no
+					exit animation being lost here. */}
 			{flyout === 'taskview' && <TaskView onClose={closeFlyout} />}
 
 			{menu && (

@@ -13,9 +13,17 @@ npm test         # Run the unit tests
 ```
 
 Tests run on Node's built-in runner with native type stripping — there is no
-test dependency and no config. `src/context/window-reducer.test.ts` covers the
-window state machine. Adding a file matching `src/**/*.test.ts` is enough for
-`npm test` to pick it up.
+test dependency and no config, and adding a file matching `src/**/*.test.ts`
+is enough for `npm test` to pick it up.
+
+Two of the eight check the repository rather than the runtime, because the
+bugs they guard cannot be reached from a running page:
+`src/lib/repo.test.ts` reads `globals.css` and the component tree as text —
+it fails when two apps each style the same class name, when an accent swatch
+stops matching the token it previews, or when an icon component name is left
+sitting in prose. `src/data/data.test.ts` pins the `projects` ↔ `skills`
+name join, which fails silently rather than loudly: a tool spelled "Golang"
+in one file and "Go" in the other simply drops out of the evidence.
 
 ## Stack
 
@@ -34,7 +42,9 @@ window state machine. Adding a file matching `src/**/*.test.ts` is enough for
     `document` at import time, so a server component cannot import it at all.
     Taking the artwork and leaving the packaging fixes both, makes every fill
     `currentColor`, and ships only what is used. Regenerate from
-    `scratchpad/gen` — do not hand-edit the file.
+    `scratchpad/gen/line-icons.mjs`, which installs the package with
+    `--no-save`, emits one component, and is removed again — do not hand-edit
+    the file.
   - **Lucide** for the 60-odd glyphs LineIcons has no answer for: window
     minimise and restore, battery and its charging states, wifi on and off,
     pin and unpin, skip back and forward, the alert and warning marks.
@@ -188,6 +198,41 @@ session via `sessionStorage`, collapses to a short fade under
 `prefers-reduced-motion`, and Start's Restart replays it by setting `booted`
 back to false.
 
+### Teaching the shell
+
+Nothing on a desktop announces that its windows drag, snap and close, and the
+only guidance here used to be a toast that lasted six seconds and fired on
+every reload — so a returning visitor, who had already dismissed it, was the
+one person left with nothing to read.
+
+[src/components/apps/tips-app.tsx](src/components/apps/tips-app.tsx) **opens by
+itself on a visitor's first arrival and never again**, which is the whole
+reason it is a window rather than an overlay: the first thing anybody does
+here is drag, resize and close the thing explaining drag, resize and close.
+Coach marks were rejected for the opposite reason — a modal Windows does not
+have, blocking the desktop until dismissed, positioned against elements whose
+coordinates are deliberately kept out of React.
+
+The arrival is tracked in `shell-context.tsx` as two **idempotent markers**
+(`shell:seen`, `shell:greeted`) rather than a counter, because a lazy
+initialiser and an effect both run twice under React's development
+double-invoke: setting a constant twice is harmless where incrementing is not.
+First arrival opens Tips; the second gets one toast pointing at `F1`; every
+later one is silent. It is `localStorage`, not `sessionStorage` — that
+distinction *is* the bug the toast had.
+
+The content lives in [src/data/tips.ts](src/data/tips.ts), not in the
+component, so it reaches the Tips window, Start's search index, the Terminal's
+`tips` command and the server document from one place.
+
+**The ⊞ shortcuts do not work on Windows.** The OS claims them before the
+browser is told, so on the operating system this shell imitates they do
+nothing. `Ctrl`+`Alt` is bound alongside them **for the arrows only** —
+`Ctrl`+`Alt` is AltGr on many layouts, where `Ctrl`+`Alt`+`E` types €, and
+`⊞`+`D`/`⊞`+`E` already have several other routes. Tips ▸ Keyboard shows
+both columns always; the platform only decides which is named first. A reader
+shown only the half that fails concludes the site is broken.
+
 ### Adding an app
 
 1. Write the content component in `src/components/apps/`.
@@ -201,6 +246,14 @@ The registry is the only place that maps an id to a window; the desktop,
 taskbar, Start, Task View and notification centre all read from it.
 
 ### Styling
+
+**A class prefix belongs to one app.** `.xp-bar` was declared twice at equal
+specificity — File e**xp**lorer's address bar and e**xp**erience's career bar
+had claimed the same three letters. Neither rule was wrong alone; the cascade
+merged them per-property, so the address bar was silently forced to 52px tall
+with its overflow hidden, in a window whose author never saw the other rule.
+Experience is `ex-` now and `xp-` means Explorer only. `repo.test.ts` fails
+if two apps ever again each style one class name.
 
 `globals.css` is organised as: tokens → accents → base → shared controls →
 desktop → windows → taskbar → flyouts → menus → per-app sections → mobile →
@@ -258,7 +311,7 @@ The shell holds one set of typed data and offers several routes through it. All
 of them derive; none of them keep a second copy.
 
 - **Search** ([src/lib/search.ts](src/lib/search.ts)) indexes roles, projects,
-  skills, the case study, the discarded decisions and the profile — 51 entries
+  skills, the case study, the discarded decisions, the tips and the profile — 68 entries
   built from `src/data`. Start used to filter fourteen app names, so "Pub/Sub"
   and "Kafka" returned nothing while sitting in the data. A title match outranks
   a body match, and a result quotes the sentence it matched in.
@@ -269,6 +322,14 @@ of them derive; none of them keep a second copy.
 - **Skill evidence** ([src/lib/skill-evidence.ts](src/lib/skill-evidence.ts))
   answers "used where, for how long" by walking the roles that name the tool.
   Nine skills are named by no role; the UI says so rather than padding them.
+- **File Explorer** ([src/components/apps/explorer-app.tsx](src/components/apps/explorer-app.tsx))
+  navigates roles, the case study and the reversed decisions as folders. Three
+  of its four folders used to hold `appFile()` entries — *applications wearing
+  file icons* — which is worse than an empty folder: it teaches the visitor the
+  file metaphor is a costume, and then `Portfolio/`, the one folder that was
+  real, gets no credit either. The tree is smaller now and entirely data.
+  Skills deliberately gets no folder: 28 names in a flat list is worse than the
+  Skills window, and Tips ▸ What's not here says so.
 - **Desktop gestures** ([src/hooks/use-desktop-gestures.ts](src/hooks/use-desktop-gestures.ts))
   — marquee select and drag-to-rearrange. Same rule as the window frame and the
   cat: the gesture writes to the DOM and dispatches once, on pointer-up. The
@@ -293,6 +354,14 @@ reversed — the progress bars, the glyph tiles, ScrollSmoother, `/articles`,
 YouTube full-track playback — each with the commit that removed it. Every entry
 is real and checkable; the one without a hash (YouTube full-track playback) was
 reverted before it was ever committed, and says so. Do not add an entry that did not happen.
+
+It reaches four places from one component,
+[discarded-detail.tsx](src/components/content/discarded-detail.tsx), with no
+`'use client'` — the Recycle Bin, Explorer's `Documents/Decisions reversed/`,
+and the server document, which is what a phone, a crawler and a printed page
+see. It was in the Recycle Bin alone until then: the strongest writing here,
+behind the last icon on the desktop grid, absent from the HTML entirely. The
+bin is pinned to the taskbar by default now.
 
 [src/data/case-study.ts](src/data/case-study.ts) is the Meditap ASO billing
 system at more than bullet-point depth. Everything in it traces to the Meditap

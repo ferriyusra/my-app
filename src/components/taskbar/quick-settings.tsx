@@ -1,6 +1,6 @@
 'use client';
 
-import { Image as ImageIcon, Settings as SettingsGlyph, SunMedium, Wifi } from 'lucide-react';
+import { Image as ImageIcon, Settings as SettingsGlyph, SunMedium, Wifi, WifiOff } from 'lucide-react';
 import { LiBell, LiMoon, LiSun, LiVolume2, LiVolumeX } from '@/components/icons/line-icons';
 import { useMemo } from 'react';
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/context/shell-context';
 import { useTheme } from '@/components/theme-provider';
 import { useWindowManager } from '@/hooks/use-window-manager';
+import { useSystemStatus } from '@/hooks/use-system-status';
 import Flyout from '@/components/ui/flyout';
 
 /**
@@ -37,6 +38,7 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 	} = useShell();
 	const { theme, toggle, mounted } = useTheme();
 	const { launch } = useWindowManager();
+	const { online } = useSystemStatus();
 	const dark = mounted && theme === 'dark';
 
 	/* The cycle covers whatever is on offer, so an image dropped into
@@ -150,9 +152,16 @@ export default function QuickSettings({ onClose }: { onClose: () => void }) {
 			</label>
 
 			<footer className='qs-foot'>
+				{/* The tray reads navigator.onLine three components away. This said
+					"Connected" whatever the answer, so going offline put WifiOff in the
+					tray and a contradiction of it here, both visible at once. */}
 				<span className='qs-net'>
-					<Wifi size={15} aria-hidden='true' />
-					Connected
+					{online ? (
+						<Wifi size={15} aria-hidden='true' />
+					) : (
+						<WifiOff size={15} aria-hidden='true' />
+					)}
+					{online ? 'Connected' : 'No internet'}
 				</span>
 				<button
 					type='button'

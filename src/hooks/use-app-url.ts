@@ -33,7 +33,7 @@ function appFromUrl(): AppId | null {
 export function useAppUrl() {
 	const { windows, topZ } = useWindows();
 	const { launch, focus } = useWindowManager();
-	const { booted } = useShell();
+	const { booted, arrival } = useShell();
 
 	/** What the URL last said, so a sync does not fight a user action. */
 	const shown = useRef<AppId | null>(null);
@@ -41,14 +41,18 @@ export function useAppUrl() {
 	/** Which apps were open last time round, to tell opening from raising. */
 	const wasOpen = useRef<AppId[]>([]);
 
-	/* Arrival: open what was asked for, or About when nothing was. */
+	/* Arrival: open what was asked for, or About when nothing was — except on
+	   a visitor's very first arrival, which opens Tips instead. Nothing on a
+	   desktop announces that its windows drag, snap and close, so the first
+	   thing anybody does here is drag, snap and close the window that says so.
+	   A shared ?app= link still wins, because it is read first. */
 	useEffect(() => {
 		if (!booted || started.current) return;
 		started.current = true;
 		const asked = appFromUrl();
 		shown.current = asked;
-		launch(asked ?? 'about');
-	}, [booted, launch]);
+		launch(asked ?? (arrival === 'first' ? 'tips' : 'about'));
+	}, [booted, arrival, launch]);
 
 	/* Keep the address bar pointed at whatever is in front. Opening an app is
 	   a navigation and gets a history entry; merely raising one that is

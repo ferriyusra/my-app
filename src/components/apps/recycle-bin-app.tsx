@@ -2,16 +2,8 @@
 
 import { useState } from 'react';
 import { DocumentIcon, RecycleIcon } from '@/components/icons/app-icons';
+import DiscardedDetail, { when } from '@/components/content/discarded-detail';
 import { discarded } from '@/data/discarded';
-
-/** "2026-08" → "August 2026", for the Date deleted column. */
-function when(iso: string): string {
-	const [y, m] = iso.split('-').map(Number);
-	return new Date(y, m - 1, 1).toLocaleDateString('en-GB', {
-		month: 'long',
-		year: 'numeric',
-	});
-}
 
 /**
  * The Recycle Bin, holding what was actually thrown away.
@@ -19,6 +11,9 @@ function when(iso: string): string {
  * An empty bin was the honest state until there was something real to put in
  * it. Every row is a decision this repository reversed, and the commit that
  * did it — so the reasoning is checkable rather than claimed.
+ *
+ * The detail pane is a shared component: Explorer opens the same entries from
+ * Documents ▸ Decisions reversed, and the server document prints them.
  */
 export default function RecycleBinApp() {
 	const [selected, setSelected] = useState(0);
@@ -64,27 +59,7 @@ export default function RecycleBinApp() {
 				</div>
 
 				<div className='rb-detail'>
-					<h3>{item.name}</h3>
-					<p className='rb-summary'>{item.summary}</p>
-					<dl className='rb-meta'>
-						<div>
-							<dt>Original location</dt>
-							<dd>{item.origin}</dd>
-						</div>
-						<div>
-							<dt>Removed by</dt>
-							<dd>
-								{item.commit ? (
-									<code>{item.commit}</code>
-								) : (
-									/* Two of these were reverted before they were ever
-									   committed; saying so is more honest than a hash. */
-									<span className='rb-nocommit'>reverted before commit</span>
-								)}
-							</dd>
-						</div>
-					</dl>
-					<p className='rb-reason'>{item.reason}</p>
+					<DiscardedDetail item={item} />
 				</div>
 			</div>
 		</div>

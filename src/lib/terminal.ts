@@ -15,6 +15,7 @@ import { skills } from '../data/skills.ts';
 import { caseStudy } from '../data/case-study.ts';
 import { profile, yearsOfExperience, CAREER_START } from '../data/profile.ts';
 import type { AppId } from '../types/windows.ts';
+import { SHORTCUTS, SHORTCUT_NOTE, TIP_PAGES } from '../data/tips.ts';
 
 export type Line = { text: string; tone?: 'dim' | 'accent' | 'error' };
 
@@ -30,7 +31,22 @@ const dim = (text: string): Line => ({ text, tone: 'dim' });
 const acc = (text: string): Line => ({ text, tone: 'accent' });
 const p = (text = ''): Line => ({ text });
 
+/** Breaks a sentence onto terminal-width lines, on word boundaries. */
+function wrap(text: string, width = 72): string[] {
+	const out: string[] = [];
+	let line = '';
+	for (const word of text.split(' ')) {
+		if (line && line.length + word.length + 1 > width) {
+			out.push(line);
+			line = word;
+		} else line = line ? `${line} ${word}` : word;
+	}
+	if (line) out.push(line);
+	return out;
+}
+
 const APP_WORDS: Record<string, AppId> = {
+	tips: 'tips',
 	about: 'about',
 	skills: 'skills',
 	experience: 'experience',
@@ -46,7 +62,6 @@ const APP_WORDS: Record<string, AppId> = {
 	bin: 'recycle',
 	code: 'vscode',
 	vscode: 'vscode',
-	browser: 'edge',
 };
 
 const COMMANDS = [
@@ -57,6 +72,7 @@ const COMMANDS = [
 	['skill <name>', 'where a tool was actually used'],
 	['open <app>', 'open a window'],
 	['uptime', 'years in the industry, computed'],
+	['tips [keys]', 'what this desktop does, and the keys it answers to'],
 	['contact', 'how to reach him'],
 	['clear', 'clear the screen'],
 ] as const;
@@ -210,6 +226,33 @@ export function run(input: string): Result {
 				};
 			}
 			return { lines: [dim(`opening ${arg}…`)], open: app };
+		}
+
+		case 'tips': {
+			if (arg === 'keys' || arg === 'keyboard') {
+				return {
+					lines: [
+						acc('Keyboard'),
+						...SHORTCUTS.map((k) =>
+							p(`  ${(k.alt ? `${k.chord}  /  ${k.alt}` : k.chord).padEnd(24)}${k.does}`),
+						),
+						dim(''),
+						...wrap(SHORTCUT_NOTE).map(dim),
+					],
+				};
+			}
+			return {
+				lines: [
+					...TIP_PAGES.flatMap((page) => [
+						acc(page.title),
+						...page.tips.map((t) =>
+							p(`  ${t.title}${t.where ? ` — ${t.where}` : ''}`),
+						),
+						p(''),
+					]),
+					dim('tips keys for the shortcuts, open tips for the window'),
+				],
+			};
 		}
 
 		case 'contact':

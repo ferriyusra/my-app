@@ -24,7 +24,8 @@ Open <http://localhost:3000>.
 | Keyboard | `⊞`+`←`/`→` snap, `⊞`+`↑`/`↓` maximise and restore, `⊞`+`D` show desktop, `⊞`+`E` File Explorer, `Alt`+`F4` close, `Esc` close, arrow keys on the desktop grid. Windows itself claims the `⊞` combinations before the browser sees them, so in practice they serve macOS and Linux |
 | Taskbar | Pinned and running apps with Windows' widening focus indicator, hover previews, right-click to pin or close, live system tray, clock |
 | Start | Search across apps and links, pinned grid, all-apps list, Recommended from this session, power menu — sleep blanks the screen, restart replays the startup sequence, shut down leaves a way back |
-| Apps | About (System Properties), File Explorer (Projects), Skills, Experience, Mail (Contact), Media Player, Settings, Browser, VS Code, Recycle Bin |
+| Apps | Tips, About (System Properties), File Explorer, Skills, Experience, Mail (Contact), Media Player, Settings, VS Code, Recycle Bin, Terminal, Career.exe |
+| Tips | Opens by itself on a first visit and never again, so the first thing anybody does here is drag, resize and close the window explaining drag, resize and close. `F1` reopens it. Four pages: the gestures, the keyboard map, the five decisions the shell is built on, and what is deliberately absent |
 | Media Player | Type a song, artist or album and play it. Search goes through `/api/music/search`, which proxies Apple's catalogue so its rate limit lands on the server rather than each visitor. Previews are 30 seconds — that is what the public API serves — and the full track is one click away |
 | Personalisation | Light / dark, six accents, four built-in wallpapers plus any image you drop into `public/background`, brightness and volume — all persisted, all changing the running shell |
 | Activation | It opens unactivated, watermark and all. Settings ▸ System ▸ Activation is where that watermark's own instruction leads, and activating actually clears it |

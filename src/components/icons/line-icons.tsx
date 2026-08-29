@@ -13,7 +13,10 @@
  * theme and accent like the rest of the shell, and only the icons actually used
  * are shipped.
  *
- * Do not hand-edit. Regenerate from scratchpad/gen if the set needs to change.
+ * Do not hand-edit. `scratchpad/gen/line-icons.mjs` emits exactly this shape
+ * from the package; its header carries the three commands. The package is
+ * installed with --no-save for the length of a regeneration and removed
+ * again, so it never becomes a dependency of the build.
  */
 
 import type * as React from 'react';
@@ -144,6 +147,22 @@ export function LiBug({ size = 16, className }: IconProps) {
 }
 
 /** LineIcons `Check`. */
+export function LiBulb({ size = 16, className }: IconProps) {
+	return (
+		<svg
+			xmlns='http://www.w3.org/2000/svg'
+			width={size}
+			height={size}
+			viewBox='0 0 25 24'
+			fill='none'
+			className={className}
+			aria-hidden='true'
+			focusable='false'>
+			<path fill="currentColor" d="M9.063 18.045c-.046-1.131-.794-2.194-1.803-3.18a7.5 7.5 0 1 1 10.48 0c-1.041 1.017-1.805 2.117-1.805 3.29v1.595a2.25 2.25 0 0 1-2.25 2.25h-2.373a2.25 2.25 0 0 1-2.25-2.25v-1.705ZM6.5 9.5a5.98 5.98 0 0 0 1.808 4.293c.741.724 1.512 1.633 1.933 2.707h4.518c.421-1.074 1.192-1.984 1.933-2.707A6 6 0 1 0 6.5 9.5Zm4.063 8.713v1.537c0 .414.335.75.75.75h2.372a.75.75 0 0 0 .75-.75V18h-3.873v.017a4.17 4.17 0 0 1 0 .196ZM1.75 9.5a.75.75 0 0 1 .75-.75h1a.75.75 0 0 1 0 1.5h-1a.75.75 0 0 1-.75-.75ZM4.215 3.85a.75.75 0 1 0-.75 1.3l.866.5a.75.75 0 1 0 .75-1.3l-.866-.5ZM3.19 14.875a.75.75 0 0 1 .275-1.024l.866-.5a.75.75 0 0 1 .75 1.298l-.866.5a.75.75 0 0 1-1.025-.274ZM21.5 8.75a.75.75 0 0 0 0 1.5h1a.75.75 0 0 0 0-1.5h-1ZM19.645 13.625a.75.75 0 0 1 1.025-.274l.866.5a.75.75 0 1 1-.75 1.298l-.866-.5a.75.75 0 0 1-.275-1.024ZM19.92 4.35a.75.75 0 0 0 .75 1.3l.866-.5a.75.75 0 1 0-.75-1.3l-.866.5Z"></path>
+		</svg>
+	);
+}
+
 export function LiCheck({ size = 16, className }: IconProps) {
 	return (
 		<svg
@@ -297,6 +316,23 @@ export function LiHome({ size = 16, className }: IconProps) {
 }
 
 /** LineIcons `Layers1`. */
+export function LiKeyboard({ size = 16, className }: IconProps) {
+	return (
+		<svg
+			xmlns='http://www.w3.org/2000/svg'
+			width={size}
+			height={size}
+			viewBox='0 0 24 24'
+			fill='none'
+			className={className}
+			aria-hidden='true'
+			focusable='false'>
+			<path fill="currentColor" d="M6.441 8.192a.8.8 0 1 0 0 1.6h.01a.8.8 0 0 0 0-1.6h-.01ZM5.64 12.367a.8.8 0 0 1 .8-.8h.01a.8.8 0 0 1 0 1.6h-.01a.8.8 0 0 1-.8-.8ZM10.145 8.192a.8.8 0 0 0 0 1.6h.01a.8.8 0 1 0 0-1.6h-.01ZM9.358 12.367a.8.8 0 0 1 .8-.8h.01a.8.8 0 0 1 0 1.6h-.01a.8.8 0 0 1-.8-.8ZM8 14.992a.75.75 0 0 0 0 1.5h8a.75.75 0 0 0 0-1.5H8ZM13.046 8.992a.8.8 0 0 1 .8-.8h.01a.8.8 0 0 1 0 1.6h-.01a.8.8 0 0 1-.8-.8ZM17.548 8.192a.8.8 0 1 0 0 1.6h.01a.8.8 0 0 0 0-1.6h-.01ZM13.037 12.367a.8.8 0 0 1 .8-.8h.01a.8.8 0 0 1 0 1.6h-.01a.8.8 0 0 1-.8-.8ZM17.556 11.567a.8.8 0 1 0 0 1.6h.01a.8.8 0 0 0 0-1.6h-.01Z"></path>
+			<path fill="currentColor" fillRule="evenodd" d="M4.25 4.867A2.25 2.25 0 0 0 2 7.117v10.5a2.25 2.25 0 0 0 2.25 2.25h15.5a2.25 2.25 0 0 0 2.25-2.25v-10.5a2.25 2.25 0 0 0-2.25-2.25H4.25Zm-.75 2.25a.75.75 0 0 1 .75-.75h15.5a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75H4.25a.75.75 0 0 1-.75-.75v-10.5Z" clipRule="evenodd"></path>
+		</svg>
+	);
+}
+
 export function LiLayers({ size = 16, className }: IconProps) {
 	return (
 		<svg
@@ -772,19 +808,19 @@ export function FolderIcon({ size = 32, className }: IconProps) {
 	);
 }
 
-/** LineIcons `Edge`. */
-export function BrowserIcon({ size = 32, className }: IconProps) {
+/** LineIcons `Bulb4`. */
+export function TipsIcon({ size = 32, className }: IconProps) {
 	return (
 		<svg
 			xmlns='http://www.w3.org/2000/svg'
 			width={size}
 			height={size}
-			viewBox='0 0 24 24'
+			viewBox='0 0 25 24'
 			fill='none'
 			className={className}
 			aria-hidden='true'
 			focusable='false'>
-			<path fill="currentColor" d="M21.256 11.482c0-1.774-.323-3.386-1.129-4.934C18.482 3.58 15.547 2 12.13 2c-5.612 0-8.773 4.225-9.386 8.837 1.71-2.483 4.709-4.902 8.837-5.031 0 0 4.451 0 4 4.225H8.549c.225-1.484.71-2.355 1.354-3.16-3.032 1.45-4.902 3.902-4.838 7.61.033 2.871 2.032 5.838 4.838 6.935 3.354 1.258 7.74.258 9.644-.871V16.32c-3.226 2.258-10.934 2.451-10.934-2.71h12.61v-2.128h.033Z"></path>
+			<path fill="currentColor" d="M9.063 18.045c-.046-1.131-.794-2.194-1.803-3.18a7.5 7.5 0 1 1 10.48 0c-1.041 1.017-1.805 2.117-1.805 3.29v1.595a2.25 2.25 0 0 1-2.25 2.25h-2.373a2.25 2.25 0 0 1-2.25-2.25v-1.705ZM6.5 9.5a5.98 5.98 0 0 0 1.808 4.293c.741.724 1.512 1.633 1.933 2.707h4.518c.421-1.074 1.192-1.984 1.933-2.707A6 6 0 1 0 6.5 9.5Zm4.063 8.713v1.537c0 .414.335.75.75.75h2.372a.75.75 0 0 0 .75-.75V18h-3.873v.017a4.17 4.17 0 0 1 0 .196ZM1.75 9.5a.75.75 0 0 1 .75-.75h1a.75.75 0 0 1 0 1.5h-1a.75.75 0 0 1-.75-.75ZM4.215 3.85a.75.75 0 1 0-.75 1.3l.866.5a.75.75 0 1 0 .75-1.3l-.866-.5ZM3.19 14.875a.75.75 0 0 1 .275-1.024l.866-.5a.75.75 0 0 1 .75 1.298l-.866.5a.75.75 0 0 1-1.025-.274ZM21.5 8.75a.75.75 0 0 0 0 1.5h1a.75.75 0 0 0 0-1.5h-1ZM19.645 13.625a.75.75 0 0 1 1.025-.274l.866.5a.75.75 0 1 1-.75 1.298l-.866-.5a.75.75 0 0 1-.275-1.024ZM19.92 4.35a.75.75 0 0 0 .75 1.3l.866-.5a.75.75 0 1 0-.75-1.3l-.866.5Z"></path>
 		</svg>
 	);
 }

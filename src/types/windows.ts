@@ -2,6 +2,7 @@
 
 /** Every app that opens in a window. */
 export type AppId =
+	| 'tips'
 	| 'about'
 	| 'explorer'
 	| 'skills'
@@ -9,7 +10,6 @@ export type AppId =
 	| 'contact'
 	| 'media'
 	| 'settings'
-	| 'edge'
 	| 'vscode'
 	| 'recycle'
 	| 'career'

@@ -1,14 +1,15 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { LiBriefcase, LiLayers, LiMail, LiUser } from '@/components/icons/line-icons';
 import {
 	DocumentIcon,
 	FolderIcon,
-	ThisPcIcon,
+	RecycleIcon,
 } from '@/components/icons/app-icons';
+import { LiBriefcase, LiLayers } from '@/components/icons/line-icons';
 import ExplorerSidebar, {
-	NAV,
+	LOCATION_LABEL,
+	PARENT,
 	type NavKey,
 } from '@/components/explorer/explorer-sidebar';
 import ExplorerToolbar, {
@@ -19,19 +20,17 @@ import Breadcrumb from '@/components/explorer/breadcrumb';
 import FolderCard from '@/components/explorer/folder-card';
 import FileRow from '@/components/explorer/file-row';
 import ProjectDetail from '@/components/explorer/project-detail';
+import RoleDetail from '@/components/explorer/role-detail';
+import CaseStudyBody from '@/components/content/case-study-body';
+import DiscardedDetail, { when } from '@/components/content/discarded-detail';
 import type { FsEntry } from '@/components/explorer/types';
-import { useWindowManager } from '@/hooks/use-window-manager';
 import { projects } from '@/data/projects';
-import { skills } from '@/data/skills';
 import { profile } from '@/data/profile';
-import { experiences } from '@/data/experience';
-import type { AppId } from '@/types/windows';
+import { experiences, tenureLabel } from '@/data/experience';
+import { caseStudy } from '@/data/case-study';
+import { discarded } from '@/data/discarded';
 
-type Loc = { nav: NavKey; project?: string };
-
-const LABEL: Record<NavKey, string> = Object.fromEntries(
-	NAV.map((n) => [n.key, n.label]),
-) as Record<NavKey, string>;
+type Loc = { nav: NavKey; item?: string };
 
 /** A tinted folder for a project, so a grid of them is scannable by colour. */
 function ProjectFolder({ colour }: { colour: string }) {
@@ -43,14 +42,19 @@ function ProjectFolder({ colour }: { colour: string }) {
 	);
 }
 
-/** Projects and documents, presented as Windows 11's File Explorer. */
+/**
+ * Projects and documents, presented as Windows 11's File Explorer.
+ *
+ * Every folder here is real data. Three of them used to hold applications
+ * wearing file icons — which is worse than an empty folder, because it teaches
+ * the visitor the file metaphor is a costume and then the one folder that was
+ * genuine gets no credit for it either.
+ */
 export default function ExplorerApp() {
-	const { launch } = useWindowManager();
-
 	const [history, setHistory] = useState<Loc[]>([{ nav: 'portfolio' }]);
 	const [index, setIndex] = useState(0);
 	const [view, setView] = useState<ViewMode>('grid');
-	const [sort, setSort] = useState<SortKey>('name');
+	const [sort, setSort] = useState<SortKey>('default');
 	const [query, setQuery] = useState('');
 	const [selected, setSelected] = useState<string | null>(null);
 
@@ -66,8 +70,9 @@ export default function ExplorerApp() {
 		[index],
 	);
 
-	const openApp = useCallback((id: AppId) => launch(id), [launch]);
-
+	/* Featured first — the order the folder is in, which `sort: 'default'`
+	   preserves. It used to be computed here and then discarded by an
+	   alphabetical sort that could not be turned off. */
 	const ordered = useMemo(
 		() => [
 			...projects.filter((p) => p.featured),
@@ -76,9 +81,11 @@ export default function ExplorerApp() {
 		[],
 	);
 
-	const current = loc.project
-		? (ordered.find((p) => p.id === loc.project) ?? null)
-		: null;
+	/* Newest first, the way a CV reads. */
+	const roles = useMemo(
+		() => [...experiences].sort((a, b) => b.startISO.localeCompare(a.startISO)),
+		[],
+	);
 
 	/* ── Folder contents ─────────────────────────────────────── */
 
@@ -90,27 +97,22 @@ export default function ExplorerApp() {
 			meta: 'Opens in a new tab',
 			icon: <DocumentIcon size={40} />,
 			href: profile.cvView,
-			onOpen: () => window.open(profile.cvView, '_blank', 'noopener,noreferrer'),
+			onOpen: () =>
+				window.open(profile.cvView, '_blank', 'noopener,noreferrer'),
 		};
 
-		const appFile = (
-			id: AppId,
+		const folder = (
+			nav: NavKey,
 			name: string,
-			type: string,
 			meta: string,
-			Icon: typeof LiUser,
-			tint: string,
+			icon: FsEntry['icon'],
 		): FsEntry => ({
-			id,
+			id: nav,
 			name,
-			type,
+			type: 'File folder',
 			meta,
-			icon: (
-				<span className='xp-file-mark' style={{ background: tint }} aria-hidden='true'>
-					<Icon size={20} color='#fff' strokeWidth={2.1} />
-				</span>
-			),
-			onOpen: () => openApp(id),
+			icon,
+			onOpen: () => go({ nav }),
 		});
 
 		switch (loc.nav) {
@@ -121,82 +123,103 @@ export default function ExplorerApp() {
 					type: p.type === 'real' ? 'Production project' : 'Case study',
 					meta: p.tech.slice(0, 3).join(' · '),
 					icon: <ProjectFolder colour={p.color} />,
-					onOpen: () => go({ nav: 'portfolio', project: p.id }),
+					onOpen: () => go({ nav: 'portfolio', item: p.id }),
+				}));
+
+			case 'roles':
+				return roles.map((r) => ({
+					id: r.short,
+					name: `${r.short} — ${r.role}`,
+					type: r.current ? 'Current role' : 'Previous role',
+					meta: `${r.period} · ${tenureLabel(r)}`,
+					icon: (
+						<span className='xp-file-mark' style={{ background: '#0e7c70' }} aria-hidden='true'>
+							<LiBriefcase size={20} color='#fff' strokeWidth={2.1} />
+						</span>
+					),
+					onOpen: () => go({ nav: 'roles', item: r.short }),
+				}));
+
+			case 'case-study':
+				return [
+					{
+						id: caseStudy.slug,
+						name: caseStudy.title,
+						type: 'Case study',
+						meta: `${caseStudy.at} · ${caseStudy.period}`,
+						icon: (
+							<span className='xp-file-mark' style={{ background: '#6d3fd4' }} aria-hidden='true'>
+								<LiLayers size={20} color='#fff' strokeWidth={2.1} />
+							</span>
+						),
+						onOpen: () => go({ nav: 'case-study', item: caseStudy.slug }),
+					},
+				];
+
+			case 'decisions':
+				return discarded.map((d) => ({
+					id: d.name,
+					name: d.name,
+					type: d.commit ? 'Removed in a commit' : 'Reverted before commit',
+					meta: `${d.origin} · ${when(d.date)}`,
+					icon: <DocumentIcon size={40} />,
+					onOpen: () => go({ nav: 'decisions', item: d.name }),
 				}));
 
 			case 'documents':
 				return [
-					resume,
-					appFile('about', 'About-Me', 'Profile', 'Bio and specifications', LiUser, '#0f6cbd'),
-					appFile(
-						'experience',
-						'Experience',
-						'Work history',
-						`${experiences.length} roles since 2021`,
-						LiBriefcase,
-						'#0e7c70',
+					folder(
+						'roles',
+						'Roles',
+						`${roles.length} roles since 2021`,
+						<FolderIcon size={40} />,
 					),
-					appFile('skills', 'Skills', 'Tech stack', `${skills.length} tools by category`, LiLayers, '#6d3fd4'),
-				];
-
-			case 'downloads':
-				return [resume];
-
-			case 'desktop':
-				return [
-					appFile('about', 'About Me', 'Application', 'System properties', LiUser, '#0f6cbd'),
-					{
-						id: 'portfolio',
-						name: 'Projects',
-						type: 'File folder',
-						meta: `${ordered.length} items`,
-						icon: <FolderIcon size={40} />,
-						onOpen: () => go({ nav: 'portfolio' }),
-					},
-					appFile('skills', 'Skills', 'Application', 'Tech stack', LiLayers, '#6d3fd4'),
-					appFile('experience', 'Experience', 'Application', 'Roles and outcomes', LiBriefcase, '#0e7c70'),
-					appFile('contact', 'Contact', 'Application', 'Send a message', LiMail, '#1454a8'),
+					folder(
+						'case-study',
+						'Case study',
+						caseStudy.title,
+						<FolderIcon size={40} />,
+					),
+					folder(
+						'decisions',
+						'Decisions reversed',
+						`${discarded.length} things built and thrown away`,
+						<RecycleIcon size={40} />,
+					),
+					resume,
 				];
 
 			case 'home':
 			default:
 				return [
-					{
-						id: 'portfolio',
-						name: 'Portfolio',
-						type: 'File folder',
-						meta: `${ordered.length} projects`,
-						icon: <FolderIcon size={40} />,
-						onOpen: () => go({ nav: 'portfolio' }),
-					},
-					{
-						id: 'documents',
-						name: 'Documents',
-						type: 'File folder',
-						meta: '4 items',
-						icon: <FolderIcon size={40} />,
-						onOpen: () => go({ nav: 'documents' }),
-					},
-					{
-						id: 'downloads',
-						name: 'Downloads',
-						type: 'File folder',
-						meta: '1 item',
-						icon: <FolderIcon size={40} />,
-						onOpen: () => go({ nav: 'downloads' }),
-					},
-					{
-						id: 'pc',
-						name: 'Local Disk (C:)',
-						type: 'Local disk',
-						meta: 'Everything on this desktop',
-						icon: <ThisPcIcon size={40} />,
-						onOpen: () => go({ nav: 'desktop' }),
-					},
+					folder(
+						'portfolio',
+						'Portfolio',
+						`${ordered.length} projects`,
+						<FolderIcon size={40} />,
+					),
+					folder('documents', 'Documents', '4 items', <FolderIcon size={40} />),
 					resume,
 				];
 		}
-	}, [loc.nav, ordered, go, openApp]);
+	}, [loc.nav, ordered, roles, go]);
+
+	/* ── What is open, if anything ───────────────────────────── */
+
+	const openProject =
+		loc.nav === 'portfolio' && loc.item
+			? (ordered.find((p) => p.id === loc.item) ?? null)
+			: null;
+	const openRole =
+		loc.nav === 'roles' && loc.item
+			? (roles.find((r) => r.short === loc.item) ?? null)
+			: null;
+	const openDecision =
+		loc.nav === 'decisions' && loc.item
+			? (discarded.find((d) => d.name === loc.item) ?? null)
+			: null;
+	const openCase = loc.nav === 'case-study' && !!loc.item;
+	const openItem = openProject || openRole || openDecision || openCase;
 
 	/* ── Filter and sort ─────────────────────────────────────── */
 
@@ -208,6 +231,7 @@ export default function ExplorerApp() {
 						e.name.toLowerCase().includes(q) || e.meta.toLowerCase().includes(q),
 				)
 			: entries;
+		if (sort === 'default') return filtered;
 		return [...filtered].sort((a, b) =>
 			sort === 'type'
 				? a.type.localeCompare(b.type) || a.name.localeCompare(b.name)
@@ -217,12 +241,30 @@ export default function ExplorerApp() {
 
 	/* ── Chrome ──────────────────────────────────────────────── */
 
+	/* Walk up the parents so a folder three deep still says where it is. */
+	const ancestors = useMemo(() => {
+		const chain: NavKey[] = [];
+		for (let key: NavKey | null = loc.nav; key; key = PARENT[key]) {
+			chain.unshift(key);
+		}
+		return chain;
+	}, [loc.nav]);
+
+	const openName =
+		openProject?.name ??
+		(openRole ? `${openRole.short} — ${openRole.role}` : null) ??
+		openDecision?.name ??
+		(openCase ? caseStudy.title : null);
+
 	const trail = [
 		{ label: 'This PC', onSelect: () => go({ nav: 'home' }) },
-		{ label: LABEL[loc.nav], onSelect: () => go({ nav: loc.nav }) },
-		...(current ? [{ label: current.name }] : []),
+		...ancestors
+			.filter((k) => k !== 'home')
+			.map((k) => ({ label: LOCATION_LABEL[k], onSelect: () => go({ nav: k }) })),
+		...(openName ? [{ label: openName }] : []),
 	];
 
+	const here = LOCATION_LABEL[loc.nav];
 	const selectedEntry = shown.find((e) => e.id === selected);
 
 	return (
@@ -237,7 +279,7 @@ export default function ExplorerApp() {
 				<ExplorerToolbar
 					canBack={index > 0}
 					canForward={index < history.length - 1}
-					canUp={!!current || loc.nav !== 'home'}
+					canUp={!!openItem || loc.nav !== 'home'}
 					onBack={() => {
 						setIndex((i) => Math.max(0, i - 1));
 						setSelected(null);
@@ -246,8 +288,15 @@ export default function ExplorerApp() {
 						setIndex((i) => Math.min(history.length - 1, i + 1));
 						setSelected(null);
 					}}
+					/* Up leaves an open item for its folder, then walks the parent
+					   chain. It used to jump straight to Home from any depth, which
+					   was right while the tree was two levels and is not now. */
 					onUp={() =>
-						go(current ? { nav: loc.nav } : { nav: 'home' })
+						go(
+							openItem
+								? { nav: loc.nav }
+								: { nav: PARENT[loc.nav] ?? 'home' },
+						)
 					}
 					onRefresh={() => {
 						setSelected(null);
@@ -259,7 +308,7 @@ export default function ExplorerApp() {
 					onSort={setSort}
 					query={query}
 					onQuery={setQuery}
-					searchLabel={`Search ${current ? current.name : LABEL[loc.nav]}`}
+					searchLabel={`Search ${openName ?? here}`}
 				/>
 
 				<div className='xp-bar'>
@@ -267,12 +316,22 @@ export default function ExplorerApp() {
 				</div>
 
 				<div className='xp-body'>
-					{current ? (
-						<ProjectDetail project={current} />
+					{openProject ? (
+						<ProjectDetail project={openProject} />
+					) : openRole ? (
+						<RoleDetail role={openRole} />
+					) : openDecision ? (
+						<article className='xp-detail'>
+							<DiscardedDetail item={openDecision} />
+						</article>
+					) : openCase ? (
+						<article className='xp-detail'>
+							<CaseStudyBody />
+						</article>
 					) : shown.length === 0 ? (
 						<p className='xp-empty'>
 							{query
-								? `Nothing in ${LABEL[loc.nav]} matches “${query}”.`
+								? `Nothing in ${here} matches “${query}”.`
 								: 'This folder is empty.'}
 						</p>
 					) : view === 'grid' ? (
@@ -290,7 +349,7 @@ export default function ExplorerApp() {
 						<div
 							className={`xp-rows${view === 'details' ? ' xp-rows-details' : ''}`}
 							role='table'
-							aria-label={LABEL[loc.nav]}>
+							aria-label={here}>
 							{view === 'details' && (
 								<div className='xp-rows-head' role='row'>
 									<span role='columnheader'>Name</span>
@@ -313,11 +372,17 @@ export default function ExplorerApp() {
 
 				<footer className='xp-status'>
 					<span>
-						{current
-							? `${current.name} · ${current.tech.length} technologies`
-							: `${shown.length} item${shown.length === 1 ? '' : 's'}`}
+						{openProject
+							? `${openProject.name} · ${openProject.tech.length} technologies`
+							: openRole
+								? `${openRole.short} · ${openRole.achievements.length} outcomes`
+								: openDecision
+									? `${openDecision.name} · ${openDecision.commit ?? 'never committed'}`
+									: openCase
+										? `${caseStudy.at} · ${caseStudy.sections.length} sections`
+										: `${shown.length} item${shown.length === 1 ? '' : 's'}`}
 					</span>
-					{selectedEntry && !current && (
+					{selectedEntry && !openItem && (
 						<span className='xp-status-sel'>
 							1 selected · {selectedEntry.type} — double-click to open
 						</span>

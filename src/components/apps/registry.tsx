@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 
 import {
 	BriefcaseIcon,
-	BrowserIcon,
 	CodeIcon,
 	DocumentIcon,
 	FolderIcon,
@@ -16,6 +15,7 @@ import {
 	MediaIcon,
 	PersonIcon,
 	RecycleIcon,
+	TipsIcon,
 	CareerIcon,
 	TerminalIcon,
 } from '@/components/icons/app-icons';
@@ -44,6 +44,7 @@ const lazy = (load: () => Promise<{ default: React.ComponentType }>) =>
 		),
 	});
 
+const TipsApp = lazy(() => import('./tips-app'));
 const AboutApp = lazy(() => import('./about-app'));
 const ExplorerApp = lazy(() => import('./explorer-app'));
 const SkillsApp = lazy(() => import('./skills-app'));
@@ -51,7 +52,6 @@ const ExperienceApp = lazy(() => import('./experience-app'));
 const ContactApp = lazy(() => import('./contact-app'));
 const MediaApp = lazy(() => import('./media-app'));
 const SettingsApp = lazy(() => import('./settings-app'));
-const BrowserApp = lazy(() => import('./browser-app'));
 const EditorApp = lazy(() => import('./editor-app'));
 const RecycleBinApp = lazy(() => import('./recycle-bin-app'));
 const CareerApp = lazy(() => import('./career-app'));
@@ -71,6 +71,15 @@ export type AppDef = {
 };
 
 export const APPS: AppDef[] = [
+	{
+		id: 'tips',
+		title: 'Tips',
+		blurb: 'What this desktop does',
+		tile: { Art: TipsIcon },
+		w: 880,
+		h: 600,
+		Content: TipsApp,
+	},
 	{
 		id: 'about',
 		title: 'About Me',
@@ -133,15 +142,6 @@ export const APPS: AppDef[] = [
 		w: 980,
 		h: 620,
 		Content: EditorApp,
-	},
-	{
-		id: 'edge',
-		title: 'Browser',
-		blurb: 'Live demos and profiles',
-		tile: { Art: BrowserIcon },
-		w: 960,
-		h: 620,
-		Content: BrowserApp,
 	},
 	{
 		id: 'settings',
@@ -227,6 +227,7 @@ export const SHORTCUT_BY_ID = Object.fromEntries(
  * the order they matter, then the web shortcuts, then the bin last.
  */
 export const DESKTOP_ITEMS: { id: AppId | ShortcutId; label: string }[] = [
+	{ id: 'tips', label: 'Tips' },
 	{ id: 'about', label: 'About Me' },
 	{ id: 'explorer', label: 'Projects' },
 	{ id: 'skills', label: 'Skills' },
@@ -243,6 +244,7 @@ export const DESKTOP_ITEMS: { id: AppId | ShortcutId; label: string }[] = [
 
 /** Apps pinned to Start, in grid order. */
 export const START_PINNED: AppId[] = [
+	'tips',
 	'about',
 	'explorer',
 	'skills',
@@ -252,8 +254,8 @@ export const START_PINNED: AppId[] = [
 	'career',
 	'terminal',
 	'vscode',
-	'edge',
 	'settings',
+	'recycle',
 ];
 
 export function isAppId(id: string): id is AppId {

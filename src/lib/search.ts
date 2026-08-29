@@ -22,13 +22,14 @@ import { skills } from '../data/skills.ts';
 import { caseStudy } from '../data/case-study.ts';
 import { discarded } from '../data/discarded.ts';
 import { profile } from '../data/profile.ts';
+import { SHORTCUTS, TIP_PAGES } from '../data/tips.ts';
 import type { AppId } from '../types/windows.ts';
 
 export type Hit = {
 	id: string;
 	/** Which window answers this, and what Start should open. */
 	app: AppId;
-	kind: 'Role' | 'Project' | 'Skill' | 'Case study' | 'Discarded' | 'Profile';
+	kind: 'Role' | 'Project' | 'Skill' | 'Case study' | 'Discarded' | 'Profile' | 'Tip';
 	title: string;
 	subtitle: string;
 	/** Everything matched against; never shown. */
@@ -103,7 +104,7 @@ export function index(): Hit[] {
 			title: d.name,
 			subtitle: d.summary,
 			haystack: [d.name, d.origin, d.summary, d.reason, d.commit ?? ''].join(' '),
-			weight: 2,
+			weight: 3,
 		});
 	}
 
@@ -115,6 +116,32 @@ export function index(): Hit[] {
 		subtitle: profile.now.map((n) => n.label).join(' · '),
 		haystack: [profile.name, profile.role, profile.roleDetail, profile.headline, profile.proof, profile.location, profile.availability, ...profile.now.map((n) => `${n.label} ${n.text}`)].join(' '),
 		weight: 2,
+	});
+
+	for (const page of TIP_PAGES) {
+		for (const tip of page.tips) {
+			out.push({
+				id: `tip:${tip.title}`,
+				app: 'tips',
+				kind: 'Tip',
+				title: tip.title,
+				subtitle: tip.where ?? page.label,
+				haystack: [tip.title, tip.body, tip.where ?? '', page.label].join(' '),
+				weight: 2,
+			});
+		}
+	}
+
+	/* One entry for the whole map, so "shortcut", "keyboard" or a chord finds
+	   the page rather than nothing. */
+	out.push({
+		id: 'tip:keyboard',
+		app: 'tips',
+		kind: 'Tip',
+		title: 'Keyboard shortcuts',
+		subtitle: `${SHORTCUTS.length} chords the shell answers to`,
+		haystack: ['keyboard shortcuts keys chords', ...SHORTCUTS.map((k) => `${k.chord} ${k.alt ?? ''} ${k.does}`)].join(' '),
+		weight: 3,
 	});
 
 	cached = out;

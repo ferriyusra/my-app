@@ -19,8 +19,8 @@
 export type IconProps = { size?: number; className?: string };
 
 export {
+	TipsIcon,
 	FolderIcon,
-	BrowserIcon,
 	CodeIcon,
 	RecycleIcon,
 	DocumentIcon,

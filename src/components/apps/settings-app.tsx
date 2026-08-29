@@ -129,7 +129,7 @@ export default function SettingsApp() {
 									title={a.label}
 									className='sw-swatch'
 									data-active={accent === a.id || undefined}
-									style={{ background: a.swatch }}
+									data-accent={a.id}
 									onClick={() => setAccent(a.id)}
 								/>
 							))}

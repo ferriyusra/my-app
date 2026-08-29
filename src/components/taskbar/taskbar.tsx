@@ -137,7 +137,7 @@ export default function Taskbar() {
 					rel='noopener noreferrer'
 					aria-label='GitHub profile — opens in a new tab'>
 					{/* Its own mark, like every other app icon on the strip. The
-					    Start, LiSearch and Task view glyphs stay line art because
+					    Start, Search and Task view glyphs stay line art because
 					    those are system controls, which is what Windows does. */}
 					<GitHubIcon size={22} />
 				</a>

@@ -26,7 +26,8 @@ export default function TaskView({ onClose }: { onClose: () => void }) {
 			<div className='taskview-inner'>
 				{windows.length === 0 ? (
 					<p className='taskview-empty'>
-						No open windows. Double-click a desktop icon to start.
+						No open windows. Double-click a desktop icon to start, or press F1
+						for what this desktop does.
 					</p>
 				) : (
 					<ul className='taskview-grid'>
@@ -63,7 +64,12 @@ export default function TaskView({ onClose }: { onClose: () => void }) {
 					</ul>
 				)}
 
-				<div className='taskview-desktops' role='group' aria-label='Desktops'>
+				{/* One desktop, named as one. Real virtual desktops would need a
+				    second window partition, per-desktop z-ordering and a taskbar that
+				    filtered by it — and a portfolio visitor switches between them
+				    exactly never. A group of one was announcing a set that does not
+				    exist; this is Show desktop, where Windows puts it. */}
+				<div className='taskview-desktops'>
 					<button
 						type='button'
 						className='taskview-desktop'
