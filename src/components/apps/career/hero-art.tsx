@@ -16,8 +16,12 @@
  * arranged to avoid.
  */
 
-export const HERO_W = 30;
-export const HERO_H = 52;
+/* Re-exported, not re-declared: the numbers live in world.ts because
+   `reachable()` is computed from them. Both were written out here too and had
+   to stay in step by hand. */
+import { HERO_H, HERO_W } from './world';
+
+export { HERO_W, HERO_H };
 
 export default function HeroArt() {
 	return (

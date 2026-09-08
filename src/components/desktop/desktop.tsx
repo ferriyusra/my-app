@@ -343,6 +343,27 @@ function Shell() {
 			if (e.key === 'Meta' || e.key === 'OS') metaAlone.current = true;
 			else metaAlone.current = false;
 
+			/* Ctrl+F6 cycles the open windows, and Ctrl+Shift+F6 goes back.
+			   Alt+Tab is the chord everyone knows and the one chord no browser
+			   is ever given — the OS takes it first, on every platform. Ctrl+F6
+			   is what Windows itself falls back to for moving between panes,
+			   and it is the only way out of a window here that does not mean
+			   tabbing through the whole app inside it.
+
+			   Minimised windows are skipped: this cycles what is on screen. */
+			if (e.key === 'F6' && e.ctrlKey && !e.metaKey && !e.altKey) {
+				const open = windows.filter((w) => !w.minimised);
+				if (open.length > 1) {
+					e.preventDefault();
+					const top = topWindow();
+					const at = top ? open.findIndex((w) => w.id === top.id) : -1;
+					const step = e.shiftKey ? -1 : 1;
+					const next = open[(at + step + open.length) % open.length];
+					focus(next.id);
+				}
+				return;
+			}
+
 			/* F1 is the help key on the operating system this imitates, and
 			   unlike '?' it needs no guard for whether a field has focus. */
 			if (e.key === 'F1') {

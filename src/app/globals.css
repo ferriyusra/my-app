@@ -4165,20 +4165,7 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 }
 
 .cx-xp { margin-top: 14px; }
-.cx-xp-track {
-  height: 10px;
-  border-radius: 999px;
-  background: var(--surface-chip);
-  overflow: hidden;
-}
-.cx-xp-fill {
-  --fill: 0%;
-  width: var(--fill);
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent-fill), var(--accent));
-  transition: width 1100ms var(--ease-decel);
-}
+.cx-xp .cx-track { margin-bottom: 7px; }
 .cx-xp-meta {
   display: flex;
   justify-content: space-between;
@@ -4271,7 +4258,6 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 .cx-foot code { font-family: var(--mono); font-size: 10.5px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .cx-xp-fill { transition: none; }
   .cx-level { opacity: 1; transform: none; transition: none; }
 }
 
@@ -4310,33 +4296,140 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 
 .cx-game { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px; }
 
-/* ── HUD ── */
-.cx-hud {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
+/* ── The career, above the world ──────────────────────────────
+   Replaces both the HUD and the per-chapter minimap. The HUD said
+   which chapter, which role and which years; a lit segment says all
+   three and says the other four roles as well.
+
+   Segment width grows with months served, so five years reads as a
+   shape before a word of it does — the same `months` the Experience
+   window's bar uses. Not strictly to scale: the floor below keeps a
+   four-month role wide enough to label, so short roles come out a
+   little wider than their share. Ordering and rough proportion are
+   the honest part; do not read exact durations off the widths. */
+.cx-track { display: flex; align-items: center; gap: 10px; }
+
+.cx-track-bar { display: flex; flex: 1; gap: 3px; min-width: 0; }
+
+.cx-track-seg {
+  position: relative;
+  flex: 1 1 0;
+  /* The readability floor. Jojonomic is four months of fifty-two and
+     lands near this, which is the narrowest a two-line label survives. */
+  min-width: 64px;
+  /* Three bands: the name, the years it ran, and the tokens along the
+     bottom. A raised pip reaches 17px, so the text stops above that. */
+  height: 56px;
   border: 1px solid var(--line-subtle);
   border-radius: var(--r-md);
-  background: var(--surface-header);
+  /* The era neutral, mixed through the accent exactly as the chapter's
+     own light is, so the strip and the world are lit the same way. */
+  background: color-mix(in srgb, var(--era-lit) 22%, var(--surface-chip));
+  color: var(--ink);
+  overflow: hidden;
 }
-.cx-hud-ch, .cx-hud-score {
+
+/* Fills the segment so the whole card is the target for "walk to this role".
+   The pips lie over it and take their own clicks. */
+.cx-track-open {
+  position: absolute;
+  inset: 0;
+  padding: 5px 8px 20px;
+  text-align: left;
+  color: inherit;
+}
+button.cx-track-open { cursor: pointer; }
+.cx-track-seg:hover { border-color: var(--accent); }
+button.cx-track-open:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.cx-track-seg[data-on] {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+/* Cleared reads on the border rather than in a number — the pips below
+   already say how many, and a count on top of them was saying it twice. */
+.cx-track-seg[data-done] { border-color: color-mix(in srgb, var(--success) 55%, transparent); }
+
+.cx-track-name {
+  display: block;
+  font-size: 12px;
+  /* Both bands are pinned rather than left to the default leading: the text
+     has to finish above the raised pips, which reach 17px off the floor. */
+  line-height: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cx-track-when {
+  display: block;
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+/* Ported from the minimap, one size down: the tightest segment puts four
+   pips about 13px apart, and an 8px dot reads as a dotted line there. */
+.cx-track-pip {
+  position: absolute;
+  z-index: 1;
+  bottom: 4px;
+  width: 6px; height: 6px;
+  margin-left: -3px;
+  border-radius: 99px;
+  border: 1.5px solid var(--accent);
+  background: var(--surface);
+  transition: background 180ms var(--ease-standard), transform 180ms var(--ease-decel);
+}
+button.cx-track-pip { cursor: pointer; }
+/* Big enough to hit without making the dot big enough to crowd its
+   neighbours: the tightest run puts them 13px apart. */
+button.cx-track-pip::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+}
+button.cx-track-pip:hover { transform: scale(1.5); border-color: var(--ink); }
+.cx-track-pip[data-got] { background: var(--accent); transform: scale(0.8); }
+button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
+/* Raised tokens sit raised here too. Otherwise someone walks straight under
+   one, nothing happens, and there is no clue that jumping is the answer. */
+.cx-track-pip[data-high] { bottom: 11px; }
+.cx-track-pip[data-high]::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 100%;
+  width: 1px; height: 6px;
+  margin-left: -0.5px;
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.cx-track-you {
+  position: absolute;
+  z-index: 2;
+  bottom: 0;
+  width: 0; height: 0;
+  margin-left: -5px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 7px solid var(--ink);
+  will-change: left;
+}
+
+.cx-track-total {
+  flex: none;
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--accent);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
 }
-.cx-hud-score { margin-left: auto; color: var(--ink-muted); }
-.cx-hud-score b { color: var(--accent); animation: cx-bump 300ms var(--ease-decel); }
+.cx-track-total b { color: var(--accent); animation: cx-bump 300ms var(--ease-decel); }
 @keyframes cx-bump {
   0%   { transform: scale(1); }
   35%  { transform: scale(1.35); }
   100% { transform: scale(1); }
 }
-.cx-hud-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.cx-hud-name strong { font-size: 13px; font-weight: 600; }
-.cx-hud-name span { font-size: 11px; color: var(--ink-muted); }
 
 /* ── Depth ───────────────────────────────────────────────────
    CSS 3D rather than a library: a perspective on the stage, the world
@@ -4498,53 +4591,6 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   font-weight: 500;
 }
 
-/* ── Minimap ──
-   One chapter at a time. A chapter is wider than the stage can show, so
-   this is what turns "I missed one" from a search into a glance. */
-.cx-map {
-  position: relative;
-  height: 22px;
-  margin: -2px 2px 0;
-}
-.cx-map-line {
-  position: absolute;
-  left: 0; right: 0; bottom: 5px;
-  height: 2px;
-  border-radius: 999px;
-  background: var(--line-subtle);
-}
-.cx-map-pip {
-  position: absolute;
-  bottom: 2px;
-  width: 8px; height: 8px;
-  margin-left: -4px;
-  border-radius: 99px;
-  border: 1.5px solid var(--accent);
-  background: var(--surface);
-  transition: background 180ms var(--ease-standard), transform 180ms var(--ease-decel);
-}
-.cx-map-pip[data-got] { background: var(--accent); transform: scale(0.8); }
-/* Raised tokens sit raised on the map too. Otherwise someone walks straight
-   under one, nothing happens, and there is no clue that jumping is the answer. */
-.cx-map-pip[data-high] { bottom: 12px; }
-.cx-map-pip[data-high]::after {
-  content: '';
-  position: absolute;
-  left: 50%; top: 100%;
-  width: 1px; height: 7px;
-  margin-left: -0.5px;
-  background: color-mix(in srgb, var(--accent) 35%, transparent);
-}
-.cx-map-you {
-  position: absolute;
-  bottom: 0;
-  width: 0; height: 0;
-  margin-left: -5px;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 7px solid var(--ink);
-  will-change: left;
-}
 
 /* ── The playfield ── */
 .cx-stage {
@@ -4572,9 +4618,12 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
    Walking right walks into it — there is no transition to write because the
    change is spatial, not temporal. `--era` is a neutral, never a hue, so the
    visitor's accent still drives the colour and all six keep working. */
-.cx-chapter {
-  /* Accent first, era neutral second — the accent is the through-line, the
-     era only moves the temperature along it. */
+/* Accent first, era neutral second — the accent is the through-line, the era
+   only moves the temperature along it. One definition, two places that set
+   their own `--era` inline: the chapter in the world, and its segment on the
+   track above it, so the strip and the ground it describes are lit alike. */
+.cx-chapter,
+.cx-track-seg {
   --era-lit: color-mix(in srgb, var(--accent) 42%, var(--era));
 }
 .cx-chapter::before {
@@ -4751,17 +4800,29 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   transform: rotateX(76deg);
 }
 
-/* ── The gate between chapters ── */
-.cx-gate {
+/* ── Where an era ends ── */
+/* ── Where an era ends ──
+   A marker, not a barrier. It genuinely blocked the way out of a chapter
+   until `0832051` removed the gate, and what stayed behind was a red slab the
+   width of a wall that nothing ever walks into — an obstacle promised and not
+   delivered, which is the same thing the old rail in the Experience window
+   was doing when it was cut.
+
+   The boundary itself is already drawn: `.cx-chapter + .cx-chapter` puts a
+   dashed seam a few pixels to the right of this. What this carries is whether
+   the era was emptied, so it is lit from the era rather than from --danger,
+   and it keeps its height. A post that lowers itself when you finish is the
+   barrier metaphor again; the colour and the plate say the state. */
+.cx-post {
   position: absolute;
   right: 18px;
-  width: 12px;
-  height: 108px;
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--danger) 55%, transparent);
-  transition: opacity 260ms var(--ease-standard), height 260ms var(--ease-decel);
+  width: 4px;
+  height: 44px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--era-lit, var(--accent)) 62%, var(--surface));
+  transition: background 260ms var(--ease-standard);
 }
-.cx-gate-lock {
+.cx-post-plate {
   position: absolute;
   bottom: 100%;
   left: 50%;
@@ -4770,22 +4831,23 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: var(--danger);
+  /* Reporting, not warning. It was --danger while it could actually stop you. */
+  color: var(--ink-muted);
   white-space: nowrap;
 }
-.cx-gate[data-open] { height: 8px; opacity: 0.35; background: var(--success); }
-/* A second face, so the barrier has a side rather than being a sticker. */
-.cx-gate::after {
+.cx-post[data-open] { background: var(--success); }
+/* A second face, so the post stands in the world rather than being a sticker. */
+.cx-post::after {
   content: '';
   position: absolute;
   inset: 0 auto 0 100%;
-  width: 9px;
+  width: 3px;
   background: inherit;
   filter: brightness(0.72);
   transform: rotateY(58deg);
   transform-origin: left center;
 }
-.cx-gate[data-open] .cx-gate-lock { color: var(--success); }
+.cx-post[data-open] .cx-post-plate { color: var(--success); }
 
 /* ── The character ── */
 .cx-hero { position: absolute; left: 0; will-change: transform; }
@@ -4919,12 +4981,12 @@ html[data-theme='dark'] .tm { background: #0b0e14; }
 @media (prefers-reduced-motion: reduce) {
   .cx-token i,
   .cx-token[data-got] i,
-  .cx-hud-score b,
+  .cx-track-total b,
   .cx-hero[data-land='true'] .cx-hero-svg,
   .cx-hero[data-idle='true'] .cx-hero-svg { animation: none; }
   .cx-hero[data-walking='true'] .cx-leg,
   .cx-hero[data-walking='true'] .cx-arm { animation: none; }
-  .cx-map-pip { transition: none; }
+  .cx-track-pip, .cx-track-seg { transition: none; }
   /* Depth is not motion: the layers, the floor and the perspective all stay.
      Only the things that actually move stand down. */
   .cx-threshold { animation: none; opacity: 0; }
