@@ -33,14 +33,14 @@ test('every skill a role unlocked becomes exactly one token', () => {
 	}
 });
 
-test('tokens stay clear of the signpost and the gate', () => {
+test('tokens stay clear of the signpost and the era post', () => {
 	for (const c of chapters()) {
 		for (const t of c.tokens) {
 			const local = t.x - c.x;
 			assert.ok(local >= 200, `${t.skill} sits under the signpost (${local})`);
 			assert.ok(
 				local <= CHAPTER_W - 140,
-				`${t.skill} sits past the gate (${local})`,
+				`${t.skill} sits past the era post (${local})`,
 			);
 		}
 	}
@@ -92,15 +92,15 @@ test('the high ledge is a climb, not a hop from the floor', () => {
 });
 
 test('a ledge never blocks the way through a chapter', () => {
-	/* Ledges are one-way platforms, but they must not sit where the gate or
-	   the signpost is, or the route reads as broken. */
+	/* Ledges are one-way platforms, but they must not sit where the era post
+	   or the signpost is, or the route reads as broken. */
 	for (const c of chapters()) {
 		for (const l of c.ledges) {
 			const local = l.x - c.x;
 			assert.ok(local >= 200, `${l.id} overlaps the signpost (${local})`);
 			assert.ok(
 				local + l.w <= CHAPTER_W - 140,
-				`${l.id} runs into the gate (${local + l.w})`,
+				`${l.id} runs into the era post (${local + l.w})`,
 			);
 		}
 	}

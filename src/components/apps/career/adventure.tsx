@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { evidenceFor, monthsLabel } from '@/lib/skill-evidence';
 import HeroArt, { HERO_H, HERO_W } from './hero-art';
+import CareerTrack from './track';
 import SkillMark, { skillByName } from './token-mark';
 import {
 	CHAPTER_W,
@@ -14,10 +15,8 @@ import {
 	PICKUP_R,
 	SPEED,
 	WORLD_H,
-	chapterProgress,
 	chapters as buildChapters,
 	heroPct,
-	pipPct,
 } from './world';
 
 /**
@@ -26,10 +25,12 @@ import {
  * Position never touches React — the same rule the window frame and the desktop
  * cat follow, for the same reason: a transform written sixty times a second
  * through state would re-render this whole tree every frame. The loop writes
- * `translate3d` straight onto the character and the camera, and only three
- * things are allowed to be state, because only they change rarely: which skills
- * have been collected, which chapter you are standing in, and whether the
- * controls have been discovered yet.
+ * `translate3d` straight onto the character and the camera, and only rarely
+ * changing things are allowed to be state: which skills have been collected,
+ * which chapter you are standing in, whether the controls have been discovered,
+ * and the one-shots the signpost and the end screen need. Every one of them is
+ * edge-triggered against a ref mirror, so it sets once per change rather than
+ * once per frame.
  *
  * Chapters used to be gated: you could not leave one until every skill in it
  * was collected. That gate is gone. It meant a visitor who could not or would
@@ -56,6 +57,12 @@ const LEAD_EASE = 0.06;
 const CAM_LEAD = 90;
 /** How close to a signpost counts as standing at it. */
 const SIGN_REACH = 150;
+/* The middle of a signpost within its chapter — `.cx-sign` is `left: 28px`
+   and 168px wide. CSS geometry restated in JS, which is a duplication, but it
+   is stated once now: the proximity test and the walk-to-a-role share it. */
+const SIGN_MID = 28 + 84;
+/** Ceiling on camera speed, px/s. Only long flights from the track reach it. */
+const PAN_MAX = 2600;
 /** Holding shift covers the 4,700px world without changing how it plays. */
 const RUN = 1.75;
 /** How long the landing squash is held, in ms. Cleared by the loop, not a timer. */
@@ -67,7 +74,28 @@ const LEFT_KEYS = new Set(['ArrowLeft', 'a', 'A']);
 const RIGHT_KEYS = new Set(['ArrowRight', 'd', 'D']);
 const JUMP_KEYS = new Set(['ArrowUp', 'w', 'W', ' ', 'Spacebar']);
 
-export default function Adventure({ onDone }: { onDone?: () => void }) {
+export default function Adventure({
+	onDone,
+	got,
+	gotRef,
+	setGot,
+	finished,
+	setFinished,
+	elapsed,
+	setElapsed,
+}: {
+	onDone?: () => void;
+	/* The run is owned by career-app.tsx so switching to Summary and back does
+	   not throw it away — see the note there. Everything else in here is still
+	   component-local, including where the character is standing. */
+	got: string[];
+	gotRef: RefObject<Set<string>>;
+	setGot: (ids: string[]) => void;
+	finished: boolean;
+	setFinished: (v: boolean) => void;
+	elapsed: number;
+	setElapsed: (s: number) => void;
+}) {
 	/* Built once, never mutated. A lazy initialiser rather than a ref, because
 	   a ref read during render is exactly what the lint rule is there to stop. */
 	const [chapters] = useState(buildChapters);
@@ -98,18 +126,13 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 		lead: 0,
 	});
 	const held = useRef({ left: false, right: false, run: false });
-	const gotRef = useRef<Set<string>>(new Set());
 	/* Stamps the loop reads instead of setting timers. */
 	const marks = useRef({ landedAt: -1, stillSince: 0 });
-	/* Which gates have already been sounded, so the cue fires once each. */
+	/* Which chapters have already been sounded, so the cue fires once each. */
 	const chimed = useRef<Set<number>>(new Set());
 
-	const [got, setGot] = useState<string[]>([]);
 	const [chapter, setChapter] = useState(0);
 	const [moved, setMoved] = useState(false);
-	const [finished, setFinished] = useState(false);
-	/* Stamped when the last token lands, never read during render. */
-	const [elapsed, setElapsed] = useState(0);
 	/* Which signpost the character is standing at. Computed every frame, but
 	   only published when it actually changes. */
 	const [atSign, setAtSign] = useState<number | null>(null);
@@ -122,7 +145,10 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 
 	const chapterRef = useRef(0);
 	const movedRef = useRef(false);
-	const finishedRef = useRef(false);
+	/* Seeded from the prop, not from false: coming back from Summary with the
+	   run already finished must not let the loop stamp a second, shorter time
+	   the moment the last chapter is walked into again. */
+	const finishedRef = useRef(finished);
 	const atSignRef = useRef<number | null>(null);
 	/* Started on the first step, so the finish can say how long it took. */
 	const startedAt = useRef(0);
@@ -137,8 +163,23 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 	   because only one of them is allowed to be read during a render. */
 	const clearedLive = useCallback(
 		(i: number) => clearedIn(i, gotRef.current),
-		[clearedIn],
+		[clearedIn, gotRef],
 	);
+
+	const [reduced] = useState(
+		() =>
+			typeof window !== 'undefined' &&
+			window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+	);
+
+	/* The one-shot that hides the hint and starts the finish clock. Written
+	   out in both input paths before, and now in a third. */
+	const firstMove = useCallback(() => {
+		if (movedRef.current) return;
+		movedRef.current = true;
+		startedAt.current = performance.now();
+		setMoved(true);
+	}, []);
 
 	const jump = useCallback(() => {
 		if (body.current.onGround) {
@@ -146,6 +187,68 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 			body.current.onGround = false;
 		}
 	}, []);
+
+	/**
+	 * Walk to a role, from the track above.
+	 *
+	 * It moves the *character*, not the camera, and that is what keeps it
+	 * free: `want` is computed from `b.x` every frame, so the follow camera
+	 * that already exists becomes the flight. A camera-only version would
+	 * need a second owner for `b.cam` and a rule for handing it back the
+	 * moment a key is pressed.
+	 *
+	 * It lands on the signpost, so `atSign` fires on the next frame and the
+	 * role's own numbers are open when the camera arrives. Nothing is
+	 * collected on the way: pickup is a per-frame proximity test, and
+	 * skipping over eighteen tokens correctly picks up none of them.
+	 */
+	const walkTo = useCallback(
+		(centreX: number) => {
+			const b = body.current;
+			b.x = centreX - HERO_W / 2;
+			b.y = 0;
+			b.vy = 0;
+			b.onGround = true;
+			b.facing = 1;
+
+			if (reduced) {
+				/* A 3850px whip is a great deal more than a walk, so where motion
+				   is unwelcome this cuts instead. The loop keeps running either
+				   way — walking still works here. */
+				const view = stageRef.current?.clientWidth ?? 600;
+				b.cam = Math.max(
+					0,
+					Math.min(b.x + HERO_W / 2 - view / 2, worldW - view),
+				);
+			}
+
+			firstMove();
+			/* The keydown guard stands down when the event target is a button,
+			   and after this click that is exactly where focus is. Without
+			   this the arrow keys are dead until the stage is clicked. */
+			stageRef.current?.focus();
+		},
+		[firstMove, reduced, worldW],
+	);
+
+	/** Walk to a role's signpost, so its numbers are open on arrival. */
+	const jumpTo = useCallback(
+		(index: number) => walkTo(index * CHAPTER_W + SIGN_MID),
+		[walkTo],
+	);
+
+	/**
+	 * Walk to one token, from its pip on the track.
+	 *
+	 * It stops short of it rather than on it. Landing centred would put the
+	 * character inside `PICKUP_R` of a ground token and collect it on the next
+	 * frame, which would make the track a way of finishing the game without
+	 * playing it. The track navigates; it does not collect.
+	 */
+	const jumpToToken = useCallback(
+		(t: { x: number }) => walkTo(t.x - 45),
+		[walkTo],
+	);
 
 	/**
 	 * Keys are read from `window`, but only while this app's own window is the
@@ -189,11 +292,7 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				launch('experience');
 			} else return;
 			e.preventDefault();
-			if (!movedRef.current) {
-				movedRef.current = true;
-				startedAt.current = performance.now();
-				setMoved(true);
-			}
+			firstMove();
 		};
 
 		const up = (e: KeyboardEvent) => {
@@ -219,19 +318,15 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 			window.removeEventListener('keyup', up);
 			window.removeEventListener('blur', release);
 		};
-	}, [focused, jump, launch]);
+	}, [focused, firstMove, jump, launch]);
 
 	/* Touch and mouse get the same three verbs the keyboard has. */
 	const press = useCallback(
 		(dir: 'left' | 'right', on: boolean) => {
 			held.current[dir] = on;
-			if (on && !movedRef.current) {
-				movedRef.current = true;
-				startedAt.current = performance.now();
-				setMoved(true);
-			}
+			if (on) firstMove();
 		},
-		[],
+		[firstMove],
 	);
 
 	useEffect(() => {
@@ -354,7 +449,12 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				0,
 				Math.min(b.x + HERO_W / 2 - view / 2 + b.lead, worldW - view),
 			);
-			b.cam += (want - b.cam) * rate(CAM_EASE);
+			/* Eased, then capped. Clicking the last role is 3850px away, and the
+			   first frame of that ease is 462px — a cut, not a pan. Walking needs
+			   at most SPEED * RUN = 437px/s of camera, so this is inert during
+			   play and only shapes the long flights the track can start. */
+			const step = (want - b.cam) * rate(CAM_EASE);
+			b.cam += Math.min(Math.abs(step), PAN_MAX * dt) * Math.sign(step);
 
 			if (camRef.current) {
 				/* Deliberately *not* rounded to whole pixels. Snapping the camera
@@ -405,7 +505,7 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 
 			/* Near enough to a signpost to read it. The sign sits 28px into the
 			   chapter and is 168px wide; anywhere across it counts. */
-			const signMid = here * CHAPTER_W + 28 + 84;
+			const signMid = here * CHAPTER_W + SIGN_MID;
 			const near =
 				Math.abs(b.x + HERO_W / 2 - signMid) < SIGN_REACH ? here : null;
 			if (near !== atSignRef.current) {
@@ -432,51 +532,36 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 
 		raf = requestAnimationFrame(frame);
 		return () => cancelAnimationFrame(raf);
-	}, [chapters, ledges, clearedLive, play, worldW]);
+	}, [
+		chapters,
+		ledges,
+		clearedLive,
+		play,
+		worldW,
+		gotRef,
+		setGot,
+		setFinished,
+		setElapsed,
+	]);
 
 	const total = chapters.reduce((n, c) => n + c.tokens.length, 0);
-	const ch = chapters[chapter];
 	/* What render is allowed to see: the state list, not the live ref. */
 	const have = new Set(got);
-	const here = chapterProgress(ch, have);
 
 	return (
 		<div className='cx-game'>
-			<div className='cx-hud'>
-				<span className='cx-hud-ch'>
-					CH.{chapter + 1}/{chapters.length}
-				</span>
-				<div className='cx-hud-name'>
-					<strong>{ch.exp.short}</strong>
-					<span>{ch.exp.period}</span>
-				</div>
-				<span className='cx-hud-score'>
-					{/* Remounted on every pickup so the CSS bump replays — the
-					    same trick the desktop cat's hearts use. */}
-					<b key={got.length}>
-						{here.done}/{here.total}
-					</b>{' '}
-					here · {got.length}/{total} total
-				</span>
-			</div>
-
-			{/* One chapter's worth of pips. A chapter is wider than the stage can
-			    show, so without this a missed token means walking back and forth
-			    with nothing to aim at. */}
-			<div className='cx-map' aria-hidden='true'>
-				<span className='cx-map-line' />
-				{ch.tokens.map((t) => (
-					<span
-						key={t.id}
-						className='cx-map-pip'
-						data-got={have.has(t.id) || undefined}
-						data-high={t.y > PICKUP_R || undefined}
-						style={{ left: `${pipPct(t, ch)}%` }}
-						title={t.skill}
-					/>
-				))}
-				<div className='cx-map-you' ref={markRef} />
-			</div>
+			{/* The whole career, before a step is taken. This replaced a HUD that
+						named the current chapter and a minimap that drew that chapter's
+						pips — both of which said where you are, and neither of which said
+						what you are in the middle of. */}
+			<CareerTrack
+				chapters={chapters}
+				here={chapter}
+				have={have}
+				onPick={jumpTo}
+				onPickToken={jumpToToken}
+				markRef={markRef}
+			/>
 
 			{/* The playfield. tabIndex so it can take the keys it listens for. */}
 			<div
@@ -501,7 +586,6 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 						<section
 							key={c.exp.company}
 							className='cx-chapter'
-							data-cleared={clearedIn(c.index, have) || undefined}
 							style={{
 								left: c.x,
 								width: CHAPTER_W,
@@ -591,18 +675,24 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 								);
 							})}
 
-							{/* The gate at the right edge of every chapter but the last */}
+							{/* The post at the right edge of every chapter but the last. It
+								  reports whether the era was emptied; it has stopped nobody
+								  since 0832051. */}
 							{c.index < chapters.length - 1 && (
 								<span
-									className='cx-gate'
+									className='cx-post'
 									data-open={clearedIn(c.index, have) || undefined}
 									style={{ bottom: GROUND }}>
-									<span className='cx-gate-lock'>
+									<span className='cx-post-plate'>
 										{(() => {
-											const p = chapterProgress(c, have);
-											return p.done === p.total
-												? 'CLEARED'
-												: `${p.total - p.done} still out there`;
+											const missing = c.tokens.filter((t) => !have.has(t.id));
+											if (!missing.length) return 'CLEARED';
+											/* Named only when the hunt is nearly over. A count is what you
+													want at six left; at one or two, the count is the one thing
+													you already know and the name is the thing you need. */
+											return missing.length <= 2
+												? `${missing.map((t) => t.skill).join(', ')} still out there`
+												: `${missing.length} still out there`;
 										})()}
 									</span>
 								</span>
@@ -629,8 +719,8 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 					</div>
 				</div>
 
-				{/* Crossing into a new era is the one thing the gates already make
-				    significant; remounting on the chapter replays the wash. */}
+				{/* Crossing into a new era is the one thing the posts already mark;
+				    remounting on the chapter replays the wash. */}
 				{moved && <span key={chapter} className='cx-threshold' aria-hidden='true' />}
 
 				{lastPick && (() => {
@@ -650,7 +740,7 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 				{!moved && (
 					<p className='cx-hint'>
 						<kbd>←</kbd> <kbd>→</kbd> walk · <kbd>↑</kbd> jump · <kbd>shift</kbd>{' '}
-						run · <kbd>E</kbd> at a sign
+						run · <kbd>E</kbd> at a sign · click a role above
 					</p>
 				)}
 
@@ -685,24 +775,43 @@ export default function Adventure({ onDone }: { onDone?: () => void }) {
 			{/* Pointer-only, and aria-hidden — so they are kept out of the tab
 			    order rather than being focusable things a screen reader cannot
 			    see. The keyboard has its own path above. */}
+			{/* preventDefault, or a click leaves focus on the button: every
+						keydown after that has it as `e.target`, `typing()` reads it as a
+						control, and the arrow keys stop working until the visitor
+						clicks elsewhere. tabIndex={-1} keeps them out of the tab order
+						but does not stop click-focus. */}
 			<div className='cx-pad' aria-hidden='true'>
 				<button
 					type='button'
 					tabIndex={-1}
-					onPointerDown={() => press('left', true)}
+					onPointerDown={(e) => {
+						e.preventDefault();
+						press('left', true);
+					}}
 					onPointerUp={() => press('left', false)}
-					onPointerLeave={() => press('left', false)}>
+					onPointerLeave={() => press('left', false)}
+					onPointerCancel={() => press('left', false)}>
 					←
 				</button>
-				<button type='button' tabIndex={-1} onPointerDown={jump}>
+				<button
+					type='button'
+					tabIndex={-1}
+					onPointerDown={(e) => {
+						e.preventDefault();
+						jump();
+					}}>
 					Jump
 				</button>
 				<button
 					type='button'
 					tabIndex={-1}
-					onPointerDown={() => press('right', true)}
+					onPointerDown={(e) => {
+						e.preventDefault();
+						press('right', true);
+					}}
 					onPointerUp={() => press('right', false)}
-					onPointerLeave={() => press('right', false)}>
+					onPointerLeave={() => press('right', false)}
+					onPointerCancel={() => press('right', false)}>
 					→
 				</button>
 			</div>

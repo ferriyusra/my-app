@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { List } from 'lucide-react';
 import { LiGamepad2 } from '@/components/icons/line-icons';
 import Adventure from './career/adventure';
@@ -11,8 +11,16 @@ import CareerSummary from './career/summary';
  *
  * **Adventure** is a small side-scroller: you walk a character left to right
  * through five chapters, one per role, collecting the skills that role was the
- * first to use. A gate holds each chapter shut until its skills are picked up,
- * so you cannot arrive at 2025 without having walked through 2021.
+ * first to use. A track above the world carries all five, so the career is
+ * legible before a step is taken and any role is one click away.
+ *
+ * **The run outlives the tab.** Progress lives here rather than inside
+ * Adventure, because the switch below is a plain ternary: Adventure unmounts,
+ * and component-local state goes with it. That meant reading the summary threw
+ * away everything collected — including when the win screen's own "Read it as
+ * a summary" button did it, one click after congratulating you. The character's
+ * position is not kept, which is a smaller loss now that the track walks you
+ * back to any role in one click.
  *
  * **Summary** is the same content as a list, and it is the default when the
  * visitor has asked for reduced motion. That is the rule this window is built
@@ -30,6 +38,13 @@ export default function CareerApp() {
 			? 'read'
 			: 'play',
 	);
+
+	/* The mirrored pair the loop needs: the ref is what a frame reads and
+	   writes, the array is what render is allowed to see. */
+	const gotRef = useRef<Set<string>>(new Set());
+	const [got, setGot] = useState<string[]>([]);
+	const [finished, setFinished] = useState(false);
+	const [elapsed, setElapsed] = useState(0);
 
 	return (
 		<div className='cx-app'>
@@ -53,7 +68,16 @@ export default function CareerApp() {
 			</div>
 
 			{mode === 'play' ? (
-				<Adventure onDone={() => setMode('read')} />
+				<Adventure
+					onDone={() => setMode('read')}
+					got={got}
+					gotRef={gotRef}
+					setGot={setGot}
+					finished={finished}
+					setFinished={setFinished}
+					elapsed={elapsed}
+					setElapsed={setElapsed}
+				/>
 			) : (
 				<CareerSummary />
 			)}

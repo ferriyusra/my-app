@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { career, levels } from '@/data/career-game';
 import { profile } from '@/data/profile';
 import { tenureLabel } from '@/data/experience';
+import CareerTrack from './track';
+import { chapters } from './world';
 
 /**
  * The career as a list — the plain reading of what Career.exe's adventure
@@ -12,6 +14,13 @@ import { tenureLabel } from '@/data/experience';
  * It is not a consolation prize: it is the whole content, and it is what the
  * window shows when motion is unwelcome. Anything the game says must be
  * sayable here, or the game is hiding something.
+ *
+ * That rule is why the track at the top is the same component the adventure
+ * uses, only static: the shape of the career — two short early roles, then the
+ * runs that lasted — is the one thing the strip says that a list cannot, so it
+ * has to be here too. It replaced an XP bar that filled to 100% every time and
+ * therefore encoded nothing, which is the same charge `experience-app.tsx`
+ * levels at the rail its own proportional bar replaced.
  */
 
 function prefersReducedMotion(): boolean {
@@ -24,7 +33,6 @@ function prefersReducedMotion(): boolean {
 export default function CareerSummary() {
 	const all = levels();
 	const totals = career();
-	const barRef = useRef<HTMLDivElement>(null);
 
 	/* Start fully revealed when motion is unwelcome, rather than revealing from
 	   an effect — a lazy initialiser keeps the first paint correct and keeps
@@ -33,10 +41,8 @@ export default function CareerSummary() {
 		prefersReducedMotion() ? levels().length : 0,
 	);
 
-	/* Fill the bar, then deal the levels out one at a time. */
+	/* Deal the levels out one at a time. */
 	useEffect(() => {
-		const bar = barRef.current;
-		if (bar) requestAnimationFrame(() => bar.style.setProperty('--fill', '100%'));
 		if (prefersReducedMotion()) return;
 
 		let n = 0;
@@ -66,9 +72,7 @@ export default function CareerSummary() {
 				</div>
 
 				<div className='cx-xp'>
-					<div className='cx-xp-track'>
-						<div className='cx-xp-fill' ref={barRef} />
-					</div>
+					<CareerTrack chapters={chapters()} />
 					<div className='cx-xp-meta'>
 						<span>
 							{years} yrs {months ? `${months} mos` : ''} served

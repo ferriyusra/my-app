@@ -273,17 +273,50 @@ side-scroller: you walk a character through five chapters, one per role,
 collecting the skills that role was the first to use, and climbing two one-way
 ledges per chapter to reach the ones held above the floor.
 
+**The track above the world is what makes it legible.** It opened with the
+character at x=60 of a 4700px world — you could not see the career, you had to
+walk to find it, and the minimap did not help because it maps the chapter you
+are already standing in. [track.tsx](src/components/apps/career/track.tsx) draws
+all five roles at once, each segment as wide as the months that role lasted, so
+the shape of the career reads before a word of it does. It replaced the HUD and
+the minimap together and still bought back vertical space.
+
+A globe was considered for this and rejected on the data: every role is
+`location: 'Jakarta, Indonesia'`, so a geographic projection has five markers
+in one pixel and a journey that does not move. This career's spread is time, and
+the world already ran left-to-right through it. `discarded.ts` records the same
+verdict reached once before, about `tech-globe.tsx`.
+
+Clicking a role moves the **character**, not the camera — `want` is derived from
+`b.x` every frame, so the follow camera that already existed becomes the flight,
+with no second owner for `b.cam` and no rule for handing it back. It lands on the
+signpost, so the role's own numbers are open when the camera arrives, and it
+collects nothing on the way, because pickup is a per-frame proximity test.
+`PAN_MAX` caps the first frame of a long flight; walking never reaches it.
+
+The same component draws the strip in Summary, static — no pips, no marker, no
+click. That is parity by construction rather than by discipline, and it replaced
+an XP bar that filled to 100% every time and therefore encoded nothing, which is
+the charge `experience-app.tsx` levels at the rail its own proportional bar
+replaced.
+
 Chapters were gated on collecting everything, and that gate has been removed:
 it shut a visitor who could not or would not platform out of the later roles,
-which in a portfolio means out of the CV. The post at the end of a chapter
-reports what is still out there; it does not stop anyone.
+which in a portfolio means out of the CV. What stayed behind was a red slab
+the width of a wall that nothing walks into — an obstacle promised and not
+delivered, which is the charge that took out the Experience window's old rail.
+It is a slim era post now, lit from `--era-lit` rather than `--danger`, and it
+keeps its height when a chapter is cleared: a barrier that lowers itself is the
+same metaphor again. It reports what is still out there; it stops nobody.
 
 It follows the same rule as the window frame and the desktop cat — **position
 never touches React**. The loop writes `translate3d` onto the character and the
 camera, and even "am I walking" is a `data-` attribute written from the loop
-rather than a prop, because it flips on almost every frame. Only three things
-are state: skills collected, current chapter, and whether the controls have
-been found.
+rather than a prop, because it flips on almost every frame. State is reserved
+for what changes rarely — skills collected, the current chapter, whether the
+controls have been found, and the handful of one-shots the end screen and the
+signpost need — and each of those is edge-triggered against a ref mirror so it
+sets at most once per change.
 
 Two constraints are load-bearing and covered by tests in `world.test.ts`: every
 raised token must sit within a jump of the ground (`reachable()` checks it

@@ -30,6 +30,10 @@ export const PICKUP_R = 26;
 export const SPEED = 250;
 export const GRAVITY = 1900;
 export const JUMP_V = 640;
+/* The character's box. Here rather than beside its artwork because
+   `reachable()` is computed from it and `world.test.ts` has to be able to
+   load it — importing the art would pull JSX into `node --test`. */
+export const HERO_W = 30;
 export const HERO_H = 52;
 
 /** Peak of a jump from standing, in px above the ground. */
@@ -95,13 +99,6 @@ const ERA_LIGHT = [
 ] as const;
 
 /**
- * Spread a chapter's tokens across its floor.
- *
- * Every third one is lifted out of reach of a walk, so the jump is used rather
- * than decorative — but never the first, so the opening of a chapter is always
- * collectable by someone who has not worked out the controls yet.
- */
-/**
  * Two ledges per chapter, the second only reachable from the first.
  *
  * Before these the world was one flat line: the jump existed but nothing ever
@@ -116,19 +113,27 @@ function ledgesFor(index: number): Ledge[] {
 	const left = index * CHAPTER_W;
 	return [
 		{ id: `${index}-low`, chapter: index, x: left + 292, w: 148, y: 76 },
-		/* The gap is deliberately short. The gate demands every token in a
-		   chapter, and tokens stand on these ledges — so a climb that only
-		   works from the last 40px of the low ledge would strand a player at
-		   a gate they cannot open. Reachable from most of the run-up, not from
-		   a pixel. */
+		/* The gap is deliberately short. Tokens stand on these ledges, so a
+		   climb that only worked from the last 40px of the low ledge would put
+		   part of a role out of reach for anyone who is not precise with a
+		   jump. Reachable from most of the run-up, not from a pixel. */
 		{ id: `${index}-high`, chapter: index, x: left + 455, w: 200, y: 150 },
 	];
 }
 
+/**
+ * Spread a chapter's tokens across its floor.
+ *
+ * Height is not a rule about which token it is — it is where the token lands.
+ * One standing over a ledge stands on it, and everything else sits on the
+ * ground. So the jump is asked for wherever the ledges are, and `world.test.ts`
+ * checks the result rather than the intent: every token reachable, the first of
+ * a chapter never needing a jump, and at least one somewhere that does.
+ */
 function place(level: Level, index: number, ledges: Ledge[]): Token[] {
 	const n = level.unlocked.length;
 	const left = index * CHAPTER_W;
-	/* Keep clear of the banner on the left and the gate on the right. */
+	/* Keep clear of the banner on the left and the era post on the right. */
 	const from = left + 210;
 	const to = left + CHAPTER_W - 150;
 	const step = n > 1 ? (to - from) / (n - 1) : 0;
@@ -162,11 +167,6 @@ export function chapters(): Chapter[] {
 	});
 }
 
-/** Every ledge in the world, which is what the collision step walks. */
-export function allLedges(): Ledge[] {
-	return chapters().flatMap((c) => c.ledges);
-}
-
 /**
  * Can a surface at `to` be reached by jumping from one at `from`?
  *
@@ -177,8 +177,6 @@ export function allLedges(): Ledge[] {
 export function canClimb(from: number, to: number): boolean {
 	return to - from < maxJump();
 }
-
-export const WORLD_W = () => chapters().length * CHAPTER_W;
 
 /** How much of one chapter has been picked up. Counts that chapter only. */
 export function chapterProgress(
@@ -194,10 +192,10 @@ export function chapterProgress(
 /**
  * Where a token sits along its own chapter, 0–100.
  *
- * The minimap draws one chapter at a time rather than the whole career: at the
- * width the stage actually gets, five chapters' worth of pips collapse into an
- * unreadable smear, and the thing a player is trying to find is always inside
- * the chapter they are stuck in.
+ * Pips never share an axis across chapters, because each role owns its own
+ * segment of the track — so this maps within one chapter and stays there. That
+ * is also what lets the position marker sit inside the active segment and use
+ * `heroPct` unchanged.
  */
 export function pipPct(token: Token, chapter: Chapter): number {
 	const local = token.x - chapter.x;
