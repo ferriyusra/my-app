@@ -152,6 +152,7 @@ export const SHORTCUTS: Shortcut[] = [
 	{ chord: '⊞ ↓', alt: 'Ctrl Alt ↓', does: 'Restore it, or minimise if it is already floating' },
 	{ chord: '⊞ D', does: 'Show the desktop, and put everything back on a second press' },
 	{ chord: '⊞ E', does: 'Open File Explorer' },
+	{ chord: 'Ctrl F6', does: 'Move to the next open window; add Shift to go back' },
 	{ chord: 'Alt F4', does: 'Close the top window' },
 	{ chord: 'Esc', does: 'Close the open menu, flyout or window' },
 	{ chord: 'F5', does: 'Refresh the desktop and clear the selection' },

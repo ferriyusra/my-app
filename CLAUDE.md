@@ -369,6 +369,22 @@ of them derive; none of them keep a second copy.
   arrangement persists as an *order*, not pixels, so it survives a resize and a
   change of icon size.
 
+**A flyout takes focus and gives it back.**
+[ui/flyout.tsx](src/components/ui/flyout.tsx) owns both halves for Start, Quick
+Settings and the notification centre. Opening one from the keyboard used to
+leave focus on the taskbar button behind it — Start got away with it because
+its search box autofocuses — and closing any of the three left focus wherever
+it happened to be. It claims focus a frame late, so a child that wants the
+caret is not stolen from, and it hands focus back on unmount **only if nothing
+else has taken it**: picking a Start tile moves focus into the window that
+opened, and dragging it back to the taskbar afterwards would be the opposite of
+help. It is not a trap and `aria-modal` stays off; these are not modal in
+Windows and Tab is allowed to walk out.
+
+`Ctrl`+`F6` cycles the open windows and `Ctrl`+`Shift`+`F6` goes back, because
+Alt+Tab is the one chord no browser is ever handed on any platform. Without it
+the only way out of a window is tabbing through the whole app inside it.
+
 **Focus is the thing to get right in a fake desktop.** The frame takes focus
 when a window is raised, which means an app whose whole point is typing must
 claim it back — on mount, on mousedown (with `preventDefault`, or the browser's
