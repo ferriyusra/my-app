@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { BadgeCheck, Clock, Cpu, Info, Link as LinkIcon, Radar } from 'lucide-react';
-import { LiBriefcase, LiDownload, LiGithub, LiLinkedin, LiMail, LiMapPin, LiMonitor } from '@/components/icons/line-icons';
+import { DocumentIcon, LiBriefcase, LiDownload, LiGithub, LiLinkedin, LiMail, LiMapPin, LiMonitor } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import SettingCard from '@/components/ui/setting-card';
 import { profile, yearsOfExperience } from '@/data/profile';
@@ -147,15 +147,29 @@ export default function AboutApp() {
 
 			{page === 'links' && (
 				<div className='ab-links'>
+					{/* Two rows because they are two actions. This one carried a
+					    download glyph while opening a viewer, which is the kind of
+					    control that names something it does not do. */}
 					<a
 						className='ab-link'
 						href={profile.cvView}
 						target='_blank'
 						rel='noopener noreferrer'>
-						<LiDownload size={17} aria-hidden='true' />
+						<DocumentIcon size={17} />
 						<span>
 							<strong>Resume</strong>
 							<small>PDF · opens in a new tab</small>
+						</span>
+					</a>
+					<a
+						className='ab-link'
+						href={profile.cvDownload}
+						target='_blank'
+						rel='noopener noreferrer'>
+						<LiDownload size={17} aria-hidden='true' />
+						<span>
+							<strong>Download resume</strong>
+							<small>PDF · saves to your device</small>
 						</span>
 					</a>
 					<a className='ab-link' href={`mailto:${profile.email}`}>

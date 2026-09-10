@@ -192,6 +192,12 @@ export type ShortcutDef = {
 	blurb: string;
 	tile: TileArt;
 	href: string;
+	/**
+	 * A direct-download URL, where the thing behind `href` is a file rather
+	 * than a page. `href` opens it to read; this one saves it. The desktop
+	 * icon's context menu offers both, as Windows does for a file.
+	 */
+	download?: string;
 };
 
 export const SHORTCUTS: ShortcutDef[] = [
@@ -201,6 +207,7 @@ export const SHORTCUTS: ShortcutDef[] = [
 		blurb: 'PDF · opens in a new tab',
 		tile: { Art: DocumentIcon },
 		href: profile.cvView,
+		download: profile.cvDownload,
 	},
 	{
 		id: 'github',

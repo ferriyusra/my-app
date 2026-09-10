@@ -1,5 +1,5 @@
 import { FileCode2, FolderGit2, Radar, Undo2 } from 'lucide-react';
-import { LiBriefcase, LiChevronDown, LiDownload, LiGithub, LiLayers, LiLinkedin, LiMail, LiMapPin } from '@/components/icons/line-icons';
+import { DocumentIcon, LiBriefcase, LiChevronDown, LiDownload, LiGithub, LiLayers, LiLinkedin, LiMail, LiMapPin } from '@/components/icons/line-icons';
 import ThemeToggle from './theme-toggle';
 import PrintExpander from './print-expander';
 import CaseStudyBody from './case-study-body';
@@ -96,7 +96,16 @@ export default function PortfolioDocument() {
 					href={profile.cvView}
 					target='_blank'
 					rel='noopener noreferrer'>
-					<LiDownload size={15} aria-hidden='true' /> Resume
+					<DocumentIcon size={15} /> Resume
+				</a>
+				{/* This surface has no right-click menu to hide a Save behind, and
+				    it is the one a phone and a scripting-disabled browser get. */}
+				<a
+					className='fl-btn fl-btn-standard'
+					href={profile.cvDownload}
+					target='_blank'
+					rel='noopener noreferrer'>
+					<LiDownload size={15} aria-hidden='true' /> Download
 				</a>
 				<a className='fl-btn fl-btn-standard' href={`mailto:${profile.email}`}>
 					<LiMail size={15} aria-hidden='true' /> Email

@@ -16,6 +16,8 @@ export type DeskItem = {
 	tile: TileArt;
 	/** Present on shortcuts that leave the page. */
 	href?: string;
+	/** Present on shortcuts whose target is a file that can also be saved. */
+	download?: string;
 	/** Shown by the icon's context menu, and by Start's all-apps list. */
 	blurb: string;
 	/** Drives the "Sort by type" ordering: apps before shortcuts. */
@@ -63,6 +65,7 @@ export function useDesktopIcons() {
 					label,
 					tile: sc.tile,
 					href: sc.href,
+					download: sc.download,
 					blurb: sc.blurb,
 					kind: 'link',
 				};
