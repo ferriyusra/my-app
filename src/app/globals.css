@@ -3927,7 +3927,19 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 }
 
 @media (max-width: 560px) {
-  .ab-now div, .mb-now div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  /* The About window keeps the stack: it has a whole window to spend. */
+  .ab-now div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+
+  /* The document runs the label into its text instead. Stacked, the three
+     entries cost three extra lines and push the spine off the first
+     viewport — which is the one thing the direction contract spends that
+     viewport on. Scoped to `.mb-` so the shared rule above still owns
+     `.ab-`; one prefix, one app. */
+  .mb-now { gap: 10px; }
+  .mb-now div { display: block; }
+  .mb-now dt,
+  .mb-now dd { display: inline; }
+  .mb-now dt::after { content: ' · '; color: var(--ink-disabled); }
 }
 
 /* ── Desktop: marquee and dragging ───────────────────────────
@@ -5170,7 +5182,7 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin: 30px 0 14px;
+  margin: 22px 0 13px;
   padding-bottom: 7px;
   border-bottom: 1px solid var(--line);
   font-size: 13px;
@@ -5208,7 +5220,8 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   position: absolute;
   top: 6px; bottom: 6px; left: 3px;
   width: 1px;
-  background: var(--line);
+  background: var(--accent);
+  opacity: 0.45;
 }
 .mb-spine > li { position: relative; display: grid; gap: 3px; }
 /* The node. A hollow ring for past roles, filled for the current one, so the
@@ -5284,7 +5297,7 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 .mb-fold-body { padding: 0 0 22px; }
 
 .mb-company { font-size: 13px; color: var(--ink-secondary); }
-.mb-period { font-size: 12px; color: var(--ink-muted); }
+.mb-period { font-size: 12px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
 .mb-tech { display: block; margin-top: 6px; font-size: 11px; color: var(--ink-muted); }
 
 .mb-skill-group { margin-bottom: 18px; }

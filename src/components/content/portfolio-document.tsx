@@ -127,26 +127,6 @@ export default function PortfolioDocument() {
 				</a>
 			</div>
 
-			{/* Directly under the actions, because it is the only part that answers
-			    "and today?" and the only part with a date on it. */}
-			<section aria-labelledby='doc-now'>
-				<Head title='Now' meta={`Updated ${nowStamp}`} id='doc-now' />
-				<dl className='mb-now'>
-					{profile.now.map((n) => (
-						<div key={n.label}>
-							<dt>{n.label}</dt>
-							<dd>{n.text}</dd>
-						</div>
-					))}
-				</dl>
-			</section>
-
-			{/* This used to name what the reader was missing and stop there,
-			    which is an apology. The sentence from tips.ts says what the thing
-			    actually is, and cannot drift from what Tips ▸ How it's built says
-			    inside the shell. */}
-			<p className='mb-note'>{BUILT_SUMMARY}</p>
-
 			<section aria-labelledby='doc-exp'>
 				<Head
 					title='Experience'
@@ -194,6 +174,25 @@ export default function PortfolioDocument() {
 						);
 					})}
 				</ol>
+			</section>
+
+			{/* After the spine, not before it. Above the actions it pushed the
+			    first role past the fold on every phone once browser chrome is
+			    counted, and the first viewport is the one thing the direction
+			    contract spends on the career. Here it closes the reverse-
+			    chronological run — the last role read is the current one, and this
+			    says what that role is doing this month. Availability already
+			    appears in the header, so nothing above the fold was lost. */}
+			<section aria-labelledby='doc-now'>
+				<Head title='Now' meta={`Updated ${nowStamp}`} id='doc-now' />
+				<dl className='mb-now'>
+					{profile.now.map((n) => (
+						<div key={n.label}>
+							<dt>{n.label}</dt>
+							<dd>{n.text}</dd>
+						</div>
+					))}
+				</dl>
 			</section>
 
 			<Fold
@@ -268,6 +267,11 @@ export default function PortfolioDocument() {
 					))}
 				</ol>
 			</section>
+
+			{/* An aside about the other rendering, so it sits after the evidence
+			    rather than in front of it: between the actions and the career it
+			    cost 200px of the one viewport that has to carry the spine. */}
+			<p className='mb-note'>{BUILT_SUMMARY}</p>
 
 			<footer className='mb-foot'>
 				<a href={`mailto:${profile.email}`}>
