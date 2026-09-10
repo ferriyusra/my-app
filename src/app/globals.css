@@ -3851,7 +3851,8 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 }
 
 .cs-section + .cs-section { margin-top: 20px; }
-.cs-section h4 {
+.cs-section h4,
+.cs-section h5 {
   margin: 0 0 6px;
   font-size: 13px;
   font-weight: 600;
@@ -5149,7 +5150,7 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 .mb-points { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
 .mb-points li { font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
 .mb-points li::marker { color: var(--accent); }
-.mb-roles h3, .mb-projects h3 { display: inline; font-size: 14px; margin-right: 8px; }
+.mb-projects h3 { display: inline; font-size: 14px; margin-right: 8px; }
 .mb-actions { display: flex; gap: 10px; margin-bottom: 18px; }
 .mb-note {
   margin: 0 0 22px;
@@ -5162,52 +5163,128 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   color: var(--ink-secondary);
 }
 
-.mb-card {
-  margin-bottom: 10px;
-  border: 1px solid var(--line-subtle);
-  border-radius: var(--r-lg);
-  background: var(--surface);
-  overflow: hidden;
+/* A section heading and its count, on one rule. These carry the document's
+   outline: the sections used to be <strong> inside a <summary>, which reads
+   as bold text rather than as a landmark. */
+.mb-rule-h {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 30px 0 14px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink);
 }
-.mb-card-head {
+.mb-rule-h span {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+
+/* ── The spine ────────────────────────────────────────────
+   Five roles down one rule, newest first, the case study
+   rendered inside the role that produced it. The rule is
+   drawn on the <ol> rather than per-item so it is one
+   continuous line and not five stacked segments.
+   ═══════════════════════════════════════════════════════ */
+.mb-spine {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 2px 0 0 22px;
+  display: grid;
+  gap: 26px;
+}
+.mb-spine::before {
+  content: '';
+  position: absolute;
+  top: 6px; bottom: 6px; left: 3px;
+  width: 1px;
+  background: var(--line);
+}
+.mb-spine > li { position: relative; display: grid; gap: 3px; }
+/* The node. A hollow ring for past roles, filled for the current one, so the
+   present reads off the rule itself rather than off a badge. */
+.mb-spine > li::before {
+  content: '';
+  position: absolute;
+  top: 5px; left: -22px;
+  width: 7px; height: 7px;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: var(--bg);
+}
+.mb-spine > li[data-current]::before {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.mb-spine > li p { margin: 6px 0 0; font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
+.mb-spine h3 { margin: 0; font-size: 14px; }
+
+/* The case study, inline in its own role. Indented off the spine and given a
+   quiet ground so it reads as depth belonging to the role above it rather
+   than as the next section. */
+.mb-case {
+  margin: 14px 0 2px;
+  padding: 16px 16px 4px;
+  border-radius: var(--r-lg);
+  background: var(--surface-subtle);
+}
+
+/* Reference material that stays collapsible: the spine and the reversals are
+   the argument, Skills and Projects are lookup. */
+.mb-fold { border-top: 1px solid var(--line-subtle); }
+.mb-fold:last-of-type { border-bottom: 1px solid var(--line-subtle); }
+.mb-fold-head {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
-  padding: 14px 16px;
-  color: var(--ink);
-  text-align: left;
+  padding: 4px 0;
   cursor: pointer;
   list-style: none;
 }
-.mb-card-head::-webkit-details-marker { display: none; }
-.mb-card-head:hover { background: var(--subtle-hover); }
-.mb-card-head:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
-.mb-card-icon {
-  display: grid;
-  place-items: center;
-  width: 34px; height: 34px;
-  flex-shrink: 0;
-  border-radius: var(--r-md);
-  background: var(--accent-soft);
-  color: var(--accent);
+.mb-fold-head::-webkit-details-marker { display: none; }
+.mb-fold-head > h2 {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 18px 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink);
 }
-.mb-card-title { flex: 1; display: flex; flex-direction: column; }
-.mb-card-title strong { font-size: 15px; }
-.mb-card-title small { font-size: 12px; color: var(--ink-muted); }
-.mb-card-head > svg {
+.mb-fold-head > h2 span {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-muted);
+}
+.mb-fold-head:hover > h2 { color: var(--accent); }
+.mb-fold-head:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: var(--r-sm); }
+.mb-fold-head > svg {
   flex-shrink: 0;
   color: var(--ink-muted);
   transition: transform var(--dur-fast) var(--ease-standard);
 }
-.mb-card[open] > .mb-card-head > svg { transform: rotate(180deg); }
-.mb-card-body { padding: 0 16px 18px; border-top: 1px solid var(--line-subtle); padding-top: 16px; }
+.mb-fold[open] > .mb-fold-head > svg { transform: rotate(180deg); }
+.mb-fold-body { padding: 0 0 22px; }
 
-.mb-roles { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
-.mb-roles li { display: grid; gap: 3px; }
 .mb-company { font-size: 13px; color: var(--ink-secondary); }
 .mb-period { font-size: 12px; color: var(--ink-muted); }
-.mb-roles p { margin: 6px 0 0; font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
 .mb-tech { display: block; margin-top: 6px; font-size: 11px; color: var(--ink-muted); }
 
 .mb-skill-group { margin-bottom: 18px; }
@@ -5351,23 +5428,25 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   .mb-theme,
   .mb-note,
   .mb-actions,
-  .mb-card-head > svg { display: none !important; }
+  .mb-fold-head > svg { display: none !important; }
 
-  .mb-card {
-    border: none;
-    border-radius: 0;
-    background: none;
-    margin-bottom: 4mm;
-  }
-  .mb-card-head { padding: 0 0 2mm; }
-  .mb-card-body { padding: 0; border-top: none; }
-  .mb-card-icon { display: none; }
+  .mb-fold { border: none; }
+  .mb-fold-head { padding: 0; }
+  .mb-fold-body { padding: 0; }
+  .mb-rule-h,
+  .mb-fold-head > h2 { margin: 6mm 0 3mm; border-bottom: 0.4pt solid #999; font-size: 11pt; }
+
+  /* The spine is a screen device; on paper the rule and the nodes are ink
+     spent on nothing, and the indent only narrows the measure. */
+  .mb-spine { padding-left: 0; gap: 6mm; }
+  .mb-spine::before,
+  .mb-spine > li::before { display: none; }
+  .mb-case { padding: 0; background: none; border-radius: 0; }
 
   /* Keep a role or a project from being split across two pages. */
-  .mb-roles > li,
+  .mb-spine > li,
   .mb-projects > li,
   .mb-skill-group { break-inside: avoid; }
-  .mb-card-title strong { font-size: 15pt; }
 
   /* A printed link is useless without its destination. */
   .mb-foot a[href]::after,

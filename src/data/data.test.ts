@@ -3,6 +3,8 @@ import { test } from 'node:test';
 
 import { projects } from './projects.ts';
 import { skills } from './skills.ts';
+import { experiences } from './experience.ts';
+import { caseStudy } from './case-study.ts';
 import { evidenceFor } from '../lib/skill-evidence.ts';
 
 /**
@@ -85,4 +87,35 @@ test('every skill and project name is distinct', () => {
 	assert.equal(new Set(names).size, names.length, 'skills.ts has a duplicate name');
 	const ids = projects.map((p) => p.id);
 	assert.equal(new Set(ids).size, ids.length, 'projects.ts has a duplicate id');
+});
+
+/**
+ * The document renders the case study *inside* the role that produced it, and
+ * finds that role by `experiences[].short === caseStudy.at`. Nothing throws
+ * when the join misses: the spine simply renders five roles and the deepest
+ * technical writing on the site disappears from the response body — which is
+ * the surface a phone, an ATS and a crawler get.
+ *
+ * The same failure as the `projects` ↔ `skills` join above, in a place where
+ * exactly one match is expected rather than many.
+ */
+test('the case study names a role that exists, exactly once', () => {
+	const hosts = experiences.filter((e) => e.short === caseStudy.at);
+	assert.equal(
+		hosts.length,
+		1,
+		`caseStudy.at is "${caseStudy.at}", which matches ${hosts.length} roles by \`short\`. ` +
+			`Known: ${experiences.map((e) => e.short).join(', ')}.`,
+	);
+});
+
+/**
+ * The case study's own claim is that everything in it traces to that role, so
+ * the period it prints has to be the role's period rather than a second copy
+ * that can drift.
+ */
+test('the case study period matches the role it belongs to', () => {
+	const host = experiences.find((e) => e.short === caseStudy.at);
+	assert.ok(host, 'no host role — see the test above');
+	assert.equal(caseStudy.period, host.period);
 });

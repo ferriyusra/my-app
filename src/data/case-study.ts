@@ -21,7 +21,8 @@ export const caseStudy = {
 	slug: 'aso-billing',
 	title: 'A billing source of truth for ~160 entities',
 	at: 'Meditap',
-	period: 'Jul 2025 — present',
+	/* Must equal the host role's own `period`; `data.test.ts` pins it. */
+	period: 'Jul 2025 — Present',
 	role: 'Backend Engineer',
 	summary:
 		'Finance was tracking ~160 ASO entities in spreadsheets and watching balances by hand. The replacement is two Go services, an event-driven notification path on Pub/Sub, and a CMS the finance team operates without an engineer.',

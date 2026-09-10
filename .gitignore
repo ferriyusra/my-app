@@ -43,3 +43,8 @@ yarn-error.log*
 next-env.d.ts
 
 .agents
+# impeccable: the surface briefs are durable design decisions and are tracked;
+# the review captures and the per-machine config are not.
+.impeccable/review/
+.impeccable/questions/
+.impeccable/config.local.json

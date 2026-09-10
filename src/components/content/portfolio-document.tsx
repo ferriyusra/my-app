@@ -1,5 +1,4 @@
-import { FileCode2, FolderGit2, Radar, Undo2 } from 'lucide-react';
-import { DocumentIcon, LiBriefcase, LiChevronDown, LiDownload, LiGithub, LiLayers, LiLinkedin, LiMail, LiMapPin } from '@/components/icons/line-icons';
+import { DocumentIcon, LiChevronDown, LiDownload, LiGithub, LiLinkedin, LiMail, LiMapPin } from '@/components/icons/line-icons';
 import ThemeToggle from './theme-toggle';
 import PrintExpander from './print-expander';
 import CaseStudyBody from './case-study-body';
@@ -13,46 +12,62 @@ import { BUILT_SUMMARY } from '@/data/tips';
 import DiscardedDetail from './discarded-detail';
 
 /**
- * The portfolio as a plain document.
+ * The portfolio as plain semantic HTML, in the response body.
  *
- * This is the page the server sends. Before it existed the response body was
- * an empty div: every word of the work history, the projects and the stack
- * only appeared after ~266KB of JavaScript had run, so anything that does not
- * execute scripts — ATS scrapers, social preview bots, LLM crawlers — saw a
- * blank portfolio. Now the content ships in the HTML and the desktop shell is
- * the enhancement on top of it.
+ * This is the whole experience below 900px and with scripting off, and it is
+ * what a crawler, an ATS and a printer see. It is a server component and must
+ * stay one: before it existed the response body was an empty div.
  *
- * It is also the narrow-screen experience outright, which is why the sections
- * are `<details>`: native collapsing needs no JavaScript, so the whole page
- * works with scripting switched off.
+ * The arrangement is a spine. The five roles run newest-first down one rule,
+ * and the case study is rendered *inside* the role that produced it rather
+ * than filed after it — everything in `case-study.ts` traces to that entry, so
+ * a reader meets the depth while reading the role, not by finding a second
+ * section. What replaced: six collapsed `<details>` of equal weight, in which
+ * the case study and the reversed decisions — the two things a neighbouring
+ * portfolio cannot copy — each sat behind a tap, below four other headings.
  */
 
-function Section({
-	icon,
+/**
+ * A heading with its own rule and a count beside it.
+ *
+ * The sections used to be `<strong>` inside a `<summary>`, which reads as bold
+ * text to a screen reader rather than as a landmark. These are real `h2`s, so
+ * the document has an outline: name, section, role, case study.
+ */
+function Head({ title, meta, id }: { title: string; meta: string; id: string }) {
+	return (
+		<h2 className='mb-rule-h' id={id}>
+			{title} <span>{meta}</span>
+		</h2>
+	);
+}
+
+/**
+ * Reference material that stays collapsible.
+ *
+ * The rule: the spine and the reversals are the argument and are always open;
+ * Skills and Projects are lookup, and a reader opens them when they want them.
+ * Still native `<details>`, so it collapses with no JavaScript, and
+ * `PrintExpander` opens it for print.
+ */
+function Fold({
 	title,
-	subtitle,
+	meta,
 	children,
-	open,
 }: {
-	icon: React.ReactNode;
 	title: string;
-	subtitle: string;
+	meta: string;
 	children: React.ReactNode;
-	open?: boolean;
 }) {
 	return (
-		<details className='mb-card' open={open}>
-			<summary className='mb-card-head'>
-				<span className='mb-card-icon' aria-hidden='true'>
-					{icon}
-				</span>
-				<span className='mb-card-title'>
-					<strong>{title}</strong>
-					<small>{subtitle}</small>
-				</span>
+		<details className='mb-fold'>
+			<summary className='mb-fold-head'>
+				<h2>
+					{title} <span>{meta}</span>
+				</h2>
 				<LiChevronDown size={18} aria-hidden='true' />
 			</summary>
-			<div className='mb-card-body'>{children}</div>
+			<div className='mb-fold-body'>{children}</div>
 		</details>
 	);
 }
@@ -112,18 +127,10 @@ export default function PortfolioDocument() {
 				</a>
 			</div>
 
-			{/* This used to name what the reader was missing and stop there,
-			    which is an apology. The sentence from tips.ts says what the thing
-			    actually is, and cannot drift from what Tips ▸ How it's built says
-			    inside the shell. */}
-			<p className='mb-note'>{BUILT_SUMMARY}</p>
-
-			{/* First, because it is the only section that answers "and today?" */}
-			<Section
-				icon={<Radar size={17} />}
-				title='Now'
-				subtitle={`Updated ${nowStamp}`}
-				open>
+			{/* Directly under the actions, because it is the only part that answers
+			    "and today?" and the only part with a date on it. */}
+			<section aria-labelledby='doc-now'>
+				<Head title='Now' meta={`Updated ${nowStamp}`} id='doc-now' />
 				<dl className='mb-now'>
 					{profile.now.map((n) => (
 						<div key={n.label}>
@@ -132,57 +139,66 @@ export default function PortfolioDocument() {
 						</div>
 					))}
 				</dl>
-			</Section>
+			</section>
 
-			<Section
-				icon={<LiBriefcase size={17} />}
-				title='Experience'
-				subtitle={`${experiences.length} roles · ${years} years`}
-				open>
-				<ol className='mb-roles'>
-					{experiences.map((e) => (
-						<li key={e.company}>
-							<h3>{e.role}</h3>
-							<span className='mb-company'>{e.company}</span>
-							<span className='mb-period'>
-								{e.period} · {tenureLabel(e)} · {e.location}
-							</span>
-							{e.stats.length > 0 && (
-								<ul className='mb-stats'>
-									{e.stats.map((s) => (
-										<li key={s.label}>
-											<strong>{s.value}</strong>
-											<span>{s.label}</span>
-										</li>
+			{/* This used to name what the reader was missing and stop there,
+			    which is an apology. The sentence from tips.ts says what the thing
+			    actually is, and cannot drift from what Tips ▸ How it's built says
+			    inside the shell. */}
+			<p className='mb-note'>{BUILT_SUMMARY}</p>
+
+			<section aria-labelledby='doc-exp'>
+				<Head
+					title='Experience'
+					meta={`${experiences.length} roles · ${years} years`}
+					id='doc-exp'
+				/>
+				<ol className='mb-spine'>
+					{experiences.map((e) => {
+						/* The join that puts the case study inside its own role. It is
+						   by name, so it fails silently if either side is renamed —
+						   which is why `data.test.ts` pins it. */
+						const carriesCase = e.short === caseStudy.at;
+						return (
+							<li key={e.company} data-current={e.current || undefined}>
+								<h3>{e.role}</h3>
+								<span className='mb-company'>{e.company}</span>
+								<span className='mb-period'>
+									{e.period} · {tenureLabel(e)} · {e.location}
+								</span>
+								{e.stats.length > 0 && (
+									<ul className='mb-stats'>
+										{e.stats.map((s) => (
+											<li key={s.label}>
+												<strong>{s.value}</strong>
+												<span>{s.label}</span>
+											</li>
+										))}
+									</ul>
+								)}
+								<p>{e.description}</p>
+								<ul className='mb-points'>
+									{e.achievements.map((a) => (
+										<li key={a}>{a}</li>
 									))}
 								</ul>
-							)}
-							<p>{e.description}</p>
-							<ul className='mb-points'>
-								{e.achievements.map((a) => (
-									<li key={a}>{a}</li>
-								))}
-							</ul>
-							<span className='mb-tech'>{e.tech.join(' · ')}</span>
-						</li>
-					))}
+								<span className='mb-tech'>{e.tech.join(' · ')}</span>
+
+								{carriesCase && (
+									<div className='mb-case'>
+										<h4 className='mb-cs-title'>{caseStudy.title}</h4>
+										<CaseStudyBody level={5} />
+									</div>
+								)}
+							</li>
+						);
+					})}
 				</ol>
-			</Section>
+			</section>
 
-			{/* The deepest technical content on the site, so it ships in the
-			    response body rather than behind the shell. */}
-			<Section
-				icon={<FileCode2 size={17} />}
-				title='Case study'
-				subtitle={`${caseStudy.at} · ${caseStudy.period}`}>
-				<h3 className='mb-cs-title'>{caseStudy.title}</h3>
-				<CaseStudyBody />
-			</Section>
-
-			<Section
-				icon={<LiLayers size={17} />}
+			<Fold
 				title='Skills'
-				subtitle={`${skills.length} tools across ${SKILL_CATEGORIES.length} categories`}>
+				meta={`${skills.length} tools · ${SKILL_CATEGORIES.length} categories`}>
 				{SKILL_CATEGORIES.map((c) => (
 					<div key={c.key} className='mb-skill-group'>
 						<h3>{c.key}</h3>
@@ -199,12 +215,9 @@ export default function PortfolioDocument() {
 						</dl>
 					</div>
 				))}
-			</Section>
+			</Fold>
 
-			<Section
-				icon={<FolderGit2 size={17} />}
-				title='Projects'
-				subtitle={`${projects.length} selected`}>
+			<Fold title='Projects' meta={`${projects.length} selected`}>
 				<ul className='mb-projects'>
 					{projects.map((p) => (
 						<li key={p.id}>
@@ -236,15 +249,17 @@ export default function PortfolioDocument() {
 						</li>
 					))}
 				</ul>
-			</Section>
+			</Fold>
 
-			{/* Absent from this document until now, so a phone, a crawler and a
-			    printed page all saw a portfolio with no reversals in it. Closed by
-			    default because it is long; print-expander opens it for print. */}
-			<Section
-				icon={<Undo2 size={17} />}
-				title='Decisions reversed'
-				subtitle={`${discarded.length} things built and thrown away`}>
+			{/* Open, not folded. PRODUCT.md calls this the thing a neighbouring
+			    portfolio cannot truthfully copy; it spent one release behind a tap
+			    and before that was absent from the document altogether. */}
+			<section aria-labelledby='doc-rev'>
+				<Head
+					title='Decisions reversed'
+					meta={`${discarded.length} things built and thrown away`}
+					id='doc-rev'
+				/>
 				<ol className='mb-discarded'>
 					{discarded.map((d) => (
 						<li key={d.name}>
@@ -252,7 +267,7 @@ export default function PortfolioDocument() {
 						</li>
 					))}
 				</ol>
-			</Section>
+			</section>
 
 			<footer className='mb-foot'>
 				<a href={`mailto:${profile.email}`}>
