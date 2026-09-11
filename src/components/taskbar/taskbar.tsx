@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { LayoutGrid, Pin, PinOff, SquareStack, X } from 'lucide-react';
 import { LiSearch } from '@/components/icons/line-icons';
-import { GitHubIcon } from '@/components/icons/app-icons';
+import { DocumentIcon, GitHubIcon } from '@/components/icons/app-icons';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { APP_BY_ID, APPS } from '@/components/apps/registry';
@@ -67,8 +67,11 @@ export default function Taskbar() {
 
 	return (
 		<div className='taskbar'>
-			{/* Windows puts a weather widget here. Ours carries something a
-			    visitor can act on: what time it is where I am. */}
+			{/* Windows puts a weather widget here. Ours says whose desktop this
+			    is and what I am open to, with the time where I am: the two lines
+			    a visitor needs first, on the one surface no window covers. It
+			    used to say only the time and "Available", which was the whole of
+			    the person on the desktop once the first window was closed. */}
 			<button
 				type='button'
 				className='tb-widget'
@@ -76,8 +79,10 @@ export default function Taskbar() {
 				suppressHydrationWarning>
 				<span className='tb-widget-dot' aria-hidden='true' />
 				<span className='tb-widget-text'>
-					<strong>{jakarta || '--:--'} in Jakarta</strong>
-					{profile.availability}
+					<strong>
+						{profile.name} · {profile.role}
+					</strong>
+					{profile.workType} · {jakarta || '--:--'} in Jakarta
 				</span>
 			</button>
 
@@ -128,6 +133,18 @@ export default function Taskbar() {
 						/>
 					);
 				})}
+
+				{/* The CV is the one real file on this desktop and the action a
+				    visit succeeds in. It sits on the strip for the same reason
+				    GitHub does: a destination, always one click away. */}
+				<a
+					className='tb-btn tb-link'
+					href={profile.cvView}
+					target='_blank'
+					rel='noopener noreferrer'
+					aria-label='Resume — PDF, opens in a new tab'>
+					<DocumentIcon size={22} />
+				</a>
 
 				{/* GitHub is a real destination, not an app — it leaves the page. */}
 				<a

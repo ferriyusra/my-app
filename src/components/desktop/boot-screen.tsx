@@ -25,8 +25,15 @@ type Phase = 'boot' | 'lock' | 'welcome';
 
 const ORDER: Phase[] = ['boot', 'lock', 'welcome'];
 
-/** How long each phase holds if the visitor does nothing, in ms. */
-const HOLD: Record<Phase, number> = { boot: 900, lock: 1600, welcome: 900 };
+/**
+ * How long each phase holds if the visitor does nothing, in ms.
+ *
+ * Shorter than the real thing. It was 900 / 1600 / 900: 3.4 seconds of
+ * firmware logo and clock before a word about the owner, for a reader who
+ * arrived from a link to check a claim. The sequence still reads as a boot;
+ * it just no longer costs a recruiter a third of their patience.
+ */
+const HOLD: Record<Phase, number> = { boot: 600, lock: 1000, welcome: 600 };
 
 /** Dots in the orbiting spinner Windows shows under the boot logo. */
 const DOTS = [0, 1, 2, 3, 4];
@@ -139,6 +146,16 @@ export default function BootScreen() {
 					<div className='bt-stage bt-lock' suppressHydrationWarning>
 						<p className='bt-time'>{time || ' '}</p>
 						<p className='bt-date'>{longDate || ' '}</p>
+					</div>
+					{/* Windows puts an app's detailed status in this corner of the
+					    lock screen. A portfolio's status is whose it is: the name
+					    used to appear first on the sign-in screen, 2.5 seconds
+					    in, for under a second. */}
+					<div className='bt-who'>
+						<strong>{profile.name}</strong>
+						<span>
+							{profile.role} — {profile.roleDetail}
+						</span>
 					</div>
 					<p className='bt-hint'>Press any key to sign in</p>
 				</>

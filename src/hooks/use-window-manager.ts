@@ -12,10 +12,38 @@ const COMPLEMENT = { left: 'right', right: 'left' } as const;
 /** Taskbar height in CSS pixels; mirrors `--taskbar-h` in globals.css. */
 export const TASKBAR_H = 48;
 
+/**
+ * The strip above the taskbar where the cat walks, its house stands and the
+ * activation watermark sits. All three are drawn above windows on purpose,
+ * which was fine on a 900px-tall desktop and put them over the current role's
+ * outcomes on a 720p laptop, where a default window reached the floor.
+ */
+export const FLOOR_H = 76;
+
 /** The desktop area, i.e. the viewport minus the taskbar. */
 export function desktopBounds(): Bounds {
 	if (typeof window === 'undefined') return { w: 1440, h: 900 - TASKBAR_H };
 	return { w: window.innerWidth, h: window.innerHeight - TASKBAR_H };
+}
+
+/** Where a window may open: the desktop, less the floor. Snapping and
+    maximising still use the whole desktop, as they do on Windows. */
+export function placementBounds(): Bounds {
+	const b = desktopBounds();
+	return { w: b.w, h: b.h - FLOOR_H };
+}
+
+/**
+ * The size an app opens at: its registry size, grown on a large screen so a
+ * window is not a postcard in the middle of a 27-inch monitor. At 1920×1080
+ * the About window used to cover a quarter of the screen with 13px prose in
+ * it. The reducer clamps the result to the bounds it is given.
+ */
+export function defaultSize(app: { w: number; h: number }, b: Bounds) {
+	return {
+		w: Math.min(Math.max(app.w, Math.round(b.w * 0.55)), 1200),
+		h: Math.min(Math.max(app.h, Math.round(b.h * 0.7)), 800),
+	};
 }
 
 /**
@@ -38,13 +66,14 @@ export function useWindowManager() {
 		runningRef.current = windows;
 	}, [windows]);
 
-	/** Open an app at the size its registry entry asks for. */
+	/** Open an app at its default size, placed clear of the floor. */
 	const launch = useCallback(
 		(id: AppId) => {
 			const app = APP_BY_ID[id];
 			/* Re-raising an app that is already open should not chime. */
 			const running = runningRef.current.some((w) => w.id === id);
-			open(id, { w: app.w, h: app.h }, desktopBounds());
+			const room = placementBounds();
+			open(id, defaultSize(app, room), room);
 			if (!running) play('open');
 			pushRecent(id);
 			closeFlyout();

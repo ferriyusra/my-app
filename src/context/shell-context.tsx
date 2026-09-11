@@ -219,8 +219,20 @@ function read<T extends string>(key: string, fallback: T, allowed: readonly T[])
 const WALLPAPER_IDS = WALLPAPERS.map((w) => w.id);
 const ACCENT_IDS = ACCENTS.map((a) => a.id);
 
-/** Taskbar pins before the visitor has changed any. */
-const DEFAULT_PINNED: AppId[] = ['explorer', 'recycle', 'vscode', 'about'];
+/**
+ * Taskbar pins before the visitor has changed any: the reader's route first
+ * (who, the roles, how to write), then the folders, the bin and the editor.
+ * Mail was not pinned at all, on a site whose success metric is the CV being
+ * opened; the strip held the Recycle Bin and VS Code instead.
+ */
+const DEFAULT_PINNED: AppId[] = [
+	'about',
+	'experience',
+	'contact',
+	'explorer',
+	'recycle',
+	'vscode',
+];
 const PINNABLE: AppId[] = [
 	'tips',
 	'about',

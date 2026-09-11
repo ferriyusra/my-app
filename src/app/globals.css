@@ -844,7 +844,7 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
   transition: background var(--dur-faster) var(--ease-standard);
 }
 .tb-widget:hover { background: var(--subtle-hover); }
-.tb-widget-text { display: flex; flex-direction: column; }
+.tb-widget-text { display: flex; flex-direction: column; white-space: nowrap; }
 .tb-widget strong { color: var(--ink); font-weight: 600; }
 .tb-widget-dot {
   width: 8px; height: 8px;
@@ -2161,6 +2161,26 @@ input[type='range']::-moz-range-thumb {
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
   animation: bt-pulse 2.6s ease-in-out infinite;
 }
+/* Whose desktop this is. Windows shows an app's detailed status in this
+   corner of the lock screen; a portfolio's status is its owner's name and
+   trade, and a second and a half of clock said neither. */
+.bt-who {
+  position: absolute;
+  z-index: 2;
+  left: clamp(24px, 5vw, 72px);
+  bottom: clamp(48px, 9vh, 88px);
+  display: grid;
+  gap: 3px;
+  text-align: left;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+}
+.bt-who strong {
+  font-family: var(--display);
+  font-size: clamp(18px, 1.8vw, 24px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.bt-who span { font-size: clamp(13px, 1.1vw, 15px); opacity: 0.9; }
 @keyframes bt-pulse {
   0%, 100% { opacity: 0.5; }
   50% { opacity: 0.95; }
@@ -2332,9 +2352,31 @@ input[type='range']::-moz-range-thumb {
 .st-pane-head h2 { font-size: 26px; line-height: 32px; }
 .st-pane-head p { margin: 6px 0 0; font-size: 13px; color: var(--ink-muted); }
 .st-pane-body { padding: 8px 32px 32px; display: flex; flex-direction: column; gap: 10px; }
+/* The "Get help · Give feedback" slot every Settings page ends with, carrying
+   the two actions a visit here succeeds in. `margin-top: auto` keeps it at
+   the foot of a short page; on a long one it follows the content. */
+.st-pane-foot {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  padding: 14px 32px 20px;
+  border-top: 1px solid var(--line-subtle);
+}
+.st-pane-foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.st-pane-foot a:hover { text-decoration: underline; }
+.st-pane-foot a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 @media (max-width: 720px) {
   .st-pane-head { padding: 18px 18px 10px; }
   .st-pane-body { padding: 8px 18px 24px; }
+  .st-pane-foot { padding: 12px 18px 18px; }
 }
 
 /* ── Setting card ── */
@@ -2356,7 +2398,7 @@ input[type='range']::-moz-range-thumb {
 }
 .st-card-text { flex: 1; min-width: 0; }
 .st-card-text h3 { font-size: 14px; font-weight: 600; }
-.st-card-text p { margin: 3px 0 0; font-size: 12px; line-height: 17px; color: var(--ink-muted); }
+.st-card-text p { margin: 3px 0 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
 .st-card-control { flex-shrink: 0; }
 .st-card-extra {
   padding: 0 16px 16px;
@@ -2365,7 +2407,11 @@ input[type='range']::-moz-range-thumb {
   margin-top: -1px;
 }
 .st-card-row + .st-card-extra { border-top: 1px solid var(--line-subtle); }
-.st-prose { margin: 0 0 12px; font-size: 13px; line-height: 20px; color: var(--ink-secondary); }
+/* Reading size, not caption size: these paragraphs are the CV. The body is
+   14px, which is Fluent's; the prose inside the windows had been set below
+   it, at 12 and 13, in the one place a hiring manager actually reads. */
+.st-prose { margin: 0 0 12px; font-size: 14px; line-height: 22px; color: var(--ink-secondary); }
+.st-card-extra > .st-prose:last-child { margin-bottom: 0; }
 
 /* ── Specification tables ── */
 .st-specs { margin: 0; display: grid; gap: 0; }
@@ -2579,7 +2625,7 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   box-shadow: var(--sh-8);
 }
 .ab-hero-text h3 { font-size: 20px; }
-.ab-hero-text p { margin: 4px 0 10px; font-size: 13px; color: var(--ink-secondary); }
+.ab-hero-text p { margin: 4px 0 10px; font-size: 14px; color: var(--ink-secondary); }
 .ab-badges { display: flex; flex-wrap: wrap; gap: 6px; }
 .ab-badge {
   display: inline-flex;
@@ -2603,8 +2649,8 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   border-radius: 0 var(--r-md) var(--r-md) 0;
   background: var(--surface);
 }
-.ab-outcomes strong { font-size: 13px; }
-.ab-outcomes span { font-size: 12px; color: var(--ink-secondary); }
+.ab-outcomes strong { font-size: 14px; }
+.ab-outcomes span { font-size: 13px; color: var(--ink-secondary); }
 .ab-outcomes em { font-size: 11px; font-style: normal; color: var(--ink-muted); }
 
 .ab-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
@@ -2728,9 +2774,9 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 }
 .ex-desc {
   margin: 0 0 2px;
-  font-size: 12px;
-  line-height: 19px;
-  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ink-secondary);
 }
 .ex-points {
   /* Preflight sets list-style:none on every ul, which silently killed the
@@ -2741,7 +2787,7 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   display: grid;
   gap: 7px;
 }
-.ex-points li { font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
+.ex-points li { font-size: 14px; line-height: 21px; color: var(--ink-secondary); }
 .ex-points li::marker { color: var(--accent); }
 .ex-toggle {
   display: inline-flex;
@@ -3042,7 +3088,10 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 .xp-detail-cover {
   display: block;
   width: 100%;
-  aspect-ratio: 16 / 8;
+  /* Shallow enough that the project's name and badge are on screen when the
+     folder opens; at 16 / 8 the cover alone filled the pane. */
+  aspect-ratio: 16 / 6;
+  max-height: 240px;
   object-fit: cover;
   border: 1px solid var(--line-subtle);
   border-radius: var(--r-lg);
@@ -3858,7 +3907,7 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   font-weight: 600;
   letter-spacing: 0.01em;
 }
-.cs-section p { margin: 0 0 10px; font-size: 13px; line-height: 21px; }
+.cs-section p { margin: 0 0 10px; font-size: 14px; line-height: 22px; }
 .cs-section p:last-child { margin-bottom: 0; }
 .cs-section strong { font-weight: 600; }
 
@@ -3872,11 +3921,15 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   background: var(--surface-subtle);
 }
 .cs-open ul { margin: 10px 0 0; padding-left: 18px; }
-.cs-open li { font-size: 13px; line-height: 21px; margin-bottom: 7px; }
+.cs-open li { font-size: 14px; line-height: 22px; margin-bottom: 7px; }
 .cs-open li:last-child { margin-bottom: 0; }
 
 /* In the Experience window it is a disclosure on the current role. */
 .ex-case { margin-top: 14px; border-top: 1px solid var(--line-subtle); padding-top: 12px; }
+/* As a page of its own the write-up gets the card and a title, nothing
+   collapsed. Same component underneath as the disclosure and the document. */
+.ex-case-page { display: block; }
+.ex-case-title { margin: 0 0 12px; font-size: 18px; line-height: 24px; }
 .ex-case > summary {
   display: flex;
   align-items: center;
@@ -3919,7 +3972,7 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   letter-spacing: 0.02em;
   color: var(--ink-muted);
 }
-.ab-now dd, .mb-now dd { margin: 0; font-size: 13px; line-height: 20px; }
+.ab-now dd, .mb-now dd { margin: 0; font-size: 14px; line-height: 22px; }
 .ab-now-stamp {
   margin: 14px 0 0;
   font-size: 11px;
@@ -4514,6 +4567,10 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   width: 240px;
   border-color: var(--accent);
   box-shadow: var(--sh-16);
+  /* Open, the board is the HUD and sits over the character: the stats and
+     the key hint are its point, and the character's head covered the last
+     two lines of them. Closed, it stays in the world behind him. */
+  z-index: 2;
 }
 
 /* Kept short on purpose: the panel must not reach the ground, or standing
@@ -5136,7 +5193,10 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 }
 .mb-head-text { flex: 1; min-width: 0; }
 .mb-head-text h1 { font-size: 22px; }
-.mb-head-text > p:not(.mb-loc) { margin: 3px 0 0; font-size: 13px; color: var(--ink-secondary); }
+.mb-head-text > p:not(.mb-loc) { margin: 3px 0 0; font-size: 14px; color: var(--ink-secondary); }
+/* What, where, when — under the name, so a phone shows it on the first
+   screen instead of in Now, eight screens down. */
+.mb-open { margin: 8px 0 0 !important; font-size: 13px; line-height: 18px; }
 .mb-loc {
   display: flex;
   align-items: center;
@@ -5160,10 +5220,22 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 .mb-headline { margin: 20px 0 12px; font-size: 17px; line-height: 25px; color: var(--ink); }
 .mb-summary { margin: 0 0 20px; font-size: 14px; line-height: 22px; color: var(--ink-secondary); }
 .mb-points { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
-.mb-points li { font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
+.mb-points li { font-size: 14px; line-height: 21px; color: var(--ink-secondary); }
 .mb-points li::marker { color: var(--accent); }
 .mb-projects h3 { display: inline; font-size: 14px; margin-right: 8px; }
-.mb-actions { display: flex; gap: 10px; margin-bottom: 18px; }
+.mb-actions { display: flex; gap: 10px; margin-bottom: 14px; }
+/* Five anchors under the buttons. The document is ten screens long on a
+   phone and had no way to skip to the part a reader came for. */
+.mb-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0 0 24px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.mb-jump a { color: var(--accent); text-decoration: none; }
+.mb-jump a:hover { text-decoration: underline; }
 .mb-note {
   margin: 0 0 22px;
   padding: 12px 14px;
@@ -5407,11 +5479,14 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 }
 
 @media (max-width: 420px) {
-  .mb-head { flex-wrap: wrap; }
-  .mb-head-text { flex-basis: 100%; order: 3; }
-  .mb-actions { flex-direction: column; }
-  /* Fluent's 32px button is a mouse target; a thumb needs the whole row. */
-  .mb-actions .fl-btn { justify-content: center; height: 40px; }
+  /* The avatar stays beside the name. A phone's first screen used to spend a
+     row on two initials and a theme button before the name appeared. */
+  .mb-avatar { width: 46px; height: 46px; font-size: 16px; }
+  /* Fluent's 32px button is a mouse target; a thumb needs the whole row —
+     the resume on its own, the two secondary actions sharing the next. */
+  .mb-actions { flex-wrap: wrap; }
+  .mb-actions .fl-btn { flex: 1 1 calc(50% - 5px); justify-content: center; height: 40px; }
+  .mb-actions .fl-btn:first-child { flex-basis: 100%; }
 }
 
 /* ═══════════════════════════════════════════════════════════

@@ -5,6 +5,7 @@ import { Building2, FileCode2, History } from 'lucide-react';
 import { LiChevronDown, LiMapPin } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import CaseStudyBody from '@/components/content/case-study-body';
+import { useAppIntent } from '@/hooks/use-app-intent';
 import { caseStudy } from '@/data/case-study';
 import {
 	experiences,
@@ -15,6 +16,10 @@ import {
 
 const PAGES: SettingsPage[] = [
 	{ key: 'all', label: 'Timeline', Icon: History },
+	/* The deepest thing on the site was the hardest to find: a collapsed row
+	   under the outcomes and the chips of one role card, after an expand and a
+	   scroll. It is a page of its own now, second in the rail. */
+	{ key: 'case', label: 'Case study', Icon: FileCode2 },
 	...experiences.map((e) => ({
 		key: e.short,
 		label: e.short,
@@ -29,10 +34,13 @@ function Role({
 	exp,
 	expanded,
 	onToggle,
+	caseOpen = false,
 }: {
 	exp: Experience;
 	expanded: boolean;
 	onToggle: () => void;
+	/** Open the case study disclosure to begin with — on the role's own page. */
+	caseOpen?: boolean;
 }) {
 	const shown = expanded ? exp.achievements : exp.achievements.slice(0, COLLAPSED);
 	const hidden = exp.achievements.length - COLLAPSED;
@@ -104,9 +112,10 @@ function Role({
 
 				{/* Only the role the case study is about carries it. `<details>`
 				    rather than state: it is long, and it should be closed by
-				    default without another toggle to wire up. */}
+				    default in the timeline without another toggle to wire up. On
+				    the role's own page it starts open — that page is one card. */}
 				{exp.short === caseStudy.at && (
-					<details className='ex-case'>
+					<details className='ex-case' open={caseOpen || undefined}>
 						<summary>
 							<FileCode2 size={14} aria-hidden='true' />
 							Case study — {caseStudy.title}
@@ -188,6 +197,16 @@ export default function ExperienceApp() {
 	const shown =
 		page === 'all' ? experiences : experiences.filter((e) => e.short === page);
 
+	/* About's overview and Start's Recommended open this window on the case
+	   study; the note arrives with the launch, or now if it is already open. */
+	useAppIntent('experience', (value) => {
+		if (value !== 'case') return;
+		setPage('case');
+		setOpen(null);
+	});
+
+	const isCase = page === 'case';
+
 	return (
 		<SettingsShell
 			pages={PAGES}
@@ -196,12 +215,14 @@ export default function ExperienceApp() {
 				setPage(k);
 				setOpen(null);
 			}}
-			navLabel='Employers'
-			title={page === 'all' ? 'Experience' : page}
+			navLabel='Sections'
+			title={page === 'all' ? 'Experience' : isCase ? 'Case study' : page}
 			subtitle={
 				page === 'all'
 					? `${experiences.length} roles, most recent first`
-					: shown[0]?.company
+					: isCase
+						? `${caseStudy.at} · ${caseStudy.period}`
+						: shown[0]?.company
 			}>
 			{page === 'all' && (
 				<CareerBar
@@ -214,16 +235,24 @@ export default function ExperienceApp() {
 				/>
 			)}
 
-			<ol className='ex-timeline'>
-				{shown.map((exp) => (
-					<Role
-						key={exp.company}
-						exp={exp}
-						expanded={open === exp.company}
-						onToggle={() => setOpen(open === exp.company ? null : exp.company)}
-					/>
-				))}
-			</ol>
+			{isCase ? (
+				<article className='ex-card ex-case-page'>
+					<h3 className='ex-case-title'>{caseStudy.title}</h3>
+					<CaseStudyBody />
+				</article>
+			) : (
+				<ol className='ex-timeline'>
+					{shown.map((exp) => (
+						<Role
+							key={exp.company}
+							exp={exp}
+							expanded={open === exp.company}
+							onToggle={() => setOpen(open === exp.company ? null : exp.company)}
+							caseOpen={page !== 'all'}
+						/>
+					))}
+				</ol>
+			)}
 		</SettingsShell>
 	);
 }

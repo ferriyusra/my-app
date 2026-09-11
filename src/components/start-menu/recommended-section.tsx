@@ -1,17 +1,20 @@
 'use client';
 
-import { Clock, FileText, FolderGit2 } from 'lucide-react';
+import { Clock, FileCode2, FileText, FolderGit2 } from 'lucide-react';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
+import { sendIntent } from '@/hooks/use-app-intent';
 import { APP_BY_ID } from '@/components/apps/registry';
 import AppTile from '@/components/ui/app-tile';
 import { projects } from '@/data/projects';
 import { profile } from '@/data/profile';
+import { caseStudy } from '@/data/case-study';
 
 /**
  * Start's Recommended strip. Windows fills it with recently opened files;
- * this fills it with what was actually opened this session, then falls back
- * to the two featured projects and the CV so the row is never empty.
+ * this fills it with what was actually opened this session, then the case
+ * study, the two featured projects and the CV, so the row is never empty and
+ * the strongest document on the site is one click from Start.
  */
 export default function RecommendedSection({ onClose }: { onClose: () => void }) {
 	const { recents } = useShell();
@@ -41,6 +44,26 @@ export default function RecommendedSection({ onClose }: { onClose: () => void })
 					</button>
 				);
 			})}
+
+			<button
+				type='button'
+				className='start-reco-item'
+				onClick={() => {
+					sendIntent('experience', 'case');
+					launch('experience');
+					onClose();
+				}}>
+				<span
+					className='start-reco-swatch'
+					aria-hidden='true'
+					style={{ background: 'linear-gradient(140deg, #4a8a6c 0%, #1f4d38 100%)' }}>
+					<FileCode2 size={15} color='#fff' strokeWidth={2.1} />
+				</span>
+				<span>
+					<strong>Case study</strong>
+					<small>{caseStudy.title}</small>
+				</span>
+			</button>
 
 			{featured.map((p) => (
 				<button

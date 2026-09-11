@@ -78,7 +78,7 @@ export const TIP_PAGES: TipPage[] = [
 			},
 			{
 				title: 'One typed dataset, four ways in',
-				body: 'Roles, projects, skills, the case study and the reversed decisions are typed data with no second copy. Start searches 51 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
+				body: 'Roles, projects, skills, the case study and the reversed decisions are typed data with no second copy. Start searches 68 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
 				where: 'Start, Terminal, Skills',
 			},
 			{

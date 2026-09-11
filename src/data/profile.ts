@@ -91,6 +91,14 @@ export const profile = {
 	locationDetail: 'Jakarta, Indonesia (Hybrid / Remote)',
 	workType: 'Freelance & Full-time roles',
 
+	/**
+	 * The line a reader decides on, in one breath: what, where, when. On a
+	 * phone the long form in `now` sat eight screens down; this goes under the
+	 * name.
+	 */
+	openTo:
+		'Open to freelance and full-time backend work · Jakarta, hybrid or remote · GMT+7',
+
 	/** Stated once, rendered everywhere. */
 	availability: 'Available',
 	availabilityShort: 'Open for opportunities',
