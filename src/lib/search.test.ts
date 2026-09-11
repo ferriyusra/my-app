@@ -4,7 +4,20 @@ import { test } from 'node:test';
 
 import { experiences } from '../data/experience.ts';
 import { skills } from '../data/skills.ts';
+import { TIP_PAGES } from '../data/tips.ts';
 import { excerpt, index, search } from './search.ts';
+
+test('the Tips page states the size of the index it describes', () => {
+	/* The figure is prose in `tips.ts`, which cannot import the index without
+	   a cycle — the index includes the tips. Pinning it here is how it stays
+	   true: it said 51 in a release whose index held 68. */
+	const tip = TIP_PAGES.flatMap((p) => p.tips).find(
+		(t) => t.title === 'One typed dataset, four ways in',
+	);
+	assert.ok(tip, 'the tip that quotes the index size should still exist');
+	const said = tip.body.match(/(\d+) entries/)?.[1];
+	assert.equal(said, String(index().length), 'tips.ts quotes a stale index size');
+});
 
 test('the index covers every role, project and skill without being hand-written', () => {
 	const all = index();

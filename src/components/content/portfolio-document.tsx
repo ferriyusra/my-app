@@ -51,16 +51,19 @@ function Head({ title, meta, id }: { title: string; meta: string; id: string }) 
  * `PrintExpander` opens it for print.
  */
 function Fold({
+	id,
 	title,
 	meta,
 	children,
 }: {
+	/** An anchor for the jump row; the fold need not open to be reached. */
+	id: string;
 	title: string;
 	meta: string;
 	children: React.ReactNode;
 }) {
 	return (
-		<details className='mb-fold'>
+		<details className='mb-fold' id={id}>
 			<summary className='mb-fold-head'>
 				<h2>
 					{title} <span>{meta}</span>
@@ -98,6 +101,9 @@ export default function PortfolioDocument() {
 						<span className='mb-dot' aria-hidden='true' />
 						{profile.availability}
 					</p>
+					{/* "Available" has an object here. The long form stays in Now;
+					    on a phone that section is eight screens down. */}
+					<p className='mb-open'>{profile.openTo}</p>
 				</div>
 				<ThemeToggle />
 			</header>
@@ -126,6 +132,18 @@ export default function PortfolioDocument() {
 					<LiMail size={15} aria-hidden='true' /> Email
 				</a>
 			</div>
+
+			{/* The document is ten screens long on a phone. Five anchors, so a
+			    reader who came for the reversals need not scroll through five
+			    roles to reach them. Plain links: they work with scripting off,
+			    which is the whole point of this rendering. */}
+			<nav className='mb-jump' aria-label='Sections'>
+				<a href='#doc-exp'>Experience</a>
+				<a href='#doc-now'>Now</a>
+				<a href='#doc-skills'>Skills</a>
+				<a href='#doc-projects'>Projects</a>
+				<a href='#doc-rev'>Decisions reversed</a>
+			</nav>
 
 			<section aria-labelledby='doc-exp'>
 				<Head
@@ -196,6 +214,7 @@ export default function PortfolioDocument() {
 			</section>
 
 			<Fold
+				id='doc-skills'
 				title='Skills'
 				meta={`${skills.length} tools · ${SKILL_CATEGORIES.length} categories`}>
 				{SKILL_CATEGORIES.map((c) => (
@@ -216,7 +235,7 @@ export default function PortfolioDocument() {
 				))}
 			</Fold>
 
-			<Fold title='Projects' meta={`${projects.length} selected`}>
+			<Fold id='doc-projects' title='Projects' meta={`${projects.length} selected`}>
 				<ul className='mb-projects'>
 					{projects.map((p) => (
 						<li key={p.id}>

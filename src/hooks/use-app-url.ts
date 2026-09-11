@@ -23,6 +23,12 @@ import type { AppId } from '@/types/windows';
 
 const PARAM = 'app';
 
+/**
+ * Below this desktop width the two first-arrival windows would each get less
+ * than 600px, which is too narrow for a Settings-style pane with a rail.
+ */
+const SIDE_BY_SIDE_MIN = 1200;
+
 /** The app named in the current URL, if it names a real one. */
 function appFromUrl(): AppId | null {
 	if (typeof window === 'undefined') return null;
@@ -32,7 +38,7 @@ function appFromUrl(): AppId | null {
 
 export function useAppUrl() {
 	const { windows, topZ } = useWindows();
-	const { launch, focus } = useWindowManager();
+	const { launch, focus, snap, bounds } = useWindowManager();
 	const { booted, arrival } = useShell();
 
 	/** What the URL last said, so a sync does not fight a user action. */
@@ -41,18 +47,38 @@ export function useAppUrl() {
 	/** Which apps were open last time round, to tell opening from raising. */
 	const wasOpen = useRef<AppId[]>([]);
 
-	/* Arrival: open what was asked for, or About when nothing was — except on
-	   a visitor's very first arrival, which opens Tips instead. Nothing on a
-	   desktop announces that its windows drag, snap and close, so the first
-	   thing anybody does here is drag, snap and close the window that says so.
-	   A shared ?app= link still wins, because it is read first. */
+	/* Arrival: open what was asked for, or About when nothing was. A shared
+	   ?app= link wins, because it is read first.
+
+	   A visitor's very first arrival used to open Tips alone — the first thing
+	   anybody did here was drag, snap and close the window that says windows
+	   drag, snap and close. Clever, and the wrong opening for a hiring manager
+	   checking a claim: a manual with no evidence in it, and a desktop with no
+	   name on it once the manual was closed. Now About opens in front, and
+	   Tips opens beside it, snapped to the other half — which demonstrates
+	   snapping without anyone reading about it. Where the desktop is too
+	   narrow for two panes, Tips sits behind About in the cascade instead. */
 	useEffect(() => {
 		if (!booted || started.current) return;
 		started.current = true;
 		const asked = appFromUrl();
 		shown.current = asked;
-		launch(asked ?? (arrival === 'first' ? 'tips' : 'about'));
-	}, [booted, arrival, launch]);
+		if (asked || arrival !== 'first') {
+			launch(asked ?? 'about');
+			return;
+		}
+		/* Tips first so About, launched second, is the one in front. The
+		   context's own `snap` rather than the manager's: this is a layout,
+		   not a gesture, and must not have Snap Assist offer to fill a half
+		   that is already full. */
+		const b = bounds();
+		launch('tips');
+		launch('about');
+		if (b.w >= SIDE_BY_SIDE_MIN) {
+			snap('tips', 'right', b);
+			snap('about', 'left', b);
+		}
+	}, [booted, arrival, launch, snap, bounds]);
 
 	/* Keep the address bar pointed at whatever is in front. Opening an app is
 	   a navigation and gets a history entry; merely raising one that is

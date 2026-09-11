@@ -213,13 +213,38 @@ Coach marks were rejected for the opposite reason — a modal Windows does not
 have, blocking the desktop until dismissed, positioned against elements whose
 coordinates are deliberately kept out of React.
 
+It does not open *alone*, and it is not the window in front. For one release
+it was, and a hiring manager's first screen was a manual with no evidence in
+it, over a desktop that carried no name once the manual was closed. Now
+`use-app-url.ts` opens About in front and Tips snapped to the other half of
+the desktop (behind About in the cascade below 1200px, where two panes would
+each be too narrow), so the layout demonstrates snapping before anyone reads
+about it. The lock screen carries the name and role for the same reason, and
+the boot holds are shorter than the real thing.
+
 The arrival is tracked in `shell-context.tsx` as two **idempotent markers**
 (`shell:seen`, `shell:greeted`) rather than a counter, because a lazy
 initialiser and an effect both run twice under React's development
 double-invoke: setting a constant twice is harmless where incrementing is not.
-First arrival opens Tips; the second gets one toast pointing at `F1`; every
-later one is silent. It is `localStorage`, not `sessionStorage` — that
-distinction *is* the bug the toast had.
+First arrival opens About with Tips beside it; the second opens About and
+gets one toast pointing at `F1`; every later one is silent. It is
+`localStorage`, not `sessionStorage` — that distinction *is* the bug the toast
+had.
+
+Windows open clear of the **floor** — the strip above the taskbar where the
+cat, its house and the activation watermark live, all deliberately drawn above
+windows. `placementBounds()` in `use-window-manager.ts` reserves it, and
+`defaultSize()` grows a window's registry size on a large screen (55% of the
+width, 70% of the height, capped) so the About window is not a postcard on a
+27-inch monitor. Snap and maximise still use the whole desktop.
+
+Every Settings-style page ends with **Download CV · Email me** in the slot
+where Windows Settings puts "Get help · Give feedback"; the taskbar pins Mail
+and carries the Resume beside GitHub. The site's success metric is the CV
+being opened, and for a while the strip pinned the Recycle Bin and not the CV.
+About and Start's Recommended open Experience *at the case study* through
+`use-app-intent.ts`, a one-shot note delivered with the launch, because the
+window manager knows how to open an app and not where in it.
 
 The content lives in [src/data/tips.ts](src/data/tips.ts), not in the
 component, so it reaches the Tips window, Start's search index, the Terminal's

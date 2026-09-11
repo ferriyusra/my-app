@@ -230,20 +230,26 @@ export const SHORTCUT_BY_ID = Object.fromEntries(
 ) as Record<ShortcutId, ShortcutDef>;
 
 /**
- * The desktop grid, in the order Windows would have left them: apps first in
- * the order they matter, then the web shortcuts, then the bin last.
+ * The desktop grid, in the order a reader needs them: the person, the CV,
+ * the evidence; then the rest of the apps; the two remaining web shortcuts;
+ * the bin last, where Windows leaves it.
+ *
+ * The grid flows column-first and wraps by viewport height, so an item's
+ * column depends on the screen. Resume is second so it is in the first column
+ * on every laptop; it used to be tenth, top of column two at 1440×900 and
+ * third in column two at 1366×768.
  */
 export const DESKTOP_ITEMS: { id: AppId | ShortcutId; label: string }[] = [
-	{ id: 'tips', label: 'Tips' },
 	{ id: 'about', label: 'About Me' },
+	{ id: 'resume', label: 'Resume' },
+	{ id: 'experience', label: 'Experience' },
 	{ id: 'explorer', label: 'Projects' },
 	{ id: 'skills', label: 'Skills' },
-	{ id: 'experience', label: 'Experience' },
 	{ id: 'contact', label: 'Contact' },
-	{ id: 'media', label: 'Media Player' },
+	{ id: 'tips', label: 'Tips' },
 	{ id: 'career', label: 'Career.exe' },
 	{ id: 'terminal', label: 'Terminal' },
-	{ id: 'resume', label: 'Resume' },
+	{ id: 'media', label: 'Media Player' },
 	{ id: 'github', label: 'GitHub' },
 	{ id: 'linkedin', label: 'LinkedIn' },
 	{ id: 'recycle', label: 'Recycle Bin' },

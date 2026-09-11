@@ -1,7 +1,7 @@
 'use client';
 
 import { profile } from '@/data/profile';
-import type { IconLike } from '@/components/icons/line-icons';
+import { LiDownload, LiMail, type IconLike } from '@/components/icons/line-icons';
 
 export type SettingsPage = { key: string; label: string; Icon: IconLike };
 
@@ -64,6 +64,18 @@ export default function SettingsShell({
 					{subtitle && <p>{subtitle}</p>}
 				</header>
 				<div className='st-pane-body'>{children}</div>
+				{/* Windows Settings ends every page with "Get help" and "Give
+				    feedback". The same slot carries the two actions a visit here
+				    succeeds in, so they sit at the foot of About, Experience,
+				    Skills and Tips rather than on About's third tab. */}
+				<footer className='st-pane-foot'>
+					<a href={profile.cvDownload} target='_blank' rel='noopener noreferrer'>
+						<LiDownload size={15} aria-hidden='true' /> Download CV
+					</a>
+					<a href={`mailto:${profile.email}`}>
+						<LiMail size={15} aria-hidden='true' /> Email me
+					</a>
+				</footer>
 			</div>
 		</div>
 	);

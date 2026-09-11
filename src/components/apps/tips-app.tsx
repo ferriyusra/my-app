@@ -16,10 +16,12 @@ const PAGE_ICON = {
  * Tips, which Windows ships too — and which this desktop needs more, because
  * nothing on screen says a window can be snapped or that the cat is listening.
  *
- * It opens by itself once, on a visitor's first arrival, and never again. That
- * is the whole reason it is a window rather than an overlay: the first thing
- * anybody does here is drag, resize and close the thing explaining drag,
- * resize and close.
+ * It opens by itself once, on a visitor's first arrival, snapped beside About
+ * rather than alone in front of it — About is the evidence, this is the
+ * manual, and the two-window layout demonstrates snapping without a word.
+ * That is the whole reason it is a window rather than an overlay: the first
+ * thing anybody does here is drag, resize and close the thing explaining
+ * drag, resize and close.
  */
 export default function TipsApp() {
 	const [active, setActive] = useState('start');

@@ -82,3 +82,11 @@ test('tab completion offers commands, apps, roles and skills', () => {
 	assert.ok(c.some((x) => experiences.some((e) => e.short === x)));
 	assert.ok(c.some((x) => skills.some((s) => s.name === x)));
 });
+
+test('the bare nouns answer as their ls form', () => {
+	/* `skills` used to be "command not found" in a window next to one called
+	   Skills. */
+	for (const noun of ['roles', 'projects', 'skills']) {
+		assert.equal(text(noun), text(`ls ${noun}`));
+	}
+});

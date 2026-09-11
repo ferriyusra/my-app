@@ -78,7 +78,7 @@ export const TIP_PAGES: TipPage[] = [
 			},
 			{
 				title: 'One typed dataset, four ways in',
-				body: 'Roles, projects, skills, the case study and the reversed decisions are typed data with no second copy. Start searches 51 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
+				body: 'Roles, projects, skills, the case study and the reversed decisions are typed data with no second copy. Start searches 68 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
 				where: 'Start, Terminal, Skills',
 			},
 			{
@@ -117,8 +117,8 @@ export const TIP_PAGES: TipPage[] = [
 				body: 'Twenty-eight names in a flat list is worse than the Skills window, which groups them and shows where each was actually used. Not every dataset deserves every route.',
 			},
 			{
-				title: 'Mail has no sent items, the editor has no source control',
-				body: 'An empty Sent folder is what an empty Sent folder looks like, and a disabled Source Control icon is honest about a window that reads six files. Filling either would mean inventing content.',
+				title: 'Sent holds only what you send, the editor has no source control',
+				body: 'Mail\'s Sent folder lists the messages you send from that window, this session, and nothing else — so it starts empty and says so. Archive stays empty for the same reason, and a disabled Source Control icon is honest about a window that reads six files. Filling any of them would mean inventing content.',
 			},
 			{
 				title: 'There is no browser window',

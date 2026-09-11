@@ -1,12 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { BadgeCheck, Clock, Cpu, Info, Link as LinkIcon, Radar } from 'lucide-react';
+import { BadgeCheck, Clock, Cpu, FileCode2, Info, Link as LinkIcon, Radar } from 'lucide-react';
 import { DocumentIcon, LiBriefcase, LiDownload, LiGithub, LiLinkedin, LiMail, LiMapPin, LiMonitor } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import SettingCard from '@/components/ui/setting-card';
+import { useWindowManager } from '@/hooks/use-window-manager';
+import { sendIntent } from '@/hooks/use-app-intent';
 import { profile, yearsOfExperience } from '@/data/profile';
 import { experiences } from '@/data/experience';
+import { caseStudy } from '@/data/case-study';
 
 const PAGES: SettingsPage[] = [
 	{ key: 'overview', label: 'Overview', Icon: Info },
@@ -23,7 +26,14 @@ const PAGES: SettingsPage[] = [
  */
 export default function AboutApp() {
 	const [page, setPage] = useState('overview');
+	const { launch } = useWindowManager();
 	const years = yearsOfExperience();
+
+	/* Experience, opened on the case study rather than the timeline. */
+	const openCase = () => {
+		sendIntent('experience', 'case');
+		launch('experience');
+	};
 	const current = experiences.find((e) => e.current) ?? experiences[0];
 	const [ny, nm] = profile.nowUpdated.split('-').map(Number);
 	const nowStamp = new Date(ny, nm - 1, 1).toLocaleDateString('en-GB', {
@@ -79,10 +89,26 @@ export default function AboutApp() {
 						</div>
 					</div>
 
+					{/* As prose in the card body, not as the card's 12px caption: this
+					    paragraph is the one a hiring manager reads. */}
+					<SettingCard Icon={Info} title='Summary'>
+						<p className='st-prose'>{profile.proof}</p>
+					</SettingCard>
+
+					{/* The one piece of this site a neighbouring portfolio cannot
+					    copy was reachable from here only by knowing it existed. */}
 					<SettingCard
-						Icon={Info}
-						title='Summary'
-						description={profile.proof}
+						Icon={FileCode2}
+						title='Case study'
+						description={caseStudy.title}
+						control={
+							<button
+								type='button'
+								className='fl-btn fl-btn-standard'
+								onClick={openCase}>
+								Read it
+							</button>
+						}
 					/>
 
 					<SettingCard Icon={Radar} title='Now'>

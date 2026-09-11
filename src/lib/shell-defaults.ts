@@ -15,8 +15,13 @@
  * A `custom:` value is only honoured when that file is actually in
  * `public/background`; delete it and the shell falls back to the drawn
  * default rather than showing an empty frame.
+ *
+ * The filename is also the label Settings and Quick Settings show, which is
+ * why it is not `package.jpeg` any more: a tile that said "Package" named a
+ * file, not a wallpaper. A visitor who stored the old name falls back to the
+ * drawn Bloom once, then keeps whatever they pick next.
  */
-export const DEFAULT_WALLPAPER = 'custom:package.jpeg';
+export const DEFAULT_WALLPAPER = 'custom:bloom-photo.jpeg';
 
 /** What it falls back to: always present, because it is drawn in CSS. */
 export const FALLBACK_WALLPAPER = 'bloom';

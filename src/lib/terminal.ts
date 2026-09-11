@@ -73,7 +73,7 @@ const COMMANDS = [
 	['open <app>', 'open a window'],
 	['uptime', 'years in the industry, computed'],
 	['tips [keys]', 'what this desktop does, and the keys it answers to'],
-	['contact', 'how to reach him'],
+	['contact', 'how to reach me'],
 	['clear', 'clear the screen'],
 ] as const;
 
@@ -255,10 +255,18 @@ export function run(input: string): Result {
 			};
 		}
 
+		/* The nouns on their own. `skills` is what a visitor types when the
+		   window beside this one is called Skills, and "command not found" was
+		   the answer. */
+		case 'roles':
+		case 'projects':
+		case 'skills':
+			return run(`ls ${cmd.toLowerCase()}`);
+
 		case 'contact':
 			return {
 				lines: [
-					acc('Reach him'),
+					acc('Reach me'),
 					p(`  email     ${profile.email}`),
 					p(`  github    ${profile.github}`),
 					p(`  linkedin  ${profile.linkedin}`),
