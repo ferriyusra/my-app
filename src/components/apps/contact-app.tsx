@@ -27,6 +27,23 @@ import { profile } from '@/data/profile';
  */
 type Status = 'idle' | 'sending' | 'sent' | 'fallback' | 'error';
 
+/**
+ * A message sent from this window, this session. Sent used to be one of three
+ * folders that could never hold anything; it now holds exactly what the
+ * visitor sent and was delivered, and nothing seeded. A message that fell
+ * back to a mailto: draft is not listed, because nobody here knows whether it
+ * was sent.
+ */
+type SentMail = {
+	id: string;
+	at: number;
+	name: string;
+	email: string;
+	message: string;
+};
+
+const SENT_TINT = 'linear-gradient(140deg, #59b4f0 0%, #1454a8 100%)';
+
 type Channel = {
 	id: string;
 	from: string;
@@ -101,8 +118,12 @@ export default function ContactApp() {
 	const [folder, setFolder] = useState<string>('inbox');
 	const [form, setForm] = useState({ name: '', email: '', message: '' });
 	const [status, setStatus] = useState<Status>('idle');
+	const [sent, setSent] = useState<SentMail[]>([]);
 	const busy = status === 'sending';
 	const active = CHANNELS.find((c) => c.id === pane) ?? null;
+	const sentItem = pane.startsWith('sent:')
+		? (sent.find((m) => `sent:${m.id}` === pane) ?? null)
+		: null;
 
 	/** A pre-filled draft in the visitor's own mail client. */
 	const mailtoDraft = () => {
@@ -126,6 +147,7 @@ export default function ContactApp() {
 
 			if (data.delivered) {
 				setStatus('sent');
+				setSent((s) => [{ id: `${Date.now()}`, at: Date.now(), ...form }, ...s]);
 				setForm({ name: '', email: '', message: '' });
 				notify({
 					app: 'contact',
@@ -165,7 +187,10 @@ export default function ContactApp() {
 								onClick={() => setFolder(key)}>
 								<Icon size={16} aria-hidden='true' />
 								{label}
-								{key === 'inbox' && (
+								{key === 'sent' && sent.length > 0 && (
+										<span className='ml-count'>{sent.length}</span>
+									)}
+									{key === 'inbox' && (
 									<span className='ml-count'>{CHANNELS.length}</span>
 								)}
 							</button>
@@ -201,15 +226,63 @@ export default function ContactApp() {
 							</span>
 						</button>
 					))
+				) : folder === 'sent' && sent.length > 0 ? (
+					sent.map((m) => (
+						<button
+							key={m.id}
+							type='button'
+							className='ml-item'
+							data-active={pane === `sent:${m.id}` || undefined}
+							onClick={() => setPane(`sent:${m.id}`)}>
+							<span
+								className='ml-avatar'
+								aria-hidden='true'
+								style={{ background: SENT_TINT }}>
+								<LiSend size={16} color='#fff' strokeWidth={2.1} />
+							</span>
+							<span className='ml-item-text'>
+								<strong>To: {profile.name}</strong>
+								<span className='ml-subject'>Portfolio contact</span>
+								<span className='ml-preview ml-sent-preview'>{m.message}</span>
+							</span>
+						</button>
+					))
 				) : (
 					<p className='ml-empty'>
-						Nothing in {FOLDERS.find((f) => f.key === folder)?.label}.
+						{folder === 'sent'
+							? 'Nothing in Sent yet. Messages you send from here appear in it.'
+							: `Nothing in ${FOLDERS.find((f) => f.key === folder)?.label}.`}
 					</p>
 				)}
 			</div>
 
 			<div className='ml-read'>
-				{pane === 'compose' || !active ? (
+				{sentItem ? (
+					<article className='ml-message'>
+						<header className='ml-message-head'>
+							<span
+								className='ml-avatar ml-avatar-lg'
+								aria-hidden='true'
+								style={{ background: SENT_TINT }}>
+								<LiSend size={22} color='#fff' strokeWidth={2.1} />
+							</span>
+							<div>
+								<h2>Portfolio contact</h2>
+								<p>
+									From {sentItem.name} &lt;{sentItem.email}&gt; · to {profile.name}
+								</p>
+							</div>
+						</header>
+						<p className='ml-message-body ml-sent-body'>{sentItem.message}</p>
+						<p className='ml-sent-when'>
+							<LiCheckCircle size={14} aria-hidden='true' /> Delivered at{' '}
+							{new Date(sentItem.at).toLocaleTimeString([], {
+								hour: '2-digit',
+								minute: '2-digit',
+							})}
+						</p>
+					</article>
+				) : pane === 'compose' || !active ? (
 					<form onSubmit={submit} className='ml-form'>
 						<header className='ml-form-head'>
 							<h2>New message</h2>
