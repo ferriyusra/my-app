@@ -29,7 +29,7 @@ export const profile = {
 	 * They fill the right half of the hero with proof rather than decoration —
 	 * a visitor now sees what the work actually produced before scrolling.
 	 */
-highlights: [
+	highlights: [
 		{
 			lead: 'Billing source of truth',
 			detail: 'for ~160 ASO entities, replacing spreadsheet tracking',
@@ -101,9 +101,9 @@ highlights: [
 	site: 'https://ferriyusra.com',
 
 	cvView:
-		'https://drive.google.com/file/d/1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I/view?usp=sharing',
+		'https://drive.google.com/file/d/1-VPpaD0Rdhyq2BbZ7wdNQkbzyflgZtZ5/view?usp=sharing',
 	cvDownload:
-		'https://drive.google.com/uc?export=download&id=1ZK5ogVbmyrK95M6KYBz4w53dDJsmaQ8I',
+		'https://drive.google.com/uc?export=download&id=1-VPpaD0Rdhyq2BbZ7wdNQkbzyflgZtZ5',
 } as const;
 
 /** First month of professional work — the anchor for every "years" figure. */

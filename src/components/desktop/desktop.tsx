@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { SourceFile } from '@/lib/source';
 import { AnimatePresence } from 'framer-motion';
-import { ArrowUpDown, Cat, ExternalLink, Fish, Info, LayoutGrid, Lightbulb, Paintbrush, Pin, PinOff, RefreshCw, Settings as SettingsGlyph, Undo2 } from 'lucide-react';
+import { ArrowUpDown, Cat, Download, ExternalLink, Fish, Info, LayoutGrid, Lightbulb, Paintbrush, Pin, PinOff, RefreshCw, Settings as SettingsGlyph, Undo2 } from 'lucide-react';
 import { LiMonitor } from '@/components/icons/line-icons';
 import { WindowProvider, useWindows } from '@/context/window-context';
 import { ShellProvider, useShell } from '@/context/shell-context';
@@ -282,6 +282,24 @@ function Shell() {
 					shortcut: 'Enter',
 					onSelect: () => icons.openItem(item.id),
 				},
+				/* Windows offers Open and Save for a file, and the resume is the
+				   one desktop item that really is one. Without this the direct
+				   download URL existed in the data and nothing ever reached it. */
+				...(item.download
+					? [
+							{
+								kind: 'item' as const,
+								label: 'Download',
+								Icon: Download,
+								onSelect: () =>
+									window.open(
+										item.download,
+										'_blank',
+										'noopener,noreferrer',
+									),
+							},
+					  ]
+					: []),
 				{
 					kind: 'item',
 					label: isPinned ? 'Unpin from taskbar' : 'Pin to taskbar',

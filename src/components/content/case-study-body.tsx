@@ -17,7 +17,16 @@ function emphasise(text: string) {
 	);
 }
 
-export default function CaseStudyBody() {
+/**
+ * `level` is the heading level of the write-up's own sections.
+ *
+ * It defaults to 4, which is right where a window renders the case study under
+ * an `h3` title. The document nests it one deeper — the write-up lives inside
+ * the Meditap role there, under that role's `h3` and its own `h4` title — so
+ * without this the title and the sections it introduces would be siblings.
+ */
+export default function CaseStudyBody({ level = 4 }: { level?: 4 | 5 }) {
+	const H = (level === 5 ? 'h5' : 'h4') as 'h4' | 'h5';
 	return (
 		<div className='cs'>
 			<p className='cs-summary'>{caseStudy.summary}</p>
@@ -30,7 +39,7 @@ export default function CaseStudyBody() {
 
 			{caseStudy.sections.map((s) => (
 				<section key={s.heading} className='cs-section'>
-					<h4>{s.heading}</h4>
+					<H>{s.heading}</H>
 					{s.body.map((para, i) => (
 						<p key={i}>{emphasise(para)}</p>
 					))}
@@ -38,7 +47,7 @@ export default function CaseStudyBody() {
 			))}
 
 			<section className='cs-section cs-open'>
-				<h4>What this write-up does not answer</h4>
+				<H>What this write-up does not answer</H>
 				<p>
 					These are the questions a reader with production experience would ask
 					next. They are listed rather than glossed over, because a case study
