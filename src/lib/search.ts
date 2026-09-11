@@ -52,7 +52,7 @@ export function index(): Hit[] {
 			kind: 'Role',
 			title: `${e.role} — ${e.short}`,
 			subtitle: e.period,
-			haystack: [e.role, e.company, e.short, e.period, e.location, e.description, ...e.achievements, ...e.tech, ...e.stats.map((s) => `${s.value} ${s.label}`)].join(' '),
+			haystack: [e.role, e.company, e.short, e.period, e.location, e.description, ...e.achievements, ...e.tech, ...e.stats.map((s) => `${s.value} ${s.label}`), ...e.highlights].join(' '),
 			weight: 3,
 		});
 	}

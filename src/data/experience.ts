@@ -2,12 +2,18 @@
  * Work history, lifted out of the Experience component so the desktop's
  * Experience window can render it without importing a page section.
  *
- * `stats` is the headline figure trio each role card leads with. Every value
- * is countable from that role's own `description` / `achievements` — the ~160
- * entities and the 20–30% are stated there outright; the service, dashboard
- * and product-line counts are the named items in those sentences, counted.
- * Nothing in `stats` is an estimate. If a number is not already in the prose
- * below it does not belong here.
+ * `stats` are the countable figures a role card leads with, and only those.
+ * Every value is counted from that role's own `description` / `achievements`:
+ * the ~160 entities are stated outright; the service, store, dashboard and
+ * product-line counts are the named items in those sentences, counted. A
+ * tile promises a metric, so nothing that is not a number goes in one. The
+ * tiles used to hold "National", "Kafka", "On-call" and "PHP", and the
+ * current role's third tile was the 20–30% productivity estimate — the one
+ * figure here that was an estimate. That stays in its bullet.
+ *
+ * `highlights` are the facts that are not numbers: two or three short
+ * phrases, each lifted from a bullet below, shown as a line rather than as
+ * tiles. If it is not in the prose it does not belong in either list.
  */
 
 export const experiences = [
@@ -26,7 +32,11 @@ export const experiences = [
 		stats: [
 			{ value: '~160', label: 'entities billed' },
 			{ value: '2', label: 'core services' },
-			{ value: '20–30%', label: 'faster routine work' },
+		],
+		highlights: [
+			'Manual threshold monitoring removed',
+			'Gateway and IAM centralised with KrakenD and Keycloak',
+			'A CMS the finance team runs without an engineer',
 		],
 		achievements: [
 			'Built and maintained RESTful API services powering financial workflows for ~160 ASO entities, enabling the Finance Team to manage and monitor structured, real-time data used directly for billing and payment collection.',
@@ -61,9 +71,12 @@ export const experiences = [
 		description:
 			"Primary backend engineer on multiple health data products under SATUSEHAT — Indonesia's national health data interoperability platform — collaborating with Product Managers, Technical Program Managers, and cross-functional stakeholders to deliver backend systems supporting national-scale health data initiatives.",
 		stats: [
-			{ value: 'National', label: 'scale — SATUSEHAT' },
 			{ value: '4', label: 'data stores integrated' },
-			{ value: 'Tableau', label: 'licence costs cut' },
+		],
+		highlights: [
+			'SATUSEHAT, the national health data platform',
+			'Tableau licence costs cut',
+			'Datadog monitoring on every service',
 		],
 		achievements: [
 			'Maintained and extended API services for the SATUSEHAT Data Product in Node.js (NestJS) and PostgreSQL, developing new endpoints and improvements to ensure reliable data exchange and support evolving requirements for nationwide health data integration.',
@@ -100,7 +113,10 @@ export const experiences = [
 		stats: [
 			{ value: '5', label: 'dashboards delivered' },
 			{ value: '3', label: 'data sources joined' },
-			{ value: 'MoH', label: 'stakeholders served' },
+		],
+		highlights: [
+			'Dashboards used by Ministry of Health stakeholders',
+			'First Tableau-to-native migration',
 		],
 		achievements: [
 			'Designed and developed scalable API services in Go (Gin Framework) integrating PostgreSQL, Google BigQuery, and MongoDB to power interactive dashboards used by analysts and operational stakeholders, complemented by a Next.js API endpoint built to proxy requests to an external data source.',
@@ -135,8 +151,11 @@ export const experiences = [
 			'Implemented backend systems alongside Engineering Managers and Senior Software Engineers, translating technical designs and product requirements into reliable and scalable engineering solutions across multiple product lines.',
 		stats: [
 			{ value: '7', label: 'product lines' },
-			{ value: 'Kafka', label: 'event-driven processing' },
-			{ value: 'On-call', label: 'weekly rotation' },
+		],
+		highlights: [
+			'Kafka producers and consumers',
+			'Weekly on-call rotation',
+			'Unit tests with Mocha, Chai and Jest',
 		],
 		achievements: [
 			'Contributed to backend API services across multiple core product lines — including Crash Program, Referral Program, Survey Program, Academy Program, Banner Program, Second Inspection Program, and Open Production Issue Tools — using Node.js (Express.js) and Go with MySQL, PostgreSQL, and MongoDB integrations to support diverse business and operational workflows.',
@@ -169,10 +188,13 @@ export const experiences = [
 		location: 'Jakarta, Indonesia',
 		description:
 			'Implemented backend systems alongside System Analysts based on technical designs and business processes defined by the Product Team, contributing to backend development for banking-related web applications.',
-		stats: [
-			{ value: 'First', label: 'engineering role' },
-			{ value: 'PHP', label: 'Lumen and MySQL' },
-			{ value: 'Go', label: 'first exposure' },
+		/* Nothing countable in a four-month first role; the card leads with the
+		   highlights alone rather than dressing words up as figures. */
+		stats: [] as { value: string; label: string }[],
+		highlights: [
+			'First engineering role',
+			'PHP (Lumen) and MySQL',
+			'First exposure to Go',
 		],
 		achievements: [
 			'Developed RESTful API services using PHP (Lumen framework) with MySQL for data persistence, supporting core application workflows.',

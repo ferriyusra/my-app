@@ -174,6 +174,13 @@ export default function PortfolioDocument() {
 										))}
 									</ul>
 								)}
+								{e.highlights.length > 0 && (
+									<ul className='mb-highlights'>
+										{e.highlights.map((h) => (
+											<li key={h}>{h}</li>
+										))}
+									</ul>
+								)}
 								<p>{e.description}</p>
 								<ul className='mb-points'>
 									{e.achievements.map((a) => (

@@ -119,3 +119,25 @@ test('the case study period matches the role it belongs to', () => {
 	assert.ok(host, 'no host role — see the test above');
 	assert.equal(caseStudy.period, host.period);
 });
+
+/**
+ * A stat tile promises a metric. The tiles used to carry "National", "Kafka",
+ * "On-call" and "PHP" where a number was expected, which reads as a metric
+ * that could not be found. Those are `highlights` now, and a tile without a
+ * digit in it fails here rather than shipping.
+ */
+test('every stat tile carries a number; the words are highlights', () => {
+	for (const e of experiences) {
+		for (const s of e.stats) {
+			assert.match(s.value, /\d/, `${e.short}: tile "${s.value} ${s.label}" has no number in it`);
+		}
+		assert.ok(
+			e.stats.length + e.highlights.length > 0,
+			`${e.short} has nothing to lead its card with`,
+		);
+		assert.ok(
+			e.stats.length <= 3 && e.highlights.length <= 3,
+			`${e.short} leads with more than a card can carry`,
+		);
+	}
+});
