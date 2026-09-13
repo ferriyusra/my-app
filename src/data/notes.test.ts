@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import {
@@ -168,10 +169,35 @@ test('a written note reports a length it actually has', () => {
 	}
 });
 
-test('the plan is a plan: something is being studied, and it is dated', () => {
-	assert.ok(notes.length > 0, 'the Notes window would open on nothing');
+test('an unwritten entry is something started, not a wish list', () => {
+	/* Empty is a valid state and the window says so. What is not valid is a
+	   file of "planned" rows with nothing in hand: that is a list of topics
+	   nobody has begun, which is the promise /articles was deleted for. */
+	if (notes.length === 0) return;
 	assert.ok(
 		notes.some((n) => n.status === 'studying' || n.status === 'written'),
-		'every note is "planned", which is a wish list rather than a study log',
+		'every entry is "planned" — a list of topics nobody has started is a promise, not a study log',
+	);
+});
+
+test('the empty state promises nothing and names no date', () => {
+	/* The failure this guards cannot be reached from a running page: someone
+	   fills the quiet window with a teaser. repo.test.ts reads the component
+	   tree as text for the same class of bug. */
+	const src = readFileSync(
+		new URL('../components/apps/notes-app.tsx', import.meta.url),
+		'utf8',
+	);
+	const empty = src.slice(src.indexOf('function Empty()'), src.indexOf('function Planned('));
+	assert.ok(empty.length > 200, 'the empty state should still be in this file');
+	for (const phrase of [/coming soon/i, /stay tuned/i, /check back/i, /watch this space/i]) {
+		assert.ok(
+			!phrase.test(empty),
+			`the empty state says ${phrase} — that is the /articles bug, written out longhand`,
+		);
+	}
+	assert.ok(
+		!/\b20\d{2}\b/.test(empty),
+		'the empty state names a year, which turns an honest blank into a deadline',
 	);
 });

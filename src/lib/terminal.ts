@@ -210,6 +210,21 @@ export function run(input: string): Result {
 			}
 			if (what.startsWith('note')) {
 				const done = writtenNotes().length;
+				/* Empty is the state it is in, and saying "0 notes — 0 written, 0 on
+				   the plan" is a worse way to say so than saying so. */
+				if (!notes.length) {
+					return {
+						lines: [
+							acc('no notes yet'),
+							p(''),
+							...wrap(
+								'Notes on algorithms and system design, written up in my own words. There are none, and a list of topics nobody has started would be a promise rather than a note.',
+							).map(p),
+							dim(''),
+							dim('cat case · ls roles — the writing here that is real'),
+						],
+					};
+				}
 				return {
 					lines: [
 						acc(`${notes.length} notes — ${done} written, ${plannedNotes().length} on the plan`),

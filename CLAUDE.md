@@ -405,18 +405,25 @@ of them derive; none of them keep a second copy.
   Skills deliberately gets no folder: 28 names in a flat list is worse than the
   Skills window, and Tips ▸ What's not here says so.
 - **Notes** ([src/data/notes.ts](src/data/notes.ts)) is the learning log —
-  algorithms and system design, studied through a course and written up in the
-  owner's own words, never reproducing course material. A note is a
-  discriminated union: a `written` one must carry `sections` and a `source`,
-  and a `studying`/`planned` one has no `sections` field to fill with a
-  placeholder, so the honesty is a type rather than a convention.
-  `notes.test.ts` fails when a planned `target` month slips into the past —
-  the exact charge `discarded.ts` levels at `/articles`, a "Coming soon" page
-  whose date had passed — and `applies` must name a real skill or role short,
-  which is what makes a note evidence rather than a blog post. The Notes window
-  shows the whole plan because that is the point of it mid-course; every other
-  surface derives from `writtenNotes()`, so Explorer grows `Documents/Notes/`
-  and the server document grows a fold only once there is something in them.
+  algorithms and system design, written up in the owner's own words, never
+  reproducing course material. A note is a discriminated union: a `written` one
+  must carry `sections` and a `source`, and a `studying`/`planned` one has no
+  `sections` field to fill with a placeholder, so the honesty is a type rather
+  than a convention. `applies` must name a real skill or role short, which is
+  what makes a note evidence rather than a blog post.
+
+  **It is empty, and that is the point of the design.** It was first written
+  with six planned topics drafted from a course syllabus; they came out again
+  before the branch merged, because they were not the owner's plan and because a
+  list of topics nobody has started is exactly the promise `/articles` was
+  deleted for. The window says it is empty, says why, and offers the case study
+  and the Recycle Bin instead of dead-ending — the answer Mail's Sent folder and
+  the editor's disabled source control already give here. Two tests hold that
+  line: a `planned` `target` month may not fall into the past, and the empty
+  state may not name a year or say "coming soon". Every surface but the window
+  derives from `writtenNotes()`, so Explorer grows `Documents/Notes/`, Start
+  indexes entries and the server document grows a fold only once a note exists.
+  Do not seed this file to make the window look busier.
 - **Desktop gestures** ([src/hooks/use-desktop-gestures.ts](src/hooks/use-desktop-gestures.ts))
   — marquee select and drag-to-rearrange. Same rule as the window frame and the
   cat: the gesture writes to the DOM and dispatches once, on pointer-up. The

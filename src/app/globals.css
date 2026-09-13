@@ -5511,6 +5511,10 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 }
 .nt-group + .nt-group { margin-top: 10px; }
 .nt-group-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
   position: sticky;
   top: 0;
   z-index: 1;
@@ -5523,6 +5527,7 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   text-transform: uppercase;
   color: var(--ink-muted);
 }
+.nt-group-name span { font-variant-numeric: tabular-nums; letter-spacing: 0; }
 
 .nt-row {
   display: block;
@@ -5588,6 +5593,78 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   color: var(--ink-muted);
 }
 
+/* ── The empty state ──────────────────────────────────────────
+   A window with nothing in it is one release away from being the
+   "Coming soon" page this repository deleted, so this one says it
+   is empty, says why, and offers the writing that does exist
+   rather than dead-ending. Left-aligned prose in a centred
+   column: centred prose is a poster, and this is a paragraph. */
+.nt-empty {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 44px 32px 36px;
+}
+.nt-empty-art {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 18px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.nt-empty h3 { margin: 0 0 10px; font-size: 19px; line-height: 26px; font-weight: 600; }
+.nt-empty p { margin: 0 0 12px; font-size: 14px; line-height: 22px; color: var(--ink); }
+/* Typed against `.nt-empty p` above rather than shouted over it. */
+.nt-empty p.nt-empty-why { color: var(--ink-secondary); }
+.nt-empty p.nt-empty-label {
+  margin: 26px 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.nt-empty-links { display: grid; gap: 8px; }
+.nt-empty-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface-subtle);
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard);
+}
+.nt-empty-link:hover { background: var(--subtle-hover); border-color: var(--line); }
+.nt-empty-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.nt-empty-link-art {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--line-subtle);
+  color: var(--accent);
+}
+.nt-empty-link strong { display: block; font-size: 13px; font-weight: 600; line-height: 19px; }
+.nt-empty-link small { display: block; margin-top: 1px; font-size: 12px; line-height: 17px; color: var(--ink-muted); }
+
 @container (max-width: 640px) {
   .nt-body {
     grid-template-columns: none;
@@ -5595,6 +5672,12 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   }
   .nt-list { border-right: 0; border-bottom: 1px solid var(--line-subtle); }
   .nt-detail { padding: 16px 18px 24px; }
+}
+
+@container (max-width: 520px) {
+  .nt-empty { padding: 28px 18px 24px; }
+  .nt-empty-art { width: 50px; height: 50px; margin-bottom: 14px; }
+  .nt-empty h3 { font-size: 17px; line-height: 24px; }
 }
 
 /* ═══════════════════════════════════════════════════════════

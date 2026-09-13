@@ -25,6 +25,14 @@ import type { CaseBlock } from './case-study.ts';
  * metaphor is a costume — the same argument that took the fake file entries out
  * of Explorer.
  *
+ * **It is empty today, and that is the honest state.** It was first written
+ * with six planned topics drafted from a course syllabus. Those came out again
+ * before the branch was merged, and for two reasons: they were not the author's
+ * plan, and a list of topics nobody has started is the promise `/articles` was
+ * deleted for. The window says it is empty and why, which is what Mail's Sent
+ * folder and the editor's disabled source control already do here — filling any
+ * of them would mean inventing content.
+ *
  * Nothing here reproduces course material. A written note names what it was
  * studied from and says, on the page, that the write-up is the author's own.
  */
@@ -89,71 +97,14 @@ export const STATUS_LABEL: Record<Note['status'], string> = {
 };
 
 /**
- * The study plan, and then the notes as they are written.
+ * Every note, written and planned, in reading order.
  *
- * Ordered as it is read: what is in hand, then what is next. A planned entry
- * says what the note will cover and which tool already on the CV it reaches,
- * so the list is a direction rather than a wish.
+ * Empty until there is a real one. Add a `written` entry when a write-up
+ * exists; add a `studying`/`planned` entry only for something actually being
+ * worked on, with the month it is expected — `notes.test.ts` fails once that
+ * month is in the past, so a stale plan cannot sit here unnoticed.
  */
-export const notes: Note[] = [
-	{
-		slug: 'binary-search-boundaries',
-		title: 'Binary search on an answer, not an index',
-		topic: 'dsa',
-		status: 'studying',
-		target: '2026-09',
-		summary:
-			'The shape shared by first-true and last-true problems, and why the loop invariant matters more than the midpoint arithmetic.',
-	},
-	{
-		slug: 'two-pointers-and-windows',
-		title: 'Two pointers, and the window that falls out of them',
-		topic: 'dsa',
-		status: 'planned',
-		target: '2026-10',
-		summary:
-			'When a nested loop is really one pass, and the condition that decides which pointer moves.',
-	},
-	{
-		slug: 'graphs-bfs-dfs',
-		title: 'Breadth, depth, and choosing between them',
-		topic: 'dsa',
-		status: 'planned',
-		target: '2026-11',
-		summary:
-			'Traversal as one template with two queues, and the problems where the choice of queue is the whole answer.',
-	},
-	{
-		slug: 'idempotency-and-retries',
-		title: 'Retries, idempotency keys and exactly-once that is not',
-		topic: 'system-design',
-		status: 'planned',
-		target: '2026-12',
-		summary:
-			'Why at-least-once delivery is the honest default, and what a consumer has to hold to survive it.',
-		applies: ['Kafka', 'Pub/Sub', 'PostgreSQL'],
-	},
-	{
-		slug: 'caching-and-invalidation',
-		title: 'Caches, and the cost of being wrong for a while',
-		topic: 'system-design',
-		status: 'planned',
-		target: '2027-01',
-		summary:
-			'Read-through, write-through and TTL as a decision about staleness rather than about speed.',
-		applies: ['Redis', 'PostgreSQL'],
-	},
-	{
-		slug: 'sharding-and-hot-keys',
-		title: 'Sharding, and the key that ruins it',
-		topic: 'system-design',
-		status: 'planned',
-		target: '2027-02',
-		summary:
-			'Partitioning by hash, by range and by tenant, and what each one does when one tenant is ten times the rest.',
-		applies: ['PostgreSQL', 'Kafka'],
-	},
-];
+export const notes: Note[] = [];
 
 export const writtenNotes = (): WrittenNote[] =>
 	notes.filter((n): n is WrittenNote => n.status === 'written');

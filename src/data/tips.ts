@@ -92,8 +92,8 @@ export const TIP_PAGES: TipPage[] = [
 				where: 'Recycle Bin',
 			},
 			{
-				title: 'The notes are written, not collected',
-				body: 'Notes holds what I am studying — algorithms and system design — with the month each write-up is due beside the ones not written yet. Every note says what it was studied from and that the words are mine; none of it reproduces course material. The surfaces derive from the written ones, so Explorer grows a Notes folder and this document grows a section when there is something in them, and a test fails if a due date ever slips into the past.',
+				title: 'An empty window that says it is empty',
+				body: 'Notes will hold write-ups on algorithms and system design, in my own words. It is empty, and it says so rather than listing topics nobody has started — this desktop has a Recycle Bin holding the last page that made a promise with a date on it. Every surface derives from the notes that exist, so Explorer grows a folder and this document grows a section when there is something in them, and a test fails if an entry is ever dated into the past.',
 				where: 'Notes',
 			},
 			{

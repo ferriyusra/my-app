@@ -100,12 +100,18 @@ test('cat case prints the figure as the text it is drawn from', () => {
 	assert.ok(out.includes('Recovery is logged, not announced'), 'the table should print');
 });
 
-test('ls notes lists the whole plan, written or not', () => {
+test('ls notes lists every note there is, written or not', () => {
 	const out = text('ls notes');
 	for (const n of notes) {
 		assert.ok(out.includes(n.slug), `${n.slug} is missing from ls notes`);
 	}
-	assert.match(out, new RegExp(`${notes.length} notes`));
+	if (notes.length === 0) {
+		/* The state it is in. It should read as a sentence, not as three zeroes. */
+		assert.match(out, /no notes yet/);
+		assert.ok(!out.includes('0 notes'), 'an empty listing should say so in words');
+	} else {
+		assert.match(out, new RegExp(`${notes.length} notes`));
+	}
 });
 
 test('the bare noun answers as its ls form', () => {
@@ -133,8 +139,11 @@ test('cat reads a written note, with its sections', () => {
 	}
 });
 
-test('a note is reachable by the path Explorer shows it at', () => {
+test('a note is reachable by the path Explorer shows it at', (t) => {
+	/* Skipped rather than passed while there are none: a vacuous assertion that
+	   reports "ok" is how a broken path gets shipped. */
 	const n = notes[0];
+	if (!n) return t.skip('no notes to address yet');
 	assert.equal(text(`cat notes/${n.slug}`), text(`cat ${n.slug}`));
 });
 
