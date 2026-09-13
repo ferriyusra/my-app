@@ -369,7 +369,7 @@ The shell holds one set of typed data and offers several routes through it. All
 of them derive; none of them keep a second copy.
 
 - **Search** ([src/lib/search.ts](src/lib/search.ts)) indexes roles, projects,
-  skills, the case study, the discarded decisions, the tips and the profile — 68 entries
+  skills, the case study, the discarded decisions, the tips and the profile — 69 entries
   built from `src/data`. Start used to filter fourteen app names, so "Pub/Sub"
   and "Kafka" returned nothing while sitting in the data. A title match outranks
   a body match, and a result quotes the sentence it matched in.
@@ -437,11 +437,22 @@ see. It was in the Recycle Bin alone until then: the strongest writing here,
 behind the last icon on the desktop grid, absent from the HTML entirely. The
 bin is pinned to the taskbar by default now.
 
-[src/data/case-study.ts](src/data/case-study.ts) is the Meditap ASO billing
-system at more than bullet-point depth. Everything in it traces to the Meditap
-entry in `experience.ts`. Where a design decision is not recorded anywhere in
-this repository it is **not claimed** — those sit in `openQuestions`, which is
-rendered rather than hidden. Keep that discipline: the section is worth more for
+[src/data/case-study.ts](src/data/case-study.ts) is the Meditap deposit-threshold
+alerting system at more than bullet-point depth: a Go service joining a
+PostgreSQL ERP, a legacy SQL Server claim system and its own portal database, a
+state machine deciding *when* to alert, typed Pub/Sub messages to a separate
+notification service, and a configuration module with a field-level audit
+trail. **The record is the author's own Markdown write-up** at
+`public/projects/meditap/portfolio-aso-case-study.md`, served as-is and linked
+from the page; `case-study.ts` is that document as typed data (paragraphs,
+lists, two code blocks, the behaviour table, the figure), and
+`case-study.test.ts` reads the Markdown and fails when the title, role, stack,
+summary, headings, code or table rows drift. The write-up's résumé bullets are
+the Meditap role's `achievements`, and its card blurb is the `deposit-alerting`
+entry in `projects.ts`, joined by `caseStudy.project`. Where the write-up does
+not record something a reader would ask, the question sits in `openQuestions`,
+rendered rather than hidden — two earlier questions are gone because the
+write-up answers them. Keep that discipline: the section is worth more for
 naming its gaps than it would be for filling them with plausible invention.
 
 It renders through one component,
@@ -449,15 +460,16 @@ It renders through one component,
 `'use client'` — so the Experience window and the server document show the same
 prose and cannot drift.
 
-The **figure** under "What replaced it" is data too (`caseStudy.figure`): two
-rows of boxes and arrows, the data path and the access path, drawn as DOM and
-borders rather than an image so it prints, recolours with the theme and reflows
-to a column inside a narrow window or on a phone (`.cs` is a CSS container).
-Every label and detail is a phrase lifted from the write-up, and
+The **figure** in the Architecture section is data too (`caseStudy.figure`):
+the write-up's own diagram redrawn as one path (scheduler → message queue →
+deposit watch service → alert queue → notification service → client mailbox)
+and two sets (what the job reads once per run, what it writes every run), as
+DOM and borders rather than an image so it prints, recolours with the theme and
+reflows from two columns to one inside a narrow window or on a phone (`.cs` is
+a CSS container). Every label and detail is a phrase from the write-up, and
 `case-study.test.ts` fails if one is not — a diagram is where "claim nothing
 unrecorded" slips most easily, because a box that says "PostgreSQL" reads as a
-fact. That is why no store sits under ASO Database and nobody is named as the
-alert's recipient. The terminal's `cat case` prints the same rows as text.
+fact. The terminal's `cat case` prints the same rows as text.
 
 ### Data
 

@@ -3988,9 +3988,14 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   border-bottom: 0;
 }
 .cs-fig-cap { grid-column: 1 / -1; margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted); }
+/* A set stands its boxes one under another with nothing between them. */
+.cs-fig-row[data-kind='set'] .cs-fig-node + .cs-fig-node { margin-top: 6px; }
 
 @container cs (min-width: 460px) {
   .cs-fig { grid-template-columns: 1fr 1fr; }
+  /* One path and two sets: the path takes the left column, the sets stack
+     on the right beside it. */
+  .cs-fig[data-rows='3'] .cs-fig-row[data-kind='path']:first-child { grid-row: span 2; }
 }
 .cs-summary {
   margin: 0 0 12px;
@@ -4015,6 +4020,74 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   font-size: 11px;
   color: var(--ink-secondary);
 }
+
+/* The write-up's front matter, one line: role · domain · year. */
+.cs-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--ink-muted);
+}
+.cs-meta span + span::before { content: '·'; margin: 0 7px; color: var(--ink-disabled); }
+
+/* Lists in the prose, marked like the outcomes on a role card. */
+.cs-list {
+  list-style: disc outside;
+  margin: 0 0 10px;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+.cs-list li { font-size: 14px; line-height: 22px; }
+.cs-list li::marker { color: var(--accent); }
+
+/* Code as written — the decision function is the write-up's centre. It
+   scrolls in its own box on a phone rather than pushing the page sideways. */
+.cs-code {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface-subtle);
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 18px;
+  tab-size: 4;
+  color: var(--ink);
+  /* Cascadia draws `!=` as one glyph; the write-up's code is shown as typed. */
+  font-variant-ligatures: none;
+}
+.cs-code code { font: inherit; }
+
+/* The behaviour table: the one wide thing in the write-up. */
+.cs-table-wrap { margin: 0 0 12px; overflow-x: auto; }
+.cs-table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 18px;
+}
+.cs-table th {
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  border-bottom: 1px solid var(--line);
+}
+.cs-table td { padding: 6px 10px; vertical-align: top; border-bottom: 1px solid var(--line-subtle); }
+.cs-table strong { color: var(--accent); }
+
+/* Where this page comes from. */
+.cs-source { margin: 18px 0 0; font-size: 12px; line-height: 17px; color: var(--ink-muted); }
+.cs-source a { color: var(--accent); }
 
 .cs-section + .cs-section { margin-top: 20px; }
 .cs-section h4,
@@ -5674,6 +5747,8 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   .mb-case { padding: 0; background: none; border-radius: 0; }
   .cs-fig { break-inside: avoid; }
   .cs-fig-box { background: none; }
+  .cs-code, .cs-table-wrap { break-inside: avoid; }
+  .cs-code { white-space: pre-wrap; background: none; }
 
   /* Keep a role or a project from being split across two pages. */
   .mb-spine > li,

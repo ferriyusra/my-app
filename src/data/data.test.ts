@@ -40,6 +40,10 @@ const NOT_A_LISTED_SKILL = new Set([
 	'Python',
 	'Implement Algorithm TF-IDF',
 	'Implement Algorithm Naive Bayes Classifier',
+	/* The deposit-alerting stack, from the write-up in public/projects/meditap/. */
+	'MS SQL Server',
+	'GORM',
+	'Protobuf',
 ]);
 
 test('every tool a project names is either a listed skill or a known exception', () => {

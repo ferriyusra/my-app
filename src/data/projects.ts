@@ -34,6 +34,25 @@ export interface Project {
  */
 export const projects: Project[] = [
 	{
+		/* The card blurb from the write-up in public/projects/meditap/; the case
+		   study is that system's detail page, joined by `caseStudy.project`. */
+		id: 'deposit-alerting',
+		name: 'Deposit Threshold Alerting',
+		description:
+			'A Go service that watches corporate health-plan deposit balances across three source systems and warns clients at two severity levels before their coverage gets suspended — with a state machine that suppresses repeat alerts without ever swallowing an escalation.',
+		cover: '',
+		/* skills.ts spellings where a skill exists; the rest are on the allowlist
+		   in data.test.ts. The case study's own stack keeps the write-up's. */
+		tech: ['Go', 'Gin Framework', 'GORM', 'PostgreSQL', 'MS SQL Server', 'Pub/Sub', 'Protobuf'],
+		github: null,
+		demo: null,
+		featured: true,
+		color: '#2f6f5e',
+		initial: 'DT',
+		stars: 0,
+		type: 'real',
+	},
+	{
 		id: 'ssd',
 		name: 'SatuSehat Data',
 		description:

@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { caseStudy } from '@/data/case-study';
+import { caseStudy, type CaseBlock } from '@/data/case-study';
 
 /**
  * No 'use client' on purpose: the server document renders this into the
@@ -7,48 +7,109 @@ import { caseStudy } from '@/data/case-study';
  * the shell. One implementation, so the two never drift.
  */
 
+/** The write-up's prose uses **bold** for lead-ins and *italics* for stress. */
+function emphasise(text: string) {
+	return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, i) => {
+		if (part.startsWith('**') && part.endsWith('**')) {
+			return <strong key={i}>{part.slice(2, -2)}</strong>;
+		}
+		if (part.length > 2 && part.startsWith('*') && part.endsWith('*')) {
+			return <em key={i}>{part.slice(1, -1)}</em>;
+		}
+		return part;
+	});
+}
+
 /**
- * The shape of the system as boxes and arrows, from `caseStudy.figure`.
+ * The shape of the system as boxes, from `caseStudy.figure` — the write-up's
+ * own diagram, redrawn.
  *
  * DOM text and CSS, not an image: it renders with scripting off, recolours
- * with the theme, prints, and reflows to a column inside a narrow window or a
- * phone (`.cs` is a container; see globals.css). `<ol>` carries the order for
- * a screen reader; the arrow is an empty, hidden element rather than a glyph
- * so nothing is announced twice.
+ * with the theme, prints, and reflows from two columns to one inside a narrow
+ * window or on a phone (`.cs` is a container; see globals.css). A path row
+ * draws arrows between its boxes and `<ol>` carries the order for a screen
+ * reader; a set row stands its boxes side by side with nothing between them.
+ * The arrow is an empty, hidden element rather than a glyph so nothing is
+ * announced twice.
  */
 function CaseStudyFigure() {
+	const { rows, caption } = caseStudy.figure;
 	return (
-		<figure className='cs-fig'>
-			{caseStudy.figure.rows.map((row) => (
-				<div key={row.name} className='cs-fig-row'>
-					<p className='cs-fig-name'>{row.name}</p>
-					<ol className='cs-fig-nodes'>
-						{row.nodes.map((n, i) => (
-							<li key={n.label} className='cs-fig-node'>
-								{i > 0 && <span className='cs-fig-arrow' aria-hidden='true' />}
-								<span className='cs-fig-box'>
-									<span className='cs-fig-label'>{n.label}</span>
-									{n.detail && <span className='cs-fig-detail'>{n.detail}</span>}
-								</span>
-							</li>
-						))}
-					</ol>
-				</div>
-			))}
-			<figcaption className='cs-fig-cap'>{caseStudy.figure.caption}</figcaption>
+		<figure className='cs-fig' data-rows={rows.length}>
+			{rows.map((row) => {
+				const List = row.kind === 'path' ? 'ol' : 'ul';
+				return (
+					<div key={row.name} className='cs-fig-row' data-kind={row.kind}>
+						<p className='cs-fig-name'>{row.name}</p>
+						<List className='cs-fig-nodes'>
+							{row.nodes.map((n, i) => (
+								<li key={n.label} className='cs-fig-node'>
+									{row.kind === 'path' && i > 0 && (
+										<span className='cs-fig-arrow' aria-hidden='true' />
+									)}
+									<span className='cs-fig-box'>
+										<span className='cs-fig-label'>{n.label}</span>
+										{n.detail && <span className='cs-fig-detail'>{n.detail}</span>}
+									</span>
+								</li>
+							))}
+						</List>
+					</div>
+				);
+			})}
+			<figcaption className='cs-fig-cap'>{caption}</figcaption>
 		</figure>
 	);
 }
 
-/** The only markup the case-study prose uses is **bold** for service names. */
-function emphasise(text: string) {
-	return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-		part.startsWith('**') && part.endsWith('**') ? (
-			<strong key={i}>{part.slice(2, -2)}</strong>
-		) : (
-			part
-		),
-	);
+/** One block of a section. The write-up has paragraphs, lists, code, one table and the figure. */
+function Block({ block }: { block: CaseBlock }) {
+	if (typeof block === 'string') return <p>{emphasise(block)}</p>;
+	switch (block.kind) {
+		case 'list':
+			return (
+				<ul className='cs-list'>
+					{block.items.map((item) => (
+						<li key={item}>{emphasise(item)}</li>
+					))}
+				</ul>
+			);
+		case 'code':
+			return (
+				<pre className='cs-code' data-lang={block.lang}>
+					<code>{block.text}</code>
+				</pre>
+			);
+		case 'table':
+			return (
+				/* The one wide thing in the write-up: it scrolls in its own box
+				   on a phone rather than pushing the page sideways. */
+				<div className='cs-table-wrap'>
+					<table className='cs-table'>
+						<thead>
+							<tr>
+								{block.head.map((h) => (
+									<th key={h} scope='col'>
+										{h}
+									</th>
+								))}
+							</tr>
+						</thead>
+						<tbody>
+							{block.rows.map((row) => (
+								<tr key={row.join('|')}>
+									{row.map((cell, i) => (
+										<td key={i}>{emphasise(cell)}</td>
+									))}
+								</tr>
+							))}
+						</tbody>
+					</table>
+				</div>
+			);
+		case 'figure':
+			return <CaseStudyFigure />;
+	}
 }
 
 /**
@@ -63,6 +124,12 @@ export default function CaseStudyBody({ level = 4 }: { level?: 4 | 5 }) {
 	const H = (level === 5 ? 'h5' : 'h4') as 'h4' | 'h5';
 	return (
 		<div className='cs'>
+			{/* The write-up's front matter, as one line. */}
+			<p className='cs-meta'>
+				<span>{caseStudy.role}</span>
+				<span>{caseStudy.domain}</span>
+				<span>{caseStudy.year}</span>
+			</p>
 			<p className='cs-summary'>{caseStudy.summary}</p>
 
 			<ul className='cs-stack'>
@@ -75,13 +142,10 @@ export default function CaseStudyBody({ level = 4 }: { level?: 4 | 5 }) {
 				<Fragment key={s.heading}>
 					<section className='cs-section'>
 						<H>{s.heading}</H>
-						{s.body.map((para, i) => (
-							<p key={i}>{emphasise(para)}</p>
+						{s.body.map((b, i) => (
+							<Block key={i} block={b} />
 						))}
 					</section>
-					{/* The figure sits under the section that describes the parts,
-					    where the data says it belongs. */}
-					{s.heading === caseStudy.figure.after && <CaseStudyFigure />}
 				</Fragment>
 			))}
 
@@ -98,6 +162,17 @@ export default function CaseStudyBody({ level = 4 }: { level?: 4 | 5 }) {
 					))}
 				</ul>
 			</section>
+
+			{/* The record itself, one click away. A test keeps this page in step
+			    with it, so a reader can check rather than trust. */}
+			<p className='cs-source'>
+				Transcribed from{' '}
+				<a href={caseStudy.source} target='_blank' rel='noopener noreferrer'>
+					the original write-up
+				</a>
+				, a Markdown file served as it was written; a test keeps this page in
+				step with it.
+			</p>
 		</div>
 	);
 }

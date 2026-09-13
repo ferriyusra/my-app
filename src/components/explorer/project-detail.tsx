@@ -1,14 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, FileCode2 } from 'lucide-react';
 import { LiGithub, LiStar } from '@/components/icons/line-icons';
 import type { Project } from '@/data/projects';
+import { caseStudy } from '@/data/case-study';
+import { useWindowManager } from '@/hooks/use-window-manager';
+import { sendIntent } from '@/hooks/use-app-intent';
 
 /** The pane Explorer shows once a project folder is opened. */
 export default function ProjectDetail({ project }: { project: Project }) {
 	const [failed, setFailed] = useState(false);
 	const hasCover = !!project.cover && !failed;
+	const { launch } = useWindowManager();
+	/* One project has a write-up at depth; its card says so and opens it. */
+	const hasCase = project.id === caseStudy.project;
 
 	return (
 		<article className='xp-detail'>
@@ -64,8 +70,19 @@ export default function ProjectDetail({ project }: { project: Project }) {
 				</div>
 			</dl>
 
-			{(project.github || project.demo) && (
+			{(project.github || project.demo || hasCase) && (
 				<div className='xp-detail-links'>
+					{hasCase && (
+						<button
+							type='button'
+							className='fl-btn fl-btn-accent'
+							onClick={() => {
+								sendIntent('experience', 'case');
+								launch('experience');
+							}}>
+							<FileCode2 size={14} aria-hidden='true' /> Read the case study
+						</button>
+					)}
 					{project.github && (
 						<a
 							href={project.github}

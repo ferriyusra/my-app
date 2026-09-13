@@ -93,6 +93,8 @@ test('the bare nouns answer as their ls form', () => {
 
 test('cat case prints the figure as the text it is drawn from', () => {
 	const out = text('cat case');
-	assert.ok(out.includes('Cloud Scheduler → billing run'), 'the data path should print as arrows');
-	assert.ok(out.includes('The access path'), 'both rows should print');
+	assert.ok(out.includes('scheduler → message queue'), 'the run should print as arrows');
+	assert.ok(out.includes('Reads, once each per run'), 'the sets should print');
+	assert.ok(out.includes('func decide('), 'the code block should print');
+	assert.ok(out.includes('Recovery is logged, not announced'), 'the table should print');
 });

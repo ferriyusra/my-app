@@ -12,7 +12,7 @@
 import { experiences, tenureLabel, tenureMonths } from '../data/experience.ts';
 import { projects } from '../data/projects.ts';
 import { skills } from '../data/skills.ts';
-import { caseStudy } from '../data/case-study.ts';
+import { caseStudy, type CaseBlock } from '../data/case-study.ts';
 import { profile, yearsOfExperience, CAREER_START } from '../data/profile.ts';
 import type { AppId } from '../types/windows.ts';
 import { SHORTCUTS, SHORTCUT_NOTE, TIP_PAGES } from '../data/tips.ts';
@@ -62,6 +62,34 @@ function chain(labels: string[], width = 68): string[] {
 	}
 	if (line) out.push(line);
 	return out;
+}
+
+/** The write-up's prose without its emphasis marks. Code keeps its asterisks. */
+const unmark = (text: string) => text.replace(/\*/g, '');
+
+/** One block of the case study as terminal lines. */
+function blockLines(b: CaseBlock): Line[] {
+	if (typeof b === 'string') return [p(unmark(b))];
+	switch (b.kind) {
+		case 'list':
+			return b.items.map((i) => p(`  · ${unmark(i)}`));
+		case 'code':
+			return b.text.split('\n').map((l) => p(`    ${l}`));
+		case 'table':
+			return [
+				dim(`  ${b.head.join(' | ')}`),
+				...b.rows.map((r) => p(`  ${r.map(unmark).join(' | ')}`)),
+			];
+		case 'figure':
+			/* The figure as the text it is drawn from: a path as arrows, a set as a list. */
+			return caseStudy.figure.rows.flatMap((r) => [
+				dim(r.name),
+				...(r.kind === 'path'
+					? chain(r.nodes.map((n) => n.label)).map((l) => p(`  ${l}`))
+					: r.nodes.map((n) => p(`  · ${n.label}${n.detail ? ` — ${n.detail}` : ''}`))),
+				p(''),
+			]);
+	}
 }
 
 const APP_WORDS: Record<string, AppId> = {
@@ -174,29 +202,25 @@ export function run(input: string): Result {
 
 		case 'cat': {
 			if (!arg) return { lines: [{ text: 'cat: needs a name', tone: 'error' }] };
-			if (arg.startsWith('case') || arg.includes('aso') || arg.includes('billing')) {
+			if (
+				arg.startsWith('case') ||
+				arg.includes('aso') ||
+				arg.includes('billing') ||
+				arg.includes('deposit') ||
+				arg.includes('alert')
+			) {
 				return {
 					lines: [
 						acc(caseStudy.title),
-						dim(`${caseStudy.at} · ${caseStudy.period}`),
+						dim(`${caseStudy.at} · ${caseStudy.role} · ${caseStudy.year}`),
 						p(''),
 						p(caseStudy.summary),
 						p(''),
-						...caseStudy.sections.flatMap((s) => [
-							acc(s.heading),
-							...s.body.map((b) => p(b.replace(/\*\*/g, ''))),
-							p(''),
-							/* The figure, as the text it is drawn from: one line per path. */
-							...(s.heading === caseStudy.figure.after
-								? caseStudy.figure.rows.flatMap((r) => [
-										dim(r.name),
-										...chain(r.nodes.map((n) => n.label)).map((l) => p(`  ${l}`)),
-										p(''),
-									])
-								: []),
-						]),
+						...caseStudy.sections.flatMap((s) => [acc(s.heading), ...s.body.flatMap(blockLines), p('')]),
 						acc('What this write-up does not answer'),
 						...caseStudy.openQuestions.map((q) => p(`  · ${q}`)),
+						p(''),
+						dim(`transcribed from ${caseStudy.source}`),
 					],
 				};
 			}

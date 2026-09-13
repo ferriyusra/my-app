@@ -19,7 +19,10 @@ import { caseStudy } from '@/data/case-study';
 export default function RecommendedSection({ onClose }: { onClose: () => void }) {
 	const { recents } = useShell();
 	const { launch } = useWindowManager();
-	const featured = projects.filter((p) => p.featured).slice(0, 2);
+	/* The case study's own card is left out: it is the item above it. */
+	const featured = projects
+		.filter((p) => p.featured && p.id !== caseStudy.project)
+		.slice(0, 2);
 
 	return (
 		<div className='start-reco'>

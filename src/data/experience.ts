@@ -31,15 +31,24 @@ export const experiences = [
 			'Designed and developed backend systems for finance-related platforms using Go (Gin Framework) and PostgreSQL, delivering core services (ASO Database, ASO Notification Below Threshold) that replaced manual spreadsheet-based tracking and became the single source of truth for finance operations.',
 		stats: [
 			{ value: '~160', label: 'entities billed' },
-			{ value: '2', label: 'core services' },
+			{ value: '3', label: 'source systems joined' },
+			{ value: '2', label: 'alert severity levels' },
 		],
 		highlights: [
-			'Manual threshold monitoring removed',
+			'Repeat alerts suppressed, escalations always sent',
+			'Billing and notification rules became configuration with an audit trail',
 			'Gateway and IAM centralised with KrakenD and Keycloak',
-			'A CMS the finance team runs without an engineer',
 		],
+		/* The deposit-alerting bullets are the résumé bullets from the write-up
+		   in public/projects/meditap/, which is also what case-study.ts is
+		   transcribed from. */
 		achievements: [
 			'Built and maintained RESTful API services powering financial workflows for ~160 ASO entities, enabling the Finance Team to manage and monitor structured, real-time data used directly for billing and payment collection.',
+			'Built a Go service that monitors self-funded health-plan deposit balances across corporate clients and issues two-level, state-aware alerts — joining an ERP deposit ledger, a legacy claim system and internal configuration, and publishing typed queue messages to a separate notification service.',
+			'Designed a state-machine alerting engine that suppresses repeat warnings while guaranteeing delivery on escalation, threshold changes and deposit top-ups.',
+			"Integrated three heterogeneous sources (PostgreSQL ERP, legacy SQL Server, and the service's own database) with one batched read per source per run.",
+			'Built the client configuration module — CRUD, cross-system validation, and field-level audit logging — turning per-client billing and notification rules into data an account manager can edit.',
+			'Shipped to production behind a single feature flag honoured by every entry point, including message subscriber registration.',
 			'Automated threshold-based financial notifications and scheduled billing processes with an event-driven architecture using Google Pub/Sub and Cloud Scheduler, eliminating recurring manual monitoring tasks previously done by the Finance Team.',
 			'Configured and managed KrakenD API Gateway and Keycloak IAM with role-based access control across multiple internal services and user roles, centralizing access management and reducing security-misconfiguration risk.',
 			'Developed internal CMS tools using React and Material UI, giving non-technical stakeholders direct visibility into financial data and streamlining workflows that previously required engineering support.',
@@ -56,6 +65,8 @@ export const experiences = [
 			'Cloud Scheduler',
 			'KrakenD',
 			'Keycloak',
+			'Protobuf',
+			'GORM',
 		],
 	},
 	{

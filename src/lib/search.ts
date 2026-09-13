@@ -19,7 +19,7 @@
 import { experiences } from '../data/experience.ts';
 import { projects } from '../data/projects.ts';
 import { skills } from '../data/skills.ts';
-import { caseStudy } from '../data/case-study.ts';
+import { caseStudy, caseStudyText } from '../data/case-study.ts';
 import { discarded } from '../data/discarded.ts';
 import { profile } from '../data/profile.ts';
 import { SHORTCUTS, TIP_PAGES } from '../data/tips.ts';
@@ -87,12 +87,13 @@ export function index(): Hit[] {
 	}
 
 	out.push({
-		id: 'case:aso',
+		id: `case:${caseStudy.slug}`,
 		app: 'experience',
 		kind: 'Case study',
 		title: caseStudy.title,
 		subtitle: `${caseStudy.at} · ${caseStudy.period}`,
-		haystack: [caseStudy.title, caseStudy.summary, ...caseStudy.stack, ...caseStudy.sections.flatMap((s) => [s.heading, ...s.body]), ...caseStudy.openQuestions].join(' '),
+		/* One flattening for every block kind, shared with the tests. */
+		haystack: caseStudyText().join(' '),
 		weight: 3,
 	});
 
