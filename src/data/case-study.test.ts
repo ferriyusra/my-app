@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-import { caseStudy, caseStudyText } from './case-study.ts';
+import { caseStudy, caseStudyLength, caseStudyText } from './case-study.ts';
 import { projects } from './projects.ts';
 
 /**
@@ -109,6 +109,21 @@ test('the case study names a project card that exists', () => {
 		projects.some((p) => p.id === caseStudy.project),
 		`caseStudy.project is "${caseStudy.project}", which is no id in projects.ts`,
 	);
+});
+
+test('the reading length is computed from the text, and is the size of a real write-up', () => {
+	const { sections, words, minutes } = caseStudyLength();
+	assert.equal(sections, caseStudy.sections.length);
+	assert.ok(words > 400 && words < 4000, `${words} words is not the size of this write-up`);
+	assert.equal(minutes, Math.max(1, Math.round(words / 200)));
+});
+
+test('section headings make distinct, anchor-safe ids', () => {
+	const ids = caseStudy.sections.map((s) =>
+		s.heading.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+	);
+	assert.equal(new Set(ids).size, ids.length, 'two headings slug to the same id');
+	for (const id of ids) assert.match(id, /^[a-z0-9][a-z0-9-]*$/);
 });
 
 test('the flattened text carries every block, so search cannot miss one', () => {

@@ -1,5 +1,5 @@
-import { Fragment } from 'react';
-import { caseStudy, type CaseBlock } from '@/data/case-study';
+import { caseStudy, caseStudyLength, type CaseBlock } from '@/data/case-study';
+import CaseStudyNav from './case-study-nav';
 
 /**
  * No 'use client' on purpose: the server document renders this into the
@@ -19,6 +19,29 @@ function emphasise(text: string) {
 		return part;
 	});
 }
+
+/** A paragraph that opens with a bold lead-in reads as a run-in heading. */
+const LEAD = /^\*\*[^*]+\*\*\s/;
+
+/** An id for a heading: "The problem" → "the-problem". */
+function slug(heading: string): string {
+	return heading
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-|-$/g, '');
+}
+
+/**
+ * Section numbers come from the data, not from a CSS counter.
+ *
+ * `.cs` is a CSS container, and `container-type` brings style containment with
+ * it, which scopes counters — every heading rendered "01". Numbering here also
+ * means the contents list and the headings cannot disagree.
+ */
+const num = (i: number) => String(i + 1).padStart(2, '0');
+
+/** What the code box says in its corner. `text` is a formula, and says nothing. */
+const LANG_LABEL: Record<string, string> = { go: 'Go' };
 
 /**
  * The shape of the system as boxes, from `caseStudy.figure` — the write-up's
@@ -64,7 +87,9 @@ function CaseStudyFigure() {
 
 /** One block of a section. The write-up has paragraphs, lists, code, one table and the figure. */
 function Block({ block }: { block: CaseBlock }) {
-	if (typeof block === 'string') return <p>{emphasise(block)}</p>;
+	if (typeof block === 'string') {
+		return <p className={LEAD.test(block) ? 'cs-lead' : undefined}>{emphasise(block)}</p>;
+	}
 	switch (block.kind) {
 		case 'list':
 			return (
@@ -74,12 +99,23 @@ function Block({ block }: { block: CaseBlock }) {
 					))}
 				</ul>
 			);
-		case 'code':
+		case 'code': {
+			const label = LANG_LABEL[block.lang];
 			return (
-				<pre className='cs-code' data-lang={block.lang}>
-					<code>{block.text}</code>
-				</pre>
+				<div className='cs-code-box'>
+					{/* In the box's own bar, not floating over the code: the code
+					    scrolls sideways and would have run under it. */}
+					{label && (
+						<span className='cs-code-lang' aria-hidden='true'>
+							{label}
+						</span>
+					)}
+					<pre className='cs-code' data-lang={block.lang}>
+						<code>{block.text}</code>
+					</pre>
+				</div>
 			);
+		}
 		case 'table':
 			return (
 				/* The one wide thing in the write-up: it scrolls in its own box
@@ -119,16 +155,33 @@ function Block({ block }: { block: CaseBlock }) {
  * an `h3` title. The document nests it one deeper — the write-up lives inside
  * the Meditap role there, under that role's `h3` and its own `h4` title — so
  * without this the title and the sections it introduces would be siblings.
+ *
+ * `idPrefix` keeps the section ids unique on a page that holds the write-up
+ * twice: the desktop renders the server document (hidden) and a window.
  */
-export default function CaseStudyBody({ level = 4 }: { level?: 4 | 5 }) {
+export default function CaseStudyBody({
+	level = 4,
+	idPrefix = 'cs',
+}: {
+	level?: 4 | 5;
+	idPrefix?: string;
+}) {
 	const H = (level === 5 ? 'h5' : 'h4') as 'h4' | 'h5';
+	const length = caseStudyLength();
+	const sections = caseStudy.sections.map((s) => ({ ...s, id: `${idPrefix}-${slug(s.heading)}` }));
+	const openId = `${idPrefix}-open-questions`;
+
 	return (
 		<div className='cs'>
-			{/* The write-up's front matter, as one line. */}
+			{/* The write-up's front matter, plus its size: a reader deciding
+			    whether to start wants to know how long the thing is. */}
 			<p className='cs-meta'>
 				<span>{caseStudy.role}</span>
 				<span>{caseStudy.domain}</span>
 				<span>{caseStudy.year}</span>
+				<span>
+					{length.sections} sections · about {length.minutes} min
+				</span>
 			</p>
 			<p className='cs-summary'>{caseStudy.summary}</p>
 
@@ -138,19 +191,34 @@ export default function CaseStudyBody({ level = 4 }: { level?: 4 | 5 }) {
 				))}
 			</ul>
 
-			{caseStudy.sections.map((s) => (
-				<Fragment key={s.heading}>
-					<section className='cs-section'>
-						<H>{s.heading}</H>
-						{s.body.map((b, i) => (
-							<Block key={i} block={b} />
-						))}
-					</section>
-				</Fragment>
+			<CaseStudyNav
+				items={[
+					...sections.map((s, i) => ({ id: s.id, num: num(i), label: s.heading })),
+					{ id: openId, num: num(sections.length), label: 'What it does not answer' },
+				]}
+			/>
+
+			{sections.map((s, i) => (
+				<section key={s.heading} id={s.id} className='cs-section'>
+					<H>
+						<span className='cs-num' aria-hidden='true'>
+							{num(i)}
+						</span>
+						{s.heading}
+					</H>
+					{s.body.map((b, j) => (
+						<Block key={j} block={b} />
+					))}
+				</section>
 			))}
 
-			<section className='cs-section cs-open'>
-				<H>What this write-up does not answer</H>
+			<section id={openId} className='cs-section cs-open'>
+				<H>
+					<span className='cs-num' aria-hidden='true'>
+						{num(sections.length)}
+					</span>
+					What this write-up does not answer
+				</H>
 				<p>
 					These are the questions a reader with production experience would ask
 					next. They are listed rather than glossed over, because a case study
@@ -162,17 +230,6 @@ export default function CaseStudyBody({ level = 4 }: { level?: 4 | 5 }) {
 					))}
 				</ul>
 			</section>
-
-			{/* The record itself, one click away. A test keeps this page in step
-			    with it, so a reader can check rather than trust. */}
-			<p className='cs-source'>
-				Transcribed from{' '}
-				<a href={caseStudy.source} target='_blank' rel='noopener noreferrer'>
-					the original write-up
-				</a>
-				, a Markdown file served as it was written; a test keeps this page in
-				step with it.
-			</p>
 		</div>
 	);
 }

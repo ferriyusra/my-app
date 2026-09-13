@@ -261,3 +261,21 @@ export function caseStudyText(): string[] {
 	out.push(...caseStudy.openQuestions);
 	return out;
 }
+
+/**
+ * How long the write-up is, computed rather than written down: a reader
+ * deciding whether to start wants the size of the thing, and a figure typed
+ * into the prose would be stale after the next edit.
+ */
+export function caseStudyLength(): { sections: number; words: number; minutes: number } {
+	const words = caseStudyText()
+		.join(' ')
+		.split(/\s+/)
+		.filter(Boolean).length;
+	return {
+		sections: caseStudy.sections.length,
+		words,
+		/* 200 words a minute, the usual figure for technical prose. */
+		minutes: Math.max(1, Math.round(words / 200)),
+	};
+}

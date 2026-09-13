@@ -192,7 +192,7 @@ export default function PortfolioDocument() {
 								{carriesCase && (
 									<div className='mb-case'>
 										<h4 className='mb-cs-title'>{caseStudy.title}</h4>
-										<CaseStudyBody level={5} />
+										<CaseStudyBody level={5} idPrefix='doc-cs' />
 									</div>
 								)}
 							</li>

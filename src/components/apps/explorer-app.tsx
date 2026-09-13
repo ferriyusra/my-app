@@ -326,7 +326,17 @@ export default function ExplorerApp() {
 						</article>
 					) : openCase ? (
 						<article className='xp-detail'>
-							<CaseStudyBody />
+							{/* The pane used to open on the write-up with no title: the
+							    breadcrumb named it and the page did not. */}
+							<header className='xp-detail-head xp-detail-head-first'>
+								<div>
+									<h3>{caseStudy.title}</h3>
+									<span className='xp-badge' data-type='real'>
+										Case study · {caseStudy.at}
+									</span>
+								</div>
+							</header>
+							<CaseStudyBody idPrefix='xp-cs' />
 						</article>
 					) : shown.length === 0 ? (
 						<p className='xp-empty'>
