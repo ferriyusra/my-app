@@ -68,6 +68,7 @@ function Role({
 
 				{/* The numbers lead. They were the strongest thing on the card
 				    and were sunk inside four lines of prose. */}
+				{exp.stats.length > 0 && (
 				<ul className='ex-stats'>
 					{exp.stats.map((st) => (
 						<li key={st.label}>
@@ -76,6 +77,18 @@ function Role({
 						</li>
 					))}
 				</ul>
+
+				)}
+
+				{/* The facts that are not numbers, as a line rather than as tiles: a
+				    tile with a word in it reads as a metric that could not be found. */}
+				{exp.highlights.length > 0 && (
+					<ul className='ex-highlights'>
+						{exp.highlights.map((h) => (
+							<li key={h}>{h}</li>
+						))}
+					</ul>
+				)}
 
 				<p className='ex-desc'>{exp.description}</p>
 

@@ -34,10 +34,29 @@ export interface Project {
  */
 export const projects: Project[] = [
 	{
+		/* The card blurb from the write-up in public/projects/meditap/; the case
+		   study is that system's detail page, joined by `caseStudy.project`. */
+		id: 'deposit-alerting',
+		name: 'Deposit Threshold Alerting',
+		description:
+			'A Go service that watches corporate health-plan deposit balances across three source systems and warns clients at two severity levels before their coverage gets suspended — with a state machine that suppresses repeat alerts without ever swallowing an escalation.',
+		cover: '',
+		/* skills.ts spellings where a skill exists; the rest are on the allowlist
+		   in data.test.ts. The case study's own stack keeps the write-up's. */
+		tech: ['Go', 'Gin Framework', 'GORM', 'PostgreSQL', 'MS SQL Server', 'Pub/Sub', 'Protobuf'],
+		github: null,
+		demo: null,
+		featured: true,
+		color: '#2f6f5e',
+		initial: 'DT',
+		stars: 0,
+		type: 'real',
+	},
+	{
 		id: 'ssd',
 		name: 'SatuSehat Data',
 		description:
-			'SATUSEHAT Data Portal is a portal with a vision to unite all health data distribution and its processed results in one integrated portal access (SATU Health Data) which can be a tool to support decision making and transparency through interactive data/dashboards with trusted data sources. SATUSEHAT Data Portal consists of: Dashboard, Dataset, Metadata and Data Services.',
+			'The SATUSEHAT Data Portal brings the distribution of Indonesia’s health data and its processed results into one place, as interactive dashboards on trusted sources, to support decision-making and transparency. It has four parts: Dashboard, Dataset, Metadata and Data Services.',
 		cover: '/projects/ssd/ssd-1.png',
 		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'NestJS'],
 		github: null,
@@ -79,7 +98,7 @@ export const projects: Project[] = [
 		id: 'acara',
 		name: 'Acara',
 		description:
-			'Learning to fullstack development using MERN Stack.',
+			'A full-stack learning project built to learn the MERN stack, with the backend and the frontend in separate repositories.',
 		cover: '',
 		tech: ['React', 'Next.js', 'Express.js', 'Node.js', 'MongoDB'],
 		github: 'https://github.com/ferriyusra/back-end-acara',
@@ -94,7 +113,7 @@ export const projects: Project[] = [
 		id: 'native',
 		name: 'Dashboard Native',
 		description:
-			'Migrating from dashboard tableau to native dashboard to reduce cost, loaded data and performance. handle the backend api to delivered data from database like postgresql, big query and mongodb.',
+			'Migration of Tableau dashboards to native ones, to cut licence cost and improve load times and performance. I built the backend APIs that deliver the data from PostgreSQL, BigQuery and MongoDB.',
 		cover: '/projects/native/native-1.png',
 		tech: ['Go', 'Gin Framework', 'PostgreSQL', 'React', 'Next.js'],
 		github: null,
@@ -109,7 +128,7 @@ export const projects: Project[] = [
 		id: 'tracerstd',
 		name: 'Tracer Study',
 		description:
-			'Create website for tracing the student after graduate to tracking data by using quisionare and give them information about job vaccanies and redirect to the third party job portal to easly apply.',
+			'A website that traces graduates after they leave: it collects tracking data through a questionnaire, shows job vacancies, and links out to a third-party job portal to apply.',
 		cover: '',
 		tech: ['PHP', 'Laravel 7', 'MySQL'],
 		github: 'https://github.com/ferriyusra/e-career/issues/1',
@@ -122,9 +141,9 @@ export const projects: Project[] = [
 	},
 	{
 		id: 'crowdfounding',
-		name: 'Mini Crowdfounding',
+		name: 'Mini Crowdfunding',
 		description:
-			'Create Mini Crowdfunding Website for implementation MERN Stack to implement after finish course MERN Stack.',
+			'A small crowdfunding site built after finishing a MERN-stack course, to put the stack to use end to end.',
 		cover: '',
 		tech: ['React', 'Next.js', 'Express.js', 'Node.js', 'MongoDB'],
 		github: 'https://github.com/ferriyusra/crowdfunding-be',
@@ -139,7 +158,7 @@ export const projects: Project[] = [
 		id: 'gis',
 		name: 'GIS Platform',
 		description:
-			'Create the web application to integrate GIS to the web app using minimum library map, and showing the data base on lang and lat coordinate.',
+			'A web application that integrates GIS with a minimal map library, plotting records by their latitude and longitude.',
 		cover: '',
 		tech: ['PHP', 'Codeigniter 3', 'Leaflet', 'MySQL'],
 		github: null,
@@ -152,9 +171,9 @@ export const projects: Project[] = [
 	},
 	{
 		id: 'as',
-		name: 'Analysis Sentiment Vaccine Covid-19',
+		name: 'Covid-19 Vaccine Sentiment Analysis',
 		description:
-			'The epidemic of a new disease caused by the coronavirus (2019-nCoV), commonly referred to as COVID- 19, has been declared a global virus epidemic by the World Health Organization(WHO). President Joko Widodo has officially ratified Presidential Decree No. 99 of 2020 concerning the provision of vaccines and the implementation of vaccination activities.',
+			'Sentiment analysis of Jakarta’s Twitter posts about the Covid-19 vaccine, after Presidential Decree No. 99 of 2020 set out the vaccination programme: tweets classified with TF-IDF features and a Naive Bayes classifier in Python, published on ResearchGate.',
 		cover: '/projects/as/as-1.png',
 		tech: ['Python', 'Implement Algorithm TF-IDF', 'Implement Algorithm Naive Bayes Classifier'],
 		github: 'https://github.com/ferriyusra/Analisis-Sentimen-Naive-Bayes/issues/1',

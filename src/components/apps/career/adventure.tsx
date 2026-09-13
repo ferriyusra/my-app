@@ -604,9 +604,13 @@ export default function Adventure({
 								{atSign === c.index && (
 									<div className='cx-sign-more'>
 										<ul className='cx-sign-stats'>
-											{c.exp.stats.map((st) => (
+											{[
+												...c.exp.stats,
+												/* The words follow the numbers, as they do on the card. */
+												...c.exp.highlights.map((h) => ({ value: '', label: h })),
+											].map((st) => (
 												<li key={st.label}>
-													<strong>{st.value}</strong>
+													{st.value && <strong>{st.value}</strong>}
 													<span>{st.label}</span>
 												</li>
 											))}

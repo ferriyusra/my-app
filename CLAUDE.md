@@ -266,6 +266,12 @@ shown only the half that fails concludes the site is broken.
    [src/components/apps/registry.tsx](src/components/apps/registry.tsx) — title,
    blurb, icon, default size, content component.
 4. Optionally list it in `DESKTOP_ITEMS` or `START_PINNED`.
+5. If a visitor should be able to pin it, add it to `PINNABLE` in
+   [src/context/shell-context.tsx](src/context/shell-context.tsx). That list is
+   the allowlist `readPins()` filters stored pins through, so an app missing
+   from it can be pinned and then silently loses the pin on the next reload.
+   `DEFAULT_PINNED` is a separate, deliberately short list — the strip is
+   ordered around the CV being opened.
 
 The registry is the only place that maps an id to a window; the desktop,
 taskbar, Start, Task View and notification centre all read from it.
@@ -277,8 +283,15 @@ specificity — File e**xp**lorer's address bar and e**xp**erience's career bar
 had claimed the same three letters. Neither rule was wrong alone; the cascade
 merged them per-property, so the address bar was silently forced to 52px tall
 with its overflow hidden, in a window whose author never saw the other rule.
-Experience is `ex-` now and `xp-` means Explorer only. `repo.test.ts` fails
-if two apps ever again each style one class name.
+Experience is `ex-` now and `xp-` means Explorer only. Notes is `nt-`.
+`repo.test.ts` fails if two apps ever again each style one class name.
+
+The shared prose classes are the deliberate exception. `cs-` names the blocks
+of a typed write-up rather than the case study in particular, and
+[src/components/content/prose.tsx](src/components/content/prose.tsx) renders
+them for the case study and the notes alike. `repo.test.ts` only polices
+`components/apps`, so the rule is unaffected — and a second identical block
+under another prefix is the duplication it exists to catch.
 
 `globals.css` is organised as: tokens → accents → base → shared controls →
 desktop → windows → taskbar → flyouts → menus → per-app sections → mobile →
@@ -369,10 +382,13 @@ The shell holds one set of typed data and offers several routes through it. All
 of them derive; none of them keep a second copy.
 
 - **Search** ([src/lib/search.ts](src/lib/search.ts)) indexes roles, projects,
-  skills, the case study, the discarded decisions, the tips and the profile — 68 entries
-  built from `src/data`. Start used to filter fourteen app names, so "Pub/Sub"
-  and "Kafka" returned nothing while sitting in the data. A title match outranks
-  a body match, and a result quotes the sentence it matched in.
+  skills, the case study, the discarded decisions, the written notes, the tips
+  and the profile — 70 entries built from `src/data`. Start used to filter
+  fourteen app names, so "Pub/Sub" and "Kafka" returned nothing while sitting in
+  the data. A title match outranks a body match, and a result quotes the
+  sentence it matched in. A hit may carry an `intent`, delivered through
+  `sendIntent` before the window opens, so a match on one of the case study's
+  own sentences lands on the case study rather than on Experience's front page.
 - **Terminal** ([src/lib/terminal.ts](src/lib/terminal.ts)) is a pure
   `(command) → lines` function, which is why it can be tested without a DOM.
   `open <app>` hands a real `AppId` back to the window manager rather than
@@ -388,6 +404,26 @@ of them derive; none of them keep a second copy.
   real, gets no credit either. The tree is smaller now and entirely data.
   Skills deliberately gets no folder: 28 names in a flat list is worse than the
   Skills window, and Tips ▸ What's not here says so.
+- **Notes** ([src/data/notes.ts](src/data/notes.ts)) is the learning log —
+  algorithms and system design, written up in the owner's own words, never
+  reproducing course material. A note is a discriminated union: a `written` one
+  must carry `sections` and a `source`, and a `studying`/`planned` one has no
+  `sections` field to fill with a placeholder, so the honesty is a type rather
+  than a convention. `applies` must name a real skill or role short, which is
+  what makes a note evidence rather than a blog post.
+
+  **It is empty, and that is the point of the design.** It was first written
+  with six planned topics drafted from a course syllabus; they came out again
+  before the branch merged, because they were not the owner's plan and because a
+  list of topics nobody has started is exactly the promise `/articles` was
+  deleted for. The window says it is empty, says why, and offers the case study
+  and the Recycle Bin instead of dead-ending — the answer Mail's Sent folder and
+  the editor's disabled source control already give here. Two tests hold that
+  line: a `planned` `target` month may not fall into the past, and the empty
+  state may not name a year or say "coming soon". Every surface but the window
+  derives from `writtenNotes()`, so Explorer grows `Documents/Notes/`, Start
+  indexes entries and the server document grows a fold only once a note exists.
+  Do not seed this file to make the window look busier.
 - **Desktop gestures** ([src/hooks/use-desktop-gestures.ts](src/hooks/use-desktop-gestures.ts))
   — marquee select and drag-to-rearrange. Same rule as the window frame and the
   cat: the gesture writes to the DOM and dispatches once, on pointer-up. The
@@ -437,11 +473,22 @@ see. It was in the Recycle Bin alone until then: the strongest writing here,
 behind the last icon on the desktop grid, absent from the HTML entirely. The
 bin is pinned to the taskbar by default now.
 
-[src/data/case-study.ts](src/data/case-study.ts) is the Meditap ASO billing
-system at more than bullet-point depth. Everything in it traces to the Meditap
-entry in `experience.ts`. Where a design decision is not recorded anywhere in
-this repository it is **not claimed** — those sit in `openQuestions`, which is
-rendered rather than hidden. Keep that discipline: the section is worth more for
+[src/data/case-study.ts](src/data/case-study.ts) is the Meditap deposit-threshold
+alerting system at more than bullet-point depth: a Go service joining a
+PostgreSQL ERP, a legacy SQL Server claim system and its own portal database, a
+state machine deciding *when* to alert, typed Pub/Sub messages to a separate
+notification service, and a configuration module with a field-level audit
+trail. **The record is the author's own Markdown write-up** at
+`public/projects/meditap/portfolio-aso-case-study.md`, served as-is and linked
+from the page; `case-study.ts` is that document as typed data (paragraphs,
+lists, two code blocks, the behaviour table, the figure), and
+`case-study.test.ts` reads the Markdown and fails when the title, role, stack,
+summary, headings, code or table rows drift. The write-up's résumé bullets are
+the Meditap role's `achievements`, and its card blurb is the `deposit-alerting`
+entry in `projects.ts`, joined by `caseStudy.project`. Where the write-up does
+not record something a reader would ask, the question sits in `openQuestions`,
+rendered rather than hidden — two earlier questions are gone because the
+write-up answers them. Keep that discipline: the section is worth more for
 naming its gaps than it would be for filling them with plausible invention.
 
 It renders through one component,
@@ -449,10 +496,21 @@ It renders through one component,
 `'use client'` — so the Experience window and the server document show the same
 prose and cannot drift.
 
+The **figure** in the Architecture section is data too (`caseStudy.figure`):
+the write-up's own diagram redrawn as one path (scheduler → message queue →
+deposit watch service → alert queue → notification service → client mailbox)
+and two sets (what the job reads once per run, what it writes every run), as
+DOM and borders rather than an image so it prints, recolours with the theme and
+reflows from two columns to one inside a narrow window or on a phone (`.cs` is
+a CSS container). Every label and detail is a phrase from the write-up, and
+`case-study.test.ts` fails if one is not — a diagram is where "claim nothing
+unrecorded" slips most easily, because a box that says "PostgreSQL" reads as a
+fact. The terminal's `cat case` prints the same rows as text.
+
 ### Data
 
 All content is typed data under `src/data/` — `profile`, `experience`,
-`projects`, `skills`, `case-study`, `discarded`.
+`projects`, `skills`, `case-study`, `discarded`, `notes`.
 
 The editor window is the exception, and deliberately so: its excerpts are
 **read from the real files at build time** by

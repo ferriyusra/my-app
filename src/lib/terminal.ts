@@ -12,9 +12,18 @@
 import { experiences, tenureLabel, tenureMonths } from '../data/experience.ts';
 import { projects } from '../data/projects.ts';
 import { skills } from '../data/skills.ts';
-import { caseStudy } from '../data/case-study.ts';
+import { caseStudy, type CaseBlock } from '../data/case-study.ts';
 import { profile, yearsOfExperience, CAREER_START } from '../data/profile.ts';
 import type { AppId } from '../types/windows.ts';
+import {
+	STATUS_LABEL,
+	TOPIC_SHORT,
+	noteBySlug,
+	noteMonth,
+	notes,
+	plannedNotes,
+	writtenNotes,
+} from '../data/notes.ts';
 import { SHORTCUTS, SHORTCUT_NOTE, TIP_PAGES } from '../data/tips.ts';
 
 export type Line = { text: string; tone?: 'dim' | 'accent' | 'error' };
@@ -45,6 +54,53 @@ function wrap(text: string, width = 72): string[] {
 	return out;
 }
 
+/**
+ * A path of labels joined by arrows, broken only at an arrow — `wrap` breaks
+ * on spaces, and "ASO Notification Below / Threshold" is not a box anyone
+ * drew. A line that breaks ends with the arrow, so the reader knows it goes on.
+ */
+function chain(labels: string[], width = 68): string[] {
+	const out: string[] = [];
+	let line = '';
+	for (const label of labels) {
+		const next = line ? `${line} → ${label}` : label;
+		if (line && next.length > width) {
+			out.push(`${line} →`);
+			line = label;
+		} else line = next;
+	}
+	if (line) out.push(line);
+	return out;
+}
+
+/** The write-up's prose without its emphasis marks. Code keeps its asterisks. */
+const unmark = (text: string) => text.replace(/\*/g, '');
+
+/** One block of the case study as terminal lines. */
+function blockLines(b: CaseBlock): Line[] {
+	if (typeof b === 'string') return [p(unmark(b))];
+	switch (b.kind) {
+		case 'list':
+			return b.items.map((i) => p(`  · ${unmark(i)}`));
+		case 'code':
+			return b.text.split('\n').map((l) => p(`    ${l}`));
+		case 'table':
+			return [
+				dim(`  ${b.head.join(' | ')}`),
+				...b.rows.map((r) => p(`  ${r.map(unmark).join(' | ')}`)),
+			];
+		case 'figure':
+			/* The figure as the text it is drawn from: a path as arrows, a set as a list. */
+			return caseStudy.figure.rows.flatMap((r) => [
+				dim(r.name),
+				...(r.kind === 'path'
+					? chain(r.nodes.map((n) => n.label)).map((l) => p(`  ${l}`))
+					: r.nodes.map((n) => p(`  · ${n.label}${n.detail ? ` — ${n.detail}` : ''}`))),
+				p(''),
+			]);
+	}
+}
+
 const APP_WORDS: Record<string, AppId> = {
 	tips: 'tips',
 	about: 'about',
@@ -60,6 +116,7 @@ const APP_WORDS: Record<string, AppId> = {
 	career: 'career',
 	recycle: 'recycle',
 	bin: 'recycle',
+	notes: 'notes',
 	code: 'vscode',
 	vscode: 'vscode',
 };
@@ -67,11 +124,12 @@ const APP_WORDS: Record<string, AppId> = {
 const COMMANDS = [
 	['help', 'this list'],
 	['whoami', 'who is behind the desktop'],
-	['ls [roles|projects|skills]', 'list what is on record'],
-	['cat <role|project|case>', 'read one entry in full'],
+	['ls [roles|projects|skills|notes]', 'list what is on record'],
+	['cat <role|project|case|note>', 'read one entry in full'],
 	['skill <name>', 'where a tool was actually used'],
 	['open <app>', 'open a window'],
 	['uptime', 'years in the industry, computed'],
+	['notes', 'what I am studying, and what is written up'],
 	['tips [keys]', 'what this desktop does, and the keys it answers to'],
 	['contact', 'how to reach me'],
 	['clear', 'clear the screen'],
@@ -150,22 +208,92 @@ export function run(input: string): Result {
 					],
 				};
 			}
-			return { lines: [{ text: `ls: no such listing: ${what}`, tone: 'error' }, dim('try: roles, projects, skills')] };
+			if (what.startsWith('note')) {
+				const done = writtenNotes().length;
+				/* Empty is the state it is in, and saying "0 notes — 0 written, 0 on
+				   the plan" is a worse way to say so than saying so. */
+				if (!notes.length) {
+					return {
+						lines: [
+							acc('no notes yet'),
+							p(''),
+							...wrap(
+								'Notes on algorithms and system design, written up in my own words. There are none, and a list of topics nobody has started would be a promise rather than a note.',
+							).map(p),
+							dim(''),
+							dim('cat case · ls roles — the writing here that is real'),
+						],
+					};
+				}
+				return {
+					lines: [
+						acc(`${notes.length} notes — ${done} written, ${plannedNotes().length} on the plan`),
+						...notes.map((n) =>
+							p(
+								`  ${n.slug.padEnd(28)}${TOPIC_SHORT[n.topic].padEnd(15)}${STATUS_LABEL[n.status].padEnd(13)}${noteMonth(n)}`,
+							),
+						),
+						dim(''),
+						dim(done ? 'cat <slug> to read one' : 'nothing written up yet — the months above are when each is due'),
+					],
+				};
+			}
+			return { lines: [{ text: `ls: no such listing: ${what}`, tone: 'error' }, dim('try: roles, projects, skills, notes')] };
 		}
 
 		case 'cat': {
 			if (!arg) return { lines: [{ text: 'cat: needs a name', tone: 'error' }] };
-			if (arg.startsWith('case') || arg.includes('aso') || arg.includes('billing')) {
+
+			/* An exact slug first, and before the case-study heuristic below: that
+			   one fires on any argument containing "alert" or "billing", which a
+			   note about retries could easily be called. `notes/<slug>` works too,
+			   because Explorer shows them in a folder of that name. */
+			const note = noteBySlug(arg.replace(/^notes\//, ''));
+			if (note) {
+				if (note.status !== 'written') {
+					return {
+						lines: [
+							acc(note.title),
+							dim(`${TOPIC_SHORT[note.topic]} · ${STATUS_LABEL[note.status]} · due ${note.target}`),
+							p(''),
+							...wrap(note.summary).map(p),
+							p(''),
+							dim('not written up yet — ls notes for the rest of the plan'),
+						],
+					};
+				}
+				return {
+					lines: [
+						acc(note.title),
+						dim(`${TOPIC_SHORT[note.topic]} · ${note.date}${note.applies?.length ? ` · ${note.applies.join(' · ')}` : ''}`),
+						p(''),
+						...wrap(note.summary).map(p),
+						p(''),
+						...note.sections.flatMap((sec) => [acc(sec.heading), ...sec.body.flatMap(blockLines), p('')]),
+						dim(`studied from ${note.source.name}`),
+					],
+				};
+			}
+
+			if (
+				arg.startsWith('case') ||
+				arg.includes('aso') ||
+				arg.includes('billing') ||
+				arg.includes('deposit') ||
+				arg.includes('alert')
+			) {
 				return {
 					lines: [
 						acc(caseStudy.title),
-						dim(`${caseStudy.at} · ${caseStudy.period}`),
+						dim(`${caseStudy.at} · ${caseStudy.role} · ${caseStudy.year}`),
 						p(''),
 						p(caseStudy.summary),
 						p(''),
-						...caseStudy.sections.flatMap((s) => [acc(s.heading), ...s.body.map((b) => p(b.replace(/\*\*/g, ''))), p('')]),
+						...caseStudy.sections.flatMap((s) => [acc(s.heading), ...s.body.flatMap(blockLines), p('')]),
 						acc('What this write-up does not answer'),
 						...caseStudy.openQuestions.map((q) => p(`  · ${q}`)),
+						p(''),
+						dim(`transcribed from ${caseStudy.source}`),
 					],
 				};
 			}
@@ -190,7 +318,7 @@ export function run(input: string): Result {
 					lines: [acc(proj.name), p(''), p(proj.description), p(''), dim(proj.tech.join(' · '))],
 				};
 			}
-			return { lines: [{ text: `cat: not found: ${arg}`, tone: 'error' }, dim('ls roles · ls projects · cat case')] };
+			return { lines: [{ text: `cat: not found: ${arg}`, tone: 'error' }, dim('ls roles · ls projects · ls notes · cat case')] };
 		}
 
 		case 'skill': {
@@ -261,6 +389,7 @@ export function run(input: string): Result {
 		case 'roles':
 		case 'projects':
 		case 'skills':
+		case 'notes':
 			return run(`ls ${cmd.toLowerCase()}`);
 
 		case 'contact':
@@ -301,5 +430,6 @@ export function completions(): string[] {
 		...Object.keys(APP_WORDS),
 		...experiences.map((e) => e.short),
 		...skills.map((s) => s.name),
+		...notes.map((n) => n.slug),
 	];
 }

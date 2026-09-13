@@ -41,8 +41,10 @@ A backend engineer whose portfolio is itself the strongest evidence of
 front-of-house engineering judgement. The differentiator is not the Windows
 pastiche — it is what the pastiche is built to be honest about:
 
-- one production system written up at real depth (`case-study.ts`), with its
-  unrecorded design rationale left in `openQuestions` rather than invented;
+- one production system written up at real depth (`case-study.ts`, transcribed
+  from the author's own Markdown write-up in `public/projects/meditap/`, with a
+  test that keeps the two in step), with what the write-up leaves unrecorded
+  held in `openQuestions` rather than invented;
 - a `discarded.ts` of decisions this repository **reversed**, each with the
   commit that removed it — the failures are shipped, not hidden;
 - an editor window whose excerpts are read from the real source files at build
@@ -73,12 +75,12 @@ copy a repository that publishes its own reversals.
 resizable, snappable windows; taskbar; Start with search; Quick Settings;
 notification centre; File Explorer; a boot → lock → sign-in sequence; a
 desktop cat; personalisation (light/dark, six accents, four CSS wallpapers
-plus any image in `public/background`, brightness, volume). Twelve apps open in
-windows: Tips, About, Explorer, Skills, Experience, Contact (Mail), Media
-Player, Settings, VS Code, Recycle Bin, Career.exe, Terminal.
+plus any image in `public/background`, brightness, volume). Thirteen apps open
+in windows: Tips, About, Explorer, Skills, Experience, Contact (Mail), Media
+Player, Settings, VS Code, Recycle Bin, Notes, Career.exe, Terminal.
 
 **Content is typed data.** `src/data/` holds `profile`, `experience`,
-`projects`, `skills`, `case-study`, `discarded`, `tips`. Every surface derives
+`projects`, `skills`, `case-study`, `discarded`, `notes`, `tips`. Every surface derives
 from it; none keeps a second copy. Derived figures (years of experience, role
 tenure) are computed from ISO dates rather than written down.
 
@@ -125,10 +127,14 @@ Real, checkable, and already in the repository:
 - **Five roles**, 2021-10 to present, all Jakarta: Meditap (current), INA
   Digital / Peruri Digital Security, the Health Technology Transformation &
   Digitalization Team (SATUSEHAT), Moladin, Jojonomic.
-- **One deep case study** — Meditap ASO billing for ~160 entities: two Go
-  services, Pub/Sub, Cloud Scheduler, KrakenD, Keycloak, a finance-operated
-  CMS. Its unrecorded rationale is held in `openQuestions` and rendered.
-- **Eight projects** in `projects.ts`, joined by name to `skills.ts` — a join
+- **One deep case study** — Meditap's deposit-threshold alerting for
+  self-funded health plans: a Go service joining a PostgreSQL ERP, a legacy SQL
+  Server claim system and its own portal database, a state machine deciding
+  when to alert, typed Pub/Sub messages to a separate notification service,
+  and a configuration module with a field-level audit trail. The record is the
+  author's Markdown write-up in `public/projects/meditap/`; what it leaves
+  unrecorded is held in `openQuestions` and rendered.
+- **Nine projects** in `projects.ts`, joined by name to `skills.ts` — a join
   pinned by `data.test.ts` because it fails silently.
 - **28 skills** across Backend, Frontend, Database, DevOps, Cloud, AI Tools;
   nine are named by no role, and `skill-evidence.ts` says so rather than

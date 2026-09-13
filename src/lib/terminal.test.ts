@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { experiences } from '../data/experience.ts';
+import { notes, writtenNotes } from '../data/notes.ts';
 import { skills } from '../data/skills.ts';
 import { completions, run } from './terminal.ts';
 
@@ -89,4 +90,65 @@ test('the bare nouns answer as their ls form', () => {
 	for (const noun of ['roles', 'projects', 'skills']) {
 		assert.equal(text(noun), text(`ls ${noun}`));
 	}
+});
+
+test('cat case prints the figure as the text it is drawn from', () => {
+	const out = text('cat case');
+	assert.ok(out.includes('scheduler → message queue'), 'the run should print as arrows');
+	assert.ok(out.includes('Reads, once each per run'), 'the sets should print');
+	assert.ok(out.includes('func decide('), 'the code block should print');
+	assert.ok(out.includes('Recovery is logged, not announced'), 'the table should print');
+});
+
+test('ls notes lists every note there is, written or not', () => {
+	const out = text('ls notes');
+	for (const n of notes) {
+		assert.ok(out.includes(n.slug), `${n.slug} is missing from ls notes`);
+	}
+	if (notes.length === 0) {
+		/* The state it is in. It should read as a sentence, not as three zeroes. */
+		assert.match(out, /no notes yet/);
+		assert.ok(!out.includes('0 notes'), 'an empty listing should say so in words');
+	} else {
+		assert.match(out, new RegExp(`${notes.length} notes`));
+	}
+});
+
+test('the bare noun answers as its ls form', () => {
+	assert.equal(text('notes'), text('ls notes'));
+});
+
+test('cat on a planned note says it is not written, and when it is due', () => {
+	const planned = notes.filter((n) => n.status !== 'written');
+	for (const n of planned.slice(0, 3)) {
+		const out = text(`cat ${n.slug}`);
+		assert.ok(out.includes(n.title), `${n.slug}: the title is missing`);
+		assert.match(out, /not written up yet/);
+		assert.ok(out.includes(n.target), `${n.slug}: the due month is missing`);
+	}
+});
+
+test('cat reads a written note, with its sections', () => {
+	for (const n of writtenNotes()) {
+		const out = text(`cat ${n.slug}`);
+		assert.ok(out.includes(n.title), `${n.slug}: the title is missing`);
+		assert.ok(out.includes(n.source.name), `${n.slug}: the attribution is missing`);
+		for (const sec of n.sections) {
+			assert.ok(out.includes(sec.heading), `${n.slug}: section "${sec.heading}" is missing`);
+		}
+	}
+});
+
+test('a note is reachable by the path Explorer shows it at', (t) => {
+	/* Skipped rather than passed while there are none: a vacuous assertion that
+	   reports "ok" is how a broken path gets shipped. */
+	const n = notes[0];
+	if (!n) return t.skip('no notes to address yet');
+	assert.equal(text(`cat notes/${n.slug}`), text(`cat ${n.slug}`));
+});
+
+test('open notes opens the window, and Tab knows every slug', () => {
+	assert.equal(run('open notes').open, 'notes');
+	const c = completions();
+	for (const n of notes) assert.ok(c.includes(n.slug), `${n.slug} is not completable`);
 });

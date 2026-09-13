@@ -5,6 +5,7 @@ import { test } from 'node:test';
 import { experiences } from '../data/experience.ts';
 import { skills } from '../data/skills.ts';
 import { TIP_PAGES } from '../data/tips.ts';
+import { writtenNotes } from '../data/notes.ts';
 import { excerpt, index, search } from './search.ts';
 
 test('the Tips page states the size of the index it describes', () => {
@@ -91,4 +92,31 @@ test('searching a discarded decision finds the Recycle Bin, not a role', () => {
 	const hit = search('ScrollSmoother')[0];
 	assert.equal(hit.kind, 'Discarded');
 	assert.equal(hit.app, 'recycle');
+});
+
+test('written notes are indexed, and planned ones are not', () => {
+	/* A planned note has no body to match, and a result that opens onto "not
+	   written yet" answers nothing — the charge that deleted /articles. */
+	const all = index();
+	assert.equal(all.filter((h) => h.kind === 'Note').length, writtenNotes().length);
+	for (const h of all.filter((h) => h.kind === 'Note')) {
+		assert.equal(h.app, 'notes');
+		assert.ok(h.intent, `${h.title} has no intent, so Start would open Notes on whatever was last selected`);
+	}
+});
+
+test('every note hit carries the slug of the note it names', () => {
+	for (const n of writtenNotes()) {
+		const hit = index().find((h) => h.id === `note:${n.slug}`);
+		assert.ok(hit, `${n.slug} is written but not indexed`);
+		assert.equal(hit.intent, n.slug);
+		assert.equal(hit.title, n.title);
+	}
+});
+
+test('a hit that lands somewhere particular says where', () => {
+	/* Start could only open an app, so a hit on one of the case study's own
+	   sentences opened Experience on its landing page. */
+	const hit = index().find((h) => h.kind === 'Case study');
+	assert.equal(hit?.intent, 'case');
 });

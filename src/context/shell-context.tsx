@@ -244,6 +244,7 @@ const PINNABLE: AppId[] = [
 	'settings',
 	'vscode',
 	'recycle',
+	'notes',
 ];
 
 /** Restores pins, discarding anything that is no longer a known app. */

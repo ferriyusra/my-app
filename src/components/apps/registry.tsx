@@ -15,6 +15,7 @@ import {
 	MediaIcon,
 	PersonIcon,
 	RecycleIcon,
+	NotesIcon,
 	TipsIcon,
 	CareerIcon,
 	TerminalIcon,
@@ -54,6 +55,7 @@ const MediaApp = lazy(() => import('./media-app'));
 const SettingsApp = lazy(() => import('./settings-app'));
 const EditorApp = lazy(() => import('./editor-app'));
 const RecycleBinApp = lazy(() => import('./recycle-bin-app'));
+const NotesApp = lazy(() => import('./notes-app'));
 const CareerApp = lazy(() => import('./career-app'));
 const TerminalApp = lazy(() => import('./terminal-app'));
 
@@ -162,6 +164,15 @@ export const APPS: AppDef[] = [
 		Content: RecycleBinApp,
 	},
 	{
+		id: 'notes',
+		title: 'Notes',
+		blurb: 'What I am studying, and what I have written up',
+		tile: { Art: NotesIcon },
+		w: 900,
+		h: 620,
+		Content: NotesApp,
+	},
+	{
 		id: 'career',
 		title: 'Career.exe',
 		blurb: 'Walk the CV',
@@ -250,6 +261,7 @@ export const DESKTOP_ITEMS: { id: AppId | ShortcutId; label: string }[] = [
 	{ id: 'career', label: 'Career.exe' },
 	{ id: 'terminal', label: 'Terminal' },
 	{ id: 'media', label: 'Media Player' },
+	{ id: 'notes', label: 'Notes' },
 	{ id: 'github', label: 'GitHub' },
 	{ id: 'linkedin', label: 'LinkedIn' },
 	{ id: 'recycle', label: 'Recycle Bin' },
@@ -266,6 +278,7 @@ export const START_PINNED: AppId[] = [
 	'media',
 	'career',
 	'terminal',
+	'notes',
 	'vscode',
 	'settings',
 	'recycle',

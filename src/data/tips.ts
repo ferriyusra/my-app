@@ -69,7 +69,7 @@ export const TIP_PAGES: TipPage[] = [
 		key: 'built',
 		label: "How it's built",
 		title: "How it's built",
-		subtitle: 'Five decisions, each with the window that demonstrates it',
+		subtitle: 'Six decisions, each with the window that demonstrates it',
 		tips: [
 			{
 				title: 'A pointer gesture never dispatches',
@@ -78,7 +78,7 @@ export const TIP_PAGES: TipPage[] = [
 			},
 			{
 				title: 'One typed dataset, four ways in',
-				body: 'Roles, projects, skills, the case study and the reversed decisions are typed data with no second copy. Start searches 68 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
+				body: 'Roles, projects, skills, the case study, the reversed decisions and the learning notes are typed data with no second copy. Start searches 70 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
 				where: 'Start, Terminal, Skills',
 			},
 			{
@@ -90,6 +90,11 @@ export const TIP_PAGES: TipPage[] = [
 				title: 'The Recycle Bin holds real reversals',
 				body: 'Every entry is something this repository built and then removed, with the commit that removed it and the reasoning that led there. The hashes are in the history and can be checked. A portfolio shows what shipped; that window shows what was cut.',
 				where: 'Recycle Bin',
+			},
+			{
+				title: 'An empty window that says it is empty',
+				body: 'Notes will hold write-ups on algorithms and system design, in my own words. It is empty, and it says so rather than listing topics nobody has started — this desktop has a Recycle Bin holding the last page that made a promise with a date on it. Every surface derives from the notes that exist, so Explorer grows a folder and this document grows a section when there is something in them, and a test fails if an entry is ever dated into the past.',
+				where: 'Notes',
 			},
 			{
 				title: 'The whole portfolio is in the HTML',
