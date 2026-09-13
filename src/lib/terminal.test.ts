@@ -90,3 +90,9 @@ test('the bare nouns answer as their ls form', () => {
 		assert.equal(text(noun), text(`ls ${noun}`));
 	}
 });
+
+test('cat case prints the figure as the text it is drawn from', () => {
+	const out = text('cat case');
+	assert.ok(out.includes('Cloud Scheduler → billing run'), 'the data path should print as arrows');
+	assert.ok(out.includes('The access path'), 'both rows should print');
+});

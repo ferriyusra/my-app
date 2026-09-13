@@ -3919,7 +3919,79 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 /* ── Case study ──────────────────────────────────────────────
    Rendered by one component in two places: the Experience window and
    the server document. */
-.cs { max-width: 72ch; }
+/* A container, because the same component sits in a 920px window, in a
+   <details> on a role card, and in a 360px document — the figure below has
+   to answer to the width it is given, not to the viewport. */
+.cs { max-width: 72ch; container-type: inline-size; container-name: cs; }
+
+/* ── The figure: the parts the prose names, as boxes; the paths it states,
+   as arrows. DOM and borders only — no image bytes, no glyphs, no transforms,
+   so it prints, recolours with the theme and reads with scripting off. ── */
+/* Each path reads downward, the way the terminal prints it and a phone
+   shows it. Side by side once the column is wide enough for two: the prose
+   measure is 72ch, about 540px, so five boxes in a row would each get 90px
+   and "ASO Notification Below Threshold" would break into four lines. */
+.cs-fig {
+  display: grid;
+  gap: 14px 18px;
+  margin: 18px 0 22px;
+}
+.cs-fig-row { min-width: 0; }
+.cs-fig-name {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+.cs-fig-nodes {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cs-fig-node { display: flex; flex-direction: column; align-items: stretch; min-width: 0; }
+.cs-fig-box {
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.cs-fig-label { display: block; font-size: 12px; font-weight: 600; line-height: 16px; }
+/* The data keeps the prose's own casing ("the alert"); a box label reads
+   better capitalised, and this is a rendering choice, not a data change. */
+.cs-fig-label::first-letter { text-transform: uppercase; }
+.cs-fig-detail {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--ink-secondary);
+}
+/* A line and a head, both drawn with borders — no glyph, no transform. */
+.cs-fig-arrow {
+  flex: none;
+  position: relative;
+  width: 1px;
+  height: 14px;
+  margin: 2px auto;
+  background: var(--line);
+}
+.cs-fig-arrow::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  bottom: -1px;
+  border: 3.5px solid transparent;
+  border-top: 5px solid var(--line);
+  border-bottom: 0;
+}
+.cs-fig-cap { grid-column: 1 / -1; margin: 0; font-size: 12px; line-height: 17px; color: var(--ink-muted); }
+
+@container cs (min-width: 460px) {
+  .cs-fig { grid-template-columns: 1fr 1fr; }
+}
 .cs-summary {
   margin: 0 0 12px;
   font-size: 14px;
@@ -5600,6 +5672,8 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   .mb-spine::before,
   .mb-spine > li::before { display: none; }
   .mb-case { padding: 0; background: none; border-radius: 0; }
+  .cs-fig { break-inside: avoid; }
+  .cs-fig-box { background: none; }
 
   /* Keep a role or a project from being split across two pages. */
   .mb-spine > li,

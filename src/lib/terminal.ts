@@ -45,6 +45,25 @@ function wrap(text: string, width = 72): string[] {
 	return out;
 }
 
+/**
+ * A path of labels joined by arrows, broken only at an arrow — `wrap` breaks
+ * on spaces, and "ASO Notification Below / Threshold" is not a box anyone
+ * drew. A line that breaks ends with the arrow, so the reader knows it goes on.
+ */
+function chain(labels: string[], width = 68): string[] {
+	const out: string[] = [];
+	let line = '';
+	for (const label of labels) {
+		const next = line ? `${line} → ${label}` : label;
+		if (line && next.length > width) {
+			out.push(`${line} →`);
+			line = label;
+		} else line = next;
+	}
+	if (line) out.push(line);
+	return out;
+}
+
 const APP_WORDS: Record<string, AppId> = {
 	tips: 'tips',
 	about: 'about',
@@ -163,7 +182,19 @@ export function run(input: string): Result {
 						p(''),
 						p(caseStudy.summary),
 						p(''),
-						...caseStudy.sections.flatMap((s) => [acc(s.heading), ...s.body.map((b) => p(b.replace(/\*\*/g, ''))), p('')]),
+						...caseStudy.sections.flatMap((s) => [
+							acc(s.heading),
+							...s.body.map((b) => p(b.replace(/\*\*/g, ''))),
+							p(''),
+							/* The figure, as the text it is drawn from: one line per path. */
+							...(s.heading === caseStudy.figure.after
+								? caseStudy.figure.rows.flatMap((r) => [
+										dim(r.name),
+										...chain(r.nodes.map((n) => n.label)).map((l) => p(`  ${l}`)),
+										p(''),
+									])
+								: []),
+						]),
 						acc('What this write-up does not answer'),
 						...caseStudy.openQuestions.map((q) => p(`  · ${q}`)),
 					],

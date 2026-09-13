@@ -17,6 +17,11 @@ export type CaseSection = {
 	body: string[];
 };
 
+/** One box in the figure: a part the write-up names, and a phrase it says about it. */
+export type FigureNode = { label: string; detail?: string };
+/** One row of boxes with arrows between them: a path the write-up states. */
+export type FigureRow = { name: string; nodes: FigureNode[] };
+
 export const caseStudy = {
 	slug: 'aso-billing',
 	title: 'A billing source of truth for ~160 entities',
@@ -75,6 +80,45 @@ export const caseStudy = {
 			],
 		},
 	] as CaseSection[],
+
+	/**
+	 * The shape of the system, drawn from the prose and nothing else.
+	 *
+	 * Five sections of two paragraphs said which part talks to which, and a
+	 * reader had to get through two of them to find out. This says it in one
+	 * look. Every label and every detail is a phrase lifted from the write-up,
+	 * and `case-study.test.ts` fails if one is not — so the figure can never
+	 * grow past the text. No store is named under ASO Database and nobody is
+	 * named as the alert's recipient, because `openQuestions` says those are
+	 * not recorded. Labels keep the prose's own casing.
+	 */
+	figure: {
+		/** The section it follows. */
+		after: 'What replaced it',
+		caption:
+			'Drawn from the write-up above and nothing else: the boxes are the parts it names, the arrows the paths it states.',
+		rows: [
+			{
+				name: 'The data path',
+				nodes: [
+					{ label: 'Cloud Scheduler', detail: 'recurring billing runs' },
+					{ label: 'billing run' },
+					{ label: 'Pub/Sub', detail: 'threshold events' },
+					{ label: 'ASO Notification Below Threshold', detail: 'watches balances' },
+					{ label: 'the alert', detail: 'that a person used to raise' },
+				],
+			},
+			{
+				name: 'The access path',
+				nodes: [
+					{ label: 'finance team' },
+					{ label: 'CMS', detail: 'React and Material UI' },
+					{ label: 'KrakenD', detail: 'API gateway · Keycloak as the identity provider' },
+					{ label: 'ASO Database', detail: 'entity records · REST API' },
+				],
+			},
+		] as FigureRow[],
+	},
 
 	/**
 	 * Not rhetorical. These are the parts a reader with real experience would

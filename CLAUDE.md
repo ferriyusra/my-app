@@ -449,6 +449,16 @@ It renders through one component,
 `'use client'` — so the Experience window and the server document show the same
 prose and cannot drift.
 
+The **figure** under "What replaced it" is data too (`caseStudy.figure`): two
+rows of boxes and arrows, the data path and the access path, drawn as DOM and
+borders rather than an image so it prints, recolours with the theme and reflows
+to a column inside a narrow window or on a phone (`.cs` is a CSS container).
+Every label and detail is a phrase lifted from the write-up, and
+`case-study.test.ts` fails if one is not — a diagram is where "claim nothing
+unrecorded" slips most easily, because a box that says "PostgreSQL" reads as a
+fact. That is why no store sits under ASO Database and nobody is named as the
+alert's recipient. The terminal's `cat case` prints the same rows as text.
+
 ### Data
 
 All content is typed data under `src/data/` — `profile`, `experience`,
