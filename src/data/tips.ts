@@ -69,7 +69,7 @@ export const TIP_PAGES: TipPage[] = [
 		key: 'built',
 		label: "How it's built",
 		title: "How it's built",
-		subtitle: 'Five decisions, each with the window that demonstrates it',
+		subtitle: 'Six decisions, each with the window that demonstrates it',
 		tips: [
 			{
 				title: 'A pointer gesture never dispatches',
@@ -78,7 +78,7 @@ export const TIP_PAGES: TipPage[] = [
 			},
 			{
 				title: 'One typed dataset, four ways in',
-				body: 'Roles, projects, skills, the case study and the reversed decisions are typed data with no second copy. Start searches 69 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
+				body: 'Roles, projects, skills, the case study, the reversed decisions and the learning notes are typed data with no second copy. Start searches 70 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
 				where: 'Start, Terminal, Skills',
 			},
 			{
@@ -90,6 +90,11 @@ export const TIP_PAGES: TipPage[] = [
 				title: 'The Recycle Bin holds real reversals',
 				body: 'Every entry is something this repository built and then removed, with the commit that removed it and the reasoning that led there. The hashes are in the history and can be checked. A portfolio shows what shipped; that window shows what was cut.',
 				where: 'Recycle Bin',
+			},
+			{
+				title: 'The notes are written, not collected',
+				body: 'Notes holds what I am studying — algorithms and system design — with the month each write-up is due beside the ones not written yet. Every note says what it was studied from and that the words are mine; none of it reproduces course material. The surfaces derive from the written ones, so Explorer grows a Notes folder and this document grows a section when there is something in them, and a test fails if a due date ever slips into the past.',
+				where: 'Notes',
 			},
 			{
 				title: 'The whole portfolio is in the HTML',

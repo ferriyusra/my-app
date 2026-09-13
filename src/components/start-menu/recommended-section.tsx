@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, FileCode2, FileText, FolderGit2 } from 'lucide-react';
+import { Clock, FileCode2, FileText, FolderGit2, NotebookPen } from 'lucide-react';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { sendIntent } from '@/hooks/use-app-intent';
@@ -9,6 +9,7 @@ import AppTile from '@/components/ui/app-tile';
 import { projects } from '@/data/projects';
 import { profile } from '@/data/profile';
 import { caseStudy } from '@/data/case-study';
+import { newestNote } from '@/data/notes';
 
 /**
  * Start's Recommended strip. Windows fills it with recently opened files;
@@ -18,6 +19,9 @@ import { caseStudy } from '@/data/case-study';
  */
 export default function RecommendedSection({ onClose }: { onClose: () => void }) {
 	const { recents } = useShell();
+	/* Only when there is one. The strip recommends what can be read, not what
+	   is planned — the study plan is the Notes window's job. */
+	const note = newestNote();
 	const { launch } = useWindowManager();
 	/* The case study's own card is left out: it is the item above it. */
 	const featured = projects
@@ -67,6 +71,28 @@ export default function RecommendedSection({ onClose }: { onClose: () => void })
 					<small>{caseStudy.title}</small>
 				</span>
 			</button>
+
+			{note && (
+				<button
+					type='button'
+					className='start-reco-item'
+					onClick={() => {
+						sendIntent('notes', note.slug);
+						launch('notes');
+						onClose();
+					}}>
+					<span
+						className='start-reco-swatch'
+						aria-hidden='true'
+						style={{ background: 'linear-gradient(140deg, #7a6ca8 0%, #3d3168 100%)' }}>
+						<NotebookPen size={15} color='#fff' strokeWidth={2.1} />
+					</span>
+					<span>
+						<strong>Latest note</strong>
+						<small>{note.title}</small>
+					</span>
+				</button>
+			)}
 
 			{featured.map((p) => (
 				<button

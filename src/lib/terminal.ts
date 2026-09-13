@@ -15,6 +15,15 @@ import { skills } from '../data/skills.ts';
 import { caseStudy, type CaseBlock } from '../data/case-study.ts';
 import { profile, yearsOfExperience, CAREER_START } from '../data/profile.ts';
 import type { AppId } from '../types/windows.ts';
+import {
+	STATUS_LABEL,
+	TOPIC_SHORT,
+	noteBySlug,
+	noteMonth,
+	notes,
+	plannedNotes,
+	writtenNotes,
+} from '../data/notes.ts';
 import { SHORTCUTS, SHORTCUT_NOTE, TIP_PAGES } from '../data/tips.ts';
 
 export type Line = { text: string; tone?: 'dim' | 'accent' | 'error' };
@@ -107,6 +116,7 @@ const APP_WORDS: Record<string, AppId> = {
 	career: 'career',
 	recycle: 'recycle',
 	bin: 'recycle',
+	notes: 'notes',
 	code: 'vscode',
 	vscode: 'vscode',
 };
@@ -114,11 +124,12 @@ const APP_WORDS: Record<string, AppId> = {
 const COMMANDS = [
 	['help', 'this list'],
 	['whoami', 'who is behind the desktop'],
-	['ls [roles|projects|skills]', 'list what is on record'],
-	['cat <role|project|case>', 'read one entry in full'],
+	['ls [roles|projects|skills|notes]', 'list what is on record'],
+	['cat <role|project|case|note>', 'read one entry in full'],
 	['skill <name>', 'where a tool was actually used'],
 	['open <app>', 'open a window'],
 	['uptime', 'years in the industry, computed'],
+	['notes', 'what I am studying, and what is written up'],
 	['tips [keys]', 'what this desktop does, and the keys it answers to'],
 	['contact', 'how to reach me'],
 	['clear', 'clear the screen'],
@@ -197,11 +208,58 @@ export function run(input: string): Result {
 					],
 				};
 			}
-			return { lines: [{ text: `ls: no such listing: ${what}`, tone: 'error' }, dim('try: roles, projects, skills')] };
+			if (what.startsWith('note')) {
+				const done = writtenNotes().length;
+				return {
+					lines: [
+						acc(`${notes.length} notes — ${done} written, ${plannedNotes().length} on the plan`),
+						...notes.map((n) =>
+							p(
+								`  ${n.slug.padEnd(28)}${TOPIC_SHORT[n.topic].padEnd(15)}${STATUS_LABEL[n.status].padEnd(13)}${noteMonth(n)}`,
+							),
+						),
+						dim(''),
+						dim(done ? 'cat <slug> to read one' : 'nothing written up yet — the months above are when each is due'),
+					],
+				};
+			}
+			return { lines: [{ text: `ls: no such listing: ${what}`, tone: 'error' }, dim('try: roles, projects, skills, notes')] };
 		}
 
 		case 'cat': {
 			if (!arg) return { lines: [{ text: 'cat: needs a name', tone: 'error' }] };
+
+			/* An exact slug first, and before the case-study heuristic below: that
+			   one fires on any argument containing "alert" or "billing", which a
+			   note about retries could easily be called. `notes/<slug>` works too,
+			   because Explorer shows them in a folder of that name. */
+			const note = noteBySlug(arg.replace(/^notes\//, ''));
+			if (note) {
+				if (note.status !== 'written') {
+					return {
+						lines: [
+							acc(note.title),
+							dim(`${TOPIC_SHORT[note.topic]} · ${STATUS_LABEL[note.status]} · due ${note.target}`),
+							p(''),
+							...wrap(note.summary).map(p),
+							p(''),
+							dim('not written up yet — ls notes for the rest of the plan'),
+						],
+					};
+				}
+				return {
+					lines: [
+						acc(note.title),
+						dim(`${TOPIC_SHORT[note.topic]} · ${note.date}${note.applies?.length ? ` · ${note.applies.join(' · ')}` : ''}`),
+						p(''),
+						...wrap(note.summary).map(p),
+						p(''),
+						...note.sections.flatMap((sec) => [acc(sec.heading), ...sec.body.flatMap(blockLines), p('')]),
+						dim(`studied from ${note.source.name}`),
+					],
+				};
+			}
+
 			if (
 				arg.startsWith('case') ||
 				arg.includes('aso') ||
@@ -245,7 +303,7 @@ export function run(input: string): Result {
 					lines: [acc(proj.name), p(''), p(proj.description), p(''), dim(proj.tech.join(' · '))],
 				};
 			}
-			return { lines: [{ text: `cat: not found: ${arg}`, tone: 'error' }, dim('ls roles · ls projects · cat case')] };
+			return { lines: [{ text: `cat: not found: ${arg}`, tone: 'error' }, dim('ls roles · ls projects · ls notes · cat case')] };
 		}
 
 		case 'skill': {
@@ -316,6 +374,7 @@ export function run(input: string): Result {
 		case 'roles':
 		case 'projects':
 		case 'skills':
+		case 'notes':
 			return run(`ls ${cmd.toLowerCase()}`);
 
 		case 'contact':
@@ -356,5 +415,6 @@ export function completions(): string[] {
 		...Object.keys(APP_WORDS),
 		...experiences.map((e) => e.short),
 		...skills.map((s) => s.name),
+		...notes.map((n) => n.slug),
 	];
 }

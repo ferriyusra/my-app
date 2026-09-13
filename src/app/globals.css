@@ -4082,6 +4082,19 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 }
 .cs-code code { font: inherit; }
 
+/* Inline code: a name the reader could type, inside a sentence. Tinted
+   rather than boxed — a border on every second word turns prose into a
+   fence, and these sit mid-line where a box would shift the baseline. */
+.cs-ic {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--surface-subtle);
+  font-family: var(--mono);
+  font-size: 0.9em;
+  font-variant-ligatures: none;
+  color: var(--ink);
+}
+
 /* The behaviour table: the one wide thing in the write-up. */
 .cs-table-wrap { margin: 0 0 12px; overflow-x: auto; }
 .cs-table {
@@ -4154,6 +4167,21 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   color: var(--accent);
 }
 .cs-nav-list .cs-num { font-weight: 400; color: var(--ink-muted); }
+/* A note titles itself inside .cs, where the case study is titled by whatever
+   opens it — the window head, Explorer's detail header, the document's fold. */
+.cs > h3 { margin: 0 0 8px; font-size: 19px; line-height: 26px; font-weight: 600; }
+
+/* Where a write-up comes from. The case study links its Markdown record; a
+   note names the course it was studied from and says whose words it is in. */
+.cs-source {
+  margin: 20px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-subtle);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-muted);
+}
+.cs-source a { color: var(--accent); }
 .cs-section { scroll-margin-top: 12px; }
 .cs-section + .cs-section {
   margin-top: 26px;
@@ -5438,6 +5466,138 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 .rb-reason { margin: 0; font-size: 13px; line-height: 21px; max-width: 68ch; }
 
 /* ═══════════════════════════════════════════════════════════
+   NOTES
+   A study log: what is written, and what is still ahead with
+   the month it is due. The list keeps a side pane here, where
+   the Recycle Bin stacks — a note is long prose and wants the
+   width, and its rows are two short lines rather than three
+   columns. Under a narrow window the panes stack anyway.
+   ═══════════════════════════════════════════════════════════ */
+
+/* The container is .nt and the query targets .nt-body inside it: a container
+   query matches descendants, never the element that declares it, so declaring
+   it on .nt-body itself left the panes side by side at every width. */
+.nt {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.nt-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--line-subtle);
+}
+.nt-head h2 { margin: 0; font-size: 15px; font-weight: 600; }
+.nt-head p { margin: 2px 0 0; font-size: 12px; color: var(--ink-muted); }
+
+/* A container query, not a media query: a window is resized on its own and
+   knows nothing about the viewport it floats over. */
+.nt-body {
+  display: grid;
+  grid-template-columns: minmax(0, 232px) minmax(0, 1fr);
+  min-height: 0;
+  flex: 1;
+}
+
+.nt-list {
+  overflow-y: auto;
+  padding: 8px;
+  border-right: 1px solid var(--line-subtle);
+}
+.nt-group + .nt-group { margin-top: 10px; }
+.nt-group-name {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 6px 10px 5px;
+  background: var(--surface);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.nt-row {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.nt-row:hover { background: var(--subtle-hover); }
+.nt-row[data-on] { background: var(--accent-soft); }
+.nt-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.nt-row-title {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+}
+.nt-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+/* The dot is the status at a glance: filled where there is something to
+   read, ringed where there is not yet. */
+.nt-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-disabled);
+}
+.nt-row[data-status='written'] .nt-dot { background: var(--success); }
+.nt-row[data-status='studying'] .nt-dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.nt-detail { overflow-y: auto; padding: 18px 24px 28px; }
+
+/* The pane for a note that is not written yet. It says so, with the month
+   it is due — the whole difference between a study plan and the "Coming
+   soon" page this repository deleted. */
+.nt-soon { max-width: 72ch; }
+.nt-soon h3 { margin: 0 0 8px; font-size: 19px; line-height: 26px; font-weight: 600; }
+.nt-soon-meta { margin: 0 0 12px; font-size: 12px; color: var(--ink-muted); }
+.nt-soon-meta span + span::before { content: '·'; margin: 0 7px; color: var(--ink-disabled); }
+.nt-soon-summary { margin: 0 0 14px; font-size: 15px; line-height: 23px; color: var(--ink); }
+.nt-soon-note {
+  margin: 18px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-subtle);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--ink-muted);
+}
+
+@container (max-width: 640px) {
+  .nt-body {
+    grid-template-columns: none;
+    grid-template-rows: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+  .nt-list { border-right: 0; border-bottom: 1px solid var(--line-subtle); }
+  .nt-detail { padding: 16px 18px 24px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    MOBILE SHELL
    A windowing metaphor needs a pointer and room to overlap.
    Below 900px it gets neither, so the content moves to a
@@ -5759,6 +5919,12 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 
 /* The reversed decisions. Long by nature, so each one is separated rather
    than boxed — a card per entry would read as eight cards, not one argument. */
+/* The notes fold. Each note renders the same .cs block the window and
+   Explorer render, so all this does is space them and rule them apart. */
+.mb-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 26px; }
+.mb-notes > li + li { padding-top: 26px; border-top: 1px solid var(--line-subtle); }
+.mb-notes .cs > h3 { font-size: 16px; line-height: 23px; }
+.mb-notes .cs-section h4 { font-size: 14px; line-height: 20px; }
 .mb-discarded { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
 .mb-discarded > li + li { padding-top: 22px; border-top: 1px solid var(--line-subtle); }
 .mb-discarded h3 { margin: 0; font-size: 14px; }

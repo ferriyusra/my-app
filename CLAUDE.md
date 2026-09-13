@@ -266,6 +266,12 @@ shown only the half that fails concludes the site is broken.
    [src/components/apps/registry.tsx](src/components/apps/registry.tsx) — title,
    blurb, icon, default size, content component.
 4. Optionally list it in `DESKTOP_ITEMS` or `START_PINNED`.
+5. If a visitor should be able to pin it, add it to `PINNABLE` in
+   [src/context/shell-context.tsx](src/context/shell-context.tsx). That list is
+   the allowlist `readPins()` filters stored pins through, so an app missing
+   from it can be pinned and then silently loses the pin on the next reload.
+   `DEFAULT_PINNED` is a separate, deliberately short list — the strip is
+   ordered around the CV being opened.
 
 The registry is the only place that maps an id to a window; the desktop,
 taskbar, Start, Task View and notification centre all read from it.
@@ -277,8 +283,15 @@ specificity — File e**xp**lorer's address bar and e**xp**erience's career bar
 had claimed the same three letters. Neither rule was wrong alone; the cascade
 merged them per-property, so the address bar was silently forced to 52px tall
 with its overflow hidden, in a window whose author never saw the other rule.
-Experience is `ex-` now and `xp-` means Explorer only. `repo.test.ts` fails
-if two apps ever again each style one class name.
+Experience is `ex-` now and `xp-` means Explorer only. Notes is `nt-`.
+`repo.test.ts` fails if two apps ever again each style one class name.
+
+The shared prose classes are the deliberate exception. `cs-` names the blocks
+of a typed write-up rather than the case study in particular, and
+[src/components/content/prose.tsx](src/components/content/prose.tsx) renders
+them for the case study and the notes alike. `repo.test.ts` only polices
+`components/apps`, so the rule is unaffected — and a second identical block
+under another prefix is the duplication it exists to catch.
 
 `globals.css` is organised as: tokens → accents → base → shared controls →
 desktop → windows → taskbar → flyouts → menus → per-app sections → mobile →
@@ -369,10 +382,13 @@ The shell holds one set of typed data and offers several routes through it. All
 of them derive; none of them keep a second copy.
 
 - **Search** ([src/lib/search.ts](src/lib/search.ts)) indexes roles, projects,
-  skills, the case study, the discarded decisions, the tips and the profile — 69 entries
-  built from `src/data`. Start used to filter fourteen app names, so "Pub/Sub"
-  and "Kafka" returned nothing while sitting in the data. A title match outranks
-  a body match, and a result quotes the sentence it matched in.
+  skills, the case study, the discarded decisions, the written notes, the tips
+  and the profile — 70 entries built from `src/data`. Start used to filter
+  fourteen app names, so "Pub/Sub" and "Kafka" returned nothing while sitting in
+  the data. A title match outranks a body match, and a result quotes the
+  sentence it matched in. A hit may carry an `intent`, delivered through
+  `sendIntent` before the window opens, so a match on one of the case study's
+  own sentences lands on the case study rather than on Experience's front page.
 - **Terminal** ([src/lib/terminal.ts](src/lib/terminal.ts)) is a pure
   `(command) → lines` function, which is why it can be tested without a DOM.
   `open <app>` hands a real `AppId` back to the window manager rather than
@@ -388,6 +404,19 @@ of them derive; none of them keep a second copy.
   real, gets no credit either. The tree is smaller now and entirely data.
   Skills deliberately gets no folder: 28 names in a flat list is worse than the
   Skills window, and Tips ▸ What's not here says so.
+- **Notes** ([src/data/notes.ts](src/data/notes.ts)) is the learning log —
+  algorithms and system design, studied through a course and written up in the
+  owner's own words, never reproducing course material. A note is a
+  discriminated union: a `written` one must carry `sections` and a `source`,
+  and a `studying`/`planned` one has no `sections` field to fill with a
+  placeholder, so the honesty is a type rather than a convention.
+  `notes.test.ts` fails when a planned `target` month slips into the past —
+  the exact charge `discarded.ts` levels at `/articles`, a "Coming soon" page
+  whose date had passed — and `applies` must name a real skill or role short,
+  which is what makes a note evidence rather than a blog post. The Notes window
+  shows the whole plan because that is the point of it mid-course; every other
+  surface derives from `writtenNotes()`, so Explorer grows `Documents/Notes/`
+  and the server document grows a fold only once there is something in them.
 - **Desktop gestures** ([src/hooks/use-desktop-gestures.ts](src/hooks/use-desktop-gestures.ts))
   — marquee select and drag-to-rearrange. Same rule as the window frame and the
   cat: the gesture writes to the DOM and dispatches once, on pointer-up. The
@@ -474,7 +503,7 @@ fact. The terminal's `cat case` prints the same rows as text.
 ### Data
 
 All content is typed data under `src/data/` — `profile`, `experience`,
-`projects`, `skills`, `case-study`, `discarded`.
+`projects`, `skills`, `case-study`, `discarded`, `notes`.
 
 The editor window is the exception, and deliberately so: its excerpts are
 **read from the real files at build time** by

@@ -9,7 +9,9 @@ import { projects } from '@/data/projects';
 import { caseStudy } from '@/data/case-study';
 import { discarded } from '@/data/discarded';
 import { BUILT_SUMMARY } from '@/data/tips';
-import DiscardedDetail from './discarded-detail';
+import DiscardedDetail, { when } from './discarded-detail';
+import NoteBody from './note-body';
+import { TOPICS, plannedNotes, writtenNotes } from '@/data/notes';
 
 /**
  * The portfolio as plain semantic HTML, in the response body.
@@ -77,6 +79,8 @@ function Fold({
 
 export default function PortfolioDocument() {
 	const years = yearsOfExperience();
+	const written = writtenNotes();
+	const planned = plannedNotes();
 	const [ny, nm] = profile.nowUpdated.split('-').map(Number);
 	const nowStamp = new Date(ny, nm - 1, 1).toLocaleDateString('en-GB', {
 		month: 'long',
@@ -142,6 +146,7 @@ export default function PortfolioDocument() {
 				<a href='#doc-now'>Now</a>
 				<a href='#doc-skills'>Skills</a>
 				<a href='#doc-projects'>Projects</a>
+				{written.length > 0 && <a href='#doc-notes'>Notes</a>}
 				<a href='#doc-rev'>Decisions reversed</a>
 			</nav>
 
@@ -275,6 +280,34 @@ export default function PortfolioDocument() {
 					))}
 				</ul>
 			</Fold>
+
+			{/* Written notes only, and the fold only when there are some: a
+			    section of promises is the "Coming soon" page this repository
+			    deleted. The plan lives in the Notes window, where it is a study
+			    log rather than a claim in the middle of the evidence. */}
+			{written.length > 0 && (
+				<Fold
+					id='doc-notes'
+					title='Notes'
+					meta={`${written.length} written up`}>
+					<ol className='mb-notes'>
+						{written.map((n) => (
+							<li key={n.slug}>
+								<NoteBody note={n} />
+							</li>
+						))}
+					</ol>
+					{planned.length > 0 && (
+						<p className='mb-note'>
+							Also on the plan:{' '}
+							{planned
+								.map((n) => `${n.title} (${TOPICS[n.topic]}, ${when(n.target)})`)
+								.join('; ')}
+							.
+						</p>
+					)}
+				</Fold>
+			)}
 
 			{/* Open, not folded. PRODUCT.md calls this the thing a neighbouring
 			    portfolio cannot truthfully copy; it spent one release behind a tap

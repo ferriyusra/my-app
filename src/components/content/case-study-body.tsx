@@ -1,27 +1,12 @@
 import { caseStudy, caseStudyLength, type CaseBlock } from '@/data/case-study';
 import CaseStudyNav from './case-study-nav';
+import ProseBlock from './prose';
 
 /**
  * No 'use client' on purpose: the server document renders this into the
  * response body, and the Experience window renders the same component inside
  * the shell. One implementation, so the two never drift.
  */
-
-/** The write-up's prose uses **bold** for lead-ins and *italics* for stress. */
-function emphasise(text: string) {
-	return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, i) => {
-		if (part.startsWith('**') && part.endsWith('**')) {
-			return <strong key={i}>{part.slice(2, -2)}</strong>;
-		}
-		if (part.length > 2 && part.startsWith('*') && part.endsWith('*')) {
-			return <em key={i}>{part.slice(1, -1)}</em>;
-		}
-		return part;
-	});
-}
-
-/** A paragraph that opens with a bold lead-in reads as a run-in heading. */
-const LEAD = /^\*\*[^*]+\*\*\s/;
 
 /** An id for a heading: "The problem" → "the-problem". */
 function slug(heading: string): string {
@@ -39,9 +24,6 @@ function slug(heading: string): string {
  * means the contents list and the headings cannot disagree.
  */
 const num = (i: number) => String(i + 1).padStart(2, '0');
-
-/** What the code box says in its corner. `text` is a formula, and says nothing. */
-const LANG_LABEL: Record<string, string> = { go: 'Go' };
 
 /**
  * The shape of the system as boxes, from `caseStudy.figure` — the write-up's
@@ -85,67 +67,16 @@ function CaseStudyFigure() {
 	);
 }
 
-/** One block of a section. The write-up has paragraphs, lists, code, one table and the figure. */
+/**
+ * One block of a section.
+ *
+ * Paragraphs, lists, code and tables are shared with the learning notes and
+ * rendered by ProseBlock. The figure is the one block only this write-up has,
+ * so it is the one block this file still draws.
+ */
 function Block({ block }: { block: CaseBlock }) {
-	if (typeof block === 'string') {
-		return <p className={LEAD.test(block) ? 'cs-lead' : undefined}>{emphasise(block)}</p>;
-	}
-	switch (block.kind) {
-		case 'list':
-			return (
-				<ul className='cs-list'>
-					{block.items.map((item) => (
-						<li key={item}>{emphasise(item)}</li>
-					))}
-				</ul>
-			);
-		case 'code': {
-			const label = LANG_LABEL[block.lang];
-			return (
-				<div className='cs-code-box'>
-					{/* In the box's own bar, not floating over the code: the code
-					    scrolls sideways and would have run under it. */}
-					{label && (
-						<span className='cs-code-lang' aria-hidden='true'>
-							{label}
-						</span>
-					)}
-					<pre className='cs-code' data-lang={block.lang}>
-						<code>{block.text}</code>
-					</pre>
-				</div>
-			);
-		}
-		case 'table':
-			return (
-				/* The one wide thing in the write-up: it scrolls in its own box
-				   on a phone rather than pushing the page sideways. */
-				<div className='cs-table-wrap'>
-					<table className='cs-table'>
-						<thead>
-							<tr>
-								{block.head.map((h) => (
-									<th key={h} scope='col'>
-										{h}
-									</th>
-								))}
-							</tr>
-						</thead>
-						<tbody>
-							{block.rows.map((row) => (
-								<tr key={row.join('|')}>
-									{row.map((cell, i) => (
-										<td key={i}>{emphasise(cell)}</td>
-									))}
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
-			);
-		case 'figure':
-			return <CaseStudyFigure />;
-	}
+	if (typeof block !== 'string' && block.kind === 'figure') return <CaseStudyFigure />;
+	return <ProseBlock block={block} />;
 }
 
 /**

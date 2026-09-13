@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import {
 	DocumentIcon,
 	FolderIcon,
+	NotesIcon,
 	RecycleIcon,
 } from '@/components/icons/app-icons';
 import { LiBriefcase, LiLayers } from '@/components/icons/line-icons';
@@ -29,6 +30,8 @@ import { profile } from '@/data/profile';
 import { experiences, tenureLabel } from '@/data/experience';
 import { caseStudy } from '@/data/case-study';
 import { discarded } from '@/data/discarded';
+import { TOPICS, writtenNotes } from '@/data/notes';
+import NoteBody from '@/components/content/note-body';
 
 type Loc = { nav: NavKey; item?: string };
 
@@ -78,6 +81,13 @@ export default function ExplorerApp() {
 			...projects.filter((p) => p.featured),
 			...projects.filter((p) => !p.featured),
 		],
+		[],
+	);
+
+	/* Newest first, and only the ones that exist: the folder and its rows both
+	   derive from this, so neither can be a promise. */
+	const written = useMemo(
+		() => [...writtenNotes()].sort((a, b) => b.date.localeCompare(a.date)),
 		[],
 	);
 
@@ -166,6 +176,16 @@ export default function ExplorerApp() {
 					onOpen: () => go({ nav: 'decisions', item: d.name }),
 				}));
 
+			case 'notes':
+				return written.map((n) => ({
+					id: n.slug,
+					name: n.title,
+					type: 'Note',
+					meta: `${TOPICS[n.topic]} · ${when(n.date)}`,
+					icon: <DocumentIcon size={40} />,
+					onOpen: () => go({ nav: 'notes', item: n.slug }),
+				}));
+
 			case 'documents':
 				return [
 					folder(
@@ -180,6 +200,19 @@ export default function ExplorerApp() {
 						caseStudy.title,
 						<FolderIcon size={40} />,
 					),
+					/* The folder appears when there is a note to put in it. An
+					   empty folder teaches the visitor the file metaphor is a
+					   costume, which is what took the fake entries out of here. */
+					...(written.length
+						? [
+								folder(
+									'notes',
+									'Notes',
+									`${written.length} written up`,
+									<NotesIcon size={40} />,
+								),
+							]
+						: []),
 					folder(
 						'decisions',
 						'Decisions reversed',
@@ -198,11 +231,16 @@ export default function ExplorerApp() {
 						`${ordered.length} projects`,
 						<FolderIcon size={40} />,
 					),
-					folder('documents', 'Documents', '4 items', <FolderIcon size={40} />),
+					folder(
+						'documents',
+						'Documents',
+						`${4 + (written.length ? 1 : 0)} items`,
+						<FolderIcon size={40} />,
+					),
 					resume,
 				];
 		}
-	}, [loc.nav, ordered, roles, go]);
+	}, [loc.nav, ordered, roles, written, go]);
 
 	/* ── What is open, if anything ───────────────────────────── */
 
@@ -218,8 +256,13 @@ export default function ExplorerApp() {
 		loc.nav === 'decisions' && loc.item
 			? (discarded.find((d) => d.name === loc.item) ?? null)
 			: null;
+	const openNote =
+		loc.nav === 'notes' && loc.item
+			? (written.find((n) => n.slug === loc.item) ?? null)
+			: null;
 	const openCase = loc.nav === 'case-study' && !!loc.item;
-	const openItem = openProject || openRole || openDecision || openCase;
+	const openItem =
+		openProject || openRole || openDecision || openNote || openCase;
 
 	/* ── Filter and sort ─────────────────────────────────────── */
 
@@ -324,6 +367,10 @@ export default function ExplorerApp() {
 						<article className='xp-detail'>
 							<DiscardedDetail item={openDecision} />
 						</article>
+					) : openNote ? (
+						<article className='xp-detail'>
+							<NoteBody note={openNote} />
+						</article>
 					) : openCase ? (
 						<article className='xp-detail'>
 							{/* The pane used to open on the write-up with no title: the
@@ -388,7 +435,9 @@ export default function ExplorerApp() {
 								? `${openRole.short} · ${openRole.achievements.length} outcomes`
 								: openDecision
 									? `${openDecision.name} · ${openDecision.commit ?? 'never committed'}`
-									: openCase
+									: openNote
+										? `${TOPICS[openNote.topic]} · ${openNote.sections.length} section${openNote.sections.length === 1 ? '' : 's'}`
+										: openCase
 										? `${caseStudy.at} · ${caseStudy.sections.length} sections`
 										: `${shown.length} item${shown.length === 1 ? '' : 's'}`}
 					</span>

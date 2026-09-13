@@ -23,19 +23,28 @@ import { caseStudy, caseStudyText } from '../data/case-study.ts';
 import { discarded } from '../data/discarded.ts';
 import { profile } from '../data/profile.ts';
 import { SHORTCUTS, TIP_PAGES } from '../data/tips.ts';
+import { TOPICS, noteText, writtenNotes } from '../data/notes.ts';
 import type { AppId } from '../types/windows.ts';
 
 export type Hit = {
 	id: string;
 	/** Which window answers this, and what Start should open. */
 	app: AppId;
-	kind: 'Role' | 'Project' | 'Skill' | 'Case study' | 'Discarded' | 'Profile' | 'Tip';
+	kind: 'Role' | 'Project' | 'Skill' | 'Case study' | 'Discarded' | 'Profile' | 'Tip' | 'Note';
 	title: string;
 	subtitle: string;
 	/** Everything matched against; never shown. */
 	haystack: string;
 	/** Score contribution when the title itself matches. */
 	weight: number;
+	/**
+	 * Where in the window to land, handed to `sendIntent` before it opens.
+	 *
+	 * Start could only open an app, so a hit on one of the case study's own
+	 * sentences opened Experience on its landing page and left the reader to
+	 * find it again.
+	 */
+	intent?: string;
 };
 
 /** Built once per module load; the data is static for the life of the page. */
@@ -95,6 +104,7 @@ export function index(): Hit[] {
 		/* One flattening for every block kind, shared with the tests. */
 		haystack: caseStudyText().join(' '),
 		weight: 3,
+		intent: 'case',
 	});
 
 	for (const d of discarded) {
@@ -109,6 +119,20 @@ export function index(): Hit[] {
 		});
 	}
 
+	/* Written notes only. A planned one has no body to match, and a result
+	   that opens onto "not written yet" answers nothing. */
+	for (const n of writtenNotes()) {
+		out.push({
+			id: `note:${n.slug}`,
+			app: 'notes',
+			kind: 'Note',
+			title: n.title,
+			subtitle: `${TOPICS[n.topic]} · ${n.summary}`,
+			haystack: noteText(n).join(' '),
+			weight: 3,
+			intent: n.slug,
+		});
+	}
 	out.push({
 		id: 'profile:now',
 		app: 'about',

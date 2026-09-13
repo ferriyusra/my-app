@@ -16,7 +16,8 @@ export type NavKey =
 	| 'portfolio'
 	| 'roles'
 	| 'case-study'
-	| 'decisions';
+	| 'decisions'
+	| 'notes';
 
 export const NAV: { key: NavKey; label: string; Icon: IconLike }[] = [
 	{ key: 'home', label: 'Home', Icon: LiHome },
@@ -31,6 +32,7 @@ export const LOCATION_LABEL: Record<NavKey, string> = {
 	roles: 'Roles',
 	'case-study': 'Case study',
 	decisions: 'Decisions reversed',
+	notes: 'Notes',
 };
 
 /** The folder each location sits in, which is what Up walks and the
@@ -42,6 +44,7 @@ export const PARENT: Record<NavKey, NavKey | null> = {
 	roles: 'documents',
 	'case-study': 'documents',
 	decisions: 'documents',
+	notes: 'documents',
 };
 
 /** The Quick access entry a location belongs under, for the highlight. */

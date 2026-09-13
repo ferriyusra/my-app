@@ -12,6 +12,7 @@ import RecommendedSection from './recommended-section';
 import PowerMenu from './power-menu';
 import { profile } from '@/data/profile';
 import { excerpt, search, type Hit } from '@/lib/search';
+import { sendIntent } from '@/hooks/use-app-intent';
 
 type Entry = {
 	key: string;
@@ -151,6 +152,9 @@ export default function StartMenu({ onClose }: { onClose: () => void }) {
 													type='button'
 													className='start-hit'
 													onClick={() => {
+														/* The window manager knows how to open an app and not
+														   where in it; the hit carries the rest. */
+														if (h.intent) sendIntent(h.app, h.intent);
 														launch(h.app);
 														onClose();
 													}}>

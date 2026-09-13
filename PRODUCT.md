@@ -75,12 +75,12 @@ copy a repository that publishes its own reversals.
 resizable, snappable windows; taskbar; Start with search; Quick Settings;
 notification centre; File Explorer; a boot → lock → sign-in sequence; a
 desktop cat; personalisation (light/dark, six accents, four CSS wallpapers
-plus any image in `public/background`, brightness, volume). Twelve apps open in
-windows: Tips, About, Explorer, Skills, Experience, Contact (Mail), Media
-Player, Settings, VS Code, Recycle Bin, Career.exe, Terminal.
+plus any image in `public/background`, brightness, volume). Thirteen apps open
+in windows: Tips, About, Explorer, Skills, Experience, Contact (Mail), Media
+Player, Settings, VS Code, Recycle Bin, Notes, Career.exe, Terminal.
 
 **Content is typed data.** `src/data/` holds `profile`, `experience`,
-`projects`, `skills`, `case-study`, `discarded`, `tips`. Every surface derives
+`projects`, `skills`, `case-study`, `discarded`, `notes`, `tips`. Every surface derives
 from it; none keeps a second copy. Derived figures (years of experience, role
 tenure) are computed from ISO dates rather than written down.
 

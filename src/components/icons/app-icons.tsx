@@ -35,4 +35,5 @@ export {
 	LinkedInIcon,
 	MediaIcon,
 	TerminalIcon,
+	NotesIcon,
 } from './line-icons';

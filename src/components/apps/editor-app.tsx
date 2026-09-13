@@ -5,47 +5,7 @@ import { FileCode2, GitBranch, Package, X } from 'lucide-react';
 import { LiBug, LiChevronDown, LiSearch, LiSettings2 } from '@/components/icons/line-icons';
 import { useShell } from '@/context/shell-context';
 import type { SourceFile } from '@/lib/source';
-
-/**
- * A minimal TypeScript highlighter.
- *
- * A full tokeniser (or Shiki) would be several hundred kilobytes to colour
- * five short excerpts. One alternation regex covering comments, strings,
- * keywords and numbers gets the same read at a rounding error of the cost —
- * and because the alternation is ordered, a keyword inside a string or a
- * comment is never mis-coloured.
- */
-const TOKEN =
-	/(\/\/[^\n]*)|('(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|\b(const|let|var|function|return|type|interface|export|import|from|if|else|switch|case|default|new|await|async|for|of|null|true|false|undefined)\b|\b(\d+(?:\.\d+)?)\b/g;
-
-function highlight(line: string) {
-	const out: React.ReactNode[] = [];
-	let last = 0;
-	let m: RegExpExecArray | null;
-	TOKEN.lastIndex = 0;
-
-	while ((m = TOKEN.exec(line))) {
-		if (m.index > last) out.push(line.slice(last, m.index));
-		const [full, comment, string, keyword, num] = m;
-		const cls = comment
-			? 'tk-comment'
-			: string
-				? 'tk-string'
-				: keyword
-					? 'tk-keyword'
-					: num
-						? 'tk-number'
-						: '';
-		out.push(
-			<span key={`${m.index}-${full}`} className={cls}>
-				{full}
-			</span>,
-		);
-		last = m.index + full.length;
-	}
-	if (last < line.length) out.push(line.slice(last));
-	return out;
-}
+import { tokenize } from '@/lib/highlight';
 
 function CodePane({ file }: { file: SourceFile }) {
 	const lines = useMemo(() => file.code.split('\n'), [file.code]);
@@ -57,7 +17,13 @@ function CodePane({ file }: { file: SourceFile }) {
 						<span className='vs-ln' aria-hidden='true'>
 							{i + 1}
 						</span>
-						<span className='vs-line'>{highlight(line)}</span>
+						<span className='vs-line'>
+							{tokenize(line, file.lang).map((t, j) => (
+								<span key={j} className={t.cls}>
+									{t.text}
+								</span>
+							))}
+						</span>
 					</Fragment>
 				))}
 			</code>

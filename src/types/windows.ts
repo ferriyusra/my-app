@@ -12,6 +12,7 @@ export type AppId =
 	| 'settings'
 	| 'vscode'
 	| 'recycle'
+	| 'notes'
 	| 'career'
 	| 'terminal';
 
