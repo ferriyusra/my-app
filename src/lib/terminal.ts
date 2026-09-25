@@ -13,7 +13,7 @@ import { experiences, tenureLabel, tenureMonths } from '../data/experience.ts';
 import { projects } from '../data/projects.ts';
 import { skills } from '../data/skills.ts';
 import { caseStudy, type CaseBlock } from '../data/case-study.ts';
-import { profile, yearsOfExperience, CAREER_START } from '../data/profile.ts';
+import { profile, careerSince } from '../data/profile.ts';
 import type { AppId } from '../types/windows.ts';
 import {
 	STATUS_LABEL,
@@ -168,8 +168,8 @@ export function run(input: string): Result {
 			const months = experiences.reduce((n, e) => n + tenureMonths(e), 0);
 			return {
 				lines: [
-					p(`up ${yearsOfExperience()} years, ${months} months across ${experiences.length} roles`),
-					dim(`since ${CAREER_START} · ${skills.length} tools · load average: steady`),
+					p(`up since ${careerSince()} — ${months} months in role across ${experiences.length} roles`),
+					dim(`${skills.length} tools · load average: steady`),
 				],
 			};
 		}

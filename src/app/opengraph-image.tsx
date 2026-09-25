@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { profile } from '@/data/profile';
+import { profile, careerSince } from '@/data/profile';
 
 /* Rendered at build/request time by Next. Without this, every share of the
    site on LinkedIn / X / WhatsApp showed a blank preview card. */
@@ -103,8 +103,7 @@ export default function OpengraphImage() {
 							maxWidth: 900,
 							lineHeight: 1.4,
 						}}>
-						4+ years building production APIs and event-driven systems across
-						fintech, GovTech health, and automotive.
+						{`Building production APIs and event-driven systems since ${careerSince('year')} across fintech, GovTech health, and automotive.`}
 					</div>
 				</div>
 
