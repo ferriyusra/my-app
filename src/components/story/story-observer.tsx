@@ -5,7 +5,9 @@ import { useEffect } from 'react';
 /**
  * The story's one watcher. It renders nothing; it marks where the reader is.
  *
- * - the nav link of the section on screen (`aria-current`);
+ * - the nav link of the section on screen (`aria-current`), and whether the
+ *   hero is still in view (`data-hero` on the nav) — while it is, the hero's
+ *   own CV button is the one filled action on screen, and the nav's steps back;
  * - the career bar's segment for the role being read (`data-on`);
  * - the case study's contents entry for the part being read;
  * - the run: which step is being told (`data-step` on the figure), and each
@@ -74,10 +76,12 @@ export default function StoryObserver() {
 			}
 		};
 
+		const nav = document.querySelector('.sy-nav');
 		const markSection = () => {
 			const i = passed(sections, 0.4);
 			const id = i >= 0 ? sections[i].id : null;
 			for (const a of navLinks) set(a, 'aria-current', a.getAttribute('data-sy-link') === id ? 'true' : null);
+			if (nav) set(nav, 'data-hero', id === null || id === 'top' ? '' : null);
 			const wasInCareer = inCareer;
 			inCareer = id === 'career';
 			if (inCareer !== wasInCareer) markRole();
@@ -127,8 +131,16 @@ export default function StoryObserver() {
 		};
 		watch(steps, 0.5, markStep);
 		/* The track's visibility follows the viewport, so a resize can turn the
-		   telling on or off. */
-		const onResize = () => markStep();
+		   telling on or off. Once per frame at most: resize fires far faster. */
+		let frame = 0;
+		const onResize = () => {
+			if (frame) return;
+			frame = requestAnimationFrame(() => {
+				frame = 0;
+				markStep();
+			});
+		};
+		stops.push(() => cancelAnimationFrame(frame));
 		window.addEventListener('resize', onResize);
 		stops.push(() => window.removeEventListener('resize', onResize));
 

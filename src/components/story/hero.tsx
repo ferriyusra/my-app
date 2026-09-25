@@ -6,6 +6,7 @@ import { experiences } from '@/data/experience';
 import { run } from '@/lib/terminal';
 import { highlightRole, roleSlug } from '@/lib/story';
 import TerminalPrompt from './terminal-prompt';
+import ExtArrow from './ext-arrow';
 
 /** What the terminal card has already typed when the page arrives. */
 const OPENING = 'ls roles';
@@ -51,9 +52,7 @@ export default function Hero() {
 							target='_blank'
 							rel='noopener noreferrer'>
 							View CV
-							<span className='sy-ext' aria-hidden='true'>
-								↗
-							</span>
+							<ExtArrow />
 						</a>
 						<a className='sy-btn' href={profile.cvDownload} target='_blank' rel='noopener noreferrer'>
 							<LiDownload size={16} />

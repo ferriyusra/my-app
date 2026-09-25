@@ -4,6 +4,7 @@ import ModeLink from '@/components/ui/mode-link';
 import { profile } from '@/data/profile';
 import { BUILT_SUMMARY } from '@/data/tips';
 import { DESKTOP_MIN_WIDTH } from '@/lib/shell-defaults';
+import ExtArrow from './ext-arrow';
 import SectionHead from './section-head';
 
 /**
@@ -44,9 +45,7 @@ export default function Contact() {
 								target='_blank'
 								rel='noopener noreferrer'>
 								View CV
-								<span className='sy-ext' aria-hidden='true'>
-									↗
-								</span>
+								<ExtArrow />
 							</a>
 							<a className='sy-btn' href={profile.cvDownload} target='_blank' rel='noopener noreferrer'>
 								<LiDownload size={16} />

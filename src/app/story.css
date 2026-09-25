@@ -85,6 +85,10 @@ body { background: var(--sy-bg); }
 /* Anchor jumps land below the sticky bar, not under it. */
 html { scroll-padding-top: calc(var(--sy-nav-h) + 16px); }
 
+/* The skip link is rendered by the root layout, outside the story, so it
+   would arrive in the desktop's blue; here it is the story's own action. */
+.skip-link { background: var(--sy-signal); color: var(--sy-on-signal); }
+
 /* ── The root ──
    It maps the shell's Fluent tokens onto the console palette, so
    the components the story shares with the windows — the write-up
@@ -125,6 +129,8 @@ html { scroll-padding-top: calc(var(--sy-nav-h) + 16px); }
 .sy :where(h1, h2, h3, h4, p, ul, ol, dl, figure) { margin: 0; }
 .sy :where(ul, ol) { padding: 0; }
 .sy a { color: inherit; }
+/* No double-tap zoom delay on anything a finger presses. */
+.sy :where(a, button, summary, input) { touch-action: manipulation; }
 .sy :focus-visible { outline: 2px solid var(--sy-signal); outline-offset: 3px; border-radius: 4px; }
 .sy ::selection { background: var(--sy-signal-soft); color: var(--sy-ink); }
 
@@ -167,10 +173,11 @@ html:not([data-shell]) .sy-nojs { display: block; }
   color: var(--sy-on-signal);
 }
 .sy-btn-signal:hover { box-shadow: var(--sy-glow); filter: brightness(1.06); }
-.sy-btn-ghost { border-color: transparent; color: var(--sy-ink-2); }
+/* No edge to fill, so less padding: the four hero actions keep one row. */
+.sy-btn-ghost { padding: 0 12px; border-color: transparent; color: var(--sy-ink-2); }
 .sy-btn-ghost:hover { color: var(--sy-ink); border-color: var(--sy-control); box-shadow: none; }
 .sy-btn-sm { height: 34px; padding: 0 12px; font-size: 14px; border-radius: 8px; }
-.sy-ext { font-family: var(--mono); font-weight: 500; }
+.sy-ext { flex: none; transform: rotate(-45deg); }
 .sy-icon-btn {
   display: inline-grid;
   place-items: center;
@@ -199,8 +206,8 @@ html:not([data-shell]) .sy-nojs { display: block; }
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--sy-signal-line);
   border-radius: 9px;
   color: var(--sy-signal-ink);
@@ -219,7 +226,14 @@ html:not([data-shell]) .sy-nojs { display: block; }
 }
 .sy-links a:hover { color: var(--sy-ink); background: var(--subtle-hover); }
 .sy-links a[aria-current='true'] { color: var(--sy-ink); box-shadow: inset 0 -2px 0 var(--sy-signal); border-radius: 8px 8px 2px 2px; }
-.sy-nav-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.sy-nav-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+/* One filled action per screen: while the hero — whose own CV button is
+   filled — is in view, the nav's steps back to an outline. The observer
+   sets `data-hero`; without scripting the nav keeps the filled one. */
+.sy-nav[data-hero] .sy-btn-signal {
+  background: transparent;
+  color: var(--sy-signal-ink);
+}
 .sy-progress {
   position: absolute;
   left: 0;
@@ -292,7 +306,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   color: var(--sy-muted);
   font: 500 12.5px/1 var(--mono);
   letter-spacing: 0.12em;
@@ -379,8 +393,8 @@ html:not([data-shell]) .sy-nojs { display: block; }
   align-items: center;
   gap: 10px;
   max-width: 100%;
-  margin-bottom: 28px;
-  padding: 7px 16px 7px 12px;
+  margin-bottom: 24px;
+  padding: 8px 16px 8px 12px;
   border: 1px solid var(--sy-border);
   border-radius: 16px;
   background: var(--sy-surface);
@@ -405,7 +419,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   letter-spacing: -0.045em;
 }
 .sy-hero-role {
-  margin-top: 18px;
+  margin-top: 16px;
   color: var(--sy-ink);
   font: 600 clamp(15px, 1.6vw, 18px)/1.4 var(--mono);
   letter-spacing: -0.01em;
@@ -413,7 +427,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
 .sy-hero-role span { color: var(--sy-signal-ink); font-weight: 500; }
 .sy-headline {
   max-width: 24ch;
-  margin-top: 28px;
+  margin-top: 24px;
   color: var(--sy-ink);
   font-size: clamp(24px, 2.7vw, 32px);
   font-weight: 600;
@@ -423,18 +437,18 @@ html:not([data-shell]) .sy-nojs { display: block; }
 }
 .sy-proof {
   max-width: 58ch;
-  margin-top: 18px;
+  margin-top: 16px;
   color: var(--sy-ink-2);
   font-size: 17px;
   line-height: 1.65;
 }
-.sy-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+.sy-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 .sy-current {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: 4px 8px;
-  margin-top: 28px;
+  margin-top: 24px;
   color: var(--sy-muted);
   font-size: 15px;
 }
@@ -442,6 +456,15 @@ html:not([data-shell]) .sy-nojs { display: block; }
 .sy-current a { color: var(--sy-signal-ink); font-weight: 600; text-underline-offset: 3px; }
 .sy-current-when { font: 400 13px/1 var(--mono); }
 .sy-current-when::before { content: '· '; }
+
+/* On a phone the primary action takes the full width, under the thumb, and
+   the two quieter ones share the row beneath it. */
+@media (max-width: 559.98px) {
+  .sy-hero .sy-actions .sy-btn { flex: 1 1 calc(50% - 6px); }
+  .sy-hero .sy-actions .sy-btn:first-child { flex-basis: 100%; }
+  .sy-current-when { flex-basis: 100%; }
+  .sy-current-when::before { content: none; }
+}
 
 /* The terminal card. Real output, rendered on the server. */
 .sy-term {
@@ -459,7 +482,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 11px 14px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--sy-hairline);
   color: var(--sy-muted);
   font: 500 12px/1 var(--mono);
@@ -473,7 +496,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
 }
 .sy-term-body {
   margin: 0;
-  padding: 18px 20px 20px;
+  padding: 16px 20px 20px;
   overflow-x: auto;
   color: var(--sy-ink);
   font: 400 13.5px/1.75 var(--mono);
@@ -495,7 +518,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
 }
 .sy-shipped {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   list-style: none;
 }
 @media (min-width: 760px) {
@@ -507,7 +530,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   flex-direction: column;
   gap: 6px;
   height: 100%;
-  padding: 18px 20px 20px;
+  padding: 20px 24px 24px;
   border: 1px solid var(--sy-border);
   border-radius: 14px;
   background: var(--sy-surface);
@@ -559,13 +582,13 @@ html:not([data-shell]) .sy-nojs { display: block; }
 .sy-tl li[data-current] a { border-color: var(--sy-signal-line); background: var(--sy-signal-soft); color: var(--sy-ink); }
 .sy-tl li[data-on] a { border-color: var(--sy-signal); color: var(--sy-ink); box-shadow: var(--sy-glow); }
 .sy-tl-name { overflow: hidden; font-size: 13.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.sy-tl-when { color: var(--sy-muted); font: 400 11.5px/1.3 var(--mono); white-space: nowrap; }
+.sy-tl-when { color: var(--sy-muted); font: 400 12px/1.3 var(--mono); white-space: nowrap; }
 .sy-tl-axis {
   display: flex;
   justify-content: space-between;
-  margin-top: 6px;
+  margin-top: 8px;
   color: var(--sy-muted);
-  font: 400 11.5px/1 var(--mono);
+  font: 400 12px/1 var(--mono);
 }
 
 .sy-roles {
@@ -597,7 +620,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
 .sy-role-company { margin-top: 8px; color: var(--sy-ink); font-size: 15px; font-weight: 600; line-height: 1.4; }
 .sy-role-place { color: var(--sy-muted); font-size: 14px; }
 
-.sy-role-body { display: grid; gap: 20px; min-width: 0; }
+.sy-role-body { display: grid; gap: 24px; min-width: 0; }
 .sy-role-body h3 {
   display: flex;
   flex-wrap: wrap;
@@ -617,7 +640,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   border: 1px solid var(--sy-signal-line);
   border-radius: 999px;
   color: var(--sy-signal-ink);
-  font: 600 11.5px/1.4 var(--mono);
+  font: 600 12px/1.4 var(--mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -643,7 +666,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 16px 18px;
+  padding: 16px 20px;
   background: var(--sy-surface);
 }
 .sy-stats strong {
@@ -670,7 +693,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   font: 600 18px/1.45 var(--mono);
 }
 .sy-role-desc { max-width: 68ch; color: var(--sy-ink-2); }
-.sy-points { display: grid; gap: 10px; max-width: 72ch; list-style: none; }
+.sy-points { display: grid; gap: 12px; max-width: 72ch; list-style: none; }
 .sy-points li {
   position: relative;
   padding-left: 22px;
@@ -692,6 +715,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 32px;
   color: var(--sy-signal-ink);
   font: 500 13.5px/1.5 var(--mono);
   cursor: pointer;
@@ -706,7 +730,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   display: grid;
   gap: 6px;
   max-width: 560px;
-  padding: 18px 20px;
+  padding: 20px 24px;
   border: 1px solid var(--sy-signal-line);
   border-radius: 14px;
   background: linear-gradient(135deg, var(--sy-signal-soft), transparent 70%), var(--sy-surface);
@@ -879,7 +903,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
 }
 .sy .cs-table tr:last-child td { border-bottom: none; }
 .sy .cs-open {
-  padding: 24px 26px;
+  padding: 24px;
   border: 1px dashed var(--sy-control);
   border-radius: 14px;
 }
@@ -990,7 +1014,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
 /* ═══ Projects ═══ */
 .sy-prod {
   display: grid;
-  gap: 18px;
+  gap: 24px;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   list-style: none;
 }
@@ -1030,7 +1054,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   color: var(--sy-muted);
   font: 700 40px/1 var(--mono);
 }
-.sy-card-body { display: flex; flex: 1; flex-direction: column; gap: 12px; padding: 20px 22px 22px; }
+.sy-card-body { display: flex; flex: 1; flex-direction: column; gap: 12px; padding: 20px 24px 24px; }
 .sy-card-kind { color: var(--sy-signal-ink); font: 500 12px/1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; }
 .sy-card h3 { font-size: 21px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; }
 .sy-card-desc { color: var(--sy-ink-2); font-size: 15.5px; line-height: 1.6; }
@@ -1050,7 +1074,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
 .sy-learn li {
   display: grid;
   gap: 8px 32px;
-  padding: 18px 0;
+  padding: 20px 0;
   border-bottom: 1px solid var(--sy-hairline);
 }
 @media (min-width: 900px) {
@@ -1068,7 +1092,7 @@ html:not([data-shell]) .sy-nojs { display: block; }
   align-items: start;
 }
 .sy-cat {
-  padding: 20px 18px 8px;
+  padding: 20px 20px 8px;
   border: 1px solid var(--sy-border);
   border-radius: 16px;
   background: var(--sy-surface);
@@ -1080,8 +1104,9 @@ html:not([data-shell]) .sy-nojs { display: block; }
   display: grid;
   grid-template-columns: 20px minmax(0, 1fr) auto 12px;
   align-items: center;
-  gap: 10px;
-  padding: 10px 4px;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 4px;
   border-top: 1px solid var(--sy-hairline);
   cursor: pointer;
   list-style: none;
@@ -1128,12 +1153,12 @@ html[data-theme='light'] .sy .icon-adaptive { filter: none; }
    The decision cards are `DiscardedDetail`, the Recycle Bin's own
    detail pane, laid out as a ledger: what and where on the left,
    the reason on the right. */
-.sy-decisions { display: grid; gap: 14px; list-style: none; counter-reset: sy-decision; }
+.sy-decisions { display: grid; gap: 16px; list-style: none; }
 .sy-decision {
   position: relative;
   display: grid;
-  gap: 6px 48px;
-  padding: 24px 26px;
+  gap: 8px 48px;
+  padding: 24px;
   border: 1px solid var(--sy-border);
   border-radius: 16px;
   background: var(--sy-surface);
@@ -1146,7 +1171,7 @@ html[data-theme='light'] .sy .icon-adaptive { filter: none; }
 .sy-decision h3 { color: var(--sy-ink); font: 600 17px/1.35 var(--mono); letter-spacing: -0.01em; }
 .sy .rb-summary { margin: 0; color: var(--sy-ink-2); font-size: 15px; line-height: 1.5; }
 .sy .rb-meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 10px 0 0; }
-.sy .rb-meta dt { color: var(--sy-muted); font: 500 11px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.sy .rb-meta dt { color: var(--sy-muted); font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
 .sy .rb-meta dd { margin: 2px 0 0; color: var(--sy-ink-2); font: 400 13px/1.5 var(--mono); }
 .sy .rb-meta code {
   padding: 1px 7px;
@@ -1192,7 +1217,7 @@ html[data-theme='light'] .sy .icon-adaptive { filter: none; }
 
 .sy-teaser {
   display: grid;
-  gap: 28px;
+  gap: 32px;
   align-items: center;
   margin-top: clamp(64px, 8vw, 96px);
   padding: clamp(20px, 3vw, 32px);
@@ -1271,6 +1296,22 @@ html[data-theme='light'] .sy .icon-adaptive { filter: none; }
 /* ── Notes (only when one is written) ── */
 .sy-notes { display: grid; gap: 40px; list-style: none; }
 
+/* ── Fingers ──
+   A pointer can hit a 34px button; a thumb needs 44. On touch screens
+   every standalone control grows to that, without changing the layout
+   a mouse sees. Links inside a sentence are left alone. */
+@media (pointer: coarse) {
+  .sy-btn-sm { height: 44px; padding: 0 16px; }
+  .sy-icon-btn,
+  .sy-monogram { width: 44px; height: 44px; }
+  .sy-more > summary,
+  .sy-card-links a,
+  .sy-foot-links a,
+  .sy-reach-links a,
+  .sy .cs-nav-list a { display: inline-flex; align-items: center; min-height: 44px; }
+  .sy .cs-nav-list li { align-items: center; }
+}
+
 /* ── The live terminal ──
    The prompt under the opening output. Only with scripting on does
    the card get a scrolling body, so a long `cat case` stays inside
@@ -1347,7 +1388,7 @@ html[data-shell] .sy-term-scroll {
   html[data-shell] .sy-run-stage .sy-run-stop[data-branches] > .sy-node::after { display: none; }
   html[data-shell] .sy-run-stage .sy-run-sets { grid-template-columns: 1fr 1fr; gap: 10px; margin-left: 44px; }
   html[data-shell] .sy-run-stage .sy-run-set { padding: 10px 12px 12px; }
-  html[data-shell] .sy-run-stage .sy-run-set-name { margin-bottom: 8px; font-size: 11px; }
+  html[data-shell] .sy-run-stage .sy-run-set-name { margin-bottom: 8px; font-size: 12px; }
   html[data-shell] .sy-run-stage .sy-run-set ul { gap: 6px; }
   html[data-shell] .sy-run-stage .sy-run-set .sy-node { padding: 6px 10px; }
   html[data-shell] .sy-run-stage .sy-run-set .sy-node-label { font-size: 12.5px; }
@@ -1436,20 +1477,20 @@ html[data-shell] .sy-term-scroll {
   .sy-term,
   .sy-shipped > li {
     animation-name: sy-in;
-    animation-duration: 720ms;
+    animation-duration: 480ms;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     animation-fill-mode: both;
   }
-  .sy-hero-role { animation-delay: 60ms; }
-  .sy-proof { animation-delay: 140ms; }
-  .sy-actions { animation-delay: 200ms; }
-  .sy-term { animation-delay: 220ms; }
-  .sy-current { animation-delay: 260ms; }
-  .sy-shipped > li:nth-child(1) { animation-delay: 320ms; }
-  .sy-shipped > li:nth-child(2) { animation-delay: 390ms; }
-  .sy-shipped > li:nth-child(3) { animation-delay: 460ms; }
+  .sy-hero-role { animation-delay: 40ms; }
+  .sy-proof { animation-delay: 90ms; }
+  .sy-actions { animation-delay: 140ms; }
+  .sy-term { animation-delay: 160ms; }
+  .sy-current { animation-delay: 190ms; }
+  .sy-shipped > li:nth-child(1) { animation-delay: 240ms; }
+  .sy-shipped > li:nth-child(2) { animation-delay: 285ms; }
+  .sy-shipped > li:nth-child(3) { animation-delay: 330ms; }
 
-  /* Hover lifts, and the run's boxes changing state. */
+  /* Lifts, presses, and the run's boxes changing state. */
   .sy-btn,
   .sy-shipped a,
   .sy-card,
@@ -1464,10 +1505,22 @@ html[data-shell] .sy-term-scroll {
       color 200ms ease,
       background-color 200ms ease;
   }
-  .sy-btn:hover,
-  .sy-shipped a:hover,
-  .sy-deep:hover { transform: translateY(-2px); }
-  .sy-card:hover { transform: translateY(-3px); }
+  /* Only where hovering exists: on a touch screen a hover state sticks
+     after the tap, and a card left floating reads as a bug. */
+  @media (hover: hover) {
+    .sy-btn:hover,
+    .sy-shipped a:hover,
+    .sy-deep:hover { transform: translateY(-2px); }
+    .sy-card:hover { transform: translateY(-3px); }
+  }
+  /* A press answers at once: a slight give, released on let-go. */
+  .sy-btn:active,
+  .sy-shipped a:active,
+  .sy-deep:active,
+  .sy-tl a:active {
+    transform: scale(0.98);
+    transition-duration: 80ms;
+  }
   .sy-skill > summary::after { transition: transform 200ms ease; }
 
   /* The packet: a dot that runs down the spine into the box being
@@ -1493,29 +1546,18 @@ html[data-shell] .sy-term-scroll {
 
 @supports (animation-timeline: view()) {
   @media screen and (prefers-reduced-motion: no-preference) {
-    /* Blocks rise into place as they arrive. Leaf blocks only: never
-       one that holds something sticky, because a transformed
-       ancestor unpins it. */
+    /* The blocks that carry a section rise into place as they arrive —
+       its head, its figures and its cards — and the prose between them
+       does not: a paragraph that moves while it is read is in the way.
+       Leaf blocks only: never one that holds something sticky, because a
+       transformed ancestor unpins it. */
     .sy-section .sy-head,
     .sy-stats,
-    .sy-hl,
-    .sy-role-desc,
-    .sy-points,
-    .sy-more,
-    .sy-role-body > .sy-tech,
     .sy-deep,
-    .sy .cs-meta,
-    .sy .cs-summary,
-    .sy .cs-stack,
-    .sy .cs-section > h3,
-    .sy .cs-section > p,
-    .sy .cs-section > .cs-list,
     .sy .cs-code-box,
     .sy .cs-table-wrap,
-    .sy .cs-open,
     .sy-card,
-    .sy-sub,
-    .sy-learn > li,
+    .sy-learn,
     .sy-cat,
     .sy-decision,
     .sy-now,
@@ -1555,7 +1597,7 @@ html[data-shell] .sy-term-scroll {
   from { opacity: 0; translate: 0 14px; }
 }
 @keyframes sy-rise {
-  from { opacity: 0; translate: 0 28px; }
+  from { opacity: 0; translate: 0 20px; }
 }
 @keyframes sy-draw {
   from { clip-path: inset(0 100% 0 0 round 8px); }

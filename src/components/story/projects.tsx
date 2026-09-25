@@ -4,6 +4,7 @@ import { LiArrowRight } from '@/components/icons/line-icons';
 import { projects, type Project } from '@/data/projects';
 import { caseStudy } from '@/data/case-study';
 import { tokenize } from '@/lib/highlight';
+import ExtArrow from './ext-arrow';
 import SectionHead from './section-head';
 
 /** Lines of the write-up's Go shown on the card that has no screenshot. */
@@ -89,12 +90,12 @@ function ProductionCard({ p }: { p: Project }) {
 					)}
 					{p.demo && (
 						<a href={p.demo} target='_blank' rel='noopener noreferrer'>
-							{linkLabel(p.demo, 'demo')} <span aria-hidden='true'>↗</span>
+							{linkLabel(p.demo, 'demo')} <ExtArrow />
 						</a>
 					)}
 					{p.github && (
 						<a href={p.github} target='_blank' rel='noopener noreferrer'>
-							{linkLabel(p.github, 'github')} <span aria-hidden='true'>↗</span>
+							{linkLabel(p.github, 'github')} <ExtArrow />
 						</a>
 					)}
 				</p>
@@ -139,12 +140,12 @@ export default function Projects() {
 							<p className='sy-card-links'>
 								{p.demo && (
 									<a href={p.demo} target='_blank' rel='noopener noreferrer'>
-										{linkLabel(p.demo, 'demo')} <span aria-hidden='true'>↗</span>
+										{linkLabel(p.demo, 'demo')} <ExtArrow />
 									</a>
 								)}
 								{p.github && (
 									<a href={p.github} target='_blank' rel='noopener noreferrer'>
-										{linkLabel(p.github, 'github')} <span aria-hidden='true'>↗</span>
+										{linkLabel(p.github, 'github')} <ExtArrow />
 									</a>
 								)}
 							</p>
