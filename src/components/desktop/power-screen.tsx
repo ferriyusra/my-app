@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { LiPower } from '@/components/icons/line-icons';
 import { useShell } from '@/context/shell-context';
 import WindowsLogo from '@/components/ui/windows-logo';
+import ModeLink from '@/components/ui/mode-link';
 
 /**
  * What the screen shows once Start's power button has been used: asleep, or
@@ -58,6 +59,9 @@ export default function PowerScreen() {
 						<LiPower size={18} aria-hidden='true' />
 						Turn on
 					</button>
+					<ModeLink className='power-link' href='/'>
+						Or read the portfolio page
+					</ModeLink>
 				</>
 			)}
 		</motion.div>

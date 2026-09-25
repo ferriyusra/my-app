@@ -54,17 +54,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		if (!mounted) return;
 		document.documentElement.setAttribute('data-theme', theme);
+	}, [theme, mounted]);
+
+	/* Stored only when the visitor chooses, never on mount. Writing it on mount
+	   saved whatever the page defaulted to as if it were a choice: the story
+	   defaults to dark and the desktop to the system setting, and one visit to
+	   either would have pinned the other to it. */
+	const toggle = useCallback(() => {
+		const next: Theme = theme === 'light' ? 'dark' : 'light';
 		try {
-			localStorage.setItem('theme', theme);
+			localStorage.setItem('theme', next);
 		} catch {
 			// Private mode / storage disabled — theme still applies for this session.
 		}
-	}, [theme, mounted]);
-
-	const toggle = useCallback(
-		() => setTheme((t) => (t === 'light' ? 'dark' : 'light')),
-		[],
-	);
+		setTheme(next);
+	}, [theme]);
 
 	const value = useMemo(
 		() => ({ theme, toggle, mounted }),

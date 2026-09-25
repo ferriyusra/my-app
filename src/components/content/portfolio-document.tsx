@@ -12,6 +12,7 @@ import { BUILT_SUMMARY } from '@/data/tips';
 import DiscardedDetail, { when } from './discarded-detail';
 import NoteBody from './note-body';
 import { TOPICS, plannedNotes, writtenNotes } from '@/data/notes';
+import ModeLink from '@/components/ui/mode-link';
 
 /**
  * The portfolio as plain semantic HTML, in the response body.
@@ -134,6 +135,10 @@ export default function PortfolioDocument() {
 				<a className='fl-btn fl-btn-standard' href={`mailto:${profile.email}`}>
 					<LiMail size={15} aria-hidden='true' /> Email
 				</a>
+				{/* Only where the desktop can run: a wide screen, with scripting on. */}
+				<ModeLink className='fl-btn fl-btn-standard mb-desk' href='/desktop'>
+					Open the desktop
+				</ModeLink>
 			</div>
 
 			{/* The document is ten screens long on a phone. Five anchors, so a

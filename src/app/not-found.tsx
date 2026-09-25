@@ -11,12 +11,12 @@ export default function NotFound() {
 				</span>
 				<h1>Page not found</h1>
 				<p>
-					That page doesn&rsquo;t exist or has moved. Everything lives on the
-					desktop.
+					That page doesn&rsquo;t exist or has moved. Everything is on the
+					portfolio page, and the desktop is one click from there.
 				</p>
 				<Link href='/' className='fl-btn fl-btn-accent'>
 					<LiArrowLeft size={15} aria-hidden='true' />
-					Back to desktop
+					Back to the portfolio
 				</Link>
 			</div>
 		</main>

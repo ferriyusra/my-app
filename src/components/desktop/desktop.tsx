@@ -27,9 +27,7 @@ import type { AppId } from '@/types/windows';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
 import BootScreen from './boot-screen';
-
-/** Below this width a windowing metaphor stops being usable. */
-const DESKTOP_MIN = 900;
+import { DESKTOP_MIN_WIDTH } from '@/lib/shell-defaults';
 
 /** Everything that counts as shell furniture rather than bare wallpaper. */
 const SURFACES = '.desk-icon, .win, .taskbar, .flyout, .menu, .taskview, .toast';
@@ -634,7 +632,7 @@ function Viewport() {
 	const { booted } = useShell();
 
 	useEffect(() => {
-		const mq = window.matchMedia(`(min-width: ${DESKTOP_MIN}px)`);
+		const mq = window.matchMedia(`(min-width: ${DESKTOP_MIN_WIDTH}px)`);
 		const sync = () => {
 			setWide(mq.matches);
 			document.documentElement.dataset.shell = mq.matches

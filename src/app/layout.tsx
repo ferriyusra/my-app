@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import { DEFAULT_WALLPAPER } from '@/lib/shell-defaults';
+import { bootScript } from '@/lib/boot';
+import { profile } from '@/data/profile';
 
 /**
  * Segoe UI Variable is the Windows 11 system face, so a Windows visitor gets
@@ -22,8 +23,7 @@ const inter = Inter({
 });
 
 const TITLE = 'Ferri Yusra — Backend Engineer';
-const DESCRIPTION =
-	'Backend engineer building scalable API systems across fintech, GovTech health and automotive. Go, Node.js and PostgreSQL — presented as a Windows 11 desktop.';
+const DESCRIPTION = `${profile.bio} Go, Node.js and PostgreSQL — and a Windows 11 desktop to explore.`;
 
 export const metadata: Metadata = {
 	title: TITLE,
@@ -53,31 +53,15 @@ export const viewport = {
 };
 
 /**
- * Applies theme, accent, wallpaper — and which shell is in charge — before
- * first paint.
+ * Sets what the stylesheet keys off — theme, and on `/desktop` the accent,
+ * wallpaper and `data-shell` — before first paint. See `src/lib/boot.ts`,
+ * where it lives as a string so it can be tested by running it.
  *
- * All four are plain attributes on <html> that the stylesheet keys off, so
- * running this ahead of hydration is what stops a stored dark desktop from
- * flashing light.
- *
- * A custom wallpaper is a filename rather than a fixed id, so the name is
- * pattern-checked here before it reaches a CSS `url()` — anything that could
- * close the quote is refused and the default stands.
- *
- * `data-shell` is the one that matters most: the portfolio document is in the
- * server HTML, and on a wide screen it has to be out of the way before
- * anything paints. Setting it here rather than in React also means it is only
- * ever set when scripting is on — so a visitor without JavaScript keeps the
- * document, and never sees the black holding screen meant for the desktop.
+ * `data-shell` is only ever set by this script, so its absence means scripting
+ * is off: the page then shows what the server rendered, and never the black
+ * holding screen meant for the desktop.
  */
-const BOOT = `try{var d=document.documentElement,g=function(k,f){try{return localStorage.getItem(k)||f}catch(e){return f}};
-var t=g('theme',null);if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme:dark)').matches))d.setAttribute('data-theme','dark');
-d.setAttribute('data-accent',g('shell:accent','blue'));
-var w=g('shell:wallpaper','${DEFAULT_WALLPAPER}'),cw=w.indexOf('custom:')===0?w.slice(7):'';
-if(cw&&/^[A-Za-z0-9][\\w.-]*$/.test(cw)){d.setAttribute('data-wallpaper','custom');d.style.setProperty('--wp-custom','url("/background/'+encodeURIComponent(cw)+'")');}
-else d.setAttribute('data-wallpaper',cw?'bloom':w);
-d.setAttribute('data-shell',matchMedia('(min-width: 900px)').matches?'desktop':'document');
-var b=g('shell:brightness','1');if(b)d.style.setProperty('--screen-dim',String(Math.max(0,Math.min(0.65,1-parseFloat(b)||0))));}catch(e){}`;
+const BOOT = bootScript();
 
 export default function RootLayout({
 	children,

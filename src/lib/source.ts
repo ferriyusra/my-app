@@ -12,7 +12,7 @@ import path from 'node:path';
  * the worst kind of bug, because it is invisible.
  *
  * So nothing is copied now. A symbol is named, and the file is read at build
- * time, on the server where `page.tsx` renders — the same trick
+ * time, on the server where `desktop/page.tsx` renders — the same trick
  * [wallpapers.ts](./wallpapers.ts) uses, and for the same reason: that page is
  * statically prerendered, so this happens once at build and is baked into the
  * HTML. No API route, no runtime filesystem access.

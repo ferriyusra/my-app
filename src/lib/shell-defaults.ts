@@ -25,3 +25,13 @@ export const DEFAULT_WALLPAPER = 'custom:bloom-photo.jpeg';
 
 /** What it falls back to: always present, because it is drawn in CSS. */
 export const FALLBACK_WALLPAPER = 'bloom';
+
+/**
+ * Below this viewport width a windowing metaphor stops being usable, so the
+ * desktop steps aside for the story.
+ *
+ * Shared because two places decide it: the inline boot script, before first
+ * paint, and the desktop itself, when the viewport changes afterwards. Two
+ * copies of 900 is how a resize ends up showing one thing and a reload another.
+ */
+export const DESKTOP_MIN_WIDTH = 900;

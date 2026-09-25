@@ -4,7 +4,7 @@ import path from 'node:path';
 /**
  * Wallpapers dropped into `public/background` by hand.
  *
- * The directory is read on the server, where `page.tsx` renders — a browser
+ * The directory is read on the server, where `desktop/page.tsx` renders — a browser
  * cannot list a folder, and `public/` has no index. Because that page is
  * statically prerendered, the read happens at build time and the result is
  * baked into the HTML: no API route, no runtime filesystem access (which is

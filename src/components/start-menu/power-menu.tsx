@@ -1,13 +1,19 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { RotateCw } from 'lucide-react';
+import { LogOut, RotateCw } from 'lucide-react';
 import { LiMoon, LiPower } from '@/components/icons/line-icons';
+import ModeLink from '@/components/ui/mode-link';
 
 /**
  * The little sheet that flies up from Start's power button. Sleep and Restart
  * both do something visible rather than sitting inert: sleep blanks the
  * screen, restart replays the boot.
+ *
+ * The last item leaves the desktop for the portfolio page. Windows keeps Sign
+ * out under the account button rather than here, but that button is the
+ * mail link on this Start, and a visitor who arrived straight at /desktop
+ * needs a way to the story that does not depend on the back button.
  */
 export default function PowerMenu({
 	onClose,
@@ -43,6 +49,10 @@ export default function PowerMenu({
 			<button type='button' role='menuitem' onClick={onShutdown}>
 				<LiPower size={16} aria-hidden='true' /> Shut down
 			</button>
+			<span className='power-sep' role='separator' />
+			<ModeLink href='/' role='menuitem'>
+				<LogOut size={16} aria-hidden='true' /> Back to the portfolio
+			</ModeLink>
 		</div>
 	);
 }
