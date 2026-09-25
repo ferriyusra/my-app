@@ -12,6 +12,7 @@ import Stack from './stack';
 import Notes from './notes';
 import Decisions from './decisions';
 import Contact from './contact';
+import StoryObserver from './story-observer';
 
 /**
  * The portfolio at `/`: one page, told in the order a technical reader checks
@@ -57,6 +58,7 @@ export default function Story({ className = '' }: { className?: string }) {
 				</div>
 			</footer>
 			<PrintExpander scope='.sy' />
+			<StoryObserver />
 		</div>
 	);
 }

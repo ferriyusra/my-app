@@ -5716,6 +5716,35 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 }
 
 /* ═══════════════════════════════════════════════════════════
+   BETWEEN THE STORY AND THE DESKTOP
+   Moving from / to /desktop is a full page load — each mode sets
+   <html> before first paint — and the browser's cross-document
+   view transition turns that load into a fade: the story settles
+   back into the black the boot sequence starts from, and the way
+   back fades up. Both documents load this file, which is what
+   opts both of them in. Off under reduced motion; the global rule
+   below does not reach the transition's pseudo-elements.
+   ═══════════════════════════════════════════════════════════ */
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) {
+    animation-name: vt-out;
+    animation-duration: 240ms;
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+    animation-fill-mode: both;
+  }
+  ::view-transition-new(root) {
+    animation-name: vt-in;
+    animation-duration: 360ms;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    animation-fill-mode: both;
+  }
+}
+@keyframes vt-out { to { opacity: 0; transform: scale(0.985); } }
+@keyframes vt-in { from { opacity: 0; } }
+
+/* ═══════════════════════════════════════════════════════════
    REDUCED MOTION
    Keep every state change, drop every animation.
    ═══════════════════════════════════════════════════════════ */

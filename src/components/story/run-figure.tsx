@@ -1,4 +1,4 @@
-import { runFigure, type RunNode } from '@/lib/story';
+import { runFigure, runSteps, type RunNode } from '@/lib/story';
 
 /**
  * The case study's figure, drawn for the story: the run as a spine, top to
@@ -14,6 +14,11 @@ import { runFigure, type RunNode } from '@/lib/story';
  * Every box carries a `data-node` id. With scripting on, the scroll observer
  * uses them to light the box whose step is on screen; without it — or under
  * reduced motion — every box is simply lit, which is what the HTML says.
+ *
+ * The step track beside it is what the reader scrolls through on a wide
+ * screen: one card per step of `runSteps()`, each quoting only the figure's
+ * own words. It repeats what the boxes already say, so it is hidden from
+ * assistive tech, and CSS only shows it where the run is told step by step.
  */
 function Box({ node, as: Tag = 'span' }: { node: RunNode; as?: 'span' | 'li' }) {
 	return (
@@ -26,6 +31,8 @@ function Box({ node, as: Tag = 'span' }: { node: RunNode; as?: 'span' | 'li' }) 
 
 export default function RunFigure() {
 	const fig = runFigure();
+	const steps = runSteps(fig);
+	const pad = (n: number) => String(n).padStart(2, '0');
 	return (
 		<figure className='sy-run' data-sy-run>
 			<div className='sy-run-stage'>
@@ -55,6 +62,17 @@ export default function RunFigure() {
 					})}
 				</ol>
 			</div>
+			<ol className='sy-run-track' aria-hidden='true'>
+				{steps.map((s, i) => (
+					<li key={s.title} data-sy-step={i} data-lights={s.lights.join(' ')}>
+						<span className='sy-step-n'>
+							{pad(i + 1)} / {pad(steps.length)}
+						</span>
+						<span className='sy-step-title'>{s.title}</span>
+						{s.detail && <span className='sy-step-detail'>{s.detail}</span>}
+					</li>
+				))}
+			</ol>
 			<figcaption className='sy-run-cap'>{fig.caption}</figcaption>
 		</figure>
 	);

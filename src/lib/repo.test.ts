@@ -13,6 +13,26 @@ import { test } from 'node:test';
 const CSS_PATH = 'src/app/globals.css';
 const css = readFileSync(CSS_PATH, 'utf8');
 
+/** Every stylesheet the app ships, whichever route imports it. */
+function cssFiles(dir = 'src/app', out: string[] = []): string[] {
+	for (const entry of readdirSync(dir)) {
+		const path = join(dir, entry);
+		if (statSync(path).isDirectory()) cssFiles(path, out);
+		else if (path.endsWith('.css')) out.push(path);
+	}
+	return out;
+}
+
+/** The declarations of every innermost `{ … }` block, with the file it is in. */
+function declarationBlocks(): { file: string; body: string }[] {
+	const blocks: { file: string; body: string }[] = [];
+	for (const file of cssFiles()) {
+		const text = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+		for (const m of text.matchAll(/\{([^{}]*)\}/g)) blocks.push({ file, body: m[1] });
+	}
+	return blocks;
+}
+
 function tsxFiles(dir = 'src', out: string[] = []): string[] {
 	for (const entry of readdirSync(dir)) {
 		const path = join(dir, entry);
@@ -123,6 +143,39 @@ test('the accent picker shows the colour selecting it produces', () => {
 			);
 			assert.equal(override![1], dark);
 		}
+	}
+});
+
+test('a scroll-driven animation is never written with the shorthand', () => {
+	/* Lightning CSS folds `animation-timeline` into the `animation` shorthand
+	   whenever every browser target supports scroll-driven animations — and
+	   Chrome drops a shorthand that carries a timeline, so the animation
+	   silently never runs. The same class of bug as the backdrop-filter pair
+	   below: fine in the source, gone in the build. Longhands only. */
+	const folded = declarationBlocks().filter(
+		({ body }) => /animation-timeline\s*:/.test(body) && /(^|[;\s])animation\s*:/.test(body),
+	);
+	assert.deepEqual(
+		folded.map(({ file, body }) => `${file}: ${body.trim().slice(0, 80)}`),
+		[],
+		'a block sets animation-timeline alongside the animation shorthand',
+	);
+	assert.ok(
+		declarationBlocks().some(({ body }) => /animation-timeline\s*:/.test(body)),
+		'no scroll-driven animation found at all — has the story stylesheet moved?',
+	);
+});
+
+test('backdrop-filter is never prefixed by hand', () => {
+	/* Lightning CSS collapses an explicit standard + prefixed pair to the
+	   prefixed property alone, which Chrome no longer honours, and every
+	   acrylic surface went opaque (CLAUDE.md). The build adds the prefix. */
+	for (const file of cssFiles()) {
+		assert.doesNotMatch(
+			readFileSync(file, 'utf8'),
+			/-webkit-backdrop-filter/,
+			`${file} writes -webkit-backdrop-filter by hand`,
+		);
 	}
 });
 

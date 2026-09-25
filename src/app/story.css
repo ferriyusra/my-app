@@ -1271,29 +1271,303 @@ html[data-theme='light'] .sy .icon-adaptive { filter: none; }
 /* ── Notes (only when one is written) ── */
 .sy-notes { display: grid; gap: 40px; list-style: none; }
 
+/* ── The live terminal ──
+   The prompt under the opening output. Only with scripting on does
+   the card get a scrolling body, so a long `cat case` stays inside
+   it; without scripting there is nothing to type and the card is
+   exactly its output. */
+html[data-shell] .sy-term-scroll {
+  max-height: 440px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.sy-term[data-cleared] .sy-term-body { display: none; }
+.sy-term-live { padding: 0 20px 16px; font: 400 13.5px/1.75 var(--mono); }
+.sy-term[data-cleared] .sy-term-live { padding-top: 16px; }
+/* Laid out by terminal.ts for a 72-column terminal: kept as laid out, and
+   scrolled sideways where the card is narrower, as a terminal would. */
+.sy-term-log .sy-term-line { margin: 0; white-space: pre; }
+.sy-term-entry { margin-bottom: 10px; }
+.sy-term-prompt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 6px;
+  margin-inline: -6px;
+  border-radius: 6px;
+}
+.sy-term-prompt:focus-within { outline: 2px solid var(--sy-signal); outline-offset: 2px; }
+.sy-term-input {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--sy-ink);
+  font: inherit;
+  caret-color: var(--sy-signal);
+}
+.sy .sy-term-input:focus-visible { outline: none; }
+.sy-term-hint { margin-top: 8px; color: var(--sy-muted); font-size: 12px; line-height: 1.5; }
+
+/* ── The run, told step by step ──
+   Where there is room and the reader has not asked for less motion,
+   the figure pins beside a track of steps, and the scroll observer
+   lights each box as its step crosses the middle of the screen.
+   Everywhere else the track is hidden and the figure stays whole. */
+.sy-run-track { display: none; }
+
+@media screen and (min-width: 1024px) and (min-height: 700px) and (prefers-reduced-motion: no-preference) {
+  html[data-shell] .sy-run {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+    column-gap: 36px;
+    padding-bottom: 0;
+  }
+  html[data-shell] .sy-run-stage {
+    position: sticky;
+    top: calc(var(--sy-nav-h) + 24px);
+    align-self: start;
+    padding-bottom: 28px;
+  }
+  html[data-shell] .sy-run-track {
+    display: grid;
+    padding: 16svh 0 24svh;
+    list-style: none;
+  }
+  html[data-shell] .sy-run-cap { grid-column: 1 / -1; margin-top: 0; padding-bottom: 28px; }
+
+  /* Compact while pinned: labels only — each step card carries the
+     detail — and the sets tucked under the service that owns them. */
+  html[data-shell] .sy-run-stage .sy-node-detail { display: none; }
+  html[data-shell] .sy-run-stage .sy-node { padding: 9px 14px; }
+  html[data-shell] .sy-run-stage .sy-run-stop { padding-bottom: 22px; }
+  html[data-shell] .sy-run-stage .sy-run-stop[data-branches] { grid-template-columns: 1fr; }
+  html[data-shell] .sy-run-stage .sy-run-stop[data-branches] > .sy-node::after { display: none; }
+  html[data-shell] .sy-run-stage .sy-run-sets { grid-template-columns: 1fr 1fr; gap: 10px; margin-left: 44px; }
+  html[data-shell] .sy-run-stage .sy-run-set { padding: 10px 12px 12px; }
+  html[data-shell] .sy-run-stage .sy-run-set-name { margin-bottom: 8px; font-size: 11px; }
+  html[data-shell] .sy-run-stage .sy-run-set ul { gap: 6px; }
+  html[data-shell] .sy-run-stage .sy-run-set .sy-node { padding: 6px 10px; }
+  html[data-shell] .sy-run-stage .sy-run-set .sy-node-label { font-size: 12.5px; }
+
+  html[data-shell] .sy-run-track li {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36svh;
+    padding-left: 20px;
+    border-left: 2px solid var(--sy-hairline);
+    color: var(--sy-muted);
+  }
+  html[data-shell] .sy-run-track li[data-on] { border-left-color: var(--sy-signal); color: var(--sy-ink-2); }
+  html[data-shell] .sy-run-track li:not([data-on]) .sy-step-title { color: var(--sy-muted); }
+}
+.sy-step-n { color: var(--sy-muted); font: 500 12px/1 var(--mono); letter-spacing: 0.08em; }
+.sy-step-title { color: var(--sy-ink); font: 600 20px/1.3 var(--mono); letter-spacing: -0.01em; }
+.sy-step-detail { font-size: 15.5px; line-height: 1.55; }
+
+/* A box's state while its step is told. Distinct in shape, not
+   only in colour: what is still to come is dashed, the box being
+   told is double-edged and glowing, and what has been told is
+   ticked. */
+.sy-run[data-step] .sy-node[data-state='next'] {
+  border-style: dashed;
+  border-color: var(--sy-control);
+  /* Opaque, or the spine behind it shows through the label. */
+  background: var(--sy-surface);
+}
+.sy-run[data-step] .sy-node[data-state='next'] .sy-node-label { color: var(--sy-muted); }
+.sy-run[data-step] .sy-node[data-state='current'] {
+  border-color: var(--sy-signal);
+  background: var(--sy-signal-soft);
+  box-shadow: var(--sy-glow), inset 0 0 0 1px var(--sy-signal);
+}
+.sy-run[data-step] .sy-node[data-state='done'] .sy-node-label::after {
+  content: '✓';
+  margin-left: 8px;
+  color: var(--sy-signal-ink);
+  font-weight: 700;
+}
+.sy-run[data-step] .sy-run-set:has(.sy-node[data-state='current']) {
+  border-style: solid;
+  border-color: var(--sy-signal-line);
+}
+
 /* ═══════════════════════════════════════════════════════════
    MOTION
-   Only where the reader has not asked for less, and only on
-   screen. Hover lifts are the whole of it for now.
+   Three systems and no more: CSS scroll timelines for what moves
+   with the scroll, one observer island for what marks the
+   reader's place, and the platform's own transitions for folds
+   and for the step between the story and the desktop
+   (globals.css). All of it only on screen, and only where the
+   reader has not asked for less — the global reduced-motion rule
+   shortens durations, which does not stop an animation driven by
+   scroll position, so every rule here is behind the query too.
+
+   Scroll-timeline rules are written in longhands, never with the
+   `animation` shorthand: Lightning CSS folds a timeline into the
+   shorthand when every browser target supports it, and Chrome
+   drops that declaration. repo.test.ts holds this line.
    ═══════════════════════════════════════════════════════════ */
 @media screen and (prefers-reduced-motion: no-preference) {
+  html:focus-within { scroll-behavior: smooth; }
+
+  /* Folds open and close rather than snapping. */
+  .sy { interpolate-size: allow-keywords; }
+  .sy details:not(.sy-menu)::details-content {
+    height: 0;
+    overflow: clip;
+    transition:
+      height 300ms cubic-bezier(0.16, 1, 0.3, 1),
+      content-visibility 300ms allow-discrete;
+  }
+  .sy details:not(.sy-menu)[open]::details-content { height: auto; }
+
+  /* The hero arrives. Not the name or the headline: those are what
+     the browser paints first, and fading them would only delay it. */
+  .sy-status,
+  .sy-hero-role,
+  .sy-proof,
+  .sy-actions,
+  .sy-current,
+  .sy-term,
+  .sy-shipped > li {
+    animation-name: sy-in;
+    animation-duration: 720ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+  .sy-hero-role { animation-delay: 60ms; }
+  .sy-proof { animation-delay: 140ms; }
+  .sy-actions { animation-delay: 200ms; }
+  .sy-term { animation-delay: 220ms; }
+  .sy-current { animation-delay: 260ms; }
+  .sy-shipped > li:nth-child(1) { animation-delay: 320ms; }
+  .sy-shipped > li:nth-child(2) { animation-delay: 390ms; }
+  .sy-shipped > li:nth-child(3) { animation-delay: 460ms; }
+
+  /* Hover lifts, and the run's boxes changing state. */
   .sy-btn,
   .sy-shipped a,
   .sy-card,
   .sy-deep,
-  .sy-tl a {
+  .sy-tl a,
+  .sy-run-track li,
+  .sy-run[data-step] .sy-node {
     transition:
-      border-color 160ms ease,
-      box-shadow 200ms ease,
-      transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
-      color 160ms ease,
-      background-color 160ms ease;
+      border-color 200ms ease,
+      box-shadow 240ms ease,
+      transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+      color 200ms ease,
+      background-color 200ms ease;
   }
   .sy-btn:hover,
   .sy-shipped a:hover,
   .sy-deep:hover { transform: translateY(-2px); }
   .sy-card:hover { transform: translateY(-3px); }
   .sy-skill > summary::after { transition: transform 200ms ease; }
+
+  /* The packet: a dot that runs down the spine into the box being
+     told. Twice, then still — nothing here moves for longer than a
+     few seconds unasked. */
+  .sy-run[data-step] .sy-run-stop:not(:first-child) > .sy-node[data-state='current']::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: -20px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--sy-signal);
+    box-shadow: 0 0 10px var(--sy-signal);
+    animation-name: sy-packet;
+    animation-duration: 900ms;
+    animation-timing-function: cubic-bezier(0.3, 0.7, 0.4, 1);
+    animation-iteration-count: 2;
+    animation-fill-mode: both;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    /* Blocks rise into place as they arrive. Leaf blocks only: never
+       one that holds something sticky, because a transformed
+       ancestor unpins it. */
+    .sy-section .sy-head,
+    .sy-stats,
+    .sy-hl,
+    .sy-role-desc,
+    .sy-points,
+    .sy-more,
+    .sy-role-body > .sy-tech,
+    .sy-deep,
+    .sy .cs-meta,
+    .sy .cs-summary,
+    .sy .cs-stack,
+    .sy .cs-section > h3,
+    .sy .cs-section > p,
+    .sy .cs-section > .cs-list,
+    .sy .cs-code-box,
+    .sy .cs-table-wrap,
+    .sy .cs-open,
+    .sy-card,
+    .sy-sub,
+    .sy-learn > li,
+    .sy-cat,
+    .sy-decision,
+    .sy-now,
+    .sy-reach,
+    .sy-teaser {
+      animation-name: sy-rise;
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+
+    /* The career bar draws itself, oldest role first. */
+    .sy-tl li {
+      animation-name: sy-draw;
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry calc(10% + var(--i, 0) * 8%) entry calc(50% + var(--i, 0) * 8%);
+    }
+
+    /* How far through the story the reader is, along the nav. */
+    .sy-progress {
+      visibility: visible;
+      animation-name: sy-grow;
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@keyframes sy-in {
+  from { opacity: 0; translate: 0 14px; }
+}
+@keyframes sy-rise {
+  from { opacity: 0; translate: 0 28px; }
+}
+@keyframes sy-draw {
+  from { clip-path: inset(0 100% 0 0 round 8px); }
+  to { clip-path: inset(0 0 0 0 round 8px); }
+}
+@keyframes sy-grow {
+  to { transform: scaleX(1); }
+}
+@keyframes sy-packet {
+  from { translate: 0 -12px; opacity: 0; }
+  35% { opacity: 1; }
+  to { translate: 0 14px; opacity: 0; }
 }
 
 /* ═══════════════════════════════════════════════════════════

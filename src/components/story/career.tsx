@@ -47,10 +47,10 @@ export default function Career() {
 			<div className='sy-tl-wrap'>
 				<div className='sy-wrap'>
 					<ol className='sy-tl' aria-label={`The ${count.toLowerCase()} roles, oldest first, sized by how long each lasted`}>
-						{chrono.map((l) => (
+						{chrono.map((l, i) => (
 							<li
 								key={l.exp.company}
-								style={{ flexGrow: l.months }}
+								style={{ flexGrow: l.months, ['--i' as string]: i }}
 								data-current={l.exp.current || undefined}
 								data-sy-seg={roleSlug(l.exp)}>
 								<a href={`#${roleSlug(l.exp)}`}>

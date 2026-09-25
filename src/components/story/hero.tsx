@@ -5,6 +5,7 @@ import { profile } from '@/data/profile';
 import { experiences } from '@/data/experience';
 import { run } from '@/lib/terminal';
 import { highlightRole, roleSlug } from '@/lib/story';
+import TerminalPrompt from './terminal-prompt';
 
 /** What the terminal card has already typed when the page arrives. */
 const OPENING = 'ls roles';
@@ -84,6 +85,7 @@ export default function Hero() {
 						</span>
 						<span className='sy-term-title'>~/ferri-yusra</span>
 					</div>
+					<div className='sy-term-scroll'>
 					<pre className='sy-term-body'>
 						<code>
 							<span className='sy-term-line'>
@@ -101,6 +103,8 @@ export default function Hero() {
 							))}
 						</code>
 					</pre>
+					<TerminalPrompt hint='type help — or try cat case, skill go, open experience' />
+					</div>
 				</figure>
 			</div>
 
