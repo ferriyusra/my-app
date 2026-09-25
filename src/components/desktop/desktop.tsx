@@ -27,6 +27,8 @@ import type { AppId } from '@/types/windows';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
 import BootScreen from './boot-screen';
+import DesktopNote from './desktop-note';
+import { sectionForApp } from '@/lib/story-sections';
 import { DESKTOP_MIN_WIDTH } from '@/lib/shell-defaults';
 
 /** Everything that counts as shell furniture rather than bare wallpaper. */
@@ -613,19 +615,17 @@ function Shell() {
 }
 
 /**
- * Chooses between the desktop shell and the stacked mobile reading view.
+ * Decides whether there is room for the desktop.
  *
- * The check runs in an effect rather than a media query so the two trees never
- * both mount — a phone should not pay to hydrate a window manager it cannot
- * use. `null` on the first pass keeps the server and client markup identical.
- */
-/**
- * Decides whether the desktop shell takes over from the document underneath.
+ * The check runs in an effect rather than a media query so the shell never
+ * mounts where it cannot be used, and `null` on the first pass keeps the server
+ * and client markup identical.
  *
- * `data-shell` on <html> is the switch, and the inline script in layout.tsx
- * has already set it before first paint — so the document is hidden and the
- * black holding screen shown without waiting for React. This effect only keeps
- * the attribute honest when the viewport changes afterwards.
+ * `data-shell` on <html> is the switch, and the inline boot script has already
+ * set it before first paint — a narrow visitor never gets this far, because the
+ * script sends them to the story. This effect keeps the attribute honest when
+ * the viewport changes afterwards: narrow a window below the width a desktop
+ * needs and it steps aside for a note pointing at the story.
  */
 function Viewport() {
 	const [wide, setWide] = useState<boolean | null>(null);
@@ -644,11 +644,15 @@ function Viewport() {
 		return () => mq.removeEventListener('change', sync);
 	}, []);
 
-	/* Narrow: the server-rendered document is already the page, and nothing
-	   here should draw over it. A Windows sign-in in front of a plain reading
-	   view would be a costume, not a shell. */
+	/* Narrow: say where the portfolio is — at the section holding whatever
+	   window the address bar names — rather than squeezing windows into a
+	   space they cannot overlap in. Read from the URL here, not on the server:
+	   this branch only renders after the first effect has run. */
 	if (wide === null) return <div className='boot' aria-hidden='true' />;
-	if (!wide) return null;
+	if (!wide) {
+		const s = sectionForApp(new URLSearchParams(window.location.search).get('app'));
+		return <DesktopNote reason='narrow' href={s ? `/#${s}` : '/'} />;
+	}
 
 	/* The desktop mounts underneath the startup sequence, not after it, so the
 	   overlay is covering work the browser was doing regardless. */

@@ -104,6 +104,25 @@ test('the figure is placed once, and every row is a path or a set of at least tw
 	}
 });
 
+test('a set branches from a box on the path, as the write-up draws it', () => {
+	/* The source diagram hangs the reads and the writes off the service that
+	   does them. A set that named no box, or a box the path does not have,
+	   would be drawn floating — which says something the write-up does not. */
+	const path = caseStudy.figure.rows.find((r) => r.kind === 'path');
+	assert.ok(path, 'the figure should have a path');
+	const stops = path.nodes.map((n) => n.label);
+	for (const row of caseStudy.figure.rows) {
+		if (row.kind === 'path') {
+			assert.equal(row.after, undefined, `${row.name} is a path and cannot branch`);
+			continue;
+		}
+		assert.ok(row.after && stops.includes(row.after), `${row.name} branches from "${row.after}", which is not on the path`);
+		/* The branch point has to be in the diagram's text next to the set's
+		   name, or the drawing invents the join. */
+		assert.ok(md.toLowerCase().includes(row.after), `"${row.after}" is not in the write-up`);
+	}
+});
+
 test('the case study names a project card that exists', () => {
 	assert.ok(
 		projects.some((p) => p.id === caseStudy.project),

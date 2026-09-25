@@ -29,7 +29,7 @@ import {
  * shows nothing else — see the empty state below, which is the state it is in.
  *
  * The detail pane is a shared component, so a note reads the same here, in
- * Explorer and in the server document a phone or a crawler gets.
+ * Explorer and on the story a phone or a crawler gets.
  */
 
 /** Topic order. A group with nothing in it is not drawn. */

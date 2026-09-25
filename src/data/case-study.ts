@@ -34,8 +34,19 @@ export type CaseSection = {
 
 /** One box in the figure: a part the write-up names, and a phrase it says about it. */
 export type FigureNode = { label: string; detail?: string };
-/** One row of boxes: a path draws arrows between them, a set stands them side by side. */
-export type FigureRow = { name: string; kind: 'path' | 'set'; nodes: FigureNode[] };
+/**
+ * One row of boxes: a path draws arrows between them, a set stands them side by
+ * side. A set names the path box it branches from — `after` — because the
+ * write-up's own diagram hangs the reads and the writes off the service that
+ * does them, and a drawing that floated them free would lose that.
+ */
+export type FigureRow = {
+	name: string;
+	kind: 'path' | 'set';
+	nodes: FigureNode[];
+	/** For a set: the label of the path box it branches from. */
+	after?: string;
+};
 
 /* The decision function, verbatim from the write-up. Tabs are the source's. */
 const DECIDE = `// decide returns whether to email this client today, given today's reading
@@ -207,6 +218,7 @@ export const caseStudy = {
 			{
 				name: 'Reads, once each per run',
 				kind: 'set',
+				after: 'deposit watch service',
 				nodes: [
 					{ label: 'finance ERP', detail: 'PostgreSQL · deposit, balance, thresholds, unpaid invoices' },
 					{ label: 'core claim system', detail: 'SQL Server · exposure from open claims' },
@@ -216,6 +228,7 @@ export const caseStudy = {
 			{
 				name: 'Writes, every run',
 				kind: 'set',
+				after: 'deposit watch service',
 				nodes: [
 					{ label: 'decision row', detail: 'per client, every run' },
 					{ label: 'typed message', detail: 'on the alert queue · for clients that need one' },

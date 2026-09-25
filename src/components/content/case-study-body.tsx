@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { caseStudy, caseStudyLength, type CaseBlock } from '@/data/case-study';
 import CaseStudyNav from './case-study-nav';
 import ProseBlock from './prose';
@@ -74,8 +75,8 @@ function CaseStudyFigure() {
  * rendered by ProseBlock. The figure is the one block only this write-up has,
  * so it is the one block this file still draws.
  */
-function Block({ block }: { block: CaseBlock }) {
-	if (typeof block !== 'string' && block.kind === 'figure') return <CaseStudyFigure />;
+function Block({ block, figure }: { block: CaseBlock; figure?: ReactNode }) {
+	if (typeof block !== 'string' && block.kind === 'figure') return figure ?? <CaseStudyFigure />;
 	return <ProseBlock block={block} />;
 }
 
@@ -83,21 +84,27 @@ function Block({ block }: { block: CaseBlock }) {
  * `level` is the heading level of the write-up's own sections.
  *
  * It defaults to 4, which is right where a window renders the case study under
- * an `h3` title. The document nests it one deeper — the write-up lives inside
- * the Meditap role there, under that role's `h3` and its own `h4` title — so
- * without this the title and the sections it introduces would be siblings.
+ * an `h3` title. The story gives the write-up its own section, titled by an
+ * `h2`, so its sections are `h3`s there; without this the title and the
+ * sections it introduces would be siblings, or skip a level.
  *
  * `idPrefix` keeps the section ids unique on a page that holds the write-up
- * twice: the desktop renders the server document (hidden) and a window.
+ * twice, and out of the namespace the page's own anchors use.
+ *
+ * `figure` replaces the boxes this file draws. The story passes the scroll-told
+ * version of the same figure; everything else here renders as it does in a
+ * window, so the prose cannot drift between the two.
  */
 export default function CaseStudyBody({
 	level = 4,
 	idPrefix = 'cs',
+	figure,
 }: {
-	level?: 4 | 5;
+	level?: 3 | 4 | 5;
 	idPrefix?: string;
+	figure?: ReactNode;
 }) {
-	const H = (level === 5 ? 'h5' : 'h4') as 'h4' | 'h5';
+	const H = `h${level}` as 'h3' | 'h4' | 'h5';
 	const length = caseStudyLength();
 	const sections = caseStudy.sections.map((s) => ({ ...s, id: `${idPrefix}-${slug(s.heading)}` }));
 	const openId = `${idPrefix}-open-questions`;
@@ -138,7 +145,7 @@ export default function CaseStudyBody({
 						{s.heading}
 					</H>
 					{s.body.map((b, j) => (
-						<Block key={j} block={b} />
+						<Block key={j} block={b} figure={figure} />
 					))}
 				</section>
 			))}

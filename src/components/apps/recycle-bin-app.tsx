@@ -13,7 +13,7 @@ import { discarded } from '@/data/discarded';
  * did it — so the reasoning is checkable rather than claimed.
  *
  * The detail pane is a shared component: Explorer opens the same entries from
- * Documents ▸ Decisions reversed, and the server document prints them.
+ * Documents ▸ Decisions reversed, and the story at `/` prints them.
  */
 export default function RecycleBinApp() {
 	const [selected, setSelected] = useState(0);

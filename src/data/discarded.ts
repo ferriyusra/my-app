@@ -24,6 +24,15 @@ export type Discarded = {
 
 export const discarded: Discarded[] = [
 	{
+		name: 'The desktop as the front door',
+		origin: 'src/app/page.tsx',
+		commit: '121e56b',
+		date: '2026-09',
+		summary: 'The Windows desktop was the first thing every visitor met.',
+		reason:
+			'Every arrival sat through a boot sequence and about 90KB of gzipped shell code before a word of the work, and phones downloaded that code only to throw it away. On a first visit two Settings-style windows then snapped over the whole desktop — one template, one card recipe, the same small type — and the site read as monotonous: the metaphor had become the thing on show, in front of a backend engineer\'s career. So `/` became a page that tells that career section by section, built from the same data and still whole in the HTML — the document that used to hide under the desktop grew into it — and the desktop moved, intact, to /desktop, one click away. PRODUCT.md had called the desktop metaphor binding; that line is the decision reversed, so it is recorded here rather than quietly edited.',
+	},
+	{
 		name: 'YouTube full-track playback',
 		origin: 'src/app/api/music/resolve',
 		commit: null,

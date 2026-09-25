@@ -114,9 +114,20 @@ test('brightness is clamped, so a stored value cannot black the screen out', () 
 test('the story never raises the desktop, whatever the width', () => {
 	for (const wide of [true, false]) {
 		const { attrs, replaced } = boot('/', { wide });
-		assert.notEqual(attrs['data-shell'], 'desktop');
+		assert.equal(attrs['data-shell'], 'story');
 		assert.equal(replaced, null);
 	}
+});
+
+test('the story is dark unless the visitor chose light, whatever the system says', () => {
+	assert.equal(boot('/').attrs['data-theme'], 'dark');
+	assert.equal(boot('/', { darkOs: false }).attrs['data-theme'], 'dark');
+	assert.equal(boot('/', { stored: { theme: 'light' }, darkOs: true }).attrs['data-theme'], 'light');
+});
+
+test('the desktop still follows the system until a choice is stored', () => {
+	assert.equal(boot('/desktop', { darkOs: true }).attrs['data-theme'], 'dark');
+	assert.equal(boot('/desktop', { darkOs: false }).attrs['data-theme'], undefined);
 });
 
 test('a stored theme wins on both routes', () => {

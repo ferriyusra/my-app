@@ -13,7 +13,11 @@
  *   brings up the black holding screen the boot sequence plays over. Below
  *   `DESKTOP_MIN_WIDTH` it does not try: it replaces itself with the story, at
  *   the section that holds whatever `?app=` asked for.
- * - Everything else is the story, which only needs the theme.
+ * - Everything else is the story. It only needs the theme, and it is dark
+ *   unless the visitor chose light — the attribute is set both ways, because
+ *   `ThemeProvider` reads a missing one as light. `data-shell="story"` marks
+ *   that scripting ran, which is what lets the story show its script-only
+ *   controls.
  *
  * A custom wallpaper is a filename rather than a fixed id, and it reaches a CSS
  * `url()`, so it is pattern-checked before it is used — anything that could
@@ -55,8 +59,8 @@ export function bootScript(): string {
 		"var b=g('shell:brightness','1');if(b)d.style.setProperty('--screen-dim',String(Math.max(0,Math.min(0.65,1-parseFloat(b)||0))));",
 		'}',
 		'}else{',
-		"if(dark)d.setAttribute('data-theme','dark');",
-		"d.setAttribute('data-shell','document');",
+		"d.setAttribute('data-theme',t==='light'?'light':'dark');",
+		"d.setAttribute('data-shell','story');",
 		'}',
 		'}catch(e){}',
 	].join('');

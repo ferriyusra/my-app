@@ -1,4 +1,5 @@
 import type { Discarded } from '@/data/discarded';
+import { emphasise } from './prose';
 
 /**
  * No 'use client' on purpose: the Recycle Bin renders this, Explorer renders
@@ -42,7 +43,9 @@ export default function DiscardedDetail({ item }: { item: Discarded }) {
 					</dd>
 				</div>
 			</dl>
-			<p className='rb-reason'>{item.reason}</p>
+			{/* Through the write-up's own inline renderer, so a `name` in a reason
+			    is set as code rather than shown with its backticks. */}
+			<p className='rb-reason'>{emphasise(item.reason)}</p>
 		</>
 	);
 }

@@ -123,12 +123,12 @@ const APP_WORDS: Record<string, AppId> = {
 
 const COMMANDS = [
 	['help', 'this list'],
-	['whoami', 'who is behind the desktop'],
+	['whoami', 'who built this'],
 	['ls [roles|projects|skills|notes]', 'list what is on record'],
 	['cat <role|project|case|note>', 'read one entry in full'],
 	['skill <name>', 'where a tool was actually used'],
 	['open <app>', 'open a window'],
-	['uptime', 'years in the industry, computed'],
+	['uptime', 'how long, computed from the dates'],
 	['notes', 'what I am studying, and what is written up'],
 	['tips [keys]', 'what this desktop does, and the keys it answers to'],
 	['contact', 'how to reach me'],

@@ -1,11 +1,11 @@
 /**
  * What the shell can do, and why it was built the way it was.
  *
- * This is data rather than markup because it has to reach four places: the
- * Tips window, Start's search index, the Terminal's `tips` command, and the
- * server document — which is the only one a phone or a crawler ever sees. A
- * Tips app with its strings inlined would be the first surface here to keep a
- * second copy of something.
+ * This is data rather than markup because it has to reach several places: the
+ * Tips window, Start's search index, the Terminal's `tips` command, and — for
+ * `BUILT_SUMMARY` — the story's desktop teaser, which is what a phone or a
+ * crawler sees. A Tips app with its strings inlined would be the first surface
+ * here to keep a second copy of something.
  *
  * Nothing in here may describe behaviour the shell does not have. Every entry
  * names the window that proves it.
@@ -78,7 +78,7 @@ export const TIP_PAGES: TipPage[] = [
 			},
 			{
 				title: 'One typed dataset, four ways in',
-				body: 'Roles, projects, skills, the case study, the reversed decisions and the learning notes are typed data with no second copy. Start searches 70 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
+				body: 'Roles, projects, skills, the case study, the reversed decisions and the learning notes are typed data with no second copy. Start searches 71 entries built from it, the Terminal answers from it, and the Skills window computes "used where, for how long" by walking the roles that name each tool rather than claiming a number.',
 				where: 'Start, Terminal, Skills',
 			},
 			{
@@ -98,7 +98,7 @@ export const TIP_PAGES: TipPage[] = [
 			},
 			{
 				title: 'The whole portfolio is in the HTML',
-				body: 'Turn JavaScript off, or read the response body, and the portfolio is still there as plain semantic markup — the same data, rendered by server components. Below 900px that document is the entire experience, because a windowing metaphor needs a pointer and room to overlap.',
+				body: 'Turn JavaScript off, or read the response body, and the portfolio is still there as plain semantic markup — the same data, rendered by server components. That markup is the page at the site’s own address; this desktop is the enhancement at /desktop, and below 900px it hands over to the page, because a windowing metaphor needs a pointer and room to overlap.',
 				where: 'View source',
 			},
 		],
@@ -169,9 +169,9 @@ export const SHORTCUT_NOTE =
 	'Windows claims the ⊞ combinations before the browser sees them, so on Windows itself they do nothing — Ctrl Alt covers the arrows there. The letter chords are deliberately not aliased: Ctrl Alt is AltGr on many keyboard layouts, where Ctrl Alt E types €. Everything without a ⊞ works everywhere.';
 
 /**
- * Two sentences for the server document, where the desktop is described to
- * someone who cannot open it. Drawn from the "How it's built" page so the two
- * cannot drift.
+ * Two sentences for the story's desktop teaser, under a heading that already
+ * says what the desktop is — so they start with what it does. Drawn from the
+ * "How it's built" page so the two cannot drift.
  */
 export const BUILT_SUMMARY =
-	'On a wider screen this is a Windows 11 desktop: draggable, resizable, snappable windows over a real taskbar, Start, Quick Settings and a File Explorer. Window geometry is kept out of React entirely so a drag never re-renders the apps behind it, the editor window quotes code read from this repository at build time rather than pasted, and the Recycle Bin holds decisions this project reversed with the commits that reversed them.';
+	'Draggable, resizable, snappable windows over a real taskbar, Start, Quick Settings and a File Explorer. Window geometry is kept out of React entirely so a drag never re-renders the apps behind it, the editor window quotes code read from this repository at build time rather than pasted, and the Recycle Bin holds decisions this project reversed with the commits that reversed them.';

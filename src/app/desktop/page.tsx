@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Desktop from '@/components/desktop/desktop';
-import PortfolioDocument from '@/components/content/portfolio-document';
+import DesktopNote from '@/components/desktop/desktop-note';
 import { listCustomWallpapers } from '@/lib/wallpapers';
 import { loadSources } from '@/lib/source';
 import { profile } from '@/data/profile';
@@ -35,10 +35,15 @@ export default async function DesktopPage() {
 
 	return (
 		<>
-			{/* Still underneath for now: it is what a narrow window, a printer
-			    and a browser without scripting get on this route until the
-			    story takes over that job. */}
-			<PortfolioDocument />
+			{/* The words live at `/` now; without scripting, and on paper, this
+			    route says so rather than showing a black screen. A narrowed
+			    window gets the same note from the desktop itself. */}
+			<noscript>
+				<DesktopNote reason='script' />
+			</noscript>
+			<div className='dk-print'>
+				<DesktopNote reason='print' landmark={false} />
+			</div>
 			<Desktop customWallpapers={customWallpapers} sources={sources} />
 		</>
 	);

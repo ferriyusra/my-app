@@ -398,11 +398,12 @@ html[data-theme='dark'] .icon-adaptive { filter: invert(1) brightness(1.7); }
   color: var(--accent);
 }
 
-/* ── Which shell is in charge ──
-   The portfolio document is always in the server HTML. On a wide screen with
-   scripting on, the desktop takes over and the document steps aside; with
-   scripting off `data-shell` is never set, so the document simply stays and
-   the desktop's black holding screen never appears. */
+/* ── /desktop before it is a desktop ──
+   `data-shell` is set only by the inline boot script, so on /desktop it means
+   scripting is on and the shell is coming: the black holding screen covers
+   the page until the boot sequence takes over. Without scripting the
+   attribute is never set, the holding screen never appears, and the
+   <noscript> note pointing at the story is the page. */
 .boot { display: none; }
 html[data-shell='desktop'] .boot {
   display: block;
@@ -410,11 +411,15 @@ html[data-shell='desktop'] .boot {
   inset: 0;
   background: #000;
 }
-html[data-shell='desktop'] .doc,
 html[data-shell='desktop'] .skip-link { display: none; }
-/* `data-shell` is only ever set by script, so its absence means scripting is
-   off — and a theme switch that cannot switch anything should not be there. */
-html:not([data-shell]) .mb-theme { display: none; }
+
+/* What /desktop prints instead of a black page. Screens never show it; a
+   narrowed window has its own copy of the note, which paper does not need. */
+.dk-print { display: none; }
+@media print {
+  .dk-print { display: block; }
+  .dk-note[data-reason='narrow'] { display: none; }
+}
 
 /* ═══════════════════════════════════════════════════════════
    DESKTOP + WALLPAPER
@@ -4215,9 +4220,6 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   font-weight: 600;
   letter-spacing: 0;
 }
-/* The document nests one level deeper and keeps its own scale. */
-.mb-case .cs-section h5 { font-size: 14px; line-height: 20px; }
-
 /* A paragraph that opens with a bold lead-in ("Record every evaluation, not
    just the sends.") reads as a run-in heading with the lead on its own line. */
 .cs-lead > strong { display: block; margin-bottom: 2px; color: var(--ink); }
@@ -4268,25 +4270,24 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 .ex-case[open] .ex-case-chev { transform: rotate(180deg); }
 .ex-case[open] > summary { margin-bottom: 12px; }
 
-.mb-cs-title { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
 
 /* ── Now ─────────────────────────────────────────────────────
-   The same two-column definition list in both renderings: the About
-   window and the server document. */
-.ab-now, .mb-now { display: flex; flex-direction: column; gap: 12px; margin: 0; }
-.ab-now div, .mb-now div {
+   The About window's two-column definition list. The story draws its
+   own (story.css). */
+.ab-now { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+.ab-now div {
   display: grid;
   grid-template-columns: 92px minmax(0, 1fr);
   gap: 4px 16px;
   align-items: baseline;
 }
-.ab-now dt, .mb-now dt {
+.ab-now dt {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--ink-muted);
 }
-.ab-now dd, .mb-now dd { margin: 0; font-size: 14px; line-height: 22px; }
+.ab-now dd { margin: 0; font-size: 14px; line-height: 22px; }
 .ab-now-stamp {
   margin: 14px 0 0;
   font-size: 11px;
@@ -4296,17 +4297,6 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 @media (max-width: 560px) {
   /* The About window keeps the stack: it has a whole window to spend. */
   .ab-now div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-
-  /* The document runs the label into its text instead. Stacked, the three
-     entries cost three extra lines and push the spine off the first
-     viewport — which is the one thing the direction contract spends that
-     viewport on. Scoped to `.mb-` so the shared rule above still owns
-     `.ab-`; one prefix, one app. */
-  .mb-now { gap: 10px; }
-  .mb-now div { display: block; }
-  .mb-now dt,
-  .mb-now dd { display: inline; }
-  .mb-now dt::after { content: ' · '; color: var(--ink-disabled); }
 }
 
 /* ── Desktop: marquee and dragging ───────────────────────────
@@ -5697,373 +5687,13 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   MOBILE SHELL
-   A windowing metaphor needs a pointer and room to overlap.
-   Below 900px it gets neither, so the content moves to a
-   widgets-board layout built from the same tokens.
-   ═══════════════════════════════════════════════════════════ */
-
-.mb-shell {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 24px 18px 56px;
-}
-.mb-head { display: flex; align-items: flex-start; gap: 14px; }
-.mb-avatar {
-  display: grid;
-  place-items: center;
-  width: 54px; height: 54px;
-  flex-shrink: 0;
-  border-radius: 99px;
-  background: var(--accent-fill);
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-}
-.mb-head-text { flex: 1; min-width: 0; }
-.mb-head-text h1 { font-size: 22px; }
-.mb-head-text > p:not(.mb-loc) { margin: 3px 0 0; font-size: 14px; color: var(--ink-secondary); }
-/* What, where, when — under the name, so a phone shows it on the first
-   screen instead of in Now, eight screens down. */
-.mb-open { margin: 8px 0 0 !important; font-size: 13px; line-height: 18px; }
-.mb-loc {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin: 3px 0 0;
-  font-size: 12px;
-  color: var(--ink-muted);
-}
-.mb-dot { width: 4px; height: 4px; border-radius: 99px; background: var(--ink-disabled); }
-.mb-theme {
-  display: grid;
-  place-items: center;
-  width: 38px; height: 38px;
-  flex-shrink: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface);
-  color: var(--ink);
-}
-.mb-headline { margin: 20px 0 12px; font-size: 17px; line-height: 25px; color: var(--ink); }
-.mb-summary { margin: 0 0 20px; font-size: 14px; line-height: 22px; color: var(--ink-secondary); }
-.mb-points { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; }
-.mb-points li { font-size: 14px; line-height: 21px; color: var(--ink-secondary); }
-.mb-points li::marker { color: var(--accent); }
-.mb-projects h3 { display: inline; font-size: 14px; margin-right: 8px; }
-.mb-actions { display: flex; gap: 10px; margin-bottom: 14px; }
-/* The desktop needs a wide screen and scripting, and `data-shell` is only
-   ever set by script — so the link only appears where it can lead somewhere. */
-.mb-desk { display: none; }
-@media (min-width: 900px) {
-  html[data-shell] .mb-desk { display: inline-flex; }
-}
-/* Five anchors under the buttons. The document is ten screens long on a
-   phone and had no way to skip to the part a reader came for. */
-.mb-jump {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-  margin: 0 0 24px;
-  font-size: 13px;
-  line-height: 20px;
-}
-.mb-jump a { color: var(--accent); text-decoration: none; }
-.mb-jump a:hover { text-decoration: underline; }
-.mb-note {
-  margin: 0 0 22px;
-  padding: 12px 14px;
-  border: 1px solid var(--line-subtle);
-  border-radius: var(--r-lg);
-  background: var(--accent-soft);
-  font-size: 12px;
-  line-height: 18px;
-  color: var(--ink-secondary);
-}
-
-/* A section heading and its count, on one rule. These carry the document's
-   outline: the sections used to be <strong> inside a <summary>, which reads
-   as bold text rather than as a landmark. */
-.mb-rule-h {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin: 22px 0 13px;
-  padding-bottom: 7px;
-  border-bottom: 1px solid var(--line);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.mb-rule-h span {
-  margin-left: auto;
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-muted);
-}
-
-/* ── The spine ────────────────────────────────────────────
-   Five roles down one rule, newest first, the case study
-   rendered inside the role that produced it. The rule is
-   drawn on the <ol> rather than per-item so it is one
-   continuous line and not five stacked segments.
-   ═══════════════════════════════════════════════════════ */
-.mb-spine {
-  position: relative;
-  list-style: none;
-  margin: 0;
-  padding: 2px 0 0 22px;
-  display: grid;
-  gap: 26px;
-}
-.mb-spine::before {
-  content: '';
-  position: absolute;
-  top: 6px; bottom: 6px; left: 3px;
-  width: 1px;
-  background: var(--accent);
-  opacity: 0.45;
-}
-.mb-spine > li { position: relative; display: grid; gap: 3px; }
-/* The node. A hollow ring for past roles, filled for the current one, so the
-   present reads off the rule itself rather than off a badge. */
-.mb-spine > li::before {
-  content: '';
-  position: absolute;
-  top: 5px; left: -22px;
-  width: 7px; height: 7px;
-  border: 1px solid var(--line);
-  border-radius: 99px;
-  background: var(--bg);
-}
-.mb-spine > li[data-current]::before {
-  border-color: var(--accent);
-  background: var(--accent);
-}
-.mb-spine > li p { margin: 6px 0 0; font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
-.mb-spine h3 { margin: 0; font-size: 14px; }
-
-/* The case study, inline in its own role. Indented off the spine and given a
-   quiet ground so it reads as depth belonging to the role above it rather
-   than as the next section. */
-.mb-case {
-  margin: 14px 0 2px;
-  padding: 16px 16px 4px;
-  border-radius: var(--r-lg);
-  background: var(--surface-subtle);
-}
-
-/* Reference material that stays collapsible: the spine and the reversals are
-   the argument, Skills and Projects are lookup. */
-.mb-fold { border-top: 1px solid var(--line-subtle); }
-.mb-fold:last-of-type { border-bottom: 1px solid var(--line-subtle); }
-.mb-fold-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 4px 0;
-  cursor: pointer;
-  list-style: none;
-}
-.mb-fold-head::-webkit-details-marker { display: none; }
-.mb-fold-head > h2 {
-  flex: 1;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin: 18px 0 16px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.mb-fold-head > h2 span {
-  margin-left: auto;
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-muted);
-}
-.mb-fold-head:hover > h2 { color: var(--accent); }
-.mb-fold-head:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: var(--r-sm); }
-.mb-fold-head > svg {
-  flex-shrink: 0;
-  color: var(--ink-muted);
-  transition: transform var(--dur-fast) var(--ease-standard);
-}
-.mb-fold[open] > .mb-fold-head > svg { transform: rotate(180deg); }
-.mb-fold-body { padding: 0 0 22px; }
-
-.mb-company { font-size: 13px; color: var(--ink-secondary); }
-.mb-period { font-size: 12px; color: var(--ink-muted); font-variant-numeric: tabular-nums; }
-.mb-tech { display: block; margin-top: 6px; font-size: 11px; color: var(--ink-muted); }
-
-.mb-skill-group { margin-bottom: 18px; }
-.mb-skill-group h3 { margin-bottom: 8px; font-size: 13px; }
-/* Was a wrapped row of pills, which is a list of 28 names a reader has to
-   take on faith — the problem skill-evidence.ts exists to answer inside the
-   shell. A pill cannot carry the note, so this carries it instead. */
-.mb-skills { margin: 0; display: grid; gap: 0; }
-.mb-skills > div {
-  display: grid;
-  grid-template-columns: 140px minmax(0, 1fr);
-  gap: 4px 14px;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--line-subtle);
-}
-.mb-skills > div:last-child { border-bottom: none; }
-.mb-skills dt { font-size: 13px; font-weight: 600; }
-.mb-skills dd { margin: 0; font-size: 12.5px; line-height: 18px; color: var(--ink-muted); }
-
-.mb-skill-group li {
-  padding: 4px 11px;
-  border: 1px solid var(--line-subtle);
-  border-radius: 99px;
-  background: var(--surface-subtle);
-  font-size: 12.5px;
-  color: var(--ink-secondary);
-}
-
-.mb-projects { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
-.mb-projects li { display: flex; gap: 12px; }
-.mb-project-dot {
-  width: 10px; height: 10px;
-  margin-top: 5px;
-  flex-shrink: 0;
-  border-radius: 99px;
-}
-.mb-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 99px;
-  font-size: 10px;
-  font-weight: 600;
-  vertical-align: 2px;
-}
-.mb-badge[data-type='real'] { background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
-.mb-badge[data-type='case-study'] { background: var(--surface-chip); color: var(--ink-secondary); }
-.mb-projects p { margin: 6px 0 0; font-size: 13px; line-height: 19px; color: var(--ink-secondary); }
-.mb-project-links { display: flex; gap: 14px; margin-top: 8px; font-size: 13px; font-weight: 600; }
-
-.mb-foot {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line-subtle);
-}
-.mb-foot a {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  color: var(--ink);
-  text-decoration: none;
-}
-.mb-foot a:hover { color: var(--accent); }
-
-
-/* The numbers lead on the Experience card in the shell, and were sunk inside
-   four lines of prose here — the exact thing that card was changed to fix. */
-.mb-stats {
-  list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  gap: 8px;
-}
-.mb-stats li {
-  padding: 8px 10px;
-  border: 1px solid var(--line-subtle);
-  border-radius: var(--r-md);
-  background: var(--surface-subtle);
-}
-.mb-stats strong {
-  display: block;
-  font-size: 15px;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-.mb-stats span { font-size: 11px; line-height: 15px; color: var(--ink-muted); }
-.mb-highlights {
-  list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-}
-.mb-highlights li {
-  position: relative;
-  padding-left: 12px;
-  font-size: 13px;
-  line-height: 19px;
-  color: var(--ink-secondary);
-}
-.mb-highlights li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 8px;
-  width: 6px;
-  height: 2px;
-  border-radius: 1px;
-  background: var(--accent);
-}
-
-/* The reversed decisions. Long by nature, so each one is separated rather
-   than boxed — a card per entry would read as eight cards, not one argument. */
-/* The notes fold. Each note renders the same .cs block the window and
-   Explorer render, so all this does is space them and rule them apart. */
-.mb-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 26px; }
-.mb-notes > li + li { padding-top: 26px; border-top: 1px solid var(--line-subtle); }
-.mb-notes .cs > h3 { font-size: 16px; line-height: 23px; }
-.mb-notes .cs-section h4 { font-size: 14px; line-height: 20px; }
-.mb-discarded { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
-.mb-discarded > li + li { padding-top: 22px; border-top: 1px solid var(--line-subtle); }
-.mb-discarded h3 { margin: 0; font-size: 14px; }
-
-/* ── The document's own widths ────────────────────────────────
-   There were none. `data-shell` decides which tree renders and that stays in
-   JavaScript — a phone must not pay to hydrate a window manager — but the
-   document's layout has to answer to the viewport on its own, or it renders
-   the same 680px column at 360px and at 2560px with scripting off. */
-@media (max-width: 620px) {
-  .mb-shell { padding: 18px 14px 44px; }
-  .mb-skills > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
-}
-
-@media (max-width: 420px) {
-  /* The avatar stays beside the name. A phone's first screen used to spend a
-     row on two initials and a theme button before the name appeared. */
-  .mb-avatar { width: 46px; height: 46px; font-size: 16px; }
-  /* Fluent's 32px button is a mouse target; a thumb needs the whole row —
-     the resume on its own, the two secondary actions sharing the next. */
-  .mb-actions { flex-wrap: wrap; }
-  .mb-actions .fl-btn { flex: 1 1 calc(50% - 5px); justify-content: center; height: 40px; }
-  .mb-actions .fl-btn:first-child { flex-basis: 100%; }
-}
-
-/* ═══════════════════════════════════════════════════════════
    PRINT
-   A desktop shell cannot be printed. The document can, and it
-   is already in the page — so printing swaps which one is
-   in charge, exactly as a narrow screen does.
+   A desktop shell cannot be printed, so /desktop prints a note
+   pointing at the story, which prints itself (story.css).
+   The write-up rules here serve both.
    ═══════════════════════════════════════════════════════════ */
 
 @media print {
-  html[data-shell='desktop'] .doc { display: block !important; }
   .desktop,
   .boot,
   .bootscreen,
@@ -6077,46 +5707,12 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
     color: #000;
   }
 
-  .mb-shell { max-width: none; padding: 0; }
-  /* Controls and asides that mean nothing on paper. */
-  .mb-theme,
-  .mb-note,
-  .mb-actions,
-  .mb-fold-head > svg { display: none !important; }
-
-  .mb-fold { border: none; }
-  .mb-fold-head { padding: 0; }
-  .mb-fold-body { padding: 0; }
-  .mb-rule-h,
-  .mb-fold-head > h2 { margin: 6mm 0 3mm; border-bottom: 0.4pt solid #999; font-size: 11pt; }
-
-  /* The spine is a screen device; on paper the rule and the nodes are ink
-     spent on nothing, and the indent only narrows the measure. */
-  .mb-spine { padding-left: 0; gap: 6mm; }
-  .mb-spine::before,
-  .mb-spine > li::before { display: none; }
-  .mb-case { padding: 0; background: none; border-radius: 0; }
   .cs-fig { break-inside: avoid; }
   .cs-fig-box { background: none; }
   .cs-code, .cs-table-wrap { break-inside: avoid; }
   .cs-code { white-space: pre-wrap; background: none; }
   /* Links to jump by are nothing on paper. */
   .cs-nav { display: none; }
-
-  /* Keep a role or a project from being split across two pages. */
-  .mb-spine > li,
-  .mb-projects > li,
-  .mb-skill-group { break-inside: avoid; }
-
-  /* A printed link is useless without its destination. */
-  .mb-foot a[href]::after,
-  .mb-project-links a[href]::after {
-    content: ' (' attr(href) ')';
-    font-size: 8pt;
-    font-weight: 400;
-    color: #444;
-  }
-  a[href^='mailto:']::after { content: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════

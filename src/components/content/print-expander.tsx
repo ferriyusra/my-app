@@ -10,8 +10,11 @@ import { useEffect } from 'react';
  * printout — someone saving the page as a PDF would get the headings and
  * none of the work. CSS cannot force one open, so this listens for the print
  * event instead.
+ *
+ * `scope` is the page's root selector, so nothing outside the printed page —
+ * a window's own folds, say — is touched.
  */
-export default function PrintExpander() {
+export default function PrintExpander({ scope = '.sy' }: { scope?: string }) {
 	useEffect(() => {
 		/* Only sections this opened are closed again, so anything the reader
 		   had already expanded stays expanded. */
@@ -19,7 +22,7 @@ export default function PrintExpander() {
 
 		const expand = () => {
 			opened = [
-				...document.querySelectorAll<HTMLDetailsElement>('.doc details:not([open])'),
+				...document.querySelectorAll<HTMLDetailsElement>(`${scope} details:not([open])`),
 			];
 			for (const d of opened) d.open = true;
 		};
@@ -34,7 +37,7 @@ export default function PrintExpander() {
 			window.removeEventListener('beforeprint', expand);
 			window.removeEventListener('afterprint', restore);
 		};
-	}, []);
+	}, [scope]);
 
 	return null;
 }
