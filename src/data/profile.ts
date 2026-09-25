@@ -5,6 +5,12 @@
  * (availability was stated three different ways, the role title two).
  */
 
+/** First month of professional work — the anchor for every "since" figure. */
+export const CAREER_START = '2021-10';
+
+/** The year the copy states, derived rather than typed. */
+const SINCE = CAREER_START.slice(0, 4);
+
 export const profile = {
 	name: 'Ferri Yusra',
 	initials: 'FY',
@@ -19,7 +25,7 @@ export const profile = {
 
 	/** Concrete proof, not adjectives. */
 	proof:
-		"Four years in Go and Node.js. Previously backend for SATUSEHAT, Indonesia’s national health data platform; currently building finance infrastructure at Meditap.",
+		`Go and Node.js since ${SINCE}. Previously backend for SATUSEHAT, Indonesia’s national health data platform; currently building finance infrastructure at Meditap.`,
 
 	/** Names carry more weight above the fold than a list of technologies. */
 	previously: 'SATUSEHAT · Peruri · Moladin',
@@ -58,7 +64,7 @@ export const profile = {
 	portrait: null as string | null,
 
 	tagline:
-		'4+ years building production APIs and event-driven systems across fintech, GovTech health, and automotive. Currently going deeper on system design and DSA.',
+		`Building production APIs and event-driven systems since ${SINCE} across fintech, GovTech health, and automotive. Currently going deeper on system design and DSA.`,
 
 	/**
 	 * What is true right now, in the "/now page" sense.
@@ -85,7 +91,7 @@ export const profile = {
 		},
 	],
 
-	bio: 'Backend engineer with 4+ years building scalable API systems across fintech, GovTech health, and automotive industries.',
+	bio: `Backend engineer building scalable API systems since ${SINCE} across fintech, GovTech health, and automotive industries.`,
 
 	location: 'Jakarta, Indonesia',
 	locationDetail: 'Jakarta, Indonesia (Hybrid / Remote)',
@@ -114,18 +120,21 @@ export const profile = {
 		'https://drive.google.com/uc?export=download&id=1-VPpaD0Rdhyq2BbZ7wdNQkbzyflgZtZ5',
 } as const;
 
-/** First month of professional work — the anchor for every "years" figure. */
-export const CAREER_START = '2021-10';
-
 /**
- * Years of experience, computed rather than written down.
+ * When the career started, as a reader sees it: "Oct 2021", or "2021" alone.
  *
- * The old copy said "4+ years" in five places and had already drifted from the
- * dates in `experience.ts`. Deriving it from one constant means the number is
- * still true next year without anyone remembering to edit it.
+ * The site used to state a year count, and stated it three ways at once:
+ * calendar years since `CAREER_START` (5 from October 2026), the months
+ * actually spent in role (4 yrs 4 mos at that point — there are gaps between
+ * jobs), and "Four years" / "4+ years" typed into the copy. A start
+ * date is the one figure all three agree on, and it never goes stale, so it is
+ * the only one stated. Durations are shown in months, computed per role.
  */
-export function yearsOfExperience(now: Date = new Date()): number {
+export function careerSince(form: 'month' | 'year' = 'month'): string {
 	const [y, m] = CAREER_START.split('-').map(Number);
-	const months = (now.getFullYear() - y) * 12 + (now.getMonth() + 1 - m);
-	return Math.max(1, Math.floor(months / 12));
+	if (form === 'year') return String(y);
+	return new Date(y, m - 1, 1).toLocaleDateString('en-GB', {
+		month: 'short',
+		year: 'numeric',
+	});
 }

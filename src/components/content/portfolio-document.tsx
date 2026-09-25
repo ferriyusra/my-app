@@ -2,7 +2,7 @@ import { DocumentIcon, LiChevronDown, LiDownload, LiGithub, LiLinkedin, LiMail, 
 import ThemeToggle from './theme-toggle';
 import PrintExpander from './print-expander';
 import CaseStudyBody from './case-study-body';
-import { profile, yearsOfExperience } from '@/data/profile';
+import { profile, careerSince } from '@/data/profile';
 import { experiences, tenureLabel } from '@/data/experience';
 import { SKILL_CATEGORIES, skills } from '@/data/skills';
 import { projects } from '@/data/projects';
@@ -78,7 +78,6 @@ function Fold({
 }
 
 export default function PortfolioDocument() {
-	const years = yearsOfExperience();
 	const written = writtenNotes();
 	const planned = plannedNotes();
 	const [ny, nm] = profile.nowUpdated.split('-').map(Number);
@@ -153,7 +152,7 @@ export default function PortfolioDocument() {
 			<section aria-labelledby='doc-exp'>
 				<Head
 					title='Experience'
-					meta={`${experiences.length} roles · ${years} years`}
+					meta={`${experiences.length} roles · since ${careerSince('year')}`}
 					id='doc-exp'
 				/>
 				<ol className='mb-spine'>

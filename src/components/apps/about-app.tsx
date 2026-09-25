@@ -7,9 +7,10 @@ import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell
 import SettingCard from '@/components/ui/setting-card';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { sendIntent } from '@/hooks/use-app-intent';
-import { profile, yearsOfExperience } from '@/data/profile';
+import { profile, careerSince } from '@/data/profile';
 import { experiences } from '@/data/experience';
 import { caseStudy } from '@/data/case-study';
+import { career } from '@/data/career-game';
 
 const PAGES: SettingsPage[] = [
 	{ key: 'overview', label: 'Overview', Icon: Info },
@@ -27,7 +28,6 @@ const PAGES: SettingsPage[] = [
 export default function AboutApp() {
 	const [page, setPage] = useState('overview');
 	const { launch } = useWindowManager();
-	const years = yearsOfExperience();
 
 	/* Experience, opened on the case study rather than the timeline. */
 	const openCase = () => {
@@ -35,6 +35,7 @@ export default function AboutApp() {
 		launch('experience');
 	};
 	const current = experiences.find((e) => e.current) ?? experiences[0];
+	const inRole = career().months;
 	const [ny, nm] = profile.nowUpdated.split('-').map(Number);
 	const nowStamp = new Date(ny, nm - 1, 1).toLocaleDateString('en-GB', {
 		month: 'long',
@@ -44,7 +45,7 @@ export default function AboutApp() {
 	const deviceSpecs: [string, string][] = [
 		['Name', profile.name],
 		['Role', `${profile.role} — ${profile.roleDetail}`],
-		['Experience', `${years} years, since ${current ? 'Oct 2021' : '—'}`],
+		['Experience', `Since ${careerSince()} · ${inRole} months in role across ${experiences.length} roles`],
 		['Currently', current.company],
 		['Location', profile.locationDetail],
 		['Time zone', 'GMT+7 (WIB) — overlaps EU and APAC'],
@@ -77,7 +78,7 @@ export default function AboutApp() {
 							<p>{profile.headline}</p>
 							<span className='ab-badges'>
 								<span className='ab-badge'>
-									<BadgeCheck size={13} aria-hidden='true' /> {years} yrs experience
+									<BadgeCheck size={13} aria-hidden='true' /> Since {careerSince('year')}
 								</span>
 								<span className='ab-badge'>
 									<LiMapPin size={13} aria-hidden='true' /> {profile.location}
