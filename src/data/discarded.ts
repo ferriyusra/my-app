@@ -24,6 +24,15 @@ export type Discarded = {
 
 export const discarded: Discarded[] = [
 	{
+		name: 'Four learning projects',
+		origin: 'src/data/projects.ts',
+		commit: '855f23a',
+		date: '2026-09',
+		summary: 'Acara, Mini Crowdfunding, Tracer Study and GIS Platform.',
+		reason:
+			'Six of the nine projects were learning exercises, which put the production work in the minority on its own list. Two were the same MERN course exercise built twice; one linked to a GitHub issue rather than a repository; one had no link at all. Each was honest about being practice, and none of them was wrong to have built — but a hiring manager reads a project list as a whole, and the whole said more about coursework than about the systems shipped since. What stayed is the production work, the HRIS app with a repository and a live demo, and the sentiment-analysis paper that was published. The repositories are still on GitHub for anyone who looks.',
+	},
+	{
 		name: 'YouTube full-track playback',
 		origin: 'src/app/api/music/resolve',
 		commit: null,
