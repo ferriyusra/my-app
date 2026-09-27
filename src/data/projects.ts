@@ -58,7 +58,10 @@ export const projects: Project[] = [
 		description:
 			'The SATUSEHAT Data Portal brings the distribution of Indonesia’s health data and its processed results into one place, as interactive dashboards on trusted sources, to support decision-making and transparency. It has four parts: Dashboard, Dataset, Metadata and Data Services.',
 		cover: '/projects/ssd/ssd-1.png',
-		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'NestJS'],
+		/* Node.js named as well as NestJS: the INA Digital role records the
+		   Data Product APIs as "Node.js (NestJS)", and once the MERN exercises
+		   left this list it was the only project that could show it. */
+		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'NestJS', 'Node.js'],
 		github: null,
 		demo: 'https://satusehat.kemkes.go.id/data',
 		featured: true,
@@ -95,21 +98,6 @@ export const projects: Project[] = [
 		type: 'case-study',
 	},
 	{
-		id: 'acara',
-		name: 'Acara',
-		description:
-			'A full-stack learning project built to learn the MERN stack, with the backend and the frontend in separate repositories.',
-		cover: '',
-		tech: ['React', 'Next.js', 'Express.js', 'Node.js', 'MongoDB'],
-		github: 'https://github.com/ferriyusra/back-end-acara',
-		demo: 'https://front-end-acara-lac.vercel.app/',
-		featured: false,
-		color: '#3d7a5c',
-		initial: 'AC',
-		stars: 0,
-		type: 'case-study',
-	},
-	{
 		id: 'native',
 		name: 'Dashboard Native',
 		description:
@@ -123,51 +111,6 @@ export const projects: Project[] = [
 		initial: 'NA',
 		stars: 0,
 		type: 'real',
-	},
-	{
-		id: 'tracerstd',
-		name: 'Tracer Study',
-		description:
-			'A website that traces graduates after they leave: it collects tracking data through a questionnaire, shows job vacancies, and links out to a third-party job portal to apply.',
-		cover: '',
-		tech: ['PHP', 'Laravel 7', 'MySQL'],
-		github: 'https://github.com/ferriyusra/e-career/issues/1',
-		demo: null,
-		featured: false,
-		color: '#a8762b',
-		initial: 'TS',
-		stars: 0,
-		type: 'case-study',
-	},
-	{
-		id: 'crowdfounding',
-		name: 'Mini Crowdfunding',
-		description:
-			'A small crowdfunding site built after finishing a MERN-stack course, to put the stack to use end to end.',
-		cover: '',
-		tech: ['React', 'Next.js', 'Express.js', 'Node.js', 'MongoDB'],
-		github: 'https://github.com/ferriyusra/crowdfunding-be',
-		demo: 'https://crowdfunding-fe-dun.vercel.app/',
-		featured: false,
-		color: '#96453f',
-		initial: 'CF',
-		stars: 0,
-		type: 'case-study',
-	},
-	{
-		id: 'gis',
-		name: 'GIS Platform',
-		description:
-			'A web application that integrates GIS with a minimal map library, plotting records by their latitude and longitude.',
-		cover: '',
-		tech: ['PHP', 'Codeigniter 3', 'Leaflet', 'MySQL'],
-		github: null,
-		demo: null,
-		featured: false,
-		color: '#6b5570',
-		initial: 'GI',
-		stars: 0,
-		type: 'case-study',
 	},
 	{
 		id: 'as',

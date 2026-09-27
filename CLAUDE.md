@@ -383,7 +383,7 @@ of them derive; none of them keep a second copy.
 
 - **Search** ([src/lib/search.ts](src/lib/search.ts)) indexes roles, projects,
   skills, the case study, the discarded decisions, the written notes, the tips
-  and the profile — 70 entries built from `src/data`. Start used to filter
+  and the profile — 66 entries built from `src/data`. Start used to filter
   fourteen app names, so "Pub/Sub" and "Kafka" returned nothing while sitting in
   the data. A title match outranks a body match, and a result quotes the
   sentence it matched in. A hit may carry an `intent`, delivered through
