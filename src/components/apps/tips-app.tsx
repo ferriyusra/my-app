@@ -56,6 +56,7 @@ export default function TipsApp() {
 			active={active}
 			onSelect={setActive}
 			navLabel='Tips'
+			account={false}
 			title={page ? page.title : 'Keyboard'}
 			subtitle={
 				page ? page.subtitle : 'What works, and where the operating system wins'

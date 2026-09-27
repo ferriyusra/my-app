@@ -1,15 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { BadgeCheck, Clock, Cpu, FileCode2, Info, Link as LinkIcon, Radar } from 'lucide-react';
-import { DocumentIcon, LiBriefcase, LiDownload, LiGithub, LiLinkedin, LiMail, LiMapPin, LiMonitor } from '@/components/icons/line-icons';
+import { BadgeCheck, Briefcase, Clock, Cpu, FileCode2, Info, Link as LinkIcon, MapPin, Radar } from 'lucide-react';
+import { DocumentIcon, LiDownload, LiGithub, LiLinkedin, LiMail, LiMonitor } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import SettingCard from '@/components/ui/setting-card';
 import { useWindowManager } from '@/hooks/use-window-manager';
 import { sendIntent } from '@/hooks/use-app-intent';
 import { profile, careerSince } from '@/data/profile';
 import { experiences } from '@/data/experience';
-import { caseStudy } from '@/data/case-study';
+import { caseStudy, caseStudyLength } from '@/data/case-study';
 import { career } from '@/data/career-game';
 
 const PAGES: SettingsPage[] = [
@@ -35,6 +35,7 @@ export default function AboutApp() {
 		launch('experience');
 	};
 	const current = experiences.find((e) => e.current) ?? experiences[0];
+	const caseLength = caseStudyLength();
 	const inRole = career().months;
 	const [ny, nm] = profile.nowUpdated.split('-').map(Number);
 	const nowStamp = new Date(ny, nm - 1, 1).toLocaleDateString('en-GB', {
@@ -65,26 +66,36 @@ export default function AboutApp() {
 			pages={PAGES}
 			active={page}
 			onSelect={setPage}
-			title='About'
-			subtitle={`${profile.role} · ${profile.location}`}>
+			title='About'>
 			{page === 'overview' && (
 				<>
 					<div className='ab-hero'>
 						<span className='ab-avatar' aria-hidden='true'>
 							{profile.initials}
 						</span>
+						{/* Three levels, in the order a reader decides on them: who,
+						    what they do and in which stack, then the pitch. The page
+						    title used to be the largest text here and the role was a
+						    13px grey subtitle above the card — the one fact every
+						    reader compares against a job description, set as a
+						    caption. The stack line was only on the Specifications
+						    tab, and "Available" had no object. */}
 						<div className='ab-hero-text'>
 							<h3>{profile.name}</h3>
-							<p>{profile.headline}</p>
+							<p className='ab-role'>
+								{profile.role} — {profile.roleDetail}
+							</p>
+							<p className='ab-lede'>{profile.headline}</p>
 							<span className='ab-badges'>
 								<span className='ab-badge'>
 									<BadgeCheck size={13} aria-hidden='true' /> Since {careerSince('year')}
 								</span>
 								<span className='ab-badge'>
-									<LiMapPin size={13} aria-hidden='true' /> {profile.location}
+									<MapPin size={13} aria-hidden='true' /> {profile.locationDetail}
 								</span>
 								<span className='ab-badge' data-live>
-									<Clock size={13} aria-hidden='true' /> {profile.availability}
+									<Clock size={13} aria-hidden='true' /> {profile.availability} ·{' '}
+									{profile.workType}
 								</span>
 							</span>
 							{/* The CV sat on the third tab, so the one action this site
@@ -115,41 +126,33 @@ export default function AboutApp() {
 						</div>
 					</div>
 
-					{/* As prose in the card body, not as the card's 12px caption: this
-					    paragraph is the one a hiring manager reads. */}
-					<SettingCard Icon={Info} title='Summary'>
-						<p className='st-prose'>{profile.proof}</p>
-					</SettingCard>
+					{/* The paragraph a hiring manager reads, straight under the card
+					    it belongs to. It was a card of its own whose 62px header
+					    existed to say "Summary", and that header is what pushed the
+					    case study below the fold on a 720p laptop. */}
+					<p className='ab-proof'>{profile.proof}</p>
 
 					{/* The one piece of this site a neighbouring portfolio cannot
-					    copy was reachable from here only by knowing it existed. */}
+					    copy. As a one-line row it said only "health plans", which
+					    tells an engineer nothing; its own summary and stack do. The
+					    button stays standard so View CV remains the one primary
+					    action on the page. */}
 					<SettingCard
 						Icon={FileCode2}
-						title='Case study'
-						description={caseStudy.title}
+						title={`Case study: ${caseStudy.title}`}
+						description={`${caseStudy.stack.slice(0, 4).join(' · ')} · about ${caseLength.minutes} min read`}
 						control={
 							<button
 								type='button'
 								className='fl-btn fl-btn-standard'
 								onClick={openCase}>
-								Read it
+								Read the case study
 							</button>
-						}
-					/>
-
-					<SettingCard Icon={Radar} title='Now'>
-						<dl className='ab-now'>
-							{profile.now.map((n) => (
-								<div key={n.label}>
-									<dt>{n.label}</dt>
-									<dd>{n.text}</dd>
-								</div>
-							))}
-						</dl>
-						<p className='ab-now-stamp'>Updated {nowStamp}</p>
+						}>
+						<p className='st-prose'>{caseStudy.summary}</p>
 					</SettingCard>
 
-					<SettingCard Icon={LiBriefcase} title='What I actually ship'>
+					<SettingCard Icon={Briefcase} title='What I actually ship'>
 						<p className='st-prose'>
 							Most of what I have shipped replaced something manual: spreadsheet
 							tracking that became a billing source of truth, Tableau dashboards
@@ -167,6 +170,18 @@ export default function AboutApp() {
 								</li>
 							))}
 						</ul>
+					</SettingCard>
+
+					<SettingCard Icon={Radar} title='Now'>
+						<dl className='ab-now'>
+							{profile.now.map((n) => (
+								<div key={n.label}>
+									<dt>{n.label}</dt>
+									<dd>{n.text}</dd>
+								</div>
+							))}
+						</dl>
+						<p className='ab-now-stamp'>Updated {nowStamp}</p>
 					</SettingCard>
 				</>
 			)}

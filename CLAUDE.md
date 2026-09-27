@@ -216,10 +216,18 @@ coordinates are deliberately kept out of React.
 It does not open *alone*, and it is not the window in front. For one release
 it was, and a hiring manager's first screen was a manual with no evidence in
 it, over a desktop that carried no name once the manual was closed. Now
-`use-app-url.ts` opens About in front and Tips snapped to the other half of
-the desktop (behind About in the cascade below 1200px, where two panes would
+`use-app-url.ts` opens About in front, snapped to two thirds, and Tips in the
+last third (behind About in the cascade below 1200px, where two panes would
 each be too narrow), so the layout demonstrates snapping before anyone reads
-about it. The lock screen carries the name and role for the same reason, and
+about it. It was two halves until About turned out to be 640px wide on a
+1280px laptop — a third of it nav rail, the CV buttons stacked three high.
+Both are laid out clear of the floor, as a launched window is.
+
+The Settings chrome (`.st-shell`) and the Explorer, Mail and editor shells
+are CSS **containers**: every rule that reacts to width inside a window uses
+`@container`, never `@media`. The shell only exists at 900px and up, so a
+viewport query written for a narrow pane can never match inside it — the
+first-arrival windows sat for months beside rules that were dead code. The lock screen carries the name and role for the same reason, and
 the boot holds are shorter than the real thing.
 
 The arrival is tracked in `shell-context.tsx` as two **idempotent markers**

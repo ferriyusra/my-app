@@ -134,8 +134,10 @@ Real, checkable, and already in the repository:
   and a configuration module with a field-level audit trail. The record is the
   author's Markdown write-up in `public/projects/meditap/`; what it leaves
   unrecorded is held in `openQuestions` and rendered.
-- **Nine projects** in `projects.ts`, joined by name to `skills.ts` — a join
-  pinned by `data.test.ts` because it fails silently.
+- **Five projects** in `projects.ts` — three production, two learning — joined
+  by name to `skills.ts`, a join pinned by `data.test.ts` because it fails
+  silently. Four more learning projects came out in 855f23a; the Recycle Bin
+  says why.
 - **28 skills** across Backend, Frontend, Database, DevOps, Cloud, AI Tools;
   nine are named by no role, and `skill-evidence.ts` says so rather than
   padding them.

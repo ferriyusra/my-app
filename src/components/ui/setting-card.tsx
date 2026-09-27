@@ -4,8 +4,14 @@ import type { IconLike } from '@/components/icons/line-icons';
 
 
 /**
- * One Settings row: a tinted glyph, a title over a description, and whatever
+ * One Settings row: a glyph, a title over a description, and whatever
  * control belongs on the right. Fluent's card, not a generic list item.
+ *
+ * The glyph is plain, as Windows 11 Settings draws it. Every card used to
+ * lead with the same blue plate, so a page of five cards showed five
+ * identical blue squares and the accent meant nothing by the time it reached
+ * the CV button. A plate is drawn only when a card has a state to report —
+ * `tint` — which is what Settings ▸ Activation uses it for.
  */
 export default function SettingCard({
 	Icon,
@@ -16,7 +22,8 @@ export default function SettingCard({
 	children,
 }: {
 	Icon?: IconLike;
-	/** Background for the glyph plate. Defaults to the accent. */
+	/** Draws a plate behind the glyph, in this colour, for a card that reports
+	    a state. Without it the glyph is plain. */
 	tint?: string;
 	title: React.ReactNode;
 	description?: React.ReactNode;
@@ -30,8 +37,9 @@ export default function SettingCard({
 					<span
 						className='st-card-icon'
 						aria-hidden='true'
+						data-plate={tint ? '' : undefined}
 						style={tint ? { background: tint } : undefined}>
-						<Icon size={18} />
+						<Icon size={tint ? 18 : 20} />
 					</span>
 				)}
 				<div className='st-card-text'>

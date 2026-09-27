@@ -9,6 +9,13 @@ export type SettingsPage = { key: string; label: string; Icon: IconLike };
  * The Windows 11 Settings chrome: an account card over a nav rail on the
  * left, a titled scrolling pane on the right. About, Skills, Experience and
  * Settings all wear it, which is why it lives here rather than in one app.
+ *
+ * The rail answers to the width of the window, not of the screen — the
+ * `st` container in globals.css — because that is what Windows' own
+ * NavigationView does, and because every snapped window is narrow on a
+ * screen that is not. The labels stay in the DOM when the rail collapses to
+ * icons, so each item keeps its accessible name; `title` is the tooltip the
+ * compact rail shows in Windows.
  */
 export default function SettingsShell({
 	pages,
@@ -18,6 +25,7 @@ export default function SettingsShell({
 	subtitle,
 	children,
 	navLabel = 'Sections',
+	account = true,
 }: {
 	pages: SettingsPage[];
 	active: string;
@@ -26,19 +34,24 @@ export default function SettingsShell({
 	subtitle?: string;
 	children: React.ReactNode;
 	navLabel?: string;
+	/** The signed-in account card. Tips has none in Windows, and on first
+	    arrival it sits beside About, which would show the same card twice. */
+	account?: boolean;
 }) {
 	return (
 		<div className='st-shell'>
 			<nav className='st-nav' aria-label={navLabel}>
-				<div className='st-account'>
-					<span className='st-avatar' aria-hidden='true'>
-						{profile.initials}
-					</span>
-					<span className='st-account-text'>
-						<strong>{profile.name}</strong>
-						<small>{profile.email}</small>
-					</span>
-				</div>
+				{account && (
+					<div className='st-account'>
+						<span className='st-avatar' aria-hidden='true'>
+							{profile.initials}
+						</span>
+						<span className='st-account-text'>
+							<strong>{profile.name}</strong>
+							<small>{profile.email}</small>
+						</span>
+					</div>
+				)}
 
 				<ul className='st-nav-list'>
 					{pages.map(({ key, label, Icon }) => (
@@ -48,10 +61,11 @@ export default function SettingsShell({
 								className='st-nav-item'
 								data-active={active === key || undefined}
 								aria-current={active === key ? 'page' : undefined}
+								title={label}
 								onClick={() => onSelect(key)}>
 								<span className='st-nav-rail' aria-hidden='true' />
 								<Icon size={17} aria-hidden='true' />
-								{label}
+								<span className='st-nav-text'>{label}</span>
 							</button>
 						</li>
 					))}

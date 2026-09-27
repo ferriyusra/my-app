@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useWindows } from '@/context/window-context';
 import { useShell } from '@/context/shell-context';
-import { useWindowManager } from '@/hooks/use-window-manager';
+import { useWindowManager, placementBounds } from '@/hooks/use-window-manager';
 import { isAppId } from '@/components/apps/registry';
 import type { AppId } from '@/types/windows';
 
@@ -24,8 +24,8 @@ import type { AppId } from '@/types/windows';
 const PARAM = 'app';
 
 /**
- * Below this desktop width the two first-arrival windows would each get less
- * than 600px, which is too narrow for a Settings-style pane with a rail.
+ * Below this desktop width About's two thirds would be under 800px and Tips'
+ * third under 400px, so the pair cascades instead.
  */
 const SIDE_BY_SIDE_MIN = 1200;
 
@@ -38,7 +38,7 @@ function appFromUrl(): AppId | null {
 
 export function useAppUrl() {
 	const { windows, topZ } = useWindows();
-	const { launch, focus, snap, bounds } = useWindowManager();
+	const { launch, focus, snap } = useWindowManager();
 	const { booted, arrival } = useShell();
 
 	/** What the URL last said, so a sync does not fight a user action. */
@@ -57,7 +57,16 @@ export function useAppUrl() {
 	   name on it once the manual was closed. Now About opens in front, and
 	   Tips opens beside it, snapped to the other half — which demonstrates
 	   snapping without anyone reading about it. Where the desktop is too
-	   narrow for two panes, Tips sits behind About in the cascade instead. */
+	   narrow for two panes, Tips sits behind About in the cascade instead.
+
+	   The split is two thirds and one third, not halves. At half of a 1280px
+	   screen About was 640px wide, a third of it nav rail, and the evidence
+	   sat in a column narrower than the phone view with its CV buttons
+	   stacked three high, beside a manual of the same width. The reader came
+	   for About; Tips is the aside. Both are laid out clear of the floor, as
+	   a launched window is, so the cat, its house and the watermark walk
+	   under neither on arrival. A snap the visitor makes still uses the whole
+	   desktop. */
 	useEffect(() => {
 		if (!booted || started.current) return;
 		started.current = true;
@@ -71,14 +80,14 @@ export function useAppUrl() {
 		   context's own `snap` rather than the manager's: this is a layout,
 		   not a gesture, and must not have Snap Assist offer to fill a half
 		   that is already full. */
-		const b = bounds();
+		const b = placementBounds();
 		launch('tips');
 		launch('about');
 		if (b.w >= SIDE_BY_SIDE_MIN) {
-			snap('tips', 'right', b);
-			snap('about', 'left', b);
+			snap('tips', 'third-r', b);
+			snap('about', 'wide-l', b);
 		}
-	}, [booted, arrival, launch, snap, bounds]);
+	}, [booted, arrival, launch, snap]);
 
 	/* Keep the address bar pointed at whatever is in front. Opening an app is
 	   a navigation and gets a history entry; merely raising one that is
