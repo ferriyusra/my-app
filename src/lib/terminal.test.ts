@@ -4,7 +4,8 @@ import { test } from 'node:test';
 import { experiences } from '../data/experience.ts';
 import { notes, writtenNotes } from '../data/notes.ts';
 import { skills } from '../data/skills.ts';
-import { completions, run } from './terminal.ts';
+import { HINT_COMMANDS, completions, run } from './terminal.ts';
+import { profile } from '../data/profile.ts';
 
 const text = (cmd: string) => run(cmd).lines.map((l) => l.text).join('\n');
 
@@ -44,6 +45,22 @@ test('skill reports the roles that actually name the tool', () => {
 test('skill is case-insensitive and matches a partial name', () => {
 	assert.match(text('skill postgres'), /PostgreSQL/);
 	assert.match(text('skill GO'), /Used in/);
+});
+
+test('every command the opening hint suggests is one the terminal answers', () => {
+	for (const c of HINT_COMMANDS) {
+		const r = run(c);
+		assert.ok(r.lines.length > 0, `${c} printed nothing`);
+		assert.ok(!r.lines.some((l) => l.tone === 'error'), `${c} is suggested and then fails`);
+	}
+});
+
+test('open case lands on the write-up, not on Experience\'s front page', () => {
+	assert.deepEqual({ open: run('open case').open, intent: run('open case').intent }, { open: 'experience', intent: 'case' });
+});
+
+test('contact carries the CV', () => {
+	assert.ok(run('contact').lines.some((l) => l.text.includes(profile.cvView)));
 });
 
 test('open hands a real app id back to the shell', () => {

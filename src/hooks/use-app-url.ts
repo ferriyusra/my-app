@@ -5,6 +5,7 @@ import { useWindows } from '@/context/window-context';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager, placementBounds } from '@/hooks/use-window-manager';
 import { isAppId } from '@/components/apps/registry';
+import { sendIntent } from '@/hooks/use-app-intent';
 import type { AppId } from '@/types/windows';
 
 /**
@@ -29,6 +30,26 @@ const PARAM = 'app';
  */
 const SIDE_BY_SIDE_MIN = 1200;
 
+/**
+ * Where inside the front window the reader is, as the address bar's `at`.
+ *
+ * Only one place is worth a URL today: Experience's case study, which is the
+ * thing the owner sends a link to. `?app=experience&at=case` lands on it,
+ * on the desktop and — through DocDeepLink — on a phone.
+ *
+ * An app announces its place rather than writing the address bar itself, so
+ * this hook stays the only writer of it.
+ */
+const AT = 'at';
+const PLACE_EVENT = 'shell:app-place';
+type Place = { app: AppId; at: string | null };
+
+/** Say where in `app` the reader now is; `null` for its front page. */
+export function announcePlace(app: AppId, at: string | null) {
+	if (typeof window === 'undefined') return;
+	window.dispatchEvent(new CustomEvent<Place>(PLACE_EVENT, { detail: { app, at } }));
+}
+
 /** The app named in the current URL, if it names a real one. */
 function appFromUrl(): AppId | null {
 	if (typeof window === 'undefined') return null;
@@ -46,6 +67,8 @@ export function useAppUrl() {
 	const started = useRef(false);
 	/** Which apps were open last time round, to tell opening from raising. */
 	const wasOpen = useRef<AppId[]>([]);
+	/** The last place an app announced, kept while that app is in front. */
+	const place = useRef<Place | null>(null);
 
 	/* Arrival: open what was asked for, or About when nothing was. A shared
 	   ?app= link wins, because it is read first.
@@ -72,6 +95,8 @@ export function useAppUrl() {
 		started.current = true;
 		const asked = appFromUrl();
 		shown.current = asked;
+		const at = new URLSearchParams(window.location.search).get(AT);
+		if (asked === 'experience' && at === 'case') sendIntent('experience', 'case');
 		if (asked || arrival !== 'first') {
 			launch(asked ?? 'about');
 			return;
@@ -109,6 +134,9 @@ export function useAppUrl() {
 		const url = new URL(window.location.href);
 		if (front) url.searchParams.set(PARAM, front);
 		else url.searchParams.delete(PARAM);
+		/* A place belongs to one app; raising another drops it. */
+		if (place.current?.app === front && place.current.at) url.searchParams.set(AT, place.current.at);
+		else url.searchParams.delete(AT);
 
 		/* An app that was not open a moment ago is a navigation; one that was
 		   is merely being raised, and rewrites the entry instead of adding to
@@ -117,6 +145,23 @@ export function useAppUrl() {
 		shown.current = front;
 		window.history[opening ? 'pushState' : 'replaceState']({}, '', url);
 	}, [windows, topZ]);
+
+	/* An app moving within itself rewrites the current entry — a place is not
+	   a navigation, and the back button should not step through pages of one
+	   window. */
+	useEffect(() => {
+		const onPlace = (e: Event) => {
+			const next = (e as CustomEvent<Place>).detail;
+			place.current = next;
+			if (!started.current || shown.current !== next.app) return;
+			const url = new URL(window.location.href);
+			if (next.at) url.searchParams.set(AT, next.at);
+			else url.searchParams.delete(AT);
+			window.history.replaceState({}, '', url);
+		};
+		window.addEventListener(PLACE_EVENT, onPlace);
+		return () => window.removeEventListener(PLACE_EVENT, onPlace);
+	}, []);
 
 	/* Back and forward move between the apps that were opened. */
 	useEffect(() => {

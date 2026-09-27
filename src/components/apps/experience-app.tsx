@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Building2, FileCode2, History } from 'lucide-react';
 import { LiChevronDown, LiMapPin } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import CaseStudyBody from '@/components/content/case-study-body';
 import { useAppIntent } from '@/hooks/use-app-intent';
+import { announcePlace } from '@/hooks/use-app-url';
 import { caseStudy, caseStudyLength } from '@/data/case-study';
 import {
 	experiences,
@@ -236,6 +237,12 @@ export default function ExperienceApp() {
 	});
 
 	const isCase = page === 'case';
+
+	/* Put the case study in the address bar, so the link the owner copies to
+	   send someone is the link to the write-up. */
+	useEffect(() => {
+		announcePlace('experience', isCase ? 'case' : null);
+	}, [isCase]);
 
 	return (
 		<SettingsShell

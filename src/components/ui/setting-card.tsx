@@ -20,6 +20,7 @@ export default function SettingCard({
 	description,
 	control,
 	children,
+	prose = false,
 }: {
 	Icon?: IconLike;
 	/** Draws a plate behind the glyph, in this colour, for a card that reports
@@ -29,9 +30,12 @@ export default function SettingCard({
 	description?: React.ReactNode;
 	control?: React.ReactNode;
 	children?: React.ReactNode;
+	/** The description is a paragraph to read, not a row's caption: set at
+	    body size. Settings rows keep Windows' caption size. */
+	prose?: boolean;
 }) {
 	return (
-		<section className='st-card'>
+		<section className='st-card' data-prose={prose || undefined}>
 			<div className='st-card-row'>
 				{Icon && (
 					<span

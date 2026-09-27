@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import { DEFAULT_WALLPAPER } from '@/lib/shell-defaults';
+import { DEFAULT_WALLPAPER, SHELL_QUERY } from '@/lib/shell-defaults';
 
 /**
  * Segoe UI Variable is the Windows 11 system face, so a Windows visitor gets
@@ -43,6 +43,8 @@ export const metadata: Metadata = {
 		description: DESCRIPTION,
 	},
 	robots: { index: true, follow: true },
+	/* ?app= and ?at= are places inside one page, not pages: one canonical. */
+	alternates: { canonical: '/' },
 };
 
 export const viewport = {
@@ -76,7 +78,7 @@ d.setAttribute('data-accent',g('shell:accent','blue'));
 var w=g('shell:wallpaper','${DEFAULT_WALLPAPER}'),cw=w.indexOf('custom:')===0?w.slice(7):'';
 if(cw&&/^[A-Za-z0-9][\\w.-]*$/.test(cw)){d.setAttribute('data-wallpaper','custom');d.style.setProperty('--wp-custom','url("/background/'+encodeURIComponent(cw)+'")');}
 else d.setAttribute('data-wallpaper',cw?'bloom':w);
-d.setAttribute('data-shell',matchMedia('(min-width: 900px)').matches?'desktop':'document');
+d.setAttribute('data-shell',matchMedia('${SHELL_QUERY}').matches?'desktop':'document');
 var b=g('shell:brightness','1');if(b)d.style.setProperty('--screen-dim',String(Math.max(0,Math.min(0.65,1-parseFloat(b)||0))));}catch(e){}`;
 
 export default function RootLayout({

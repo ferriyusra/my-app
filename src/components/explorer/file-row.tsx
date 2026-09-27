@@ -1,8 +1,15 @@
 'use client';
 
 import type { FsEntry } from './types';
+import { useTapOpen } from '@/hooks/use-tap-open';
 
-/** An Explorer row, used by both the List and Details views. */
+/**
+ * An Explorer row, used by both the List and Details views.
+ *
+ * The row is a `div` with the row role and the button sits inside it: a
+ * `<button role='row'>` replaces the button's role, so a screen reader was
+ * told it was on a row it could not press.
+ */
 export default function FileRow({
 	entry,
 	selected,
@@ -15,26 +22,31 @@ export default function FileRow({
 	details: boolean;
 	onSelect: () => void;
 }) {
+	const tap = useTapOpen(entry.onOpen);
 	return (
-		<button
-			type='button'
-			className='xp-row'
-			role='row'
-			data-selected={selected || undefined}
-			aria-label={`${entry.name} — ${entry.type}`}
-			onClick={onSelect}
-			onDoubleClick={entry.onOpen}
-			onKeyDown={(e) => {
-				if (e.key === 'Enter') {
-					e.preventDefault();
-					entry.onOpen();
-				}
-			}}>
+		<div className='xp-row' role='row' data-selected={selected || undefined}>
 			<span className='xp-row-name' role='cell'>
-				<span className='xp-row-icon' aria-hidden='true'>
-					{entry.icon}
-				</span>
-				{entry.name}
+				<button
+					type='button'
+					className='xp-row-btn'
+					aria-label={`${entry.name} — ${entry.type}`}
+					onPointerDown={tap.onPointerDown}
+					onClick={(e) => {
+						onSelect();
+						tap.onClick(e);
+					}}
+					onDoubleClick={tap.onDoubleClick}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							e.preventDefault();
+							entry.onOpen();
+						}
+					}}>
+					<span className='xp-row-icon' aria-hidden='true'>
+						{entry.icon}
+					</span>
+					{entry.name}
+				</button>
 			</span>
 			{details && (
 				<>
@@ -46,6 +58,6 @@ export default function FileRow({
 					</span>
 				</>
 			)}
-		</button>
+		</div>
 	);
 }

@@ -399,6 +399,7 @@ html[data-theme='dark'] .icon-adaptive { filter: invert(1) brightness(1.7); }
 }
 .sheet-card h1 { margin: 18px 0 10px; font-size: 24px; }
 .sheet-card p { margin: 0 0 22px; color: var(--ink-secondary); }
+.sheet-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 .sheet-icon {
   display: inline-grid;
   place-items: center;
@@ -419,6 +420,7 @@ html[data-shell='desktop'] .boot {
   position: fixed;
   inset: 0;
   background: #000;
+  color: #fff;
 }
 html[data-shell='desktop'] .doc,
 html[data-shell='desktop'] .skip-link { display: none; }
@@ -439,6 +441,9 @@ html:not([data-shell]) .mb-theme { display: none; }
   position: fixed;
   inset: 0;
   overflow: hidden;
+  /* One-finger drags reach the marquee and the icon drag instead of being
+     claimed as a pan; pinch zoom stays, which none would take away. */
+  touch-action: pinch-zoom;
   font-family: var(--sans);
   --desk-label: #10233f;
   --desk-label-shadow: 0 1px 2px rgba(255, 255, 255, 0.55);
@@ -757,6 +762,18 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
 .win-grip[data-edge='ne'] { top: -3px; right: -3px; width: 14px; height: 14px; cursor: nesw-resize; }
 .win-grip[data-edge='sw'] { bottom: -3px; left: -3px; width: 14px; height: 14px; cursor: nesw-resize; }
 .win-grip[data-edge='se'] { bottom: -3px; right: -3px; width: 14px; height: 14px; cursor: nwse-resize; }
+/* A finger is not a cursor: on a touch screen the grips reach further out of
+   the frame, as the -3px offsets already do, rather than into the content. */
+@media (pointer: coarse) {
+  .win-grip[data-edge='n'] { top: -8px; height: 16px; }
+  .win-grip[data-edge='s'] { bottom: -8px; height: 16px; }
+  .win-grip[data-edge='w'] { left: -8px; width: 16px; }
+  .win-grip[data-edge='e'] { right: -8px; width: 16px; }
+  .win-grip[data-edge='nw'] { top: -8px; left: -8px; width: 24px; height: 24px; }
+  .win-grip[data-edge='ne'] { top: -8px; right: -8px; width: 24px; height: 24px; }
+  .win-grip[data-edge='sw'] { bottom: -8px; left: -8px; width: 24px; height: 24px; }
+  .win-grip[data-edge='se'] { bottom: -8px; right: -8px; width: 24px; height: 24px; }
+}
 
 /* ── The plate Windows paints where a drag would land ── */
 .snap-ghost {
@@ -2445,6 +2462,7 @@ input[type='range']::-moz-range-thumb {
 .st-card-text { flex: 1; min-width: 0; }
 .st-card-text h3 { font-size: 14px; font-weight: 600; }
 .st-card-text p { margin: 3px 0 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.st-card[data-prose] .st-card-text p { max-width: 72ch; font-size: var(--t-body); line-height: 20px; color: var(--ink-secondary); }
 .st-card-control { flex-shrink: 0; }
 .st-card-extra {
   padding: 0 16px 16px;
@@ -3112,6 +3130,29 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 .xp-row:hover { background: var(--subtle-hover); }
 .xp-row[data-selected] { background: color-mix(in srgb, var(--accent) 16%, transparent); }
 .xp-row-name { display: flex; align-items: center; gap: 10px; min-width: 0; }
+/* The row is a row, and the button inside it is the control. Its hit area
+   is stretched over the whole row, so a press on the Type column still
+   selects, as it did when the row itself was the button. */
+.xp-row { position: relative; }
+.xp-row-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+.xp-row-btn::after { content: ''; position: absolute; inset: 0; border-radius: var(--r-sm); }
+.xp-row-btn:focus-visible { outline: none; }
+.xp-row-btn:focus-visible::after { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* A double-tap must not zoom the page, or a tap has to wait to find out. */
+.desk-icon,
+.xp-tile,
+.xp-row-btn { touch-action: manipulation; }
 .xp-row-icon { display: grid; place-items: center; width: 22px; height: 22px; }
 .xp-row-icon svg,
 .xp-row-icon .xp-file-mark,
@@ -3387,6 +3428,8 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 .ml-message-head h2 { font-size: 18px; }
 .ml-message-head p { margin: 3px 0 0; font-size: 13px; color: var(--ink-muted); word-break: break-all; }
 .ml-message-body { margin: 18px 0 20px; font-size: 14px; line-height: 22px; color: var(--ink-secondary); }
+.ml-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ml-actions + .ml-reply { margin: 12px 0 0; }
 .ml-reply {
   display: inline-flex;
   align-items: center;
@@ -4353,7 +4396,7 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   letter-spacing: 0.02em;
   color: var(--ink-muted);
 }
-.ab-now dd, .mb-now dd { margin: 0; font-size: 14px; line-height: 22px; }
+.ab-now dd, .mb-now dd { margin: 0; max-width: 72ch; font-size: 14px; line-height: 22px; }
 .ab-now-stamp {
   margin: 14px 0 0;
   font-size: 11px;
@@ -5772,7 +5815,7 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 /* ═══════════════════════════════════════════════════════════
    MOBILE SHELL
    A windowing metaphor needs a pointer and room to overlap.
-   Below 900px it gets neither, so the content moves to a
+   A phone gets neither, either way up, so the content moves to a
    widgets-board layout built from the same tokens.
    ═══════════════════════════════════════════════════════════ */
 
@@ -5839,6 +5882,7 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 .mb-jump a { color: var(--accent); text-decoration: none; }
 .mb-jump a:hover { text-decoration: underline; }
 
+.mb-print-cv { display: none; }
 .mb-spine > li { scroll-margin-top: 16px; }
 .mb-case { scroll-margin-top: 16px; }
 /* The route past the case study to the next role. */
@@ -6184,6 +6228,7 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   .mb-jump,
   .mb-skip,
   .mb-fold-head > svg { display: none !important; }
+  .mb-print-cv { display: block; margin: 3mm 0 0; font-size: 10pt; }
 
   .mb-fold { border: none; }
   .mb-fold-head { padding: 0; }

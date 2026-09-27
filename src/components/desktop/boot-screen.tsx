@@ -135,10 +135,20 @@ export default function BootScreen() {
 			)}
 
 			{phase === 'boot' && (
-				<div className='bt-stage'>
-					<WindowsLogo size={58} />
-					<Spinner />
-				</div>
+				<>
+					<div className='bt-stage'>
+						<WindowsLogo size={58} />
+						<Spinner />
+					</div>
+					{/* Held over from the page's holding screen, so the name does
+					    not appear, vanish for the logo, and appear again. */}
+					<div className='bt-who'>
+						<strong>{profile.name}</strong>
+						<span>
+							{profile.role} — {profile.roleDetail}
+						</span>
+					</div>
+				</>
 			)}
 
 			{phase === 'lock' && (

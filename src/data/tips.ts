@@ -35,7 +35,7 @@ export const TIP_PAGES: TipPage[] = [
 		tips: [
 			{
 				title: 'Double-click a desktop icon',
-				body: 'Single click selects, double click opens — the same as the desktop it is imitating. Arrow keys walk the grid and Enter opens, so nothing here needs a mouse.',
+				body: 'Single click selects, double click opens — the same as the desktop it is imitating. On a touch screen a tap opens, and a screen reader opens it with one press. Arrow keys walk the grid and Enter opens, so nothing here needs a mouse.',
 				where: 'Desktop',
 			},
 			{
@@ -45,7 +45,7 @@ export const TIP_PAGES: TipPage[] = [
 			},
 			{
 				title: 'Hover the maximise button',
-				body: 'Snap Layouts opens after a moment, with four arrangements and thirteen zones. Pick one and Snap Assist offers to fill the space beside it with whatever else is open.',
+				body: 'Snap Layouts opens after a moment — or press ↓ with the button focused — with four arrangements and thirteen zones. Pick one and Snap Assist offers to fill the space beside it with whatever else is open.',
 				where: 'Any window title bar',
 			},
 			{
@@ -98,7 +98,7 @@ export const TIP_PAGES: TipPage[] = [
 			},
 			{
 				title: 'The whole portfolio is in the HTML',
-				body: 'Turn JavaScript off, or read the response body, and the portfolio is still there as plain semantic markup — the same data, rendered by server components. Below 900px that document is the entire experience, because a windowing metaphor needs a pointer and room to overlap.',
+				body: 'Turn JavaScript off, or read the response body, and the portfolio is still there as plain semantic markup — the same data, rendered by server components. Below 900px, and on a phone turned sideways, that document is the entire experience, because a windowing metaphor needs a pointer and room to overlap.',
 				where: 'View source',
 			},
 		],
@@ -159,6 +159,7 @@ export const SHORTCUTS: Shortcut[] = [
 	{ chord: '⊞ E', does: 'Open File Explorer' },
 	{ chord: 'Ctrl F6', does: 'Move to the next open window; add Shift to go back' },
 	{ chord: 'Alt F4', does: 'Close the top window' },
+	{ chord: '↓ on maximise', does: 'Open Snap Layouts; arrows pick a zone, Enter snaps, Esc backs out' },
 	{ chord: 'Esc', does: 'Close the open menu, flyout or window' },
 	{ chord: 'F5', does: 'Refresh the desktop and clear the selection' },
 	{ chord: '↑ ↓ ← →', does: 'Walk the desktop icon grid; Enter opens' },

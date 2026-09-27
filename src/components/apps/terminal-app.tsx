@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWindowManager } from '@/hooks/use-window-manager';
-import { completions, run, type Line } from '@/lib/terminal';
+import { TERMINAL_HINT, completions, run, type Line } from '@/lib/terminal';
+import { sendIntent } from '@/hooks/use-app-intent';
 import { profile } from '@/data/profile';
 
 /**
@@ -23,7 +24,10 @@ type Block = { id: number; input: string; lines: Line[] };
 
 const BANNER: Line[] = [
 	{ text: `${profile.name} — ${profile.role}`, tone: 'accent' },
-	{ text: 'Type `help` for the command list.', tone: 'dim' },
+	/* Real commands to start from: a blank prompt that says only "help"
+	   leaves the reader to guess the vocabulary. Every word here is one
+	   run() accepts — terminal.test.ts checks. */
+	{ text: TERMINAL_HINT, tone: 'dim' },
 	{ text: '' },
 ];
 
@@ -90,7 +94,10 @@ export default function TerminalApp() {
 		setBlocks((b) => [...b, { id: seq.current, input: line, lines: result.lines }]);
 		/* The window manager is the shell's, not the terminal's — `open` asks
 		   for a real window rather than drawing a fake one. */
-		if (result.open) launch(result.open);
+		if (result.open) {
+			if (result.intent) sendIntent(result.open, result.intent);
+			launch(result.open);
+		}
 	}, [launch, value]);
 
 	const onKeyDown = useCallback(

@@ -447,7 +447,7 @@ export default function ExplorerApp() {
 					</span>
 					{selectedEntry && !openItem && (
 						<span className='xp-status-sel'>
-							1 selected · {selectedEntry.type} — double-click to open
+							1 selected · {selectedEntry.type} — double-click, or tap, to open
 						</span>
 					)}
 				</footer>

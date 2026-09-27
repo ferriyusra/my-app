@@ -1,8 +1,11 @@
 'use client';
 
+import { useTapOpen } from '@/hooks/use-tap-open';
+
 /**
- * An Explorer tile in the Large icons view. Single click selects, double
- * click opens — the same contract as the desktop grid.
+ * An Explorer tile in the Large icons view. With a mouse, single click
+ * selects and double click opens — the same contract as the desktop grid —
+ * and a tap or an assistive-technology click opens.
  */
 export default function FolderCard({
 	entry,
@@ -13,14 +16,19 @@ export default function FolderCard({
 	selected: boolean;
 	onSelect: () => void;
 }) {
+	const tap = useTapOpen(entry.onOpen);
 	return (
 		<button
 			type='button'
 			className='xp-tile'
 			data-selected={selected || undefined}
 			aria-label={`${entry.name} — ${entry.type}`}
-			onClick={onSelect}
-			onDoubleClick={entry.onOpen}
+			onPointerDown={tap.onPointerDown}
+			onClick={(e) => {
+				onSelect();
+				tap.onClick(e);
+			}}
+			onDoubleClick={tap.onDoubleClick}
 			onKeyDown={(e) => {
 				if (e.key === 'Enter') {
 					e.preventDefault();

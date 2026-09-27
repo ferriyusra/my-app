@@ -3,13 +3,12 @@
 import { useMemo, useState } from 'react';
 import { LayoutGrid, Pin, PinOff, SquareStack, X } from 'lucide-react';
 import { LiSearch } from '@/components/icons/line-icons';
-import { DocumentIcon, GitHubIcon } from '@/components/icons/app-icons';
 import { useShell } from '@/context/shell-context';
 import { useWindowManager } from '@/hooks/use-window-manager';
-import { APP_BY_ID, APPS } from '@/components/apps/registry';
+import { APP_BY_ID, APPS, SHORTCUT_BY_ID } from '@/components/apps/registry';
 import ContextMenu, { type MenuEntry } from '@/components/ui/context-menu';
 import WindowsLogo from '@/components/ui/windows-logo';
-import TaskbarItem from './taskbar-item';
+import TaskbarItem, { TaskbarLink } from './taskbar-item';
 import SystemTray from './system-tray';
 import { useClock } from '@/hooks/use-clock';
 import { profile } from '@/data/profile';
@@ -24,14 +23,32 @@ export default function Taskbar() {
 	const [menu, setMenu] = useState<{ x: number; y: number; id: AppId } | null>(null);
 
 	/* Pinned apps first, then anything else that is running — which is exactly
-	   how Windows orders the strip. */
-	const shown = useMemo(() => {
+	   how Windows orders the strip. The CV and GitHub are pinned too, so they
+	   sit with the pins, ahead of the running apps: they used to come last and
+	   drift one slot right every time a window opened. */
+	const extra = useMemo(() => {
 		const running = windows.map((w) => w.id);
-		const extra = APPS.filter(
-			(a) => running.includes(a.id) && !pinned.includes(a.id),
-		).map((a) => a.id);
-		return [...pinned, ...extra];
+		return APPS.filter((a) => running.includes(a.id) && !pinned.includes(a.id)).map(
+			(a) => a.id,
+		);
 	}, [windows, pinned]);
+
+	const item = (id: AppId) => {
+		const win = windows.find((w) => w.id === id);
+		return (
+			<TaskbarItem
+				key={id}
+				app={APP_BY_ID[id]}
+				running={!!win}
+				active={!!win && !win.minimised && win.z === topZ}
+				onActivate={() => toggleFromTaskbar(id)}
+				onContextMenu={(e) => {
+					e.preventDefault();
+					setMenu({ x: e.clientX, y: e.clientY, id });
+				}}
+			/>
+		);
+	};
 
 	const itemMenu = (id: AppId): MenuEntry[] => {
 		const app = APP_BY_ID[id];
@@ -117,47 +134,22 @@ export default function Taskbar() {
 
 				<span className='tb-sep' aria-hidden='true' />
 
-				{shown.map((id) => {
-					const win = windows.find((w) => w.id === id);
-					return (
-						<TaskbarItem
-							key={id}
-							app={APP_BY_ID[id]}
-							running={!!win}
-							active={!!win && !win.minimised && win.z === topZ}
-							onActivate={() => toggleFromTaskbar(id)}
-							onContextMenu={(e) => {
-								e.preventDefault();
-								setMenu({ x: e.clientX, y: e.clientY, id });
-							}}
-						/>
-					);
-				})}
+				{pinned.map(item)}
 
 				{/* The CV is the one real file on this desktop and the action a
 				    visit succeeds in. It sits on the strip for the same reason
-				    GitHub does: a destination, always one click away. */}
-				<a
-					className='tb-btn tb-link'
-					href={profile.cvView}
-					target='_blank'
-					rel='noopener noreferrer'
-					aria-label='Resume — PDF, opens in a new tab'>
-					<DocumentIcon size={22} />
-				</a>
+				    GitHub does: a destination, always one click away. Both are
+				    real destinations, not apps — they leave the page. */}
+				<TaskbarLink
+					shortcut={SHORTCUT_BY_ID.resume}
+					label='Resume — PDF, opens in a new tab'
+				/>
+				<TaskbarLink
+					shortcut={SHORTCUT_BY_ID.github}
+					label='GitHub profile — opens in a new tab'
+				/>
 
-				{/* GitHub is a real destination, not an app — it leaves the page. */}
-				<a
-					className='tb-btn tb-link'
-					href={profile.github}
-					target='_blank'
-					rel='noopener noreferrer'
-					aria-label='GitHub profile — opens in a new tab'>
-					{/* Its own mark, like every other app icon on the strip. The
-					    Start, Search and Task view glyphs stay line art because
-					    those are system controls, which is what Windows does. */}
-					<GitHubIcon size={22} />
-				</a>
+				{extra.map(item)}
 			</div>
 
 			<SystemTray onShowDesktop={minimiseAll} />

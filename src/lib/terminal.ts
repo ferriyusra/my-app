@@ -11,6 +11,7 @@
 
 import { experiences, tenureLabel, tenureMonths } from '../data/experience.ts';
 import { projects } from '../data/projects.ts';
+import { evidenceFor } from './skill-evidence.ts';
 import { skills } from '../data/skills.ts';
 import { caseStudy, type CaseBlock } from '../data/case-study.ts';
 import { profile, careerSince } from '../data/profile.ts';
@@ -32,9 +33,15 @@ export type Result = {
 	lines: Line[];
 	/** A window the command asked the shell to open. */
 	open?: AppId;
+	/** Where in that window: a note for `sendIntent`, as About sends one. */
+	intent?: string;
 	/** Set by `clear`. */
 	clear?: boolean;
 };
+
+/** The commands the prompt suggests on open. Each is one `run()` accepts. */
+export const HINT_COMMANDS = ['whoami', 'cat case', 'skill go', 'ls roles', 'open case', 'contact'] as const;
+export const TERMINAL_HINT = `try: ${HINT_COMMANDS.join(' · ')} — or help`;
 
 const dim = (text: string): Line => ({ text, tone: 'dim' });
 const acc = (text: string): Line => ({ text, tone: 'accent' });
@@ -131,7 +138,7 @@ const COMMANDS = [
 	['uptime', 'years in the industry, computed'],
 	['notes', 'what I am studying, and what is written up'],
 	['tips [keys]', 'what this desktop does, and the keys it answers to'],
-	['contact', 'how to reach me'],
+	['contact', 'how to reach me, and the CV'],
 	['clear', 'clear the screen'],
 ] as const;
 
@@ -325,10 +332,10 @@ export function run(input: string): Result {
 			if (!arg) return { lines: [{ text: 'skill: needs a name', tone: 'error' }] };
 			const hit = skills.find((s) => s.name.toLowerCase() === arg) ?? skills.find((s) => s.name.toLowerCase().includes(arg));
 			if (!hit) return { lines: [{ text: `skill: not found: ${arg}`, tone: 'error' }, dim('ls skills')] };
-			/* Evidence, computed — the roles that actually name it. */
-			const used = experiences.filter((e) => e.tech.includes(hit.name));
-			const months = used.reduce((n, e) => n + tenureMonths(e), 0);
-			const built = projects.filter((x) => x.tech.includes(hit.name));
+			/* Evidence, computed — the roles that actually name it, from the
+			   same function the Skills window answers from, so the two cannot
+			   drift. */
+			const { roles: used, months, projects: built } = evidenceFor(hit.name);
 			return {
 				lines: [
 					acc(hit.name),
@@ -344,12 +351,18 @@ export function run(input: string): Result {
 		}
 
 		case 'open': {
+			/* The first thing an engineer tries for the best content on the
+			   site, and it was "unknown window". It opens Experience at the
+			   write-up rather than at its front page. */
+			if (arg === 'case' || arg === 'case-study') {
+				return { lines: [dim('opening the case study…')], open: 'experience', intent: 'case' };
+			}
 			const app = APP_WORDS[arg];
 			if (!app) {
 				return {
 					lines: [
 						{ text: `open: unknown window: ${arg || '(nothing)'}`, tone: 'error' },
-						dim(Object.keys(APP_WORDS).join(' · ')),
+						dim([...Object.keys(APP_WORDS), 'case'].join(' · ')),
 					],
 				};
 			}
@@ -396,6 +409,7 @@ export function run(input: string): Result {
 			return {
 				lines: [
 					acc('Reach me'),
+					p(`  cv        ${profile.site}${profile.cvView}`),
 					p(`  email     ${profile.email}`),
 					p(`  github    ${profile.github}`),
 					p(`  linkedin  ${profile.linkedin}`),

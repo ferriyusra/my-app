@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import AppTile, { type TileArt } from '@/components/ui/app-tile';
+import { useTapOpen } from '@/hooks/use-tap-open';
 
 type Props = {
 	id: string;
@@ -22,8 +23,10 @@ type Props = {
 };
 
 /**
- * One desktop cell. Single click selects and double click opens, matching
- * Windows; Enter opens too, so the grid works from the keyboard.
+ * One desktop cell. With a mouse, single click selects and double click
+ * opens, matching Windows; Enter opens too, so the grid works from the
+ * keyboard; and a tap, a screen reader or voice control opens it with the one
+ * click they send (see useTapOpen).
  */
 function DesktopIcon({
 	id,
@@ -39,6 +42,7 @@ function DesktopIcon({
 	onContextMenu,
 	onDragStart,
 }: Props) {
+	const tap = useTapOpen(onOpen, !!href);
 	const common = {
 		'data-icon-id': id,
 		className: 'desk-icon',
@@ -49,12 +53,14 @@ function DesktopIcon({
 			   this click is about to make — and from starting a marquee, since
 			   the press landed on an icon rather than bare wallpaper. */
 			e.stopPropagation();
+			tap.onPointerDown(e);
 			onSelect();
 			/* Which is also why the drag begins here rather than on the <li>:
 			   the event never gets that far. */
 			onDragStart(e);
 		},
-		onDoubleClick: onOpen,
+		onClick: tap.onClick,
+		onDoubleClick: tap.onDoubleClick,
 		onKeyDown: (e: React.KeyboardEvent) => {
 			if (e.key === 'Enter' || e.key === ' ') {
 				e.preventDefault();
@@ -84,10 +90,7 @@ function DesktopIcon({
 				href={href}
 				target='_blank'
 				rel='noopener noreferrer'
-				aria-label={`${label} — opens in a new tab`}
-				/* The anchor's own activation would race the double-click, so the
-				   open path stays the one the grid controls. */
-				onClick={(e) => e.preventDefault()}>
+				aria-label={`${label} — opens in a new tab`}>
 				{inner}
 			</a>
 		);

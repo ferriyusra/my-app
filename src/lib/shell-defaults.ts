@@ -25,3 +25,23 @@ export const DEFAULT_WALLPAPER = 'custom:bloom-photo.jpeg';
 
 /** What it falls back to: always present, because it is drawn in CSS. */
 export const FALLBACK_WALLPAPER = 'bloom';
+
+/**
+ * Who gets the desktop: a screen at least 900px wide that also has a mouse or
+ * trackpad, or is tall enough for windows to overlap.
+ *
+ * It was width alone, and most large phones are 915–932px wide on their
+ * side — so a recruiter who turned a phone to read the case study's table
+ * watched the document vanish into a boot sequence and a double-click desktop
+ * 430px tall, and came back to the top of the page when they turned it back.
+ * A windowing metaphor needs a pointer and room to overlap, which is what the
+ * docs always said; the query now checks both. A mouse keeps the desktop at
+ * any height (a docked DevTools, a 150% scale); a touch-only tablet keeps it
+ * when it is tall enough, as it did before.
+ *
+ * One string, read by the pre-paint script in layout.tsx and by the live
+ * listener in desktop.tsx, so the two cannot disagree — repo.test.ts checks
+ * that neither spells its own.
+ */
+export const SHELL_QUERY =
+	'(min-width: 900px) and (pointer: fine), (min-width: 900px) and (min-height: 600px)';

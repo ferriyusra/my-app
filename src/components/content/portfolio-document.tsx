@@ -1,6 +1,7 @@
 import { DocumentIcon, LiChevronDown, LiDownload, LiGithub, LiLinkedin, LiMail, LiMapPin } from '@/components/icons/line-icons';
 import ThemeToggle from './theme-toggle';
 import PrintExpander from './print-expander';
+import DocDeepLink from './doc-deep-link';
 import CaseStudyBody from './case-study-body';
 import { profile, careerSince } from '@/data/profile';
 import { experiences, tenureLabel } from '@/data/experience';
@@ -17,7 +18,8 @@ import { TOPICS, plannedNotes, writtenNotes } from '@/data/notes';
 /**
  * The portfolio as plain semantic HTML, in the response body.
  *
- * This is the whole experience below 900px and with scripting off, and it is
+ * This is the whole experience on a phone — either way up — and with
+ * scripting off (see SHELL_QUERY), and it is
  * what a crawler, an ATS and a printer see. It is a server component and must
  * stay one: before it existed the response body was an empty div.
  *
@@ -94,6 +96,7 @@ export default function PortfolioDocument() {
 	return (
 		<main className='mb-shell doc' id='main'>
 			<PrintExpander />
+			<DocDeepLink />
 			<header className='mb-head'>
 				<span className='mb-avatar' aria-hidden='true'>
 					{profile.initials}
@@ -115,6 +118,13 @@ export default function PortfolioDocument() {
 				</div>
 				<ThemeToggle />
 			</header>
+
+			{/* Paper has no buttons, and a printed CV-shaped page with no way to
+			    the CV was the one thing print dropped. Print-only. */}
+			<p className='mb-print-cv'>
+				CV: {profile.site.replace('https://', '')}
+				{profile.cvView}
+			</p>
 
 			<p className='mb-headline'>{profile.headline}</p>
 			<p className='mb-summary'>{profile.proof}</p>

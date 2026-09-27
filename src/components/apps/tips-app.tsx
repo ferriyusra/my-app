@@ -67,6 +67,7 @@ export default function TipsApp() {
 						key={t.title}
 						title={t.title}
 						description={t.body}
+						prose
 						control={
 							t.where ? <span className='tp-where'>{t.where}</span> : undefined
 						}

@@ -121,10 +121,18 @@ export const profile = {
 	linkedin: 'https://linkedin.com/in/ferriyusra',
 	site: 'https://ferriyusra.com',
 
-	cvView:
+	/**
+	 * Where the CV file lives. Nothing links these directly: next.config.ts
+	 * redirects /cv and /cv.pdf to them, so replacing the file is one edit
+	 * here and every button on the site keeps working.
+	 */
+	cvDriveView:
 		'https://drive.google.com/file/d/1-VPpaD0Rdhyq2BbZ7wdNQkbzyflgZtZ5/view?usp=sharing',
-	cvDownload:
+	cvDriveDownload:
 		'https://drive.google.com/uc?export=download&id=1-VPpaD0Rdhyq2BbZ7wdNQkbzyflgZtZ5',
+	/** What every CV button links: the site's own short addresses. */
+	cvView: '/cv',
+	cvDownload: '/cv.pdf',
 } as const;
 
 /**

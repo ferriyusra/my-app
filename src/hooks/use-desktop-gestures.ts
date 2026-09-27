@@ -145,10 +145,20 @@ export function useDesktopGestures({
 				draw(ev.clientX, ev.clientY);
 			};
 
-			const up = (ev: PointerEvent) => {
+			const stop = () => {
 				window.removeEventListener('pointermove', move);
 				window.removeEventListener('pointerup', up);
+				window.removeEventListener('pointercancel', cancel);
 				box0.dataset.on = 'false';
+			};
+			/* A touch screen can take a drag back as a scroll or a pinch and
+			   send pointercancel instead of pointerup. Without this the band
+			   stayed on screen and the listeners stayed attached, waiting for a
+			   pointerup that would then select whatever it landed near. */
+			const cancel = () => stop();
+
+			const up = (ev: PointerEvent) => {
+				stop();
 				if (!live) return;
 				/* One dispatch, at the end — never per frame. */
 				const box = {
@@ -169,6 +179,7 @@ export function useDesktopGestures({
 
 			window.addEventListener('pointermove', move);
 			window.addEventListener('pointerup', up);
+			window.addEventListener('pointercancel', cancel);
 		},
 		[onSelectMany],
 	);
@@ -193,17 +204,27 @@ export function useDesktopGestures({
 				el.style.transform = `translate3d(${ev.clientX - x0}px,${ev.clientY - y0}px,0)`;
 			};
 
-			const up = (ev: PointerEvent) => {
+			const stop = () => {
 				window.removeEventListener('pointermove', move);
 				window.removeEventListener('pointerup', up);
-				if (!live) return;
+				window.removeEventListener('pointercancel', cancel);
 				el.style.transform = '';
 				delete el.dataset.dragging;
+			};
+			/* Cancelled: put the icon back and commit nothing. It used to stay
+			   shifted with its listeners attached, so the next pointerup
+			   anywhere — a tap on the taskbar — moved it and saved the order. */
+			const cancel = () => stop();
+
+			const up = (ev: PointerEvent) => {
+				stop();
+				if (!live) return;
 				moveTo(id, slotAt(ev.clientX, ev.clientY), ids);
 			};
 
 			window.addEventListener('pointermove', move);
 			window.addEventListener('pointerup', up);
+			window.addEventListener('pointercancel', cancel);
 		},
 		[ids, moveTo, slotAt],
 	);

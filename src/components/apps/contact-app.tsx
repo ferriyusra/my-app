@@ -126,6 +126,18 @@ export default function ContactApp() {
 		: null;
 
 	/** A pre-filled draft in the visitor's own mail client. */
+	const copyEmail = () => {
+		navigator.clipboard
+			?.writeText(profile.email)
+			.then(() =>
+				notify({ app: 'contact', title: 'Email address copied', body: profile.email }),
+			)
+			.catch(() => {
+				/* Clipboard refused (an insecure origin, a denied permission):
+				   the address is on screen above the button either way. */
+			});
+	};
+
 	const mailtoDraft = () => {
 		const body = `From: ${form.name} <${form.email}>\n\n${form.message}`;
 		return `mailto:${profile.email}?subject=${encodeURIComponent(
@@ -404,15 +416,25 @@ export default function ContactApp() {
 
 						<p className='ml-message-body'>{active.body}</p>
 
-						<a
-							className='fl-btn fl-btn-accent'
-							href={active.href}
-							{...(active.href.startsWith('mailto:')
-								? {}
-								: { target: '_blank', rel: 'noopener noreferrer' })}>
-							<active.Icon size={15} aria-hidden='true' />
-							{active.action}
-						</a>
+						<div className='ml-actions'>
+							<a
+								className='fl-btn fl-btn-accent'
+								href={active.href}
+								{...(active.href.startsWith('mailto:')
+									? {}
+									: { target: '_blank', rel: 'noopener noreferrer' })}>
+								<active.Icon size={15} aria-hidden='true' />
+								{active.action}
+							</a>
+							{/* A mailto: link does nothing, or asks to set up a mail app,
+							    for a reader on webmail — which is most recruiters. The
+							    address, copied, works everywhere. */}
+							{active.id === 'email' && (
+								<button type='button' className='fl-btn fl-btn-standard' onClick={copyEmail}>
+									Copy address
+								</button>
+							)}
+						</div>
 
 						<button
 							type='button'

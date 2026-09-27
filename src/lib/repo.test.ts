@@ -163,3 +163,15 @@ test('no icon component name is left sitting in prose', () => {
 		`an icon component name is being read as a word:\n  ${leaks.join('\n  ')}`,
 	);
 });
+
+test('the pre-paint script and the live listener decide the shell with one query', () => {
+	/* They disagreed once in spirit — both said "900px wide" while the docs
+	   said a windowing metaphor needs a pointer and room to overlap — and a
+	   phone on its side got a boot sequence. One string now, and neither file
+	   may spell a width query of its own. */
+	for (const file of ['src/app/layout.tsx', 'src/components/desktop/desktop.tsx']) {
+		const text = readFileSync(file, 'utf8');
+		assert.ok(text.includes('SHELL_QUERY'), `${file} does not use SHELL_QUERY`);
+		assert.ok(!/matchMedia\([`'"]\(min-width/.test(text), `${file} spells its own width query`);
+	}
+});

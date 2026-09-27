@@ -29,8 +29,9 @@ to convert an evaluation into a decision to proceed.
 
 **Success is the CV being opened or downloaded.** Everything else in the shell
 is evidence pointed at that moment; the visit succeeds when the reader takes
-the document into their own hiring process. The CV lives at the two Google
-Drive URLs recorded in `src/data/profile.ts` (`cvView`, `cvDownload`) and is
+the document into their own hiring process. The CV is served at `/cv` and
+`/cv.pdf`, which `next.config.ts` redirects to the two Google Drive URLs
+recorded in `src/data/profile.ts` (`cvDriveView`, `cvDriveDownload`), and is
 reachable as a desktop shortcut (`ShortcutId: 'resume'`). Future work must not
 make that route harder to find, and must not add a competing primary action
 that outranks it.
@@ -59,7 +60,8 @@ copy a repository that publishes its own reversals.
 ## Operating Context
 
 - Evaluated on a desktop-class screen with a pointer; the windowing metaphor
-  needs room to overlap. Below 900px, or with JavaScript off, the shell is
+  needs room to overlap. Below 900px, on a touch screen under 600px tall (a
+  phone on its side), or with JavaScript off, the shell is
   replaced by a stacked reading view built from the same data.
 - Read alongside a CV, a GitHub profile and a LinkedIn profile — those three
   are the neighbours this site is compared against, and all three are linked
@@ -180,6 +182,7 @@ Concretely, the following are commitments and not byproducts:
 - `prefers-reduced-motion` respected throughout — the boot sequence collapses
   to a short fade, and Career.exe's Summary mode is the default rather than a
   fallback.
-- The no-JavaScript document, which is also the sub-900px experience.
+- The no-JavaScript document, which is also the phone experience, in either
+  orientation.
 - Flyouts take focus and give it back; they are not focus traps and
   `aria-modal` stays off, matching the non-modal behaviour of the real thing.

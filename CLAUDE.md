@@ -64,7 +64,9 @@ in one file and "Go" in the other simply drops out of the evidence.
 A portfolio presented as a **Windows 11 desktop shell**, not a scrolling page.
 The single route `/` renders a desktop with draggable, resizable, snappable
 windows; a taskbar; Start; Quick Settings; a notification centre; and a File
-Explorer. Below 900px it swaps to a stacked reading view — a windowing
+Explorer. Below 900px — or on a touch screen too short for windows to overlap,
+such as a phone on its side (`SHELL_QUERY` in `shell-defaults.ts`) — it swaps
+to a stacked reading view — a windowing
 metaphor needs a pointer and room to overlap.
 
 ## Two renderings of the same data

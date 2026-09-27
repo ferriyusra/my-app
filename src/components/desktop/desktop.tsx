@@ -27,9 +27,9 @@ import type { AppId } from '@/types/windows';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
 import BootScreen from './boot-screen';
+import { profile } from '@/data/profile';
+import { SHELL_QUERY } from '@/lib/shell-defaults';
 
-/** Below this width a windowing metaphor stops being usable. */
-const DESKTOP_MIN = 900;
 
 /** Everything that counts as shell furniture rather than bare wallpaper. */
 const SURFACES = '.desk-icon, .win, .taskbar, .flyout, .menu, .taskview, .toast';
@@ -634,7 +634,7 @@ function Viewport() {
 	const { booted } = useShell();
 
 	useEffect(() => {
-		const mq = window.matchMedia(`(min-width: ${DESKTOP_MIN}px)`);
+		const mq = window.matchMedia(SHELL_QUERY);
 		const sync = () => {
 			setWide(mq.matches);
 			document.documentElement.dataset.shell = mq.matches
@@ -649,7 +649,22 @@ function Viewport() {
 	/* Narrow: the server-rendered document is already the page, and nothing
 	   here should draw over it. A Windows sign-in in front of a plain reading
 	   view would be a costume, not a shell. */
-	if (wide === null) return <div className='boot' aria-hidden='true' />;
+	/* The holder is in the server HTML and shows until the shell's JavaScript
+	   has loaded — about 290KB gzipped, which on a slow connection is long
+	   enough to read as a broken page if the screen is only black. The name
+	   sits where the lock screen will put it, so it does not move when the
+	   boot sequence takes over. */
+	if (wide === null)
+		return (
+			<div className='boot'>
+				<div className='bt-who'>
+					<strong>{profile.name}</strong>
+					<span>
+						{profile.role} — {profile.roleDetail}
+					</span>
+				</div>
+			</div>
+		);
 	if (!wide) return null;
 
 	/* The desktop mounts underneath the startup sequence, not after it, so the
