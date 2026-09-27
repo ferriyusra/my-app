@@ -27,6 +27,9 @@ export default function Flyout({
 	onClose,
 	/** Clicks inside this selector do not dismiss — the button that opened it. */
 	ignoreSelector,
+	/** Where it comes in from. Everything rises from the taskbar except the
+	    Widgets board, which Windows slides in from the left edge. */
+	from = 'below',
 }: {
 	children: React.ReactNode;
 	className?: string;
@@ -34,6 +37,7 @@ export default function Flyout({
 	anchor?: 'left' | 'centre' | 'right';
 	onClose: () => void;
 	ignoreSelector?: string;
+	from?: 'below' | 'left';
 }) {
 	const ref = useRef<HTMLDivElement>(null);
 	const returnTo = useRef<HTMLElement | null>(null);
@@ -86,9 +90,21 @@ export default function Flyout({
 			role='dialog'
 			aria-label={label}
 			tabIndex={-1}
-			initial={reduce ? { opacity: 0 } : { opacity: 0, y: 26, scale: 0.98 }}
-			animate={{ opacity: 1, y: 0, scale: 1 }}
-			exit={reduce ? { opacity: 0 } : { opacity: 0, y: 18, scale: 0.985 }}
+			initial={
+				reduce
+					? { opacity: 0 }
+					: from === 'left'
+						? { opacity: 0, x: -28 }
+						: { opacity: 0, y: 26, scale: 0.98 }
+			}
+			animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+			exit={
+				reduce
+					? { opacity: 0 }
+					: from === 'left'
+						? { opacity: 0, x: -20 }
+						: { opacity: 0, y: 18, scale: 0.985 }
+			}
 			transition={{ duration: reduce ? 0 : 0.2, ease: [0.16, 1, 0.3, 1] }}>
 			{children}
 		</motion.div>

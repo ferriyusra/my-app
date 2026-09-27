@@ -15,7 +15,7 @@ import { DEFAULT_WALLPAPER, FALLBACK_WALLPAPER } from '@/lib/shell-defaults';
 import type { AppId, ShellNotification, SnapZone } from '@/types/windows';
 
 /** Which single overlay owns the screen. Only one may be open at a time. */
-export type Flyout = 'start' | 'taskview' | 'quick' | 'notifications' | null;
+export type Flyout = 'start' | 'taskview' | 'quick' | 'notifications' | 'widgets' | null;
 
 /** The four drawn in CSS, plus anything found in `public/background`. */
 export type BuiltInWallpaper = 'bloom' | 'flow' | 'dusk' | 'solid';

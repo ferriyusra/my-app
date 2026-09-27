@@ -75,7 +75,8 @@ copy a repository that publishes its own reversals.
 
 **What it does.** A single route `/` renders a desktop shell: draggable,
 resizable, snappable windows; taskbar; Start with search; Quick Settings;
-notification centre; File Explorer; a boot → lock → sign-in sequence; a
+notification centre; a Widgets board (the career and the case study at a
+glance); File Explorer; a boot → lock → sign-in sequence; a
 desktop cat; personalisation (light/dark, six accents, four CSS wallpapers
 plus any image in `public/background`, brightness, volume). Thirteen apps open
 in windows: Tips, About, Explorer, Skills, Experience, Contact (Mail), Media

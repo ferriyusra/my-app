@@ -157,6 +157,7 @@ export const SHORTCUTS: Shortcut[] = [
 	{ chord: '⊞ ↓', alt: 'Ctrl Alt ↓', does: 'Restore it, or minimise if it is already floating' },
 	{ chord: '⊞ D', does: 'Show the desktop, and put everything back on a second press' },
 	{ chord: '⊞ E', does: 'Open File Explorer' },
+	{ chord: '⊞ W', does: 'Open Widgets: the career and the case study at a glance' },
 	{ chord: 'Ctrl F6', does: 'Move to the next open window; add Shift to go back' },
 	{ chord: 'Alt F4', does: 'Close the top window' },
 	{ chord: '↓ on maximise', does: 'Open Snap Layouts; arrows pick a zone, Enter snaps, Esc backs out' },
@@ -175,4 +176,4 @@ export const SHORTCUT_NOTE =
  * cannot drift.
  */
 export const BUILT_SUMMARY =
-	'On a wider screen this is a Windows 11 desktop: draggable, resizable, snappable windows over a real taskbar, Start, Quick Settings and a File Explorer. Window geometry is kept out of React entirely so a drag never re-renders the apps behind it, the editor window quotes code read from this repository at build time rather than pasted, and the Recycle Bin holds decisions this project reversed with the commits that reversed them.';
+	'On a wider screen this is a Windows 11 desktop: draggable, resizable, snappable windows over a real taskbar, Start, Quick Settings, Widgets and a File Explorer. Window geometry is kept out of React entirely so a drag never re-renders the apps behind it, the editor window quotes code read from this repository at build time rather than pasted, and the Recycle Bin holds decisions this project reversed with the commits that reversed them.';

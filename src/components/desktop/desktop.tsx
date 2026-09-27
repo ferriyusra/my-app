@@ -27,6 +27,7 @@ import type { AppId } from '@/types/windows';
 import Wallpaper from './wallpaper';
 import PowerScreen from './power-screen';
 import BootScreen from './boot-screen';
+import WidgetsBoard from '@/components/taskbar/widgets-board';
 import { profile } from '@/data/profile';
 import { SHELL_QUERY } from '@/lib/shell-defaults';
 
@@ -451,6 +452,11 @@ function Shell() {
 			} else if (e.key.toLowerCase() === 'e') {
 				e.preventDefault();
 				launch('explorer');
+			} else if (e.key.toLowerCase() === 'w') {
+				/* No Ctrl+Alt twin, for the AltGr reason above; the taskbar
+				   button is the route on Windows, which keeps ⊞ W for itself. */
+				e.preventDefault();
+				openFlyout(flyout === 'widgets' ? null : 'widgets');
 			}
 		};
 		const up = (e: KeyboardEvent) => {
@@ -585,6 +591,7 @@ function Shell() {
 				{flyout === 'notifications' && (
 					<NotificationCenter key='notif' onClose={closeFlyout} />
 				)}
+				{flyout === 'widgets' && <WidgetsBoard key='widgets' onClose={closeFlyout} />}
 			</AnimatePresence>
 
 			{/* Deliberately outside the block above: Task View is a full-screen

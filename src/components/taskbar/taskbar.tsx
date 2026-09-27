@@ -89,11 +89,17 @@ export default function Taskbar() {
 			    a visitor needs first, on the one surface no window covers. It
 			    used to say only the time and "Available", which was the whole of
 			    the person on the desktop once the first window was closed. */}
+			{/* It opens the Widgets board, as Windows' weather button does — it
+			    used to open Mail, which the strip already pins. */}
 			<button
 				type='button'
 				className='tb-widget'
-				onClick={() => launch('contact')}
+				aria-haspopup='dialog'
+				aria-expanded={flyout === 'widgets'}
+				data-active={flyout === 'widgets' || undefined}
+				onClick={() => toggleFlyout('widgets')}
 				suppressHydrationWarning>
+				<span className='sr-only'>Widgets — </span>
 				<span className='tb-widget-dot' aria-hidden='true' />
 				<span className='tb-widget-text'>
 					<strong>

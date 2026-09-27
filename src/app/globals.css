@@ -877,6 +877,7 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
   transition: background var(--dur-faster) var(--ease-standard);
 }
 .tb-widget:hover { background: var(--subtle-hover); }
+.tb-widget[data-active] { background: var(--subtle-pressed); }
 .tb-widget-text { display: flex; flex-direction: column; white-space: nowrap; }
 .tb-widget strong { color: var(--ink); font-weight: 600; }
 .tb-widget-dot {
@@ -886,7 +887,12 @@ html[data-theme='dark'] .desk-icon:hover { background: rgba(255, 255, 255, 0.09)
   background: var(--success);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 22%, transparent);
 }
-@media (max-width: 1180px) { .tb-widget { display: none; } }
+/* A narrow taskbar keeps the button and drops its words, as Windows does with
+   the weather — otherwise the board has no way in between 900 and 1180px. */
+@media (max-width: 1180px) {
+  .tb-widget { width: 40px; padding: 0; justify-content: center; }
+  .tb-widget-text { display: none; }
+}
 
 .taskbar-centre { display: flex; align-items: center; gap: 2px; }
 .tb-slot { position: relative; display: flex; }
@@ -1430,6 +1436,80 @@ input[type='range']::-moz-range-thumb {
   color: #fff;
   font-weight: 700;
 }
+
+/* ── Widgets ──
+   The board Windows slides in from the left: full height above the taskbar,
+   cards on the acrylic. */
+.wg {
+  top: 8px;
+  width: min(640px, calc(100vw - 16px));
+  overflow: auto;
+  padding: 20px;
+}
+.wg-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0 2px 16px;
+}
+.wg-time {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--t-title);
+  line-height: 36px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.wg-where { margin: 0; font-size: var(--t-caption); color: var(--ink-muted); }
+.wg-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px; height: 32px;
+  border-radius: 99px;
+  background: var(--accent-fill);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.wg-grid { display: grid; gap: 12px; }
+.wg-card {
+  padding: 14px 16px 16px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--sh-2);
+}
+.wg-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: var(--t-caption);
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+.wg-lead { margin: 0 0 10px; font-size: var(--t-body); font-weight: 600; }
+.wg-case-title { margin: 0; font-size: var(--t-body-lg); line-height: 24px; }
+.wg-meta { margin: 2px 0 8px; font-size: var(--t-caption); color: var(--ink-muted); }
+.wg-body { margin: 0 0 10px; max-width: 72ch; font-size: var(--t-body); line-height: 20px; color: var(--ink-secondary); }
+.wg-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; }
+.wg-chips li {
+  padding: 2px 9px;
+  border-radius: 99px;
+  background: var(--surface-chip);
+  font-size: var(--t-caption);
+  color: var(--ink-secondary);
+}
+.wg-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+.wg-foot .fl-btn { margin-left: auto; }
+.wg-now { margin: 0; font-size: var(--t-caption); color: var(--ink-muted); }
+.wg-now strong { color: var(--ink); font-weight: 600; }
 
 /* ── Toast ── */
 .toast {

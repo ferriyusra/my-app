@@ -63,8 +63,8 @@ in one file and "Go" in the other simply drops out of the evidence.
 
 A portfolio presented as a **Windows 11 desktop shell**, not a scrolling page.
 The single route `/` renders a desktop with draggable, resizable, snappable
-windows; a taskbar; Start; Quick Settings; a notification centre; and a File
-Explorer. Below 900px — or on a touch screen too short for windows to overlap,
+windows; a taskbar; Start; Quick Settings; a notification centre; a Widgets
+board; and a File Explorer. Below 900px — or on a touch screen too short for windows to overlap,
 such as a phone on its side (`SHELL_QUERY` in `shell-defaults.ts`) — it swaps
 to a stacked reading view — a windowing
 metaphor needs a pointer and room to overlap.
@@ -460,6 +460,18 @@ Windows and Tab is allowed to walk out.
 `Ctrl`+`F6` cycles the open windows and `Ctrl`+`Shift`+`F6` goes back, because
 Alt+Tab is the one chord no browser is ever handed on any platform. Without it
 the only way out of a window is tabbing through the whole app inside it.
+
+**The Widgets board**
+([taskbar/widgets-board.tsx](src/components/taskbar/widgets-board.tsx)) is the
+fourth flyout, opened by the button at the taskbar's left — which used to open
+Mail — or ⊞ W, and it slides in from the left (`from='left'` on Flyout) as
+Windows' does. It holds two widgets, by the owner's choice: the career strip
+(Career.exe's own `CareerTrack`, static) and the case study. Its figures come
+from [src/lib/widgets.ts](src/lib/widgets.ts), tested against Career.exe's
+totals, and its one line of case-study prose is cut from the write-up's
+summary, never rewritten. No "Add widgets" and no per-card menu: two widgets
+written for one reader have nothing to arrange. Do not fill it with weather,
+news or anything the data does not record.
 
 **Focus is the thing to get right in a fake desktop.** The frame takes focus
 when a window is raised, which means an app whose whole point is typing must
