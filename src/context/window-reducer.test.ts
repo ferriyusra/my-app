@@ -50,6 +50,20 @@ test('a window never spawns larger than the desktop it opens into', () => {
 	assert.ok(win.h <= tiny.h, `height ${win.h} exceeds desktop ${tiny.h}`);
 });
 
+test('a new window opens clear of the icon grid when it fits beside it', () => {
+	const b: Bounds = { w: 1280, h: 596, x0: 206 };
+	const s = reducer(EMPTY, { type: 'open', id: 'about', w: 860, h: 520, bounds: b });
+	const win = find(s, 'about');
+	assert.ok(win.x >= 206, `x ${win.x} lands on the icon grid`);
+	assert.ok(win.x + win.w <= b.w, 'and still inside the desktop');
+});
+
+test('a window too wide to sit beside the icon grid keeps the old placement', () => {
+	const b: Bounds = { w: 1024, h: 600, x0: 206 };
+	const s = reducer(EMPTY, { type: 'open', id: 'about', w: 860, h: 520, bounds: b });
+	assert.equal(find(s, 'about').x, Math.max(24, Math.round((1024 - 860) / 2) - 60));
+});
+
 test('successive windows cascade instead of stacking exactly', () => {
 	const s = open(open(EMPTY, 'about'), 'skills');
 	const a = find(s, 'about');

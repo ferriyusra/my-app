@@ -26,11 +26,19 @@ export function desktopBounds(): Bounds {
 	return { w: window.innerWidth, h: window.innerHeight - TASKBAR_H };
 }
 
-/** Where a window may open: the desktop, less the floor. Snapping and
-    maximising still use the whole desktop, as they do on Windows. */
+/** Where a window may open: the desktop, less the floor, and to the right of
+    the icon grid when there is room. Snapping and maximising still use the
+    whole desktop, as they do on Windows. The grid is measured when a window
+    opens — an event, not a gesture — because its column count follows the
+    viewport height and cannot be known from here otherwise. */
 export function placementBounds(): Bounds {
 	const b = desktopBounds();
-	return { w: b.w, h: b.h - FLOOR_H };
+	const grid =
+		typeof document === 'undefined'
+			? null
+			: document.querySelector<HTMLElement>('.desk-icons');
+	const right = grid ? Math.round(grid.getBoundingClientRect().right) : 0;
+	return { w: b.w, h: b.h - FLOOR_H, x0: right > 0 ? right + 12 : undefined };
 }
 
 /**

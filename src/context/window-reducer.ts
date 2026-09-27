@@ -52,10 +52,24 @@ export type Action =
 	   re-anchored under the cursor — exactly what Windows does. */
 	| { type: 'tearOff'; id: AppId; x: number; y: number };
 
-/** Cascade each new window so a second one never lands exactly on the first. */
+/**
+ * Cascade each new window so a second one never lands exactly on the first.
+ *
+ * Where the bounds carry a left inset (the icon grid) and the window fits
+ * beside it, it is centred in the space to the right of the grid. It used to
+ * be centred on the screen and nudged left, which on a 1280 or 1366 laptop
+ * landed it across the second icon column and left "Caree", "Term" and
+ * "Linke" poking out beside it — a layout bug on the first screen, and the
+ * routes to GitHub and LinkedIn half-hidden. Where it does not fit, the old
+ * placement stands.
+ */
 function spawn(index: number, w: number, h: number, b: Bounds): Rect {
 	const step = 28;
-	const baseX = Math.max(24, Math.round((b.w - w) / 2) - 60);
+	const x0 = b.x0 ?? 0;
+	const beside = x0 > 0 && b.w - x0 >= w + 16;
+	const baseX = beside
+		? x0 + Math.round((b.w - x0 - w) / 2)
+		: Math.max(24, Math.round((b.w - w) / 2) - 60);
 	const baseY = Math.max(20, Math.round((b.h - h) / 2) - 30);
 	/* Wrap the cascade after six windows so it never walks off-screen. */
 	const n = index % 6;

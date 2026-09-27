@@ -66,7 +66,12 @@ export type WindowState = Rect & {
 };
 
 /** The desktop area: the viewport minus the taskbar. */
-export type Bounds = { w: number; h: number };
+/**
+ * The area a window may occupy. `x0` is an optional left inset for placing
+ * a new window — the desktop icon grid — which snapping and maximising
+ * ignore, as they ignore it on Windows.
+ */
+export type Bounds = { w: number; h: number; x0?: number };
 
 /** Windows 11 toast, surfaced in the notification centre once dismissed. */
 export type ShellNotification = {
