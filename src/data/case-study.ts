@@ -238,7 +238,7 @@ export const caseStudy = {
 } as const;
 
 /** Prose without its emphasis marks. Code keeps its asterisks (`*record` is a pointer). */
-function plain(text: string): string {
+export function plain(text: string): string {
 	return text.replace(/\*/g, '');
 }
 

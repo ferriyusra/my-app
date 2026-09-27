@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { career, levels } from '@/data/career-game';
 import { profile } from '@/data/profile';
 import { tenureLabel } from '@/data/experience';
+import { decisionRows, goals } from '@/data/career-objectives';
+import { useWindowManager } from '@/hooks/use-window-manager';
+import { sendIntent } from '@/hooks/use-app-intent';
 import CareerTrack from './track';
 import { chapters } from './world';
 
@@ -33,6 +36,9 @@ function prefersReducedMotion(): boolean {
 export default function CareerSummary() {
 	const all = levels();
 	const totals = career();
+	const objectives = goals();
+	const cases = decisionRows().length;
+	const { launch } = useWindowManager();
 
 	/* Start fully revealed when motion is unwelcome, rather than revealing from
 	   an effect — a lazy initialiser keeps the first paint correct and keeps
@@ -78,7 +84,7 @@ export default function CareerSummary() {
 							{years} yrs {months ? `${months} mos` : ''} served
 						</span>
 						<span>
-							{totals.skills} skills · {totals.roles} roles
+							{totals.skills} skills · {totals.roles} roles · {objectives.length} objectives
 						</span>
 					</div>
 				</div>
@@ -107,6 +113,42 @@ export default function CareerSummary() {
 							<span aria-hidden='true'>◈</span> {l.quest}
 						</p>
 
+						{/* The adventure's objective for this role, said plainly: the
+						    game may not ask for anything the list cannot show. */}
+						{(() => {
+							const g = objectives.find((o) => o.role === l.exp.short);
+							if (!g) return null;
+							const decide = g.stops.some((s) => s.act === 'decide');
+							return (
+								<div className='cx-goal'>
+									<p>
+										<span aria-hidden='true'>◆</span> {g.verb}: {g.title}
+									</p>
+									{decide ? (
+										<p className='cx-goal-note'>
+											Play <code>decide()</code>: the {cases} cases of the case study&rsquo;s
+											behaviour table, email or not.{' '}
+											<button
+												type='button'
+												className='cx-goal-link'
+												onClick={() => {
+													sendIntent('experience', 'case');
+													launch('experience');
+												}}>
+												Read the table
+											</button>
+										</p>
+									) : (
+										<ul className='cx-goal-items'>
+											{g.stops.map((s) => (
+												<li key={s.id}>{s.name}</li>
+											))}
+										</ul>
+									)}
+								</div>
+							);
+						})()}
+
 						<div className='cx-unlock'>
 							<span className='cx-unlock-n'>
 								+{l.unlocked.length} unlocked
@@ -125,7 +167,10 @@ export default function CareerSummary() {
 				Levels are the roles in{' '}
 				<code>src/data/experience.ts</code>, oldest first. A skill unlocks at
 				the earliest role that used it — computed, not written down, so the
-				shape of it is real.
+				shape of it is real. Every objective names things from that role&rsquo;s
+				own record, and its count is the role&rsquo;s own figure. The bugs in the
+				adventure — 500, timeout, null, 404, NaN — are generic, and stand for no
+				incident on record.
 			</p>
 		</div>
 	);

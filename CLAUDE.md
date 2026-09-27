@@ -16,7 +16,7 @@ Tests run on Node's built-in runner with native type stripping — there is no
 test dependency and no config, and adding a file matching `src/**/*.test.ts`
 is enough for `npm test` to pick it up.
 
-Two of the eight check the repository rather than the runtime, because the
+Two of them check the repository rather than the runtime, because the
 bugs they guard cannot be reached from a running page:
 `src/lib/repo.test.ts` reads `globals.css` and the component tree as text —
 it fails when two apps each style the same class name, when an accent swatch
@@ -319,8 +319,43 @@ Chrome no longer honours — every acrylic surface silently goes opaque. Declare
 
 [src/components/apps/career/](src/components/apps/career/) is a small
 side-scroller: you walk a character through five chapters, one per role,
-collecting the skills that role was the first to use, and climbing two one-way
-ledges per chapter to reach the ones held above the floor.
+collecting the skills that role was the first to use, climbing one-way ledges
+to the ones held above the floor — and doing the one thing each role asks,
+while generic bugs patrol the ground.
+
+**It was only jumping**, the owner said, and it was: every chapter asked for
+the same walk-and-hop over the same 940px template. Now each role has its own
+layout (`LAYOUT` in [world.ts](src/components/apps/career/world.ts)) and an
+**objective named from its record**
+([src/data/career-objectives.ts](src/data/career-objectives.ts)): deliver
+Jojonomic's "RESTful API services" to "MySQL for data persistence" (the
+tutorial chapter, with the controls on the floor); carry Moladin's seven
+product lines; ship GovTech Health's five dashboards; connect INA Digital's
+four data stores; and, at Meditap, play `decide()` — the nine rows of the
+case study's behaviour table, email or not, with the table's own "Why"
+shown after each answer. Every name is a substring of that role's
+`achievements` and every count equals its stat tile, both tested; the table
+is read from `caseStudy`, never copied. Two limits are deliberate: GovTech's
+switches say *delivered*, not "migrated off Tableau", because the record never
+says which dashboards the migration moved; and INA's stores light "dashboards
+for the Business Intelligence team", the bullet they belong to.
+
+**The bugs are generic** — 500, timeout, null, 404, NaN — and stand for no
+incident on record. Land on one and it is fixed; walk into one and you are
+knocked back with a moment of grace. Nothing ends a run, and nothing is gated.
+
+**The physics is a pure step**
+([engine.ts](src/components/apps/career/engine.ts)): coyote time, a jump
+buffer, a jump that is higher for holding, stomps and knockback. The loop and
+`engine.test.ts` run the same function at 60Hz, so the tests hold every ledge
+to the jump the loop really makes, not only to a formula.
+
+**The run is kept** ([save.ts](src/components/apps/career/save.ts)):
+`career:run` v1 in `localStorage`, filtered through the world's ids like
+`readPins()`, flushed on page hide. It is won by every skill and every
+objective — the old check asked only whether the *last* chapter was clear,
+which after the gate went meant flying to Meditap and being told all 28 were
+collected. Play again keeps the best time.
 
 **The track above the world is what makes it legible.** It opened with the
 character at x=60 of a 4700px world — you could not see the career, you had to
@@ -367,12 +402,14 @@ controls have been found, and the handful of one-shots the end screen and the
 signpost need — and each of those is edge-triggered against a ref mirror so it
 sets at most once per change.
 
-Two constraints are load-bearing and covered by tests in `world.test.ts`: every
-raised token must sit within a jump of the ground (`reachable()` checks it
-against the actual `JUMP_V`/`GRAVITY`, which is why those live in `world.ts`
-and not in the component), and the first token of every chapter must be
-collectable without jumping. Break either and a chapter becomes impossible to
-finish.
+The layout's constraints are load-bearing and covered by `world.test.ts`
+and `engine.test.ts`: every token and walk-into stop within a jump of a
+surface under it; every press-E stop standing on something, and far enough
+from the signpost that E means one thing; the first thing in every chapter
+collected by walking; ledges climbable in order with the real jump; bugs kept
+to their surface, slower than half walking pace, and away from the spawn, the
+signpost and anything you stand still at; nothing crowding closer than
+`MIN_GAP`. Break one and a chapter becomes impossible, or unfair, to finish.
 
 **Summary mode is not a fallback, it is the same content.** It is the default
 under `prefers-reduced-motion`, and anything the game says must be sayable
@@ -385,7 +422,10 @@ inside it, so nothing responded until the playfield was clicked. Listening
 globally without the guard is the opposite mistake — an app inside a fake
 desktop must not swallow the arrow keys of the page or of whatever window is on
 top. The handler also stands down when the event target is a button or field,
-so Space on the Summary tab switches mode instead of jumping.
+so Space on the Summary tab switches mode instead of jumping, and while
+`decide()` is open, which pauses the game clock (the bugs freeze with it).
+E prefers a stop over the signpost. The decision's Escape is marked handled,
+so it closes the decision and not the window.
 
 ### Four ways into the same content
 

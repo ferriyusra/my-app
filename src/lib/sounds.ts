@@ -13,7 +13,12 @@ export type SoundName =
 	| 'notify'
 	| 'error'
 	| 'pickup'
-	| 'unlock';
+	| 'unlock'
+	| 'stomp'
+	| 'hurt'
+	| 'use'
+	| 'quest'
+	| 'miss';
 
 type Voice = { freq: number; at: number; dur: number; gain: number };
 
@@ -47,6 +52,30 @@ const CUES: Record<SoundName, Voice[]> = {
 		{ freq: 587.33, at: 0, dur: 0.14, gain: 0.1 },
 		{ freq: 880.0, at: 0.07, dur: 0.18, gain: 0.09 },
 		{ freq: 1174.66, at: 0.14, dur: 0.3, gain: 0.08 },
+	],
+	/* A bug landed on: up a fourth, quick. */
+	stomp: [
+		{ freq: 783.99, at: 0, dur: 0.06, gain: 0.1 },
+		{ freq: 1046.5, at: 0.04, dur: 0.09, gain: 0.08 },
+	],
+	/* Bumped by one: a soft step down, deliberately not the shell's error. */
+	hurt: [
+		{ freq: 220.0, at: 0, dur: 0.09, gain: 0.1 },
+		{ freq: 174.61, at: 0.05, dur: 0.12, gain: 0.08 },
+	],
+	/* A switch pressed, a delivery made: one click. */
+	use: [{ freq: 659.25, at: 0, dur: 0.08, gain: 0.1 }],
+	/* An objective finished: a four-note rise. */
+	quest: [
+		{ freq: 587.33, at: 0, dur: 0.12, gain: 0.09 },
+		{ freq: 739.99, at: 0.08, dur: 0.12, gain: 0.08 },
+		{ freq: 880.0, at: 0.16, dur: 0.14, gain: 0.08 },
+		{ freq: 1174.66, at: 0.24, dur: 0.3, gain: 0.07 },
+	],
+	/* A decision the table would not make: a gentle whole step down. */
+	miss: [
+		{ freq: 493.88, at: 0, dur: 0.1, gain: 0.08 },
+		{ freq: 440.0, at: 0.07, dur: 0.16, gain: 0.07 },
 	],
 };
 
