@@ -149,7 +149,7 @@ export default function PortfolioDocument() {
 					<LiDownload size={15} aria-hidden='true' /> Download PDF
 				</a>
 				<a className='fl-btn fl-btn-standard' href={`mailto:${profile.email}`}>
-					<LiMail size={15} aria-hidden='true' /> Email
+					<LiMail size={15} aria-hidden='true' /> Email me
 				</a>
 			</div>
 

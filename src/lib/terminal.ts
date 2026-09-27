@@ -135,7 +135,7 @@ const COMMANDS = [
 	['cat <role|project|case|note>', 'read one entry in full'],
 	['skill <name>', 'where a tool was actually used'],
 	['open <app>', 'open a window'],
-	['uptime', 'years in the industry, computed'],
+	['uptime', 'when the career started, and months in role'],
 	['notes', 'what I am studying, and what is written up'],
 	['tips [keys]', 'what this desktop does, and the keys it answers to'],
 	['contact', 'how to reach me, and the CV'],

@@ -169,6 +169,9 @@ export function useAppUrl() {
 			const asked = appFromUrl();
 			shown.current = asked;
 			if (!asked) return;
+			/* The place travels with the entry, as it does on arrival. */
+			const at = new URLSearchParams(window.location.search).get(AT);
+			if (asked === 'experience' && at === 'case') sendIntent('experience', 'case');
 			/* Focus rather than launch when it is already open, so going back
 			   does not re-run the open animation. */
 			if (windows.some((w) => w.id === asked)) focus(asked);

@@ -83,7 +83,7 @@ Player, Settings, VS Code, Recycle Bin, Notes, Career.exe, Terminal.
 
 **Content is typed data.** `src/data/` holds `profile`, `experience`,
 `projects`, `skills`, `case-study`, `discarded`, `notes`, `tips`. Every surface derives
-from it; none keeps a second copy. Derived figures (years of experience, role
+from it; none keeps a second copy. Derived figures (the career start date, role
 tenure) are computed from ISO dates rather than written down.
 
 **Technical constraints that future work must hold:**

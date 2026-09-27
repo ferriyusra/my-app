@@ -223,14 +223,15 @@ last third (behind About in the cascade below 1200px, where two panes would
 each be too narrow), so the layout demonstrates snapping before anyone reads
 about it. It was two halves until About turned out to be 640px wide on a
 1280px laptop — a third of it nav rail, the CV buttons stacked three high.
-Both are laid out clear of the floor, as a launched window is.
+Both are laid out clear of the floor, as a launched window is. The lock screen
+carries the name and role for the same reason, and the boot holds are shorter
+than the real thing.
 
 The Settings chrome (`.st-shell`) and the Explorer, Mail and editor shells
 are CSS **containers**: every rule that reacts to width inside a window uses
 `@container`, never `@media`. The shell only exists at 900px and up, so a
 viewport query written for a narrow pane can never match inside it — the
-first-arrival windows sat for months beside rules that were dead code. The lock screen carries the name and role for the same reason, and
-the boot holds are shorter than the real thing.
+first-arrival windows sat for months beside rules that were dead code.
 
 The arrival is tracked in `shell-context.tsx` as two **idempotent markers**
 (`shell:seen`, `shell:greeted`) rather than a counter, because a lazy
@@ -538,7 +539,7 @@ and three of the five had silently stopped matching — `zoneRect` had moved to
 another module, `playSound` had grown a parameter — so the window went on
 labelling that code with paths it was no longer in. A manifest names a file and
 a symbol; a missing symbol throws, so the build stops rather than shipping a
-window that lies, and `source.test.ts` catches it before the build does. Derived figures (years of experience,
+window that lies, and `source.test.ts` catches it before the build does. Derived figures (the career start date,
 role tenure) are computed from ISO dates rather than written down, so they stay
 true without anyone editing them.
 

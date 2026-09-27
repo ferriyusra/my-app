@@ -183,9 +183,10 @@ export default function ContactApp() {
 					type='button'
 					className='ml-compose'
 					data-active={pane === 'compose' || undefined}
+					title='New message'
 					onClick={() => setPane('compose')}>
 					<PenSquare size={16} aria-hidden='true' />
-					New message
+					<span className='ml-rail-text'>New message</span>
 				</button>
 
 				<ul>
@@ -196,9 +197,10 @@ export default function ContactApp() {
 								className='ml-folder'
 								data-active={folder === key || undefined}
 								aria-current={folder === key ? 'page' : undefined}
+								title={label}
 								onClick={() => setFolder(key)}>
 								<Icon size={16} aria-hidden='true' />
-								{label}
+								<span className='ml-rail-text'>{label}</span>
 								{key === 'sent' && sent.length > 0 && (
 										<span className='ml-count'>{sent.length}</span>
 									)}
