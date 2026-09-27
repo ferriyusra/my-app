@@ -8,7 +8,7 @@ import {
 	type IconLike,
 } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
-import { evidenceFor, monthsLabel } from '@/lib/skill-evidence';
+import { bySkillEvidence, evidenceFor, monthsLabel } from '@/lib/skill-evidence';
 import SkillMark from './career/token-mark';
 import {
 	SKILL_CATEGORIES,
@@ -153,7 +153,7 @@ export default function SkillsApp() {
 					...c,
 					items: skills
 						.filter((s) => s.category === c.key)
-						.sort((a, b) => b.years - a.years),
+						.sort(bySkillEvidence),
 				}),
 			),
 		[page],

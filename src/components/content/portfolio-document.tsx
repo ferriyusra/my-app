@@ -5,11 +5,12 @@ import CaseStudyBody from './case-study-body';
 import { profile, careerSince } from '@/data/profile';
 import { experiences, tenureLabel } from '@/data/experience';
 import { SKILL_CATEGORIES, skills } from '@/data/skills';
-import { projects } from '@/data/projects';
+import { projects, projectKind } from '@/data/projects';
 import { caseStudy } from '@/data/case-study';
 import { discarded } from '@/data/discarded';
 import { BUILT_SUMMARY } from '@/data/tips';
 import DiscardedDetail, { when } from './discarded-detail';
+import { bySkillEvidence } from '@/lib/skill-evidence';
 import NoteBody from './note-body';
 import { TOPICS, plannedNotes, writtenNotes } from '@/data/notes';
 
@@ -36,6 +37,10 @@ import { TOPICS, plannedNotes, writtenNotes } from '@/data/notes';
  * text to a screen reader rather than as a landmark. These are real `h2`s, so
  * the document has an outline: name, section, role, case study.
  */
+/** An anchor for one role, from its short name: "INA Digital" → "role-ina-digital". */
+const roleId = (short: string) =>
+	'role-' + short.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 function Head({ title, meta, id }: { title: string; meta: string; id: string }) {
 	return (
 		<h2 className='mb-rule-h' id={id}>
@@ -114,13 +119,15 @@ export default function PortfolioDocument() {
 			<p className='mb-headline'>{profile.headline}</p>
 			<p className='mb-summary'>{profile.proof}</p>
 
+			{/* The same words as the About window's buttons, so a reader who
+			    meets both renderings meets one set of labels. */}
 			<div className='mb-actions'>
 				<a
 					className='fl-btn fl-btn-accent'
 					href={profile.cvView}
 					target='_blank'
 					rel='noopener noreferrer'>
-					<DocumentIcon size={15} /> Resume
+					<DocumentIcon size={15} /> View CV
 				</a>
 				{/* This surface has no right-click menu to hide a Save behind, and
 				    it is the one a phone and a scripting-disabled browser get. */}
@@ -129,44 +136,56 @@ export default function PortfolioDocument() {
 					href={profile.cvDownload}
 					target='_blank'
 					rel='noopener noreferrer'>
-					<LiDownload size={15} aria-hidden='true' /> Download
+					<LiDownload size={15} aria-hidden='true' /> Download PDF
 				</a>
 				<a className='fl-btn fl-btn-standard' href={`mailto:${profile.email}`}>
 					<LiMail size={15} aria-hidden='true' /> Email
 				</a>
 			</div>
 
-			{/* The document is ten screens long on a phone. Five anchors, so a
-			    reader who came for the reversals need not scroll through five
-			    roles to reach them. Plain links: they work with scripting off,
-			    which is the whole point of this rendering. */}
+			{/* The document is ten screens long on a phone. Anchors, so a reader
+			    who came for the reversals need not scroll through five roles to
+			    reach them. Plain links: they work with scripting off, which is
+			    the whole point of this rendering. The ids are plain words, so a
+			    shared link reads as what it opens: /#case-study. */}
 			<nav className='mb-jump' aria-label='Sections'>
-				<a href='#doc-exp'>Experience</a>
-				<a href='#doc-now'>Now</a>
-				<a href='#doc-skills'>Skills</a>
-				<a href='#doc-projects'>Projects</a>
-				{written.length > 0 && <a href='#doc-notes'>Notes</a>}
-				<a href='#doc-rev'>Decisions reversed</a>
+				<a href='#experience'>Experience</a>
+				<a href='#case-study'>Case study</a>
+				<a href='#now'>Now</a>
+				<a href='#skills'>Skills</a>
+				<a href='#projects'>Projects</a>
+				{written.length > 0 && <a href='#notes'>Notes</a>}
+				<a href='#decisions'>Decisions reversed</a>
 			</nav>
 
-			<section aria-labelledby='doc-exp'>
+			<section aria-labelledby='experience'>
 				<Head
 					title='Experience'
 					meta={`${experiences.length} roles · since ${careerSince('year')}`}
-					id='doc-exp'
+					id='experience'
 				/>
 				<ol className='mb-spine'>
-					{experiences.map((e) => {
+					{experiences.map((e, i) => {
 						/* The join that puts the case study inside its own role. It is
 						   by name, so it fails silently if either side is renamed —
 						   which is why `data.test.ts` pins it. */
 						const carriesCase = e.short === caseStudy.at;
+						const next = experiences[i + 1];
 						return (
-							<li key={e.company} data-current={e.current || undefined}>
+							<li
+								key={e.company}
+								id={roleId(e.short)}
+								data-current={e.current || undefined}>
 								<h3>{e.role}</h3>
 								<span className='mb-company'>{e.company}</span>
+								{/* No duration on the current role: this page is built once
+								    and then served as it was, so a computed tenure would
+								    freeze on deploy day while the desktop's went on
+								    counting. "Present" never goes stale. */}
 								<span className='mb-period'>
-									{e.period} · {tenureLabel(e)} · {e.location}
+									{e.current
+										? `${e.period} · ${e.location}`
+										: `${e.period} · ${tenureLabel(e)} · ${e.location}`}
 								</span>
 								{e.stats.length > 0 && (
 									<ul className='mb-stats'>
@@ -193,8 +212,19 @@ export default function PortfolioDocument() {
 								</ul>
 								<span className='mb-tech'>{e.tech.join(' · ')}</span>
 
+								{/* The way past the depth, where a reader gets stuck. The
+								    case study stays inside its role and open; on a 390px
+								    phone it is 6,400px long, and the next role — SATUSEHAT,
+								    the biggest name in the proof line — started ten
+								    screens down with nothing pointing at it. Derived from
+								    the next entry, so it cannot name the wrong role. */}
+								{carriesCase && next && (
+									<a className='mb-skip' href={`#${roleId(next.short)}`}>
+										Skip the case study: next role, {next.short}, {next.period.split(' — ')[0]}
+									</a>
+								)}
 								{carriesCase && (
-									<div className='mb-case'>
+									<div className='mb-case' id='case-study'>
 										<h4 className='mb-cs-title'>{caseStudy.title}</h4>
 										<CaseStudyBody level={5} idPrefix='doc-cs' />
 									</div>
@@ -212,8 +242,8 @@ export default function PortfolioDocument() {
 			    chronological run — the last role read is the current one, and this
 			    says what that role is doing this month. Availability already
 			    appears in the header, so nothing above the fold was lost. */}
-			<section aria-labelledby='doc-now'>
-				<Head title='Now' meta={`Updated ${nowStamp}`} id='doc-now' />
+			<section aria-labelledby='now'>
+				<Head title='Now' meta={`Updated ${nowStamp}`} id='now' />
 				<dl className='mb-now'>
 					{profile.now.map((n) => (
 						<div key={n.label}>
@@ -225,7 +255,7 @@ export default function PortfolioDocument() {
 			</section>
 
 			<Fold
-				id='doc-skills'
+				id='skills'
 				title='Skills'
 				meta={`${skills.length} tools · ${SKILL_CATEGORIES.length} categories`}>
 				{SKILL_CATEGORIES.map((c) => (
@@ -234,7 +264,7 @@ export default function PortfolioDocument() {
 						<dl className='mb-skills'>
 							{skills
 								.filter((s) => s.category === c.key)
-								.sort((a, b) => b.years - a.years)
+								.sort(bySkillEvidence)
 								.map((s) => (
 									<div key={s.name}>
 										<dt>{s.name}</dt>
@@ -246,7 +276,7 @@ export default function PortfolioDocument() {
 				))}
 			</Fold>
 
-			<Fold id='doc-projects' title='Projects' meta={`${projects.length} selected`}>
+			<Fold id='projects' title='Projects' meta={`${projects.length} selected`}>
 				<ul className='mb-projects'>
 					{projects.map((p) => (
 						<li key={p.id}>
@@ -258,7 +288,7 @@ export default function PortfolioDocument() {
 							<div>
 								<h3>{p.name}</h3>
 								<span className='mb-badge' data-type={p.type}>
-									{p.type === 'real' ? 'Production' : 'Case study'}
+									{projectKind(p)}
 								</span>
 								<p>{p.description}</p>
 								<span className='mb-tech'>{p.tech.join(' · ')}</span>
@@ -270,8 +300,13 @@ export default function PortfolioDocument() {
 									)}
 									{p.demo && (
 										<a href={p.demo} target='_blank' rel='noopener noreferrer'>
-											Live demo
+											{p.demoLabel ?? 'Live demo'}
 										</a>
+									)}
+									{/* The one production system with a write-up had no link
+									    at all here, while coursework carried two. */}
+									{p.id === caseStudy.project && (
+										<a href='#case-study'>Read the case study</a>
 									)}
 								</span>
 							</div>
@@ -286,7 +321,7 @@ export default function PortfolioDocument() {
 			    log rather than a claim in the middle of the evidence. */}
 			{written.length > 0 && (
 				<Fold
-					id='doc-notes'
+					id='notes'
 					title='Notes'
 					meta={`${written.length} written up`}>
 					<ol className='mb-notes'>
@@ -311,11 +346,11 @@ export default function PortfolioDocument() {
 			{/* Open, not folded. PRODUCT.md calls this the thing a neighbouring
 			    portfolio cannot truthfully copy; it spent one release behind a tap
 			    and before that was absent from the document altogether. */}
-			<section aria-labelledby='doc-rev'>
+			<section aria-labelledby='decisions'>
 				<Head
 					title='Decisions reversed'
 					meta={`${discarded.length} things built and thrown away`}
-					id='doc-rev'
+					id='decisions'
 				/>
 				<ol className='mb-discarded'>
 					{discarded.map((d) => (
@@ -331,7 +366,7 @@ export default function PortfolioDocument() {
 			    cost 200px of the one viewport that has to carry the spine. */}
 			<p className='mb-note'>{BUILT_SUMMARY}</p>
 
-			<footer className='mb-foot'>
+			<footer className='mb-foot' id='contact'>
 				<a href={`mailto:${profile.email}`}>
 					<LiMail size={16} aria-hidden='true' /> {profile.email}
 				</a>
@@ -340,6 +375,9 @@ export default function PortfolioDocument() {
 				</a>
 				<a href={profile.linkedin} target='_blank' rel='noopener noreferrer'>
 					<LiLinkedin size={16} aria-hidden='true' /> LinkedIn
+				</a>
+				<a href={profile.repo} target='_blank' rel='noopener noreferrer'>
+					<LiGithub size={16} aria-hidden='true' /> This site&rsquo;s source
 				</a>
 			</footer>
 		</main>

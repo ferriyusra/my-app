@@ -268,6 +268,17 @@ export default function AboutApp() {
 							<small>{profile.linkedin.replace('https://', '')}</small>
 						</span>
 					</a>
+					<a
+						className='ab-link'
+						href={profile.repo}
+						target='_blank'
+						rel='noopener noreferrer'>
+						<LiGithub size={17} aria-hidden='true' />
+						<span>
+							<strong>This site&rsquo;s source</strong>
+							<small>{profile.repo.replace('https://', '')}</small>
+						</span>
+					</a>
 				</div>
 			)}
 		</SettingsShell>

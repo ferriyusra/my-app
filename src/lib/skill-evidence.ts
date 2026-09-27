@@ -32,6 +32,23 @@ export function evidenceFor(name: string): Evidence {
 	return { roles, projects: built, months, since };
 }
 
+/**
+ * The order tools are listed in: most months on record first, and the typed
+ * `years` only to break ties among tools no role names.
+ *
+ * It sorted on `years` alone, which is typed by hand, and so put Node.js
+ * (typed 4) above Go (typed 3) — on a site whose name plate is Go first, and
+ * directly above an evidence panel reporting 52 months of Go across five roles
+ * and 33 of Node.js across three. A ranking the page contradicts costs more
+ * trust than it earns.
+ */
+export function bySkillEvidence(
+	a: { name: string; years: number },
+	b: { name: string; years: number },
+): number {
+	return evidenceFor(b.name).months - evidenceFor(a.name).months || b.years - a.years;
+}
+
 /** "1 yr 8 mos" from a raw month count, matching tenureLabel's phrasing. */
 export function monthsLabel(total: number): string {
 	const years = Math.floor(total / 12);

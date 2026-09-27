@@ -6,7 +6,7 @@ import { LiChevronDown, LiMapPin } from '@/components/icons/line-icons';
 import SettingsShell, { type SettingsPage } from '@/components/ui/settings-shell';
 import CaseStudyBody from '@/components/content/case-study-body';
 import { useAppIntent } from '@/hooks/use-app-intent';
-import { caseStudy } from '@/data/case-study';
+import { caseStudy, caseStudyLength } from '@/data/case-study';
 import {
 	experiences,
 	tenureLabel,
@@ -30,20 +30,26 @@ const PAGES: SettingsPage[] = [
 /** How many outcomes show before the entry needs expanding. */
 const COLLAPSED = 2;
 
+const caseLength = caseStudyLength();
+
 function Role({
 	exp,
 	expanded,
 	onToggle,
-	caseOpen = false,
+	onReadCase,
+	single = false,
 }: {
 	exp: Experience;
 	expanded: boolean;
 	onToggle: () => void;
-	/** Open the case study disclosure to begin with — on the role's own page. */
-	caseOpen?: boolean;
+	onReadCase: () => void;
+	/** The role's own page. Nothing is collapsed there: a reader who picked
+	    one role from the rail came for its scope, and the page is one card. */
+	single?: boolean;
 }) {
-	const shown = expanded ? exp.achievements : exp.achievements.slice(0, COLLAPSED);
-	const hidden = exp.achievements.length - COLLAPSED;
+	const all = single || expanded;
+	const shown = all ? exp.achievements : exp.achievements.slice(0, COLLAPSED);
+	const hidden = single ? 0 : exp.achievements.length - COLLAPSED;
 
 	return (
 		<li className='ex-entry' data-current={exp.current || undefined}>
@@ -123,19 +129,30 @@ function Role({
 					))}
 				</ul>
 
-				{/* Only the role the case study is about carries it. `<details>`
-				    rather than state: it is long, and it should be closed by
-				    default in the timeline without another toggle to wire up. On
-				    the role's own page it starts open — that page is one card. */}
+				{/* Only the role the case study is about carries it, and as a
+				    way in rather than a copy. Meditap's own page used to show two
+				    of its ten outcomes and then the whole 1,400-word write-up
+				    expanded beneath them — a second copy of the page one rail
+				    item above, with the scope collapsed and the duplicate open.
+				    The write-up has one home in this window, with its own "On
+				    this page" nav; this row says what it is and goes there. */}
 				{exp.short === caseStudy.at && (
-					<details className='ex-case' open={caseOpen || undefined}>
-						<summary>
-							<FileCode2 size={14} aria-hidden='true' />
-							Case study — {caseStudy.title}
-							<LiChevronDown size={14} aria-hidden='true' className='ex-case-chev' />
-						</summary>
-						<CaseStudyBody />
-					</details>
+					<div className='ex-case'>
+						<FileCode2 size={20} aria-hidden='true' />
+						<span className='ex-case-text'>
+							<strong>Case study: {caseStudy.title}</strong>
+							<small>
+								{caseStudy.stack.slice(0, 4).join(' · ')} · {caseLength.sections}{' '}
+								sections · about {caseLength.minutes} min
+							</small>
+						</span>
+						<button
+							type='button'
+							className='fl-btn fl-btn-standard'
+							onClick={onReadCase}>
+							Read the case study
+						</button>
+					</div>
 				)}
 			</article>
 		</li>
@@ -261,7 +278,11 @@ export default function ExperienceApp() {
 							exp={exp}
 							expanded={open === exp.company}
 							onToggle={() => setOpen(open === exp.company ? null : exp.company)}
-							caseOpen={page !== 'all'}
+							onReadCase={() => {
+								setPage('case');
+								setOpen(null);
+							}}
+							single={page !== 'all'}
 						/>
 					))}
 				</ol>

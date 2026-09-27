@@ -1,4 +1,5 @@
 import type { Discarded } from '@/data/discarded';
+import { profile } from '@/data/profile';
 
 /**
  * No 'use client' on purpose: the Recycle Bin renders this, Explorer renders
@@ -32,8 +33,16 @@ export default function DiscardedDetail({ item }: { item: Discarded }) {
 				<div>
 					<dt>Removed by</dt>
 					<dd>
+						{/* A link, so "checkable" is one click rather than a hash
+						    typed into GitHub by someone who guessed the repository. */}
 						{item.commit ? (
-							<code>{item.commit}</code>
+							<a
+								href={`${profile.repo}/commit/${item.commit}`}
+								target='_blank'
+								rel='noopener noreferrer'
+								aria-label={`Commit ${item.commit} on GitHub`}>
+								<code>{item.commit}</code>
+							</a>
 						) : (
 							/* The one entry that never reached a commit; saying so is
 							   more honest than a hash. */

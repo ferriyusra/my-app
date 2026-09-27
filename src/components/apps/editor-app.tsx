@@ -4,8 +4,11 @@ import { Fragment, useMemo, useState } from 'react';
 import { FileCode2, GitBranch, Package, X } from 'lucide-react';
 import { LiBug, LiChevronDown, LiSearch, LiSettings2 } from '@/components/icons/line-icons';
 import { useShell } from '@/context/shell-context';
+import { useWindowManager } from '@/hooks/use-window-manager';
+import { sendIntent } from '@/hooks/use-app-intent';
 import type { SourceFile } from '@/lib/source';
 import { tokenize } from '@/lib/highlight';
+import { profile } from '@/data/profile';
 
 function CodePane({ file }: { file: SourceFile }) {
 	const lines = useMemo(() => file.code.split('\n'), [file.code]);
@@ -43,6 +46,7 @@ export default function EditorApp() {
 	/* Read from the real files when the page was built, not copied into a data
 	   module — see lib/source.ts for why that mattered. */
 	const { sources: sourceFiles } = useShell();
+	const { launch } = useWindowManager();
 	const [openPaths, setOpenPaths] = useState<string[]>([sourceFiles[0].path]);
 	const [active, setActive] = useState(sourceFiles[0].path);
 	const file = sourceFiles.find((f) => f.path === active) ?? sourceFiles[0];
@@ -123,6 +127,26 @@ export default function EditorApp() {
 						))}
 					</div>
 				))}
+
+				{/* This window is the site's own source, which is TypeScript. The
+				    Go the portfolio is about lives in a private service; the one
+				    published piece of it is in the case study, and a reader who
+				    came here looking for Go should be told where. */}
+				<div className='vs-side-note'>
+					<p>
+						The production Go is private. Its alerting decision function is in the
+						case study.
+					</p>
+					<button
+						type='button'
+						className='vs-side-link'
+						onClick={() => {
+							sendIntent('experience', 'case');
+							launch('experience');
+						}}>
+						Open the case study
+					</button>
+				</div>
 			</aside>
 
 			<div className='vs-main'>
@@ -154,7 +178,17 @@ export default function EditorApp() {
 					})}
 				</div>
 
-				<p className='vs-breadcrumb'>{file.path}</p>
+				{/* The path is a link to the same file in the repository, so
+				    "read this site's source" has somewhere to go past the
+				    excerpt. */}
+				<p className='vs-breadcrumb'>
+					<a
+						href={`${profile.repo}/blob/main/${file.path}`}
+						target='_blank'
+						rel='noopener noreferrer'>
+						{file.path}
+					</a>
+				</p>
 				<p className='vs-summary'>{file.summary}</p>
 
 				<CodePane file={file} />

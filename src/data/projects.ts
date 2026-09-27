@@ -9,6 +9,9 @@ export interface Project {
 	github: string | null;
 	/** Set to null to hide the button */
 	demo: string | null;
+	/** What the demo link actually is — a government portal is not a demo
+	    and a paper is not live. Defaults to "Live demo". */
+	demoLabel?: string;
 	featured: boolean;
 	color: string;
 	/** Two-letter abbreviation shown on non-featured card header */
@@ -16,6 +19,20 @@ export interface Project {
 	stars: number;
 	/** 'real' = production / professional work; 'case-study' = learning / personal project */
 	type: 'real' | 'case-study';
+}
+
+/**
+ * The label a reader sees for a project's type, defined once.
+ *
+ * The data key says 'case-study' for a learning project, and three surfaces
+ * printed it as "Case study" — so the HRIS app and a 2021 paper wore the badge
+ * while the one project that has a case study (the Meditap write-up, which is
+ * what "Case study" means everywhere else on the site) did not. The key stays;
+ * the words change, to the ones PRODUCT.md and the Recycle Bin already use.
+ */
+export function projectKind(p: Pick<Project, 'type'>, long = false): string {
+	if (p.type === 'real') return long ? 'Production work' : 'Production';
+	return long ? 'Learning project' : 'Learning';
 }
 
 /**
@@ -56,14 +73,15 @@ export const projects: Project[] = [
 		id: 'ssd',
 		name: 'SatuSehat Data',
 		description:
-			'The SATUSEHAT Data Portal brings the distribution of Indonesia’s health data and its processed results into one place, as interactive dashboards on trusted sources, to support decision-making and transparency. It has four parts: Dashboard, Dataset, Metadata and Data Services.',
+			'The SATUSEHAT Data Portal brings the distribution of Indonesia’s health data and its processed results into one place, as interactive dashboards on trusted sources, to support decision-making and transparency. It has four parts: Dashboard, Dataset, Metadata and Data Services. I maintained and extended the Data Product’s API services in Node.js (NestJS) and PostgreSQL.',
 		cover: '/projects/ssd/ssd-1.png',
 		/* Node.js named as well as NestJS: the INA Digital role records the
 		   Data Product APIs as "Node.js (NestJS)", and once the MERN exercises
 		   left this list it was the only project that could show it. */
-		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'NestJS', 'Node.js'],
+		tech: ['NestJS', 'Node.js', 'PostgreSQL', 'Next.js', 'TypeScript'],
 		github: null,
 		demo: 'https://satusehat.kemkes.go.id/data',
+		demoLabel: 'Live site',
 		featured: true,
 		color: '#a8432a',
 		initial: 'SSD',
@@ -106,6 +124,7 @@ export const projects: Project[] = [
 		tech: ['Go', 'Gin Framework', 'PostgreSQL', 'React', 'Next.js'],
 		github: null,
 		demo: 'https://satusehat.kemkes.go.id/data/dashboard/3678097d-d11e-4b2c-8552-310d782a905b',
+		demoLabel: 'Live site',
 		featured: true,
 		color: '#4a6f8a',
 		initial: 'NA',
@@ -118,9 +137,13 @@ export const projects: Project[] = [
 		description:
 			'Sentiment analysis of Jakarta’s Twitter posts about the Covid-19 vaccine, after Presidential Decree No. 99 of 2020 set out the vaccination programme: tweets classified with TF-IDF features and a Naive Bayes classifier in Python, published on ResearchGate.',
 		cover: '/projects/as/as-1.png',
-		tech: ['Python', 'Implement Algorithm TF-IDF', 'Implement Algorithm Naive Bayes Classifier'],
-		github: 'https://github.com/ferriyusra/Analisis-Sentimen-Naive-Bayes/issues/1',
+		tech: ['Python', 'TF-IDF', 'Naive Bayes'],
+		/* The repository, not its first issue: the Recycle Bin cut Tracer Study
+		   for linking an issue, and the project that stayed kept the same
+		   defect. */
+		github: 'https://github.com/ferriyusra/Analisis-Sentimen-Naive-Bayes',
 		demo: 'https://www.researchgate.net/publication/368490963_Application_of_the_Naive_Bayes_Classifier_Algorithm_to_Analyze_Sentiment_for_the_Covid-19_Vaccine_on_Twitter_in_Jakarta',
+		demoLabel: 'Paper',
 		featured: true,
 		color: '#6b5570',
 		initial: 'AS',

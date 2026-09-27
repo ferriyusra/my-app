@@ -96,6 +96,16 @@
   --sans: 'Segoe UI Variable Text', 'Segoe UI', var(--font-inter), system-ui, sans-serif;
   --display: 'Segoe UI Variable Display', 'Segoe UI', var(--font-inter), system-ui, sans-serif;
   --mono: 'Cascadia Code', 'Cascadia Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* The Windows 11 type ramp, for the surfaces people read: About, the
+     Experience cards, the Skills evidence. Sizes a pixel apart read as noise
+     rather than hierarchy, and those surfaces had seven of them in one card.
+     The shell chrome keeps its own, deliberately small, sizes. */
+  --t-caption: 12px;
+  --t-body: 14px;
+  --t-body-lg: 18px;
+  --t-subtitle: 20px;
+  --t-title: 28px;
 }
 
 html[data-theme='dark'] {
@@ -538,12 +548,17 @@ html[data-wallpaper='custom'] .wp-layer { display: none; }
 /* A photograph can be any brightness, so icon labels stop taking their colour
    from the theme and go white over a heavier vignette — the same treatment
    Dusk already needed. */
+/* The tight halo is what Windows itself draws under white desktop text; the
+   soft drop alone left Skills, Tips and Terminal at about 2:1 against the pale
+   sky in the default photo. The left-edge scrim covers the icon columns and
+   nothing else. */
 html[data-wallpaper='custom'] .desktop {
   --desk-label: #ffffff;
-  --desk-label-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  --desk-label-shadow: 0 0 2px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.75);
 }
 html[data-wallpaper='custom'] .wp-vignette {
   background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.26), transparent 300px),
     radial-gradient(130% 95% at 18% 10%, rgba(0, 0, 0, 0.55), transparent 58%),
     linear-gradient(0deg, rgba(0, 0, 0, 0.35), transparent 30%);
 }
@@ -2292,23 +2307,6 @@ input[type='range']::-moz-range-thumb {
   background: var(--surface-header);
   overflow: auto;
 }
-/* Windows' NavigationView drops to an icon rail in a narrow window. The
-   labels stay in the DOM, visually hidden, so every item keeps its name;
-   the button's `title` is the tooltip the compact rail shows. */
-@container st (max-width: 720px) {
-  .st-nav { flex-basis: 56px; padding: 12px 6px; }
-  .st-account { justify-content: center; padding: 4px 0 12px; }
-  .st-nav-item { justify-content: center; padding: 9px 0; }
-  .st-account-text,
-  .st-nav-text {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-}
 
 .st-account {
   display: flex;
@@ -2367,6 +2365,24 @@ input[type='range']::-moz-range-thumb {
   transition: height var(--dur-normal) var(--ease-decel);
 }
 .st-nav-item[data-active] .st-nav-rail { height: 16px; }
+
+/* Windows' NavigationView drops to an icon rail in a narrow window. The
+   labels stay in the DOM, visually hidden, so every item keeps its name;
+   the button's `title` is the tooltip the compact rail shows. */
+@container st (max-width: 720px) {
+  .st-nav { flex-basis: 56px; padding: 12px 6px; }
+  .st-account { justify-content: center; padding: 4px 0 12px; }
+  .st-nav-item { justify-content: center; padding: 9px 0; }
+  .st-account-text,
+  .st-nav-text {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
 
 .st-pane { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: auto; }
 /* The column stops growing on a wide window, as Settings' does: maximised on
@@ -2659,9 +2675,9 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
    type ramp (Subtitle 24/32, Body Strong 14, Body Large 16) instead of the
    page title being the largest thing in the window. */
 .ab-hero-text h3 { font-size: 24px; line-height: 32px; }
-.ab-role { margin: 2px 0 0; font-size: 14px; font-weight: 600; color: var(--ink); }
+.ab-role { margin: 2px 0 0; font-size: var(--t-body); font-weight: 600; color: var(--ink); }
 .ab-lede { margin: 8px 0 12px; max-width: 60ch; font-size: 16px; line-height: 22px; color: var(--ink); }
-.ab-proof { margin: 4px 2px 6px; max-width: 72ch; font-size: 14px; line-height: 22px; color: var(--ink-secondary); }
+.ab-proof { margin: 4px 2px 6px; max-width: 72ch; font-size: var(--t-body); line-height: 22px; color: var(--ink-secondary); }
 .ab-badges { display: flex; flex-wrap: wrap; gap: 6px; }
 .ab-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .ab-badge {
@@ -2763,7 +2779,7 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   text-transform: uppercase;
 }
 .sk-name { display: flex; flex-direction: column; font-size: 13px; font-weight: 600; min-width: 0; }
-.sk-name small { font-weight: 400; font-size: 11px; color: var(--ink-muted); }
+.sk-name small { font-weight: 400; font-size: var(--t-caption); color: var(--ink-muted); }
 /* ═══════════════════════════════════════════════════════════
    EXPERIENCE
    ═══════════════════════════════════════════════════════════ */
@@ -2786,10 +2802,14 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   background: var(--surface-header);
 }
 .ex-card-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.ex-card-head h3 { font-size: 15px; }
+/* Four sizes on the Windows ramp where there were seven a pixel apart:
+   the role at Body Large 18, reading text at Body 14, figures at Subtitle
+   20, and everything that qualifies them at Caption 12. The role title was
+   15px over 14px bullets, which is not a hierarchy anyone can see. */
+.ex-card-head h3 { font-size: var(--t-body-lg); line-height: 24px; }
 .ex-company {
   margin: 3px 0 0;
-  font-size: 13px;
+  font-size: var(--t-body);
   color: var(--ink-secondary);
   display: flex;
   flex-wrap: wrap;
@@ -2799,20 +2819,21 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 .ex-loc { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: var(--ink-muted); }
 .ex-when { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; text-align: right; }
 .ex-when time { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; }
-.ex-when small { font-size: 11px; color: var(--ink-muted); }
+.ex-when small { font-size: var(--t-caption); color: var(--ink-muted); }
 .ex-now {
   margin-top: 2px;
   padding: 2px 8px;
   border-radius: 99px;
   background: color-mix(in srgb, var(--success) 16%, transparent);
   color: var(--success);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .ex-desc {
   margin: 0 0 2px;
-  font-size: 13px;
-  line-height: 20px;
+  max-width: 72ch;
+  font-size: var(--t-body);
+  line-height: 22px;
   color: var(--ink-secondary);
 }
 .ex-points {
@@ -2824,7 +2845,8 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   display: grid;
   gap: 7px;
 }
-.ex-points li { font-size: 14px; line-height: 21px; color: var(--ink-secondary); }
+.ex-points { max-width: 72ch; }
+.ex-points li { font-size: var(--t-body); line-height: 22px; color: var(--ink-secondary); }
 .ex-points li::marker { color: var(--accent); }
 .ex-toggle {
   display: inline-flex;
@@ -2855,7 +2877,7 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
   padding: 2px 9px;
   border-radius: 99px;
   background: var(--surface-chip);
-  font-size: 11px;
+  font-size: var(--t-caption);
   color: var(--ink-secondary);
 }
 
@@ -3680,12 +3702,34 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 
 .vs-side {
   flex: 0 0 210px;
+  display: flex;
+  flex-direction: column;
   padding: 10px 0;
   border-right: 1px solid var(--line-subtle);
   background: var(--surface-header);
   overflow: auto;
 }
 @container vs (max-width: 760px) { .vs-side { display: none; } }
+.vs-side-note {
+  margin: auto 10px 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.vs-side-note p { margin: 0 0 6px; font-size: 12px; line-height: 17px; color: var(--ink-secondary); }
+.vs-side-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+}
+.vs-side-link:hover { text-decoration: underline; }
+.vs-side-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 .vs-side-head {
   margin: 0 0 8px;
   padding: 0 14px;
@@ -3769,7 +3813,9 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 }
 .vs-tab-close:hover { background: var(--subtle-pressed); }
 
-.vs-breadcrumb { margin: 0; padding: 6px 16px 0; font-size: 11px; color: var(--ink-muted); }
+.vs-breadcrumb { margin: 0; padding: 6px 16px 0; font-size: 12px; color: var(--ink-muted); }
+.vs-breadcrumb a { color: inherit; text-decoration: none; }
+.vs-breadcrumb a:hover { color: var(--accent); text-decoration: underline; }
 .vs-summary { margin: 2px 0 0; padding: 0 16px 8px; font-size: 12px; color: var(--ink-secondary); }
 
 .vs-code {
@@ -3862,6 +3908,7 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   color: #fff;
 }
 .ex-seg[data-current]:hover { background: var(--accent-hover); }
+.ex-seg[data-current] .ex-seg-len { color: #fff; }
 
 .ex-seg-label {
   font-size: 12px;
@@ -3870,9 +3917,12 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Weight and colour tell label from tenure, not opacity: at 10px and 75%
+   this was 4.47:1 on grey and 3.74:1 on the current role, under the AA floor
+   on the figure a reader checks first. */
 .ex-seg-len {
-  font-size: 10px;
-  opacity: 0.75;
+  font-size: var(--t-caption);
+  color: var(--ink-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3882,7 +3932,7 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   display: flex;
   justify-content: space-between;
   margin-top: 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ink-muted);
 }
 .ex-bar-axis span:nth-child(2) { font-variant-numeric: tabular-nums; }
@@ -3910,13 +3960,13 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   background: var(--surface);
 }
 .ex-stats strong {
-  font-size: 17px;
+  font-size: var(--t-subtitle);
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 28px;
   font-variant-numeric: tabular-nums;
   color: var(--accent);
 }
-.ex-stats span { font-size: 11px; line-height: 15px; color: var(--ink-muted); }
+.ex-stats span { font-size: var(--t-caption); line-height: 16px; color: var(--ink-muted); }
 /* The facts that are not numbers, as a line under the tiles. */
 .ex-highlights {
   list-style: none;
@@ -3929,15 +3979,15 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 .ex-highlights li {
   position: relative;
   padding-left: 12px;
-  font-size: 13px;
-  line-height: 19px;
-  color: var(--ink-secondary);
+  font-size: var(--t-body);
+  line-height: 20px;
+  color: var(--ink);
 }
 .ex-highlights li::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 8px;
+  top: 9px;
   width: 6px;
   height: 2px;
   border-radius: 1px;
@@ -4205,6 +4255,7 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   color: var(--accent);
 }
 .cs-nav-list .cs-num { font-weight: 400; color: var(--ink-muted); }
+.cs-nav-tags { font-size: 12px; color: var(--ink-muted); white-space: nowrap; }
 /* A note titles itself inside .cs, where the case study is titled by whatever
    opens it — the window head, Explorer's detail header, the document's fold. */
 .cs > h3 { margin: 0 0 8px; font-size: 19px; line-height: 26px; font-weight: 600; }
@@ -4260,35 +4311,29 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
 .cs-open li { font-size: 14px; line-height: 22px; margin-bottom: 7px; }
 .cs-open li:last-child { margin-bottom: 0; }
 
-/* In the Experience window it is a disclosure on the current role. */
-.ex-case { margin-top: 14px; border-top: 1px solid var(--line-subtle); padding-top: 12px; }
+/* On the role it is about, a way into the write-up rather than a copy of it. */
+.ex-case {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.ex-case > svg { flex: none; color: var(--ink); }
+.ex-case-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ex-case-text strong { font-size: 14px; line-height: 20px; }
+.ex-case-text small { font-size: 12px; line-height: 16px; color: var(--ink-muted); }
+.ex-case .fl-btn { flex: none; }
+@container st (max-width: 620px) {
+  .ex-case { flex-wrap: wrap; }
+}
 /* As a page of its own the write-up gets the card and a title, nothing
    collapsed. Same component underneath as the disclosure and the document. */
 .ex-case-page { display: block; }
 .ex-case-title { margin: 0 0 12px; font-size: 18px; line-height: 24px; }
-.ex-case > summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  margin: -6px -8px;
-  border-radius: var(--r-sm);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  list-style: none;
-  transition: background var(--dur-fast) var(--ease-standard);
-}
-.ex-case > summary::-webkit-details-marker { display: none; }
-.ex-case > summary:hover { background: var(--subtle-hover); }
-.ex-case > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.ex-case-chev {
-  margin-left: auto;
-  flex: none;
-  transition: transform var(--dur-fast) var(--ease-standard);
-}
-.ex-case[open] .ex-case-chev { transform: rotate(180deg); }
-.ex-case[open] > summary { margin-bottom: 12px; }
 
 .mb-cs-title { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
 
@@ -4396,17 +4441,17 @@ html[data-theme='dark'] .tk-number  { color: #7fc4ff; }
   border-radius: var(--r-md);
   background: var(--surface-subtle);
 }
-.sk-evidence-lead { margin: 0 0 8px; font-size: 12.5px; color: var(--ink-secondary); }
+.sk-evidence-lead { margin: 0 0 8px; font-size: var(--t-body); color: var(--ink-secondary); }
 .sk-evidence-lead strong { color: var(--accent); font-variant-numeric: tabular-nums; }
-.sk-since { margin-left: 8px; font-size: 11px; color: var(--ink-muted); }
+.sk-since { margin-left: 8px; font-size: var(--t-caption); color: var(--ink-muted); }
 
 .sk-evidence-roles { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-.sk-evidence-roles li { display: flex; gap: 10px; font-size: 12px; }
+.sk-evidence-roles li { display: flex; gap: 10px; font-size: var(--t-body); line-height: 20px; }
 .sk-evidence-roles strong { min-width: 110px; font-weight: 600; }
 .sk-evidence-roles span { color: var(--ink-muted); }
 
-.sk-evidence-built { margin: 9px 0 0; font-size: 12px; color: var(--ink-muted); }
-.sk-evidence-none { margin: 0; font-size: 12px; line-height: 18px; color: var(--ink-muted); }
+.sk-evidence-built { margin: 9px 0 0; font-size: var(--t-caption); color: var(--ink-muted); }
+.sk-evidence-none { margin: 0; font-size: var(--t-caption); line-height: 18px; color: var(--ink-muted); }
 
 @container st (max-width: 560px) {
   .sk-evidence-roles li { flex-direction: column; gap: 0; }
@@ -5501,6 +5546,10 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   border-radius: var(--r-sm);
   background: var(--surface-chip);
 }
+.rb-meta a { color: inherit; text-decoration: none; }
+.rb-meta a code { color: var(--accent); }
+.rb-meta a:hover code { text-decoration: underline; }
+.rb-meta a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
 .rb-nocommit { font-style: italic; color: var(--ink-muted); }
 
 .rb-reason { margin: 0; font-size: 13px; line-height: 21px; max-width: 68ch; }
@@ -5789,6 +5838,21 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 }
 .mb-jump a { color: var(--accent); text-decoration: none; }
 .mb-jump a:hover { text-decoration: underline; }
+
+.mb-spine > li { scroll-margin-top: 16px; }
+.mb-case { scroll-margin-top: 16px; }
+/* The route past the case study to the next role. */
+.mb-skip {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 6px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+.mb-skip:hover { text-decoration: underline; }
+.mb-skip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 .mb-note {
   margin: 0 0 22px;
   padding: 12px 14px;
@@ -5963,7 +6027,7 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   display: inline-block;
   padding: 2px 8px;
   border-radius: 99px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   vertical-align: 2px;
 }
@@ -6060,6 +6124,23 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
 @media (max-width: 620px) {
   .mb-shell { padding: 18px 14px 44px; }
   .mb-skills > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+
+  /* Reading sizes on a phone. The document was set at the desktop shell's
+     caption sizes — 13px prose, 11px stacks, a role title the size of its
+     bullets — for the reader PRODUCT.md calls fast and often mobile. */
+  .mb-summary,
+  .mb-points li,
+  .mb-spine > li p,
+  .mb-projects p { font-size: 15px; line-height: 23px; }
+  .mb-open { font-size: 14px; line-height: 20px; }
+  .mb-spine h3 { font-size: 16px; line-height: 22px; }
+  .mb-highlights li { font-size: 14px; line-height: 20px; }
+  .mb-tech,
+  .mb-stats span { font-size: 12px; line-height: 16px; }
+  .mb-skills dd { font-size: 13px; line-height: 19px; }
+  .mb-jump { font-size: 14px; line-height: 22px; }
+  .mb-case .cs-section p,
+  .mb-case .cs-list li { font-size: 15px; line-height: 23px; }
 }
 
 @media (max-width: 420px) {
@@ -6100,6 +6181,8 @@ button.cx-track-pip[data-got]:hover { transform: scale(1.2); }
   .mb-theme,
   .mb-note,
   .mb-actions,
+  .mb-jump,
+  .mb-skip,
   .mb-fold-head > svg { display: none !important; }
 
   .mb-fold { border: none; }

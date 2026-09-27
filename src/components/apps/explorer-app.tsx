@@ -25,7 +25,7 @@ import RoleDetail from '@/components/explorer/role-detail';
 import CaseStudyBody from '@/components/content/case-study-body';
 import DiscardedDetail, { when } from '@/components/content/discarded-detail';
 import type { FsEntry } from '@/components/explorer/types';
-import { projects } from '@/data/projects';
+import { projects, projectKind } from '@/data/projects';
 import { profile } from '@/data/profile';
 import { experiences, tenureLabel } from '@/data/experience';
 import { caseStudy } from '@/data/case-study';
@@ -130,7 +130,10 @@ export default function ExplorerApp() {
 				return ordered.map((p) => ({
 					id: p.id,
 					name: p.name,
-					type: p.type === 'real' ? 'Production project' : 'Case study',
+					type:
+						p.id === caseStudy.project
+							? 'Production · case study'
+							: projectKind(p, true),
 					meta: p.tech.slice(0, 3).join(' · '),
 					icon: <ProjectFolder colour={p.color} />,
 					onOpen: () => go({ nav: 'portfolio', item: p.id }),
@@ -261,6 +264,7 @@ export default function ExplorerApp() {
 			? (written.find((n) => n.slug === loc.item) ?? null)
 			: null;
 	const openCase = loc.nav === 'case-study' && !!loc.item;
+	const readCase = () => go({ nav: 'case-study', item: caseStudy.slug });
 	const openItem =
 		openProject || openRole || openDecision || openNote || openCase;
 
@@ -360,9 +364,9 @@ export default function ExplorerApp() {
 
 				<div className='xp-body'>
 					{openProject ? (
-						<ProjectDetail project={openProject} />
+						<ProjectDetail project={openProject} onReadCase={readCase} />
 					) : openRole ? (
-						<RoleDetail role={openRole} />
+						<RoleDetail role={openRole} onReadCase={readCase} />
 					) : openDecision ? (
 						<article className='xp-detail'>
 							<DiscardedDetail item={openDecision} />

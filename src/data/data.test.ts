@@ -6,6 +6,7 @@ import { skills } from './skills.ts';
 import { experiences } from './experience.ts';
 import { caseStudy } from './case-study.ts';
 import { evidenceFor } from '../lib/skill-evidence.ts';
+import { profile } from './profile.ts';
 
 /**
  * The point of these: `evidenceFor()` joins a skill to a project with
@@ -34,8 +35,8 @@ const NOT_A_LISTED_SKILL = new Set([
 	'Recharts',
 	'Gin Framework',
 	'Python',
-	'Implement Algorithm TF-IDF',
-	'Implement Algorithm Naive Bayes Classifier',
+	'TF-IDF',
+	'Naive Bayes',
 	/* The deposit-alerting stack, from the write-up in public/projects/meditap/. */
 	'MS SQL Server',
 	'GORM',
@@ -54,6 +55,33 @@ test('every tool a project names is either a listed skill or a known exception',
 					`else, add it to NOT_A_LISTED_SKILL.`,
 			);
 		}
+	}
+});
+
+test('no "since YYYY" claims a tool earlier than the record shows', () => {
+	/* A note sits right above the evidence the Skills window computes, and the
+	   proof line is the first paragraph on About. "Node.js since 2021" over a
+	   panel that says 2022 is the page contradicting itself. */
+	for (const s of skills) {
+		const claimed = s.note.match(/since (\d{4})/)?.[1];
+		const since = evidenceFor(s.name).since;
+		if (!claimed || !since) continue;
+		assert.ok(claimed >= since, `${s.name}: note says since ${claimed}, the record starts ${since}`);
+	}
+	for (const [, tool, year] of profile.proof.matchAll(/(Go|Node\.js)(?: and \w+)? since (\d{4})/g)) {
+		const since = evidenceFor(tool).since;
+		assert.ok(since && year >= since, `profile.proof says ${tool} since ${year}, the record starts ${since}`);
+	}
+});
+
+test('a project links a repository, never an issue in one', () => {
+	/* The Recycle Bin cut a project for exactly this, so a project that stayed
+	   may not do it. */
+	for (const p of projects) {
+		assert.ok(
+			!p.github || !/\/(issues|pull)\//.test(p.github),
+			`${p.name} links ${p.github}, which is an issue or a pull request, not the code`,
+		);
 	}
 });
 

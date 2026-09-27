@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { profile } from '@/data/profile';
 import { LiDownload, LiMail, type IconLike } from '@/components/icons/line-icons';
 
@@ -38,6 +39,15 @@ export default function SettingsShell({
 	    arrival it sits beside About, which would show the same card twice. */
 	account?: boolean;
 }) {
+	/* A new page starts at its top, as it does in Settings. The pane is one
+	   scroller shared by every page, so without this a link at the foot of a
+	   long page — Experience's "Read the case study" — opened the next page
+	   partway down. */
+	const pane = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		pane.current?.scrollTo({ top: 0 });
+	}, [active]);
+
 	return (
 		<div className='st-shell'>
 			<nav className='st-nav' aria-label={navLabel}>
@@ -72,7 +82,7 @@ export default function SettingsShell({
 				</ul>
 			</nav>
 
-			<div className='st-pane'>
+			<div className='st-pane' ref={pane}>
 				<header className='st-pane-head'>
 					<h2>{title}</h2>
 					{subtitle && <p>{subtitle}</p>}

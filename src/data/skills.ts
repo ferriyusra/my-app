@@ -1,9 +1,15 @@
 /**
  * The tech stack, grouped the way the Skills window presents it.
  *
- * `years` is hands-on use derived from the dates in `experience.ts`. Nothing
- * displays it any more — it orders each category so the tools reached for
- * most sit at the top, which is the only ranking here that means anything.
+ * `years` is typed, not derived, and nothing displays it. It breaks ties in
+ * the ordering among tools no role names; everything else is ordered by the
+ * months `evidenceFor()` computes from `experience.ts` (see
+ * `bySkillEvidence`).
+ *
+ * A `note` sits directly above that computed evidence in the Skills window,
+ * so it may not claim more than the record shows — "since 2021" over a panel
+ * that says 2022 is a contradiction the reader sees. `data.test.ts` checks
+ * the years.
  *
  * `icon` points at a brand mark in `public/icons`. Where no mark ships, the
  * card falls back to a lettered plate rather than a broken image.
@@ -43,19 +49,19 @@ export const SKILL_CATEGORIES: {
 export const skills: Skill[] = [
 	/* ── Backend ── */
 	{ name: 'Go', category: 'Backend', icon: '/icons/go.svg', years: 3, note: 'Gin services at Meditap, SATUSEHAT, Moladin' },
-	{ name: 'Node.js', category: 'Backend', icon: '/icons/nodedotjs.svg', years: 4, note: 'Primary runtime since 2021' },
+	{ name: 'Node.js', category: 'Backend', icon: '/icons/nodedotjs.svg', years: 4, note: 'Express at Moladin, NestJS at INA Digital' },
 	{ name: 'NestJS', category: 'Backend', icon: '/icons/nestjs.svg', years: 2, note: 'SATUSEHAT Data Product APIs' },
 	{ name: 'Express.js', category: 'Backend', icon: '/icons/express.svg', adaptive: true, years: 3, note: 'Moladin product lines' },
 
 	/* ── Frontend ── */
-	{ name: 'TypeScript', category: 'Frontend', icon: '/icons/typescript.svg', years: 4, note: 'Across every recent codebase' },
+	{ name: 'TypeScript', category: 'Frontend', icon: '/icons/typescript.svg', years: 4, note: 'Meditap’s CMS and the GovTech Health dashboards' },
 	{ name: 'React', category: 'Frontend', icon: '/icons/react.svg', years: 3, note: 'Internal CMS tools at Meditap' },
 	{ name: 'Next.js', category: 'Frontend', icon: '/icons/nextdotjs.svg', adaptive: true, years: 2, note: 'Dashboards and this desktop' },
 	{ name: 'JavaScript', category: 'Frontend', icon: '/icons/javascript.svg', years: 4, note: 'Where TypeScript is not' },
 	{ name: 'Tailwind CSS', category: 'Frontend', icon: '/icons/tailwindcss.svg', years: 2, note: 'Side projects and this site' },
 
 	/* ── Database ── */
-	{ name: 'PostgreSQL', category: 'Database', icon: '/icons/postgresql.svg', years: 4, note: 'Default store on every role' },
+	{ name: 'PostgreSQL', category: 'Database', icon: '/icons/postgresql.svg', years: 4, note: 'Every role since Moladin' },
 	{ name: 'MySQL', category: 'Database', icon: '/icons/mysql.svg', years: 3, note: 'Moladin and Jojonomic' },
 	{ name: 'MongoDB', category: 'Database', icon: '/icons/mongodb.svg', years: 3, note: 'Dashboard aggregates' },
 	{ name: 'Redis', category: 'Database', icon: '/icons/redis.svg', years: 3, note: 'Caching layer for BI endpoints' },

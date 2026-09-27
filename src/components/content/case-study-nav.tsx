@@ -13,7 +13,7 @@
 export default function CaseStudyNav({
 	items,
 }: {
-	items: { id: string; num: string; label: string }[];
+	items: { id: string; num: string; label: string; tags?: string[] }[];
 }) {
 	return (
 		<nav className='cs-nav' aria-label='On this page'>
@@ -37,6 +37,9 @@ export default function CaseStudyNav({
 							}}>
 							{item.label}
 						</a>
+						{item.tags && item.tags.length > 0 && (
+							<span className='cs-nav-tags'>{item.tags.join(' · ')}</span>
+						)}
 					</li>
 				))}
 			</ol>

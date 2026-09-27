@@ -1,6 +1,8 @@
 'use client';
 
+import { FileCode2 } from 'lucide-react';
 import { tenureLabel, type Experience } from '@/data/experience';
+import { caseStudy } from '@/data/case-study';
 
 /**
  * The pane Explorer shows once a role is opened, in the same chrome a project
@@ -8,7 +10,18 @@ import { tenureLabel, type Experience } from '@/data/experience';
  * `experience.ts`, which is also what the Experience window and the server
  * document read.
  */
-export default function RoleDetail({ role }: { role: Experience }) {
+export default function RoleDetail({
+	role,
+	onReadCase,
+}: {
+	role: Experience;
+	/** Go to Explorer's own copy of the write-up, rather than open a window. */
+	onReadCase: () => void;
+}) {
+	/* The role the write-up is about was a dead end here, while the project
+	   card for the same system opened it. */
+	const hasCase = role.short === caseStudy.at;
+
 	return (
 		<article className='xp-detail'>
 			<header className='xp-detail-head'>
@@ -50,6 +63,17 @@ export default function RoleDetail({ role }: { role: Experience }) {
 					<li key={a}>{a}</li>
 				))}
 			</ul>
+
+			{hasCase && (
+				<div className='xp-detail-links'>
+					<button
+						type='button'
+						className='fl-btn fl-btn-standard'
+						onClick={onReadCase}>
+						<FileCode2 size={14} aria-hidden='true' /> Read the case study
+					</button>
+				</div>
+			)}
 		</article>
 	);
 }

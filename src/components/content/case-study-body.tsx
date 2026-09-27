@@ -26,6 +26,29 @@ function slug(heading: string): string {
 const num = (i: number) => String(i + 1).padStart(2, '0');
 
 /**
+ * What a section holds besides prose, read off its blocks — so "On this page"
+ * can say which section has the diagram and which the Go, and cannot say it
+ * of the wrong one. A reader with three minutes was otherwise left to guess
+ * that 03 was the architecture and 04 the state machine.
+ */
+function tagsFor(body: CaseBlock[]): string[] {
+	const tags: string[] = [];
+	for (const b of body) {
+		if (typeof b === 'string') continue;
+		const tag =
+			b.kind === 'figure'
+				? 'diagram'
+				: b.kind === 'code' && b.lang === 'go'
+					? 'Go'
+					: b.kind === 'table'
+						? 'table'
+						: null;
+		if (tag && !tags.includes(tag)) tags.push(tag);
+	}
+	return tags;
+}
+
+/**
  * The shape of the system as boxes, from `caseStudy.figure` — the write-up's
  * own diagram, redrawn.
  *
@@ -124,7 +147,12 @@ export default function CaseStudyBody({
 
 			<CaseStudyNav
 				items={[
-					...sections.map((s, i) => ({ id: s.id, num: num(i), label: s.heading })),
+					...sections.map((s, i) => ({
+						id: s.id,
+						num: num(i),
+						label: s.heading,
+						tags: tagsFor(s.body),
+					})),
 					{ id: openId, num: num(sections.length), label: 'What it does not answer' },
 				]}
 			/>
@@ -161,6 +189,19 @@ export default function CaseStudyBody({
 					))}
 				</ul>
 			</section>
+
+			{/* The record itself, one click away — the one-file version a
+			    reader can forward to an interview panel. It went missing when
+			    the page was made scannable, with nothing in that commit saying
+			    so; a test keeps this page in step with the file it links. */}
+			<p className='cs-source'>
+				Transcribed from{' '}
+				<a href={caseStudy.source} target='_blank' rel='noopener noreferrer'>
+					the original write-up
+				</a>
+				, a Markdown file served as it was written; a test keeps this page in
+				step with it.
+			</p>
 		</div>
 	);
 }

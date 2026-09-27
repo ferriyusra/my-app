@@ -404,6 +404,10 @@ of them derive; none of them keep a second copy.
 - **Skill evidence** ([src/lib/skill-evidence.ts](src/lib/skill-evidence.ts))
   answers "used where, for how long" by walking the roles that name the tool.
   Nine skills are named by no role; the UI says so rather than padding them.
+  It also sets the **order** (`bySkillEvidence`): the typed `years` once put
+  Node.js above Go directly over a panel saying the opposite. A note or the
+  proof line may not claim a "since" year earlier than the record —
+  `data.test.ts` checks both.
 - **File Explorer** ([src/components/apps/explorer-app.tsx](src/components/apps/explorer-app.tsx))
   navigates roles, the case study and the reversed decisions as folders. Three
   of its four folders used to hold `appFile()` entries — *applications wearing
@@ -480,6 +484,11 @@ and the server document, which is what a phone, a crawler and a printed page
 see. It was in the Recycle Bin alone until then: the strongest writing here,
 behind the last icon on the desktop grid, absent from the HTML entirely. The
 bin is pinned to the taskbar by default now.
+
+Each hash is a link to the commit on GitHub (`profile.repo`), so "checkable"
+is one click. That makes the merge strategy load-bearing: **PRs land as merge
+commits, never squashed** — a squash rewrites every hash these links point
+at. A hash on an unmerged branch 404s until the branch is on `main`.
 
 [src/data/case-study.ts](src/data/case-study.ts) is the Meditap deposit-threshold
 alerting system at more than bullet-point depth: a Go service joining a

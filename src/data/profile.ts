@@ -25,7 +25,7 @@ export const profile = {
 
 	/** Concrete proof, not adjectives. */
 	proof:
-		`Go and Node.js since ${SINCE}. Previously backend for SATUSEHAT, Indonesia’s national health data platform; currently building finance infrastructure at Meditap.`,
+		`Go since ${SINCE}, Node.js since 2022. Previously backend for SATUSEHAT, Indonesia’s national health data platform; currently building finance infrastructure at Meditap.`,
 
 	/** Names carry more weight above the fold than a list of technologies. */
 	previously: 'SATUSEHAT · Peruri · Moladin',
@@ -111,6 +111,13 @@ export const profile = {
 
 	email: 'feriyusra1616@gmail.com',
 	github: 'https://github.com/ferriyusra',
+	/**
+	 * This site's own repository. The Recycle Bin's commit hashes link into
+	 * it, so "checkable" means one click rather than typing a hash into
+	 * GitHub. PRs must keep landing as merge commits: a squash rewrites the
+	 * hashes those links point at.
+	 */
+	repo: 'https://github.com/ferriyusra/my-app',
 	linkedin: 'https://linkedin.com/in/ferriyusra',
 	site: 'https://ferriyusra.com',
 

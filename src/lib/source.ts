@@ -100,8 +100,20 @@ export function extract(source: string, symbol: string): string {
 	throw new Error(`source: \`${symbol}\` is never closed`);
 }
 
-/** The five declarations the editor window shows. */
+/**
+ * The six declarations the editor window shows; the first is the one it opens
+ * on. That was `zoneRect` — window-snapping arithmetic as the first code a
+ * technical reader saw — so it is `search` now, the ranking behind Start: a
+ * data problem with a decision in it, which is the nearest thing this
+ * front-end repository has to the work the portfolio is about.
+ */
 export const SOURCE_REFS: SourceRef[] = [
+	{
+		path: 'src/lib/search.ts',
+		symbol: 'search',
+		lang: 'TypeScript',
+		summary: 'Ranking: a title match outranks the same word in a body.',
+	},
 	{
 		path: 'src/context/window-reducer.ts',
 		symbol: 'zoneRect',
@@ -125,12 +137,6 @@ export const SOURCE_REFS: SourceRef[] = [
 		symbol: 'levels',
 		lang: 'TypeScript',
 		summary: 'Skills a role was the first to use — computed, not written.',
-	},
-	{
-		path: 'src/lib/search.ts',
-		symbol: 'search',
-		lang: 'TypeScript',
-		summary: 'Ranking: a title match outranks the same word in a body.',
 	},
 	{
 		path: 'src/components/apps/career/world.ts',

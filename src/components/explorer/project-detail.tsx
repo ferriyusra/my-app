@@ -3,16 +3,21 @@
 import { useState } from 'react';
 import { ExternalLink, FileCode2 } from 'lucide-react';
 import { LiGithub, LiStar } from '@/components/icons/line-icons';
-import type { Project } from '@/data/projects';
+import { projectKind, type Project } from '@/data/projects';
 import { caseStudy } from '@/data/case-study';
-import { useWindowManager } from '@/hooks/use-window-manager';
-import { sendIntent } from '@/hooks/use-app-intent';
 
 /** The pane Explorer shows once a project folder is opened. */
-export default function ProjectDetail({ project }: { project: Project }) {
+export default function ProjectDetail({
+	project,
+	onReadCase,
+}: {
+	project: Project;
+	/** Explorer has the write-up as a location of its own, so this navigates
+	    there instead of launching a second window from inside the first. */
+	onReadCase: () => void;
+}) {
 	const [failed, setFailed] = useState(false);
 	const hasCover = !!project.cover && !failed;
-	const { launch } = useWindowManager();
 	/* One project has a write-up at depth; its card says so and opens it. */
 	const hasCase = project.id === caseStudy.project;
 
@@ -40,7 +45,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
 				<div>
 					<h3>{project.name}</h3>
 					<span className='xp-badge' data-type={project.type}>
-						{project.type === 'real' ? 'Production' : 'Case study'}
+						{projectKind(project)}
 					</span>
 				</div>
 				{project.stars > 0 && (
@@ -60,9 +65,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
 				</div>
 				<div>
 					<dt>Type</dt>
-					<dd>
-						{project.type === 'real' ? 'Production work' : 'Personal case study'}
-					</dd>
+					<dd>{projectKind(project, true)}</dd>
 				</div>
 				<div>
 					<dt>Source</dt>
@@ -76,10 +79,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
 						<button
 							type='button'
 							className='fl-btn fl-btn-accent'
-							onClick={() => {
-								sendIntent('experience', 'case');
-								launch('experience');
-							}}>
+							onClick={onReadCase}>
 							<FileCode2 size={14} aria-hidden='true' /> Read the case study
 						</button>
 					)}
@@ -98,7 +98,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
 							target='_blank'
 							rel='noopener noreferrer'
 							className='fl-btn fl-btn-accent'>
-							<ExternalLink size={14} aria-hidden='true' /> Live demo
+							<ExternalLink size={14} aria-hidden='true' /> {project.demoLabel ?? 'Live demo'}
 						</a>
 					)}
 				</div>
