@@ -2627,6 +2627,7 @@ html[data-theme='dark'] .sw-wall[data-wall='dusk'] .sw-wall-art {
 .ab-hero-text h3 { font-size: 20px; }
 .ab-hero-text p { margin: 4px 0 10px; font-size: 14px; color: var(--ink-secondary); }
 .ab-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.ab-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .ab-badge {
   display: inline-flex;
   align-items: center;

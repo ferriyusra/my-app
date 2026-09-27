@@ -87,6 +87,31 @@ export default function AboutApp() {
 									<Clock size={13} aria-hidden='true' /> {profile.availability}
 								</span>
 							</span>
+							{/* The CV sat on the third tab, so the one action this site
+							    is measured by was behind a click a recruiter had to guess.
+							    The first screen now carries it. */}
+							<div className='ab-actions'>
+								<a
+									className='fl-btn fl-btn-accent'
+									href={profile.cvView}
+									target='_blank'
+									rel='noopener noreferrer'>
+									<DocumentIcon size={15} />
+									View CV
+								</a>
+								<a
+									className='fl-btn fl-btn-standard'
+									href={profile.cvDownload}
+									target='_blank'
+									rel='noopener noreferrer'>
+									<LiDownload size={15} aria-hidden='true' />
+									Download PDF
+								</a>
+								<a className='fl-btn fl-btn-standard' href={`mailto:${profile.email}`}>
+									<LiMail size={15} aria-hidden='true' />
+									Email me
+								</a>
+							</div>
 						</div>
 					</div>
 
