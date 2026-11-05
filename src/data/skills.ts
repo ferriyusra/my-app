@@ -50,7 +50,7 @@ export const skills: Skill[] = [
 	/* ── Frontend ── */
 	{ name: 'TypeScript', category: 'Frontend', icon: '/icons/typescript.svg', years: 4, note: 'Across every recent codebase' },
 	{ name: 'React', category: 'Frontend', icon: '/icons/react.svg', years: 3, note: 'Internal CMS tools at Meditap' },
-	{ name: 'Next.js', category: 'Frontend', icon: '/icons/nextdotjs.svg', adaptive: true, years: 2, note: 'Dashboards and this desktop' },
+	{ name: 'Next.js', category: 'Frontend', icon: '/icons/nextdotjs.svg', adaptive: true, years: 2, note: 'Dashboards and this site' },
 	{ name: 'JavaScript', category: 'Frontend', icon: '/icons/javascript.svg', years: 4, note: 'Where TypeScript is not' },
 	{ name: 'Tailwind CSS', category: 'Frontend', icon: '/icons/tailwindcss.svg', years: 2, note: 'Side projects and this site' },
 

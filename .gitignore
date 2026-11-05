@@ -48,3 +48,8 @@ next-env.d.ts
 .impeccable/review/
 .impeccable/questions/
 .impeccable/config.local.json
+
+# Hallmark: the before record, screenshots and comparison are local working files
+/.hallmark/*
+!/.hallmark/salt
+!/.hallmark/log.json

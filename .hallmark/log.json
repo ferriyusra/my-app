@@ -1,0 +1,104 @@
+[
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "site",
+  "genre": "editorial",
+  "job": "hire",
+  "shape": "conversational-faq",
+  "theme": "grid",
+  "axes": "light/grotesk-sans/cool",
+  "hero": "Index (/), Banner (/deposit-alerting)",
+  "nav": "floating pill",
+  "footer": "letter close",
+  "imagery": "screenshots 2 (owner's own, duotone, uncropped)",
+  "photos": [],
+  "entry": "none",
+  "fingerprint": "Left-margin|Two-column asymmetric|Bleed-colour block|Solid|Tightly cropped|None",
+  "sections": [
+   "hero: specimen index of five employers + ultramarine field with the year",
+   "which tools: short list",
+   "who have you built for: disclosure rows with range, tenure, figure",
+   "when should an alert go out: field holding a radio control, decision at poster scale",
+   "what have you thrown away: disclosure rows",
+   "what did you ship for SATUSEHAT: two uncropped captures + compact learning list",
+   "how do I reach you in Jakarta: red field letter close"
+  ],
+  "signature": "the career as a specimen index, the chosen employer red and its first year at poster scale on an ultramarine field",
+  "waived": [
+   "44c"
+  ],
+  "draw": "fd59c5",
+  "visible_words": 429,
+  "outcome": "Floor 0 FAIL, Reflex 0 (44c waived); hero-review fix 5/5 resolved; finish-review fix 8/8 resolved",
+  "prompt": "portfolio of a backend engineer, few words and visual: career at a glance, one production system, decisions reversed; job: hire",
+  "date": "2026-11-05"
+ },
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "site",
+  "genre": "modern-minimal",
+  "job": "hire",
+  "shape": "letter",
+  "theme": "console",
+  "axes": "dark/grotesk-sans/chromatic-amber",
+  "hero": "Corridor (/), Banner (/deposit-alerting)",
+  "nav": "edge-aligned",
+  "footer": "statement",
+  "imagery": "screenshots 2 (owner's own, duotone)",
+  "photos": [],
+  "entry": "none",
+  "fingerprint": "Hanging|Single column|Hairline|Solid|Tightly cropped|None",
+  "sections": [
+   "hero: claim + diff of what the work replaced",
+   "trail: five roles on a spine",
+   "case: decide() + behaviour table panels",
+   "changelog: decisions reversed",
+   "projects: two captures + index",
+   "tools: short list",
+   "footer: statement close"
+  ],
+  "signature": "a diff of what the work replaced, minus and plus lines read out of the roles",
+  "waived": [
+   "44c"
+  ],
+  "draw": "91fb77",
+  "outcome": "superseded before hand-off: owner asked for a total revamp with a different theme; complaint: too much text",
+  "prompt": "portfolio of a backend engineer: work history drawn to scale, one production system written up in depth, decisions reversed; job: hire",
+  "date": "2026-11-05"
+ },
+ {
+  "mode": "redesign",
+  "depth": "full",
+  "scope": "site",
+  "genre": "modern-minimal",
+  "job": "hire",
+  "shape": "index-first",
+  "theme": "cobalt",
+  "axes": "light/grotesk-sans/cool",
+  "hero": "Index (/), Banner (/deposit-alerting)",
+  "nav": "masthead",
+  "footer": "colophon",
+  "imagery": "screenshots 2 (owner's own)",
+  "photos": [],
+  "entry": "none",
+  "fingerprint": "Hanging|Two-column asymmetric|Hairline|Solid|Tightly cropped|None",
+  "sections": [
+   "hero: career drawn to scale",
+   "case: decide() on graphite + behaviour table",
+   "roles: rows",
+   "decisions: band of disclosures",
+   "projects: two captures + index",
+   "tools: grid",
+   "close: graphite band"
+  ],
+  "signature": "the career drawn to scale, five roles on one month axis with the gaps left in",
+  "waived": [
+   "44c"
+  ],
+  "draw": "1d9ac3",
+  "prompt": "portfolio of a backend engineer: work history, one production system written up in depth, decisions reversed; job: hire",
+  "date": "2026-11-05"
+ }
+]

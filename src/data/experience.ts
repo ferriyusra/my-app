@@ -4,8 +4,9 @@
  *
  * `stats` are the countable figures a role card leads with, and only those.
  * Every value is counted from that role's own `description` / `achievements`:
- * the ~160 entities are stated outright; the service, store, dashboard and
- * product-line counts are the named items in those sentences, counted. A
+ * Meditap's 300+ records, ~19 RPCs and 154 tests are stated outright; the
+ * service, store, dashboard and product-line counts elsewhere are the named
+ * items in those sentences, counted. A
  * tile promises a metric, so nothing that is not a number goes in one. The
  * tiles used to hold "National", "Kafka", "On-call" and "PHP", and the
  * current role's third tile was the 20–30% productivity estimate — the one
@@ -27,46 +28,57 @@ export const experiences = [
 		startISO: '2025-07',
 		current: true,
 		location: 'Jakarta, Indonesia',
+		/* Rewritten on 2026-11-05 to cover the new bullets below: it used to name
+		   only the finance services. The spreadsheet and single-source-of-truth
+		   claims are the old description's own; "health-plan" is the
+		   deposit-alerting write-up's word for the ASO clients. */
 		description:
-			'Designed and developed backend systems for finance-related platforms using Go (Gin Framework) and PostgreSQL, delivering core services (ASO Database, ASO Notification Below Threshold) that replaced manual spreadsheet-based tracking and became the single source of truth for finance operations.',
+			'Designed and developed backend systems for health-plan administration in Go and PostgreSQL: the hospital inpatient case-monitoring (guarantee) workflow linking hospitals with the internal guarantee team, and the finance services (ASO Database, ASO deposit-balance monitoring) that replaced manual spreadsheet-based tracking and became the single source of truth for finance operations.',
 		stats: [
-			{ value: '~160', label: 'entities billed' },
-			{ value: '3', label: 'source systems joined' },
-			{ value: '2', label: 'alert severity levels' },
+			{ value: '300+', label: 'ASO client records' },
+			{ value: '~19', label: 'gRPC RPCs shipped' },
+			{ value: '154', label: 'unit tests written' },
 		],
 		highlights: [
-			'Repeat alerts suppressed, escalations always sent',
-			'Billing and notification rules became configuration with an audit trail',
-			'Gateway and IAM centralised with KrakenD and Keycloak',
+			'Inpatient case monitoring across hospital and guarantee-team portals',
+			'Duplicate alert emails prevented by alert history',
+			'A broken object-level authorization gap closed in the HR portal',
 		],
-		/* The deposit-alerting bullets are the résumé bullets from the write-up
-		   in public/projects/meditap/, which is also what case-study.ts is
-		   transcribed from. */
+		/* The owner's own bullets, as given on 2026-11-05, verbatim. They
+		   replaced ten earlier ones, four of which were the résumé bullets of the
+		   deposit-alerting write-up in public/projects/meditap/; that write-up and
+		   case-study.ts are unchanged and still describe the service as it was
+		   written up. */
 		achievements: [
-			'Built and maintained RESTful API services powering financial workflows for ~160 ASO entities, enabling the Finance Team to manage and monitor structured, real-time data used directly for billing and payment collection.',
-			'Built a Go service that monitors self-funded health-plan deposit balances across corporate clients and issues two-level, state-aware alerts — joining an ERP deposit ledger, a legacy claim system and internal configuration, and publishing typed queue messages to a separate notification service.',
-			'Designed a state-machine alerting engine that suppresses repeat warnings while guaranteeing delivery on escalation, threshold changes and deposit top-ups.',
-			"Integrated three heterogeneous sources (PostgreSQL ERP, legacy SQL Server, and the service's own database) with one batched read per source per run.",
-			'Built the client configuration module — CRUD, cross-system validation, and field-level audit logging — turning per-client billing and notification rules into data an account manager can edit.',
-			'Shipped to production behind a single feature flag honoured by every entry point, including message subscriber registration.',
-			'Automated threshold-based financial notifications and scheduled billing processes with an event-driven architecture using Google Pub/Sub and Cloud Scheduler, eliminating recurring manual monitoring tasks previously done by the Finance Team.',
-			'Configured and managed KrakenD API Gateway and Keycloak IAM with role-based access control across multiple internal services and user roles, centralizing access management and reducing security-misconfiguration risk.',
-			'Developed internal CMS tools using React and Material UI, giving non-technical stakeholders direct visibility into financial data and streamlining workflows that previously required engineering support.',
-			'Accelerated feature delivery and improved code consistency by integrating AI-assisted coding and review tools (Anthropic Claude) into daily refactoring, documentation, and implementation workflows — ~20–30% productivity gain on routine engineering tasks.',
+			'Built the backend for a hospital inpatient case-monitoring (guarantee) workflow linking hospital and internal guarantee-team portals: pre-admission, care dashboard, treatment plans, discharge, and document management. Shipped ~19 gRPC RPCs across Go microservices, with Redis-cached lookups and RFC 5322 email threading for hospital correspondence.',
+			'Built the ASO (Administrative Services Only) client database end to end, now holding 300+ client records. On the backend: Go (Gin) and PostgreSQL APIs with partner validation against Odoo ERP and field-level audit logs. On the frontend: a React/TypeScript module (MUI, React Hook Form + Zod, TanStack Query) where the Finance team manages billing settings.',
+			'Automated ASO deposit-balance monitoring with Cloud Scheduler and Google Pub/Sub. Each run combines Odoo deposit data with claims incurred from the core claims system (SQL Server) and evaluates a 10-scenario threshold state machine (breach, escalation, recovery, top-up detection). It uses alert history to prevent duplicate emails and publishes Protobuf events that a notification service sends as client emails.',
+			"Secured access across portals: defined Keycloak viewer/editor roles and registered API routes in the KrakenD gateway. Closed a broken object-level authorization gap in the client (HR) portal by limiting claim, approval, and ride-hailing data to each user's assigned policies.",
+			'Raised engineering quality: added golangci-lint, OSV dependency scanning, pre-commit hooks, and cached/parallel CI steps. Wrote 154 unit tests while refactoring 45 case-monitoring handlers, and set up shared Claude Code configuration (custom subagents, commands, hooks) for AI-assisted refactoring and code review.',
 		],
+		/* Spelled as skills.ts spells a tool wherever it is one (Claude, not
+		   Claude Code), so the name join in skill-evidence.ts holds. */
 		tech: [
 			'Go',
-			'TypeScript',
-			'React',
+			'Gin',
+			'gRPC',
+			'Protobuf',
 			'PostgreSQL',
 			'MS SQL Server',
 			'Redis',
 			'Pub/Sub',
 			'Cloud Scheduler',
+			'Odoo',
 			'KrakenD',
 			'Keycloak',
-			'Protobuf',
+			'TypeScript',
+			'React',
+			'Material UI',
+			'React Hook Form',
+			'Zod',
+			'TanStack Query',
 			'GORM',
+			'Claude',
 		],
 	},
 	{

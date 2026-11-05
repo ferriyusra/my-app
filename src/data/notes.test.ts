@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
 import {
@@ -54,7 +53,7 @@ test('every month is a real month', () => {
 });
 
 test('no planned note has a target month that has already passed', () => {
-	/* The charge against /articles, in discarded.ts: "a promise with a date
+	/* The charge against /articles, deleted in 9f30192: "a promise with a date
 	   attached, and the date had passed". It cannot pass here without this
 	   failing first. There is no CI, so the reminder lands on `npm test` and
 	   never blocks a deploy. */
@@ -147,20 +146,6 @@ test('no note title collides with a skill name', () => {
 	}
 });
 
-test('no slug is caught by the terminal case-study heuristic', () => {
-	/* `cat` matches the case study on any argument containing these words. The
-	   exact-slug lookup runs first, but a slug that collides would still be
-	   unreachable by a prefix, so keep them apart. */
-	for (const n of notes) {
-		for (const word of ['case', 'aso', 'billing', 'deposit', 'alert']) {
-			assert.ok(
-				!n.slug.includes(word),
-				`${n.slug} contains "${word}", which the terminal reads as the case study`,
-			);
-		}
-	}
-});
-
 test('a written note reports a length it actually has', () => {
 	for (const n of writtenNotes()) {
 		const { sections, minutes } = noteLength(n);
@@ -180,24 +165,3 @@ test('an unwritten entry is something started, not a wish list', () => {
 	);
 });
 
-test('the empty state promises nothing and names no date', () => {
-	/* The failure this guards cannot be reached from a running page: someone
-	   fills the quiet window with a teaser. repo.test.ts reads the component
-	   tree as text for the same class of bug. */
-	const src = readFileSync(
-		new URL('../components/apps/notes-app.tsx', import.meta.url),
-		'utf8',
-	);
-	const empty = src.slice(src.indexOf('function Empty()'), src.indexOf('function Planned('));
-	assert.ok(empty.length > 200, 'the empty state should still be in this file');
-	for (const phrase of [/coming soon/i, /stay tuned/i, /check back/i, /watch this space/i]) {
-		assert.ok(
-			!phrase.test(empty),
-			`the empty state says ${phrase} — that is the /articles bug, written out longhand`,
-		);
-	}
-	assert.ok(
-		!/\b20\d{2}\b/.test(empty),
-		'the empty state names a year, which turns an honest blank into a deadline',
-	);
-});
