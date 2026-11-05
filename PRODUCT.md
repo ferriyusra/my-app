@@ -8,162 +8,141 @@ web
 
 ## Users
 
-**Primary: technical hiring managers** — engineers, tech leads and engineering
-managers evaluating whether Ferri Yusra can build what their team needs. They
-arrive from an application, a referral or a link, usually on a desktop-class
-screen with a pointer, and they read rather than skim: the case study, the
-reversed decisions, the source excerpts and the code itself are all aimed at
+**Primary: technical hiring managers.** Engineers, tech leads and engineering
+managers deciding whether Ferri Yusra can build what their team needs. They
+arrive from an application, a referral or a link, and they read rather than
+skim: the case study and the role detail are aimed at
 this reader. When a design decision has to favour one audience, it favours
 them.
 
 Other readers exist and are not designed around: recruiters and HR screeners
-(fast, often mobile — served by the server-rendered document), prospective
-freelance clients, and peer engineers who found the shell itself interesting.
+(fast, often on a phone), prospective freelance clients, and peer engineers.
 None of them may cost the primary reader anything.
 
 ## Product Purpose
 
-A personal portfolio for a backend engineer, presented as a **Windows 11
-desktop that runs in the browser** rather than as a scrolling page. It exists
-to convert an evaluation into a decision to proceed.
+A personal portfolio for a backend engineer: one server-rendered page and one
+long-form case study. It exists to turn an evaluation into a decision to
+proceed.
 
-**Success is the CV being opened or downloaded.** Everything else in the shell
-is evidence pointed at that moment; the visit succeeds when the reader takes
-the document into their own hiring process. The CV lives at the two Google
-Drive URLs recorded in `src/data/profile.ts` (`cvView`, `cvDownload`) and is
-reachable as a desktop shortcut (`ShortcutId: 'resume'`). Future work must not
-make that route harder to find, and must not add a competing primary action
-that outranks it.
+**Success is the CV being opened or downloaded.** Everything else on the site
+is evidence pointed at that moment. The CV lives at the two Google Drive URLs
+in `src/data/profile.ts` (`cvView`, `cvDownload`), and it is the one filled
+primary key on the home page. Future work must not make that route harder to
+find, and must not add a competing primary action that outranks it.
 
 ## Positioning
 
-A backend engineer whose portfolio is itself the strongest evidence of
-front-of-house engineering judgement. The differentiator is not the Windows
-pastiche — it is what the pastiche is built to be honest about:
+A backend engineer whose portfolio shows its working rather than describing
+it:
 
-- one production system written up at real depth (`case-study.ts`, transcribed
-  from the author's own Markdown write-up in `public/projects/meditap/`, with a
-  test that keeps the two in step), with what the write-up leaves unrecorded
-  held in `openQuestions` rather than invented;
-- a `discarded.ts` of decisions this repository **reversed**, each with the
-  commit that removed it — the failures are shipped, not hidden;
-- an editor window whose excerpts are read from the real source files at build
-  time, so the code shown cannot drift from the code that runs;
-- the whole portfolio also present as plain semantic HTML in the server
-  response, so a crawler, an ATS scraper or a scripting-disabled browser sees
-  every word.
-
-A neighbouring portfolio can copy the desktop metaphor. It cannot truthfully
-copy a repository that publishes its own reversals.
+- **the career at a glance** on the first screen: the five places worked as
+  one index, each giving its year and tenure in place;
+- one production system written up at real depth (`case-study.ts`,
+  transcribed from the author's own Markdown in `public/projects/meditap/`,
+  with a test that keeps the two in step), its decision function and
+  behaviour table shown on the home page, and what the write-up leaves
+  unrecorded held in `openQuestions` rather than invented;
+- every word in the server response, so a crawler, an ATS scraper or a
+  browser with scripting off reads the whole portfolio.
 
 ## Operating Context
 
-- Evaluated on a desktop-class screen with a pointer; the windowing metaphor
-  needs room to overlap. Below 900px, or with JavaScript off, the shell is
-  replaced by a stacked reading view built from the same data.
-- Read alongside a CV, a GitHub profile and a LinkedIn profile — those three
-  are the neighbours this site is compared against, and all three are linked
+- Read on a desktop-class screen by the primary reader, and on a phone by most
+  recruiters. Both get the same page; it reflows rather than switching.
+- Read alongside a CV, a GitHub profile and a LinkedIn profile, all linked
   from it.
-- Often reached mid-application, with a job description already in hand: the
-  reader is checking a claim, not browsing.
+- Often reached mid-application, with a job description in hand: the reader
+  is checking a claim, not browsing.
 - Time zone GMT+7 (Jakarta), which overlaps most of the EU morning and all of
   APAC.
 
 ## Capabilities and Constraints
 
-**What it does.** A single route `/` renders a desktop shell: draggable,
-resizable, snappable windows; taskbar; Start with search; Quick Settings;
-notification centre; File Explorer; a boot → lock → sign-in sequence; a
-desktop cat; personalisation (light/dark, six accents, four CSS wallpapers
-plus any image in `public/background`, brightness, volume). Thirteen apps open
-in windows: Tips, About, Explorer, Skills, Experience, Contact (Mail), Media
-Player, Settings, VS Code, Recycle Bin, Notes, Career.exe, Terminal.
+**What it does.** Two routes, both static and server-rendered. `/` is the
+portfolio as an interview: the career as an index, then a question per
+section (tools, roles, the case as a control, the
+other projects, contact), each answered in a line with the depth folded.
+`/deposit-alerting` is the case study as a long document with its system
+diagram. Disclosures are native `<details>`, so nothing needs a script to
+open. The only client code opens them all before printing and runs the one
+reveal, which the page does not need: without script it is already finished.
 
 **Content is typed data.** `src/data/` holds `profile`, `experience`,
-`projects`, `skills`, `case-study`, `discarded`, `notes`, `tips`. Every surface derives
-from it; none keeps a second copy. Derived figures (years of experience, role
-tenure) are computed from ISO dates rather than written down.
+`projects`, `skills`, `case-study` and `notes`. Every surface
+derives from it; none keeps a second copy. Derived figures (tenure, reading
+length) are computed from ISO dates and text rather than written
+down.
 
 **Technical constraints that future work must hold:**
 
 - Next.js 16 App Router, React 19, TypeScript strict. Tailwind v4 is used only
-  for the reset and `@theme`; all component styling is hand-written CSS in
-  `src/app/globals.css`.
-- The portfolio document is a **server component** and must not move behind a
-  client boundary — that regression once left the response body empty.
-- Every environment variable reads through a default in code (`.env*` is
-  gitignored). Nothing is required to run or deploy.
+  for the reset and to emit the tokens; all styling is hand-written CSS in
+  `src/app/globals.css` over `tokens.css` and `base.css`.
+- Every page stays a server component. Before the server document existed the
+  response body was an empty div and crawlers saw a blank portfolio.
+- No colour or font family outside `tokens.css`. The share card and the
+  theme-colour meta tag, which cannot read CSS, take theirs through
+  `src/lib/palette.ts`, which reads the token file.
 - Tests run on Node's built-in runner with native type stripping; no test
   dependency, no config.
-- No image or audio bytes ship for the shell itself: wallpapers are CSS, system
-  sounds are Web Audio.
-
-**Terminology.** "The shell" is the desktop enhancement; "the document" is the
-server-rendered semantic HTML at the same route. "Apps" are windowed content
-components registered in `APPS`; "shortcuts" leave the page.
+- No environment variables. Nothing is required to run or deploy.
 
 ## Brand Commitments
 
-- **Name:** Ferri Yusra. Role as stated: Backend Engineer (Go, Node.js &
+- **Name:** Ferri Yusra. Role as stated: Backend Engineer (Go, Node.js and
   PostgreSQL). Site: ferriyusra.com.
-- **The Windows 11 desktop metaphor is binding.** It is not decoration to be
-  toned down; it is the product. Fidelity to Windows behaviour is the standard
-  the shell is judged against, and departures from it are deliberate and
-  documented (the activation watermark can be cleared; the toast is lifted off
-  it; `Ctrl`+`F6` replaces Alt+Tab).
+- **The design system is Hallmark's Grid theme, locked in `DESIGN.md`.**
+  White poster stock, blue-black ink, Radio Canada Big in sentence case, an
+  ultramarine field and one Swiss red mark, no strokes. It is the third
+  Hallmark run of 2026-11-05: Cobalt, then Console, then Grid because the
+  owner found the page too wordy. Keep the home page near 430 visible words.
+- **The Windows 11 desktop is retired.** Until 2026-11-05 this file called the
+  desktop metaphor binding. The owner reversed that and had the shell deleted
+  outright.
 - **Voice: specific, plain, unembellished, and willing to name its own
-  mistakes.** Concrete proof over adjectives — the existing copy's own rule.
-  The `discarded.ts` and `openQuestions` entries set the register: state what
-  failed and why, without softening.
-- **Availability, confirmed current:** Available for freelance and full-time
-  backend work, hybrid Jakarta or remote.
-- Two icon families, deliberately split — LineIcons for app icons, Lucide for
-  the ~60 glyphs LineIcons lacks. A tight group of controls uses one family.
+  mistakes.** Concrete proof over adjectives. The case study's
+  `openQuestions` set the register: state what is not known, without
+  softening.
+- **Availability, confirmed current:** freelance and full-time backend work,
+  hybrid in Jakarta or remote.
 
 ## Evidence on Hand
 
 Real, checkable, and already in the repository:
 
 - **Five roles**, 2021-10 to present, all Jakarta: Meditap (current), INA
-  Digital / Peruri Digital Security, the Health Technology Transformation &
+  Digital / Peruri Digital Security, the Health Technology Transformation and
   Digitalization Team (SATUSEHAT), Moladin, Jojonomic.
-- **One deep case study** — Meditap's deposit-threshold alerting for
-  self-funded health plans: a Go service joining a PostgreSQL ERP, a legacy SQL
-  Server claim system and its own portal database, a state machine deciding
-  when to alert, typed Pub/Sub messages to a separate notification service,
-  and a configuration module with a field-level audit trail. The record is the
-  author's Markdown write-up in `public/projects/meditap/`; what it leaves
-  unrecorded is held in `openQuestions` and rendered.
-- **Nine projects** in `projects.ts`, joined by name to `skills.ts` — a join
-  pinned by `data.test.ts` because it fails silently.
-- **28 skills** across Backend, Frontend, Database, DevOps, Cloud, AI Tools;
-  nine are named by no role, and `skill-evidence.ts` says so rather than
-  padding them.
-- **Reversed decisions** in `discarded.ts`, each with the removing commit. The
-  one entry without a hash was reverted before it was ever committed and says
-  so.
+- **One deep case study:** Meditap's deposit-threshold alerting for
+  self-funded health plans. The record is the author's Markdown write-up in
+  `public/projects/meditap/`.
+- **Nine projects** in `projects.ts`, joined by name to `skills.ts`, a join
+  pinned by `data.test.ts` because it fails silently. Two production projects
+  have real screenshots in `public/projects`.
+- **28 skills** across Backend, Frontend, Database, DevOps, Cloud and AI
+  Tools.
 - **CV** at the Google Drive links in `profile.ts`. **GitHub:**
   github.com/ferriyusra. **LinkedIn:** linkedin.com/in/ferriyusra.
 
 **Absences future work must not fabricate:** there are no testimonials, no
 named clients beyond the employers listed, no benchmarks, no user counts, no
 pricing, no awards, and no portrait image (`profile.portrait` is `null`). Do
-not add an entry to `discarded.ts` that did not happen. Do not fill
-`openQuestions` with plausible invention.
+not fill `openQuestions` with plausible invention.
 
 ## Product Principles
 
 1. **Every surface derives from one typed source.** A second copy of a fact is
-   a bug; the editor window reads real files at build time for exactly this
-   reason.
-2. **Publish the reversals.** Decisions this repository undid are content, not
-   embarrassment — they are the clearest evidence of judgement on the site.
+   a bug.
+2. **Show the work, not the workings.** On 2026-11-05 the owner removed the
+   page's "decisions reversed" section as not useful to a reader; the case
+   study carries the engineering judgement now.
 3. **Claim nothing that is not recorded.** Where the rationale was never
    written down, name the gap instead of inventing one.
-4. **The words must exist without JavaScript.** The document is the floor; the
-   desktop shell is the enhancement on top of it.
-5. **The shell must not cost the reader the CV.** Delight is welcome until it
-   competes with the one action a successful visit ends in.
+4. **The words must exist without JavaScript.** Every page is server-rendered
+   and every disclosure is native.
+5. **Nothing may cost the reader the CV.** It is the ink block on the first
+   screen, in the floating nav on every page, and in the close.
 
 ## Accessibility & Inclusion
 
@@ -171,13 +150,11 @@ not add an entry to `discarded.ts` that did not happen. Do not fill
 keyboard reachability and `prefers-reduced-motion` support are non-negotiable
 in every future change.
 
-Concretely, the following are commitments and not byproducts:
-
-- Full keyboard operation of the shell, including `Ctrl`+`F6` window cycling,
-  because Alt+Tab is never handed to a browser.
-- `prefers-reduced-motion` respected throughout — the boot sequence collapses
-  to a short fade, and Career.exe's Summary mode is the default rather than a
-  fallback.
-- The no-JavaScript document, which is also the sub-900px experience.
-- Flyouts take focus and give it back; they are not focus traps and
-  `aria-modal` stays off, matching the non-modal behaviour of the real thing.
+- Every text pairing passes 4.5:1 in both modes; the dark tokens are derived,
+  not inverted, and were checked numerically.
+- Focus rings appear instantly: ultramarine on paper, field-ink on the
+  ultramarine, ink on the red.
+- The hero's figure is drawn for the eye; each employer's link carries its
+  role and dates in its accessible name.
+- Disclosures are native and open with the keyboard; printing opens them all.
+- `prefers-reduced-motion` ends every transition at once.

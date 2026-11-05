@@ -13,13 +13,23 @@ export const profile = {
 	role: 'Backend Engineer',
 	roleDetail: 'Go, Node.js & PostgreSQL',
 
-	/** The hero statement. Specific enough that nobody else could write it. */
-	headline:
-		'I build APIs and event‑driven systems that replace manual work.',
+	/**
+	 * The hero statement, chosen by the owner on 2026-11-05: what is built, in
+	 * the two domains the roles below are in (SATUSEHAT's health data, Meditap's
+	 * finance). It replaced a draft, "I replaced spreadsheets and Tableau's data
+	 * layer.", which named what was removed rather than what was built; before
+	 * that it was "I build APIs and event-driven systems that replace manual
+	 * work."
+	 */
+	headline: 'Backend systems for health and finance data.',
 
-	/** Concrete proof, not adjectives. */
+	/**
+	 * Concrete proof, not adjectives. It opened with "Four years in Go and
+	 * Node.js", a count typed into prose that had gone stale by the next
+	 * October; the hero now says "since" the year `CAREER_START` names instead.
+	 */
 	proof:
-		"Four years in Go and Node.js. Previously backend for SATUSEHAT, Indonesia’s national health data platform; currently building finance infrastructure at Meditap.",
+		"Previously backend for SATUSEHAT, Indonesia’s national health data platform; currently building finance infrastructure at Meditap.",
 
 	/** Names carry more weight above the fold than a list of technologies. */
 	previously: 'SATUSEHAT · Peruri · Moladin',
@@ -69,11 +79,14 @@ export const profile = {
 	 * nothing here is aspirational. `updated` is shown, so a stale entry
 	 * admits it rather than quietly implying it is current.
 	 */
-	nowUpdated: '2026-08',
+	nowUpdated: '2026-11',
 	now: [
 		{
+			/* Redrawn on 2026-11-05 from the new Meditap bullets in
+			   experience.ts; it used to say "~160 entities", a figure those
+			   bullets no longer state. */
 			label: 'Building',
-			text: 'Finance infrastructure at Meditap — the ASO billing services and threshold notifications that ~160 entities are invoiced from, in Go and PostgreSQL on Pub/Sub.',
+			text: 'Backend at Meditap: the hospital inpatient case-monitoring workflow over gRPC, and the ASO client database and deposit-balance monitoring in Go and PostgreSQL on Pub/Sub.',
 		},
 		{
 			label: 'Learning',
@@ -97,7 +110,7 @@ export const profile = {
 	 * name.
 	 */
 	openTo:
-		'Open to freelance and full-time backend work · Jakarta, hybrid or remote · GMT+7',
+		'Open to freelance and full-time backend work, hybrid in Jakarta or remote.',
 
 	/** Stated once, rendered everywhere. */
 	availability: 'Available',

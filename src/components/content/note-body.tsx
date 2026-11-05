@@ -1,23 +1,16 @@
 import { TOPICS, noteLength, type WrittenNote } from '@/data/notes';
-import { when } from './discarded-detail';
+import { monthLong as when } from '@/lib/dates';
 import ProseBlock from './prose';
+import { prose } from '@/lib/text';
 
 /**
  * One written note, rendered.
  *
- * No 'use client' on purpose: the Notes window, Explorer's Documents ▸ Notes
- * and the server document all render this, so a note reads the same on a
- * desktop, in a folder, on a phone and with scripting off.
- *
- * Headings are fixed rather than a prop. Every host puts a note under an `h2`
- * of its own — the window's head, Explorer's detail title, the document's fold
- * — so the note's title is always an `h3` and its sections `h4`. The case study
- * needs the prop because the document nests it one deeper, inside a role.
- *
- * It borrows the `cs-` classes rather than growing a set of its own. They are
- * declared once, they describe a typed write-up rather than the case study in
- * particular, and a second identical block under another prefix is the kind of
- * duplication `repo.test.ts` exists to catch.
+ * No 'use client' on purpose: the home page renders it into the response
+ * body, so a note reads the same on a phone, in print and with scripting off.
+ * The host puts it under an `h2` of its own, so the title is an `h3` and its
+ * sections `h4`. It borrows the `cs-` prose classes the case study uses
+ * rather than growing a set of its own.
  */
 export default function NoteBody({ note }: { note: WrittenNote }) {
 	const length = noteLength(note);
@@ -32,11 +25,11 @@ export default function NoteBody({ note }: { note: WrittenNote }) {
 				<span>{TOPICS[note.topic]}</span>
 				<span>{when(note.date)}</span>
 				<span>
-					{length.sections} {length.sections === 1 ? 'section' : 'sections'} ·
-					about {length.minutes} min
+					{length.sections} {length.sections === 1 ? 'section' : 'sections'}, about{' '}
+					{length.minutes} min
 				</span>
 			</p>
-			<p className='cs-summary'>{note.summary}</p>
+			<p className='cs-summary'>{prose(note.summary)}</p>
 
 			{note.applies && note.applies.length > 0 && (
 				<ul className='cs-stack'>

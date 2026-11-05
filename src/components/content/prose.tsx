@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import type { CaseBlock } from '@/data/case-study';
 import { isHighlighted, tokenize } from '@/lib/highlight';
+import { prose } from '@/lib/text';
 
 /**
  * The blocks a typed write-up is made of, rendered.
@@ -33,7 +34,7 @@ export const isLead = (block: string) => LEAD.test(block);
 export function emphasise(text: string) {
 	return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((part, i) => {
 		if (part.startsWith('**') && part.endsWith('**')) {
-			return <strong key={i}>{part.slice(2, -2)}</strong>;
+			return <strong key={i}>{prose(part.slice(2, -2))}</strong>;
 		}
 		if (part.length > 2 && part.startsWith('`') && part.endsWith('`')) {
 			return (
@@ -43,9 +44,9 @@ export function emphasise(text: string) {
 			);
 		}
 		if (part.length > 2 && part.startsWith('*') && part.endsWith('*')) {
-			return <em key={i}>{part.slice(1, -1)}</em>;
+			return <em key={i}>{prose(part.slice(1, -1))}</em>;
 		}
-		return part;
+		return prose(part);
 	});
 }
 
@@ -106,6 +107,9 @@ function Code({ lang, text }: { lang: string; text: string }) {
 	);
 }
 
+/** 'below threshold 1' keeps its digit: a non-breaking space before a lone numeral. */
+const keepNumbered = (cell: string) => cell.replace(/ (\d)\b/g, '\u00a0$1');
+
 /** One block of a section: a paragraph, a list, a code block or a table. */
 export default function ProseBlock({ block }: { block: ProseBlockKind }) {
 	if (typeof block === 'string') {
@@ -143,7 +147,7 @@ export default function ProseBlock({ block }: { block: ProseBlockKind }) {
 							{block.rows.map((row) => (
 								<tr key={row.join('|')}>
 									{row.map((cell, i) => (
-										<td key={i}>{emphasise(cell)}</td>
+										<td key={i}>{emphasise(keepNumbered(cell))}</td>
 									))}
 								</tr>
 							))}

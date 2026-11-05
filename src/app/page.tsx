@@ -1,9 +1,14 @@
-import type { Metadata } from 'next';
-import Desktop from '@/components/desktop/desktop';
-import { listCustomWallpapers } from '@/lib/wallpapers';
-import { loadSources } from '@/lib/source';
-import PortfolioDocument from '@/components/content/portfolio-document';
 import { profile } from '@/data/profile';
+import { writtenNotes } from '@/data/notes';
+import Masthead from '@/components/site/masthead';
+import Hero from '@/components/site/hero';
+import Tools from '@/components/site/tools';
+import Roles from '@/components/site/roles';
+import CasePreview from '@/components/site/case-preview';
+import Notes from '@/components/site/notes';
+import Projects from '@/components/site/projects';
+import SiteFooter from '@/components/site/site-footer';
+import PrintExpander from '@/components/content/print-expander';
 
 const jsonLd = {
 	'@context': 'https://schema.org',
@@ -21,31 +26,33 @@ const jsonLd = {
 	sameAs: [profile.github, profile.linkedin],
 };
 
-export const metadata: Metadata = {
-	title: `${profile.name} — ${profile.role}`,
-};
-
-export default async function Home() {
-	/* Read here rather than from the client: this page is a server component
-	   and is prerendered, so the listing costs nothing at runtime. */
-	const customWallpapers = await listCustomWallpapers();
-	/* Read from the real files for the same reason, and at the same moment: if
-	   one of these declarations has been renamed away, the build stops here
-	   rather than shipping an editor that labels code with a path it is not
-	   in. */
-	const sources = await loadSources();
-
+/**
+ * The portfolio as an interview: the five places worked as an index on the
+ * first sheet, then the questions a hiring manager would ask, each answered
+ * in a line with the depth folded beneath, and a letter close on the red
+ * field with the address to write to.
+ *
+ * Every word is in the response body, folded or not. The only script is
+ * print-expander, which opens the disclosures before printing.
+ */
+export default function Home() {
 	return (
 		<>
 			<script
 				type='application/ld+json'
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
 			/>
-			{/* The document ships in the HTML and is the whole experience on a
-			    narrow screen. On a wide one the desktop shell covers it — see
-			    the `data-shell` switch in layout.tsx. */}
-			<PortfolioDocument />
-			<Desktop customWallpapers={customWallpapers} sources={sources} />
+			<Masthead />
+			<main id='main'>
+				<PrintExpander />
+				<Hero />
+				<Tools />
+				<Roles />
+				<CasePreview />
+				{writtenNotes().length > 0 && <Notes />}
+				<Projects />
+			</main>
+			<SiteFooter />
 		</>
 	);
 }

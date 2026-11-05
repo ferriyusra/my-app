@@ -1,13 +1,26 @@
 import { ImageResponse } from 'next/og';
 import { profile } from '@/data/profile';
+import { experiences } from '@/data/experience';
+import { color } from '@/lib/palette';
 
-/* Rendered at build/request time by Next. Without this, every share of the
-   site on LinkedIn / X / WhatsApp showed a blank preview card. */
-export const alt = `${profile.name} — ${profile.role}`;
+/* Rendered by Next at build time. Without it, every share of the site on
+   LinkedIn, X or WhatsApp showed a blank preview card. */
+export const alt = `${profile.name}, ${profile.role}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
+/**
+ * The share card as one Grid sheet: the claim on white, the five places worked
+ * along the foot with the current one in the mark red, and an ultramarine
+ * field from the right holding its first year, as the page's first screen does.
+ *
+ * Satori cannot read CSS custom properties, so the colours come through
+ * `palette.ts`, which reads them out of tokens.css. The face is the renderer's
+ * own sans: declaring Radio Canada here would claim a face that does not render.
+ */
 export default function OpengraphImage() {
+	const current = experiences.find((e) => e.current) ?? experiences[0];
+
 	return new ImageResponse(
 		(
 			<div
@@ -15,117 +28,51 @@ export default function OpengraphImage() {
 					width: '100%',
 					height: '100%',
 					display: 'flex',
-					flexDirection: 'column',
-					justifyContent: 'space-between',
-					background: '#f3f3f3',
-					padding: 72,
-					/* Satori renders this on the server, where Segoe UI Variable is
-					   not installed, so the card cannot pick up the desktop's face.
-					   Declaring it here would be a lie about what renders. */
+					background: color('paper'),
+					color: color('ink'),
 					fontFamily: 'sans-serif',
 				}}>
-				{/* Top row: avatar tile + availability */}
 				<div
 					style={{
 						display: 'flex',
-						alignItems: 'center',
+						flexDirection: 'column',
 						justifyContent: 'space-between',
+						width: 800,
+						padding: 64,
 					}}>
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							width: 104,
-							height: 104,
-							borderRadius: 8,
-							background: '#0f6cbd',
-							border: '1px solid #d1d1d1',
-							boxShadow: '0 6px 24px rgba(0,0,0,0.14)',
-							color: '#ffffff',
-							fontSize: 44,
-							fontWeight: 600,
-						}}>
-						{profile.initials}
+					<div style={{ display: 'flex', flexDirection: 'column' }}>
+						<div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 26 }}>
+							<div style={{ width: 30, height: 30, background: color('mark') }} />
+							{profile.name}
+						</div>
+						<div style={{ marginTop: 28, fontSize: 60, lineHeight: 1, letterSpacing: -2, fontWeight: 700 }}>
+							{profile.headline}
+						</div>
 					</div>
-
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: 12,
-							padding: '12px 24px',
-							borderRadius: 999,
-							background: '#ffffff',
-							border: '1px solid #ddd4c6',
-							boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
-							fontSize: 24,
-							fontWeight: 600,
-							color: '#242424',
-						}}>
-						<div
-							style={{
-								width: 14,
-								height: 14,
-								borderRadius: 999,
-								background: '#0e700e',
-							}}
-						/>
-						{profile.availabilityShort}
+					<div style={{ display: 'flex', flexWrap: 'wrap', rowGap: 4, fontSize: 34, letterSpacing: -1 }}>
+						{experiences.map((e) => (
+							<div key={e.short} style={{ display: 'flex', marginRight: 28, color: e.current ? color('mark') : color('ink') }}>
+								{e.short}
+							</div>
+						))}
 					</div>
 				</div>
-
-				{/* Name + role */}
-				<div style={{ display: 'flex', flexDirection: 'column' }}>
-					<div
-						style={{
-							fontSize: 92,
-							fontWeight: 600,
-							color: '#242424',
-							lineHeight: 1.05,
-						}}>
-						{profile.name}
-					</div>
-					<div
-						style={{
-							marginTop: 16,
-							fontSize: 40,
-							fontWeight: 600,
-							color: '#0f6cbd',
-						}}>
-						{`${profile.role} — ${profile.roleDetail}`}
-					</div>
-					<div
-						style={{
-							marginTop: 20,
-							fontSize: 28,
-							color: '#616161',
-							maxWidth: 900,
-							lineHeight: 1.4,
-						}}>
-						4+ years building production APIs and event-driven systems across
-						fintech, GovTech health, and automotive.
-					</div>
-				</div>
-
-				{/* Footer strip */}
 				<div
 					style={{
 						display: 'flex',
-						alignItems: 'center',
-						gap: 16,
-						fontSize: 26,
-						color: '#616161',
+						flexDirection: 'column',
+						justifyContent: 'flex-end',
+						flexGrow: 1,
+						padding: 40,
+						background: color('field'),
+						color: color('field-ink'),
 					}}>
-					<div
-						style={{
-							width: 48,
-							height: 6,
-							background: '#0f6cbd',
-							borderRadius: 999,
-						}}
-					/>
-					{profile.site.replace('https://', '')}
+					<div style={{ display: 'flex', fontSize: 120, lineHeight: 0.9, letterSpacing: -5 }}>
+						{current.startISO.slice(0, 4)}
+					</div>
+					<div style={{ display: 'flex', marginTop: 12, fontSize: 22 }}>
+						{`Joined ${current.short}${current.current ? ', still there' : ''}`}
+					</div>
 				</div>
 			</div>
 		),

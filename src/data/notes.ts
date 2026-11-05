@@ -12,9 +12,8 @@ import type { CaseBlock } from './case-study.ts';
  * A note is either **written** or it is not, and the union below makes that a
  * type rather than a convention: a planned note has no `sections` field to
  * fill in with a placeholder, and a written one cannot omit it. This
- * repository has already deleted a "Coming soon" route once — see the
- * `/articles` entry in discarded.ts, which is still on the desktop — and the
- * charge there was that the promise carried a date and the date had passed.
+ * repository has already deleted a "Coming soon" route once (`/articles`, in
+ * commit 9f30192), and the charge there was that the promise carried a date and the date had passed.
  * So an unwritten note carries a `target` month instead of a `date`, and
  * `notes.test.ts` fails when a target falls into the past. The reminder to
  * write it or move it is a failing test rather than a visitor's judgement.

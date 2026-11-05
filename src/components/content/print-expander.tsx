@@ -19,7 +19,7 @@ export default function PrintExpander() {
 
 		const expand = () => {
 			opened = [
-				...document.querySelectorAll<HTMLDetailsElement>('.doc details:not([open])'),
+				...document.querySelectorAll<HTMLDetailsElement>('main details:not([open])'),
 			];
 			for (const d of opened) d.open = true;
 		};
