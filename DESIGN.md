@@ -44,7 +44,14 @@ The faces are loaded by `next/font` in `layout.tsx` and reach the tokens as `--f
 
 ## Variants
 - **The one reveal, 2026-11-05, at the owner's request.** Grid keeps still; this site runs Hallmark's one reveal (`craft.md` § 5, `patterns.md` "One reveal that survives no script"). Everything rises once into place, `rise` keyframes, `--dur-long` (420ms) on `--ease-out`, from transparent and 24px below (40px for the question heads and the headline, 48px for the hero's field).
-- **The hero plays on load, in CSS alone,** so the first screen never waits for script: the headline, then the field and the line, then the actions, then the five names, 80ms apart and 0.74s in all.
+- **The hero plays on load, in CSS alone,** so the first screen never waits for script. It is set like a sheet coming off the press, 0.82s in all (redesigned with Hallmark on 2026-11-06; it was one fade-up for every block):
+  - at 0ms the ultramarine field is laid from the column-9 line to the bleed, a paper overlay shrinking to the right (`scaleX`, under 60rem the field is a band and does not lay);
+  - from 40ms the headline's words are set, each rising out of its own baseline, 30ms apart;
+  - at 160ms and 220ms the line and the actions settle 8px;
+  - at 240ms the year and its caption rise out of the field's foot;
+  - from 260ms the five names are set left to right, 35ms apart;
+  - at 700ms the current name takes the mark red, the choice made last.
+- "Rising out of a baseline" (`set`) moves `translate` and `clip-path` together so the clip edge holds still while the type passes it; nothing fades and nothing scales. The field rises as one block because its figures swap by `display`, which would replay an animation on every hover.
 - **Every other block carries `data-reveal`:** each question and its answer line, the tool rows, the work rows, the two captures, the learning list and its head, every "more" disclosure, and the close's address, answer, actions and office. `reveal.tsx` adds `.is-in` the first time a block comes into view, and blocks that arrive together are staggered 60ms apart in page order, five steps at most.
 - **Why it replaced the scroll pattern.** The site first ran scroll-choreography pattern 4, a sticky diptych scrubbed by `view()`. On a hard refresh the hero held still and in-view sections were drawn at their end state, so the owner saw no section arrive. A reveal plays in time, so a refresh shows it.
 - **It survives no script.** Blocks are hidden only under `html[data-js]`, which an inline script in `layout.tsx` sets before the first paint, and only where IntersectionObserver exists and motion is allowed. Print, reduced motion and scripting off get the finished page. If the bundle never runs, a 3s failsafe shows every block. Blocks already scrolled past on a refresh get `.is-seen` and do not move.

@@ -15,7 +15,7 @@
 /* Hallmark · waive 71 · the two capture captions in #projects are measured against the folded content of closed details rows, a Meditap bullet 3px above and the caption's own description 23px below, which Chrome lays out but never paints · on screen each caption head sits 20px under its capture and 48px over the list below; it is a caption and belongs to the image above it */
 /* Hallmark · dismissed kept · the words dropped are the decisions section the owner asked to remove and the Cobalt page's visible depth, now folded on purpose; every role, project, tool and the case study are still in the HTML */
 /* Hallmark · component: menu (the nav's case studies) · redesign: full · states: 6 of 8, disabled, loading, error and success never occur on a menu of links · contrast: pass · a native popover anchored under the pill, its width, opening at once because Grid keeps still; preview in .hallmark/case-menu.preview.html */
-/* Hallmark · motion: one reveal (craft.md § 5), at the owner's request: the hero rises in on load in CSS, and every block marked data-reveal rises once as it is first seen (IntersectionObserver); no scroll-scrubbed pattern; visible without script, in print and under reduced motion; DESIGN.md records it as a variant */
+/* Hallmark · motion: one reveal (craft.md § 5), at the owner's request: the hero is set like a sheet on load in CSS (the field laid from the column-9 line, the words and names set from their baselines, the current name marked red last, 0.82s; redesigned 2026-11-06 from one fade-up), and every block marked data-reveal rises once as it is first seen (IntersectionObserver); no scroll-scrubbed pattern; visible without script, in print and under reduced motion; DESIGN.md records it as a variant */
 
 @import "tailwindcss";
 @import "./tokens.css";
@@ -329,8 +329,20 @@ a:hover { color: var(--color-mark); }
    showed nothing move.
 
    The hero plays on load in CSS alone, so the first screen never waits for
-   script: the head, then the field, the line and the actions, then the five
-   names, 0.74s in all.
+   script, and it is set like a sheet coming off the press (redesigned with
+   Hallmark on 2026-11-06; it was one fade-up for every block). In 0.82s:
+     0ms      the ultramarine field is laid from the column-9 line to the
+              bleed: a paper overlay shrinks to the right (scaleX only);
+     40-220   the headline's words are set, each rising out of its own
+              baseline, 30ms apart in reading order;
+     160, 220 the line and the actions settle 8px;
+     240      the year and its caption rise out of the field's foot;
+     260-400  the five names are set left to right, 35ms apart;
+     700      the current name takes the mark red, the choice made last.
+   "Rising out of a baseline" is translate and clip-path moved together, so
+   the clip edge holds still while the type passes it; nothing fades and
+   nothing scales. The field rises as a block because its figures swap by
+   `display`, which would replay an animation on every hover.
 
    Every other block carries `data-reveal`. It is hidden only once the
    inline script in layout.tsx has marked <html data-js>, which happens
@@ -346,20 +358,28 @@ a:hover { color: var(--color-mark); }
    @supports, Turbopack drops the whole block without a word. */
 @keyframes rise { from { opacity: 0; transform: translateY(var(--rise, 24px)); } }
 @keyframes shown { to { opacity: 1; } }
+@keyframes set { from { transform: translateY(110%); clip-path: inset(-0.25em -0.25em 110% -0.25em); } to { transform: none; clip-path: inset(-0.25em); } }
+@keyframes lay { from { transform: scaleX(1); } }
+@keyframes mark { from { color: var(--color-ink); } }
 @media (prefers-reduced-motion: no-preference) {
-  .hero h1, .hero .lede, .hero .actions, .hero__field, .specimen__names li {
-    animation: rise var(--dur-long) var(--ease-out) backwards;
-    animation-delay: calc(var(--i, 0) * 80ms);
-  }
-  .hero h1 { --rise: 40px; }
-  .hero__field { --i: 1; --rise: 48px; }
-  .hero .lede { --i: 1; }
-  .hero .actions { --i: 2; }
-  .specimen__names li:nth-child(1) { --i: 2; }
-  .specimen__names li:nth-child(2) { --i: 2.5; }
-  .specimen__names li:nth-child(3) { --i: 3; }
-  .specimen__names li:nth-child(4) { --i: 3.5; }
-  .specimen__names li:nth-child(5) { --i: 4; }
+  .hero__word, .hero__field, .specimen__names li { animation: set var(--dur-long) var(--ease-out) backwards; animation-delay: var(--at, 0ms); }
+  .hero__word { display: inline-block; --at: calc(40ms + var(--i, 0) * 30ms); }
+  .hero .lede, .hero .actions { --rise: 8px; animation: rise var(--dur-long) var(--ease-out) backwards; }
+  .hero .lede { animation-delay: 160ms; }
+  .hero .actions { animation-delay: 220ms; }
+  .hero__field { --at: 240ms; }
+  .specimen__names li:nth-child(1) { --at: 260ms; }
+  .specimen__names li:nth-child(2) { --at: 295ms; }
+  .specimen__names li:nth-child(3) { --at: 330ms; }
+  .specimen__names li:nth-child(4) { --at: 365ms; }
+  .specimen__names li:nth-child(5) { --at: 400ms; }
+  .specimen__name[data-current] { animation: mark var(--dur-micro) var(--ease-out) 700ms backwards; }
+}
+/* The field is laid only where it is the hero's own background; under 60rem
+   it is a band of its own and rises with its figure. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 60.01rem) {
+  .hero { position: relative; isolation: isolate; }
+  .hero::before { content: ""; position: absolute; z-index: -1; inset-block: 0; left: var(--field-x); right: 0; background: var(--color-paper); transform: scaleX(0); transform-origin: right; animation: lay var(--dur-long) var(--ease-out) backwards; pointer-events: none; }
 }
 @media screen and (prefers-reduced-motion: no-preference) {
   html[data-js] [data-reveal]:not(.is-in, .is-seen) { opacity: 0; }

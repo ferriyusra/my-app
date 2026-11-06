@@ -111,11 +111,31 @@ Rules the page holds, from Hallmark's Floor:
 **Motion is one reveal.** At the owner's request (2026-11-05) the site runs
 Hallmark's one reveal (`craft.md` § 5, `patterns.md` "One reveal that
 survives no script"): everything rises once into place the first time it is
-seen, **on a hard refresh as well as on a scroll**. The hero plays on load in
-CSS alone. Every other block carries `data-reveal`, and
+seen, **on a hard refresh as well as on a scroll**. Every block outside the
+hero carries `data-reveal`, and
 [reveal.tsx](src/components/content/reveal.tsx) adds `.is-in` when it comes
 into view, staggering blocks that arrive together. A new block that should
 arrive needs only the attribute.
+
+**The hero's opening is CSS only, and set like a sheet off the press.** The
+owner had it redesigned with Hallmark on 2026-11-06; before that it was one
+fade-up for every block. It takes 0.82s:
+- the field is laid from the column-9 line by a `.hero::before` paper overlay
+  shrinking right;
+- the headline's words (one `.hero__word` span each, in `hero.tsx`) and the
+  five names rise out of their own baselines (`set`);
+- the line and the actions settle 8px;
+- the current name turns red last.
+
+Two traps:
+- `set` moves `translate` and `clip-path` together so the clip edge holds
+  still. Keep both in the keyframes.
+- **Never animate a `.specimen__fig` itself.** The hover swap toggles it with
+  `display`, which restarts any animation on it, so the field rises as one
+  block, `.hero__field`.
+
+Before and after filmstrips are in `.hallmark/opening-before/` and
+`.hallmark/opening-after/`.
 
 The order of operations is what keeps it safe. An inline script in
 `layout.tsx` ([reveal-gate.ts](src/components/content/reveal-gate.ts)) sets
