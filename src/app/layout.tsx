@@ -5,6 +5,7 @@ import { profile } from '@/data/profile';
 import { color } from '@/lib/palette';
 import Reveal from '@/components/content/reveal';
 import { REVEAL_GATE } from '@/components/content/reveal-gate';
+import { MENU_CLOSE } from '@/components/site/menu-close';
 
 /**
  * The Grid system's one neo-grotesque in its two optical cuts, self-hosted by
@@ -63,6 +64,7 @@ export default function RootLayout({
 		<html lang='en' className={`${rcBig.variable} ${rc.variable}`} suppressHydrationWarning>
 			<head>
 				<script dangerouslySetInnerHTML={{ __html: REVEAL_GATE }} />
+				<script dangerouslySetInnerHTML={{ __html: MENU_CLOSE }} />
 			</head>
 			<body>
 				<a href='#main' className='skip'>

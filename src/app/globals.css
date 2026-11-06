@@ -1,5 +1,5 @@
 /* Hallmark · shape: Conversational FAQ (draw fd59c5) · genre: editorial · theme: Grid (deal 1/3, seed portfolio-backend-engineer-few-d334·6287e448·2026-11-05·r0) · redesign: full
- * hero: Index (/), Banner (/deposit-alerting) · nav: floating pill · footer: letter close · imagery: screenshots 2 (the owner's own, public/projects, in the theme's duotone) · signature: the career as a specimen index, five employers at display size, the chosen one red and its first year at poster scale beside the line
+ * hero: Index (/), Banner (/deposit-alerting), Banner (/satusehat) · nav: floating pill · footer: letter close · imagery: screenshots 2 (the owner's own, public/projects, in the theme's duotone) · signature: the career as a specimen index, five employers at display size, the chosen one red and its first year at poster scale beside the line
  * axes: light/grotesk-sans/cool · posture: full-palette · contrast: pass · fold: pass · modes: light · job: hire · draw: fd59c5 · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H5 E4 S5 R5 V5 · weakest: P, a portfolio argues by its record rather than a position; the page asks the questions a hiring manager would and answers each in a line, with the depth folded */
 /* Hallmark · waive 44c · an Index hero on / sets its head above the index, and /deposit-alerting opens on a Banner head · the index is the visual and reads under the claim, not beside it; the long document starts its first section above the fold */
@@ -12,8 +12,11 @@
 /* Hallmark · finish-review: subagent · fix · 8 findings · 8 resolved (each question head stays pinned beside its answer; projects became two uncropped captures at one height with their disclosures as captions, and the learning projects one compact list under one label; the case page hangs its front matter on an ultramarine field from the column-9 line; work rows read as one range with months, the tenure and the role's first figure; the stock questions now name SATUSEHAT, Jakarta and the years; the hero caps at one sheet at 1920; em dashes in visible prose print as commas through prose(), the data unchanged; red marks only the chosen, bullets and sends in ink, the control is type on the field over hairlines) · gap: none */
 /* Hallmark · answered F4 · the CV is the one filled recipe, an ink block, met three times: the hero, the floating nav and the close; the write-up link and every other control are underlined words */
 /* Hallmark · dropped #decisions, decisions, youtube full-track playback, meter.tsx, glyph tiles, custom-cursor.tsx, smooth-scroll.tsx, mobile-shell.tsx, /articles, tech-globe.tsx · the owner removed the "What have you thrown away?" section on 2026-11-05 as not useful to a reader, and had src/data/discarded.ts deleted with it */
+/* Hallmark · waive 71 · the two capture captions in #projects are measured against the folded content of closed details rows, a Meditap bullet 3px above and the caption's own description 23px below, which Chrome lays out but never paints · on screen each caption head sits 20px under its capture and 48px over the list below; it is a caption and belongs to the image above it */
 /* Hallmark · dismissed kept · the words dropped are the decisions section the owner asked to remove and the Cobalt page's visible depth, now folded on purpose; every role, project, tool and the case study are still in the HTML */
-/* Hallmark · motion: one reveal (craft.md § 5), at the owner's request: the hero rises in on load in CSS, and every block marked data-reveal rises once as it is first seen (IntersectionObserver); no scroll-scrubbed pattern; visible without script, in print and under reduced motion; DESIGN.md records it as a variant */
+/* Hallmark · component: nav · redesign: full, 2026-11-06 · from 60rem the floating pill as it was; under 60rem a solid paper bar of 72px with the wordmark and a pill of Menu and the CV, Menu opening a full-height sheet of the sections and the case studies (a native popover; an inline script closes it when a link inside is followed) · states: 6 of 8, as the case menu · kept 63/63 links */
+/* Hallmark · component: menu (the nav's case studies) · redesign: full · states: 6 of 8, disabled, loading, error and success never occur on a menu of links · contrast: pass · a native popover anchored under the pill, its width, opening at once because Grid keeps still; preview in .hallmark/case-menu.preview.html */
+/* Hallmark · motion: one reveal (craft.md § 5), at the owner's request: the hero is set like a sheet on load in CSS (the field laid from the column-9 line, the words and names set from their baselines, the current name marked red last, 0.82s; redesigned 2026-11-06 from one fade-up), and every block marked data-reveal rises once as it is first seen (IntersectionObserver); no scroll-scrubbed pattern; visible without script, in print and under reduced motion; DESIGN.md records it as a variant */
 
 @import "tailwindcss";
 @import "./tokens.css";
@@ -69,11 +72,54 @@ a:hover { color: var(--color-mark); }
 .wordmark:hover { color: var(--color-ink); }
 .nav__pill { display: flex; align-items: center; gap: var(--space-lg); padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) var(--space-lg); background: var(--color-paper-2); }
 .nav__links { display: flex; gap: var(--space-lg); font: 500 var(--text-sm)/1 var(--font-body); }
-.nav__links a { padding-block: var(--space-sm); color: var(--color-muted); text-decoration: none; white-space: nowrap; }
-.nav__links a:hover { color: var(--color-mark); }
+.nav__links > a { padding-block: var(--space-sm); color: var(--color-muted); text-decoration: none; white-space: nowrap; }
+.nav__links > a:hover { color: var(--color-mark); }
 .nav__cv { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-md); background: var(--color-ink); color: var(--color-paper); font: 500 var(--text-sm)/1 var(--font-body); text-decoration: none; transition: background-color var(--dur-short) var(--ease-out); }
 .nav__cv:hover { background: var(--color-ink-2); color: var(--color-paper); }
 .nav__cv:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* The case-study menu: a key in the pill that drops a native popover the
+   width of the pill, as if the pill unfolded. Paper-2 like the pill, rows
+   parted by hairlines like the Work rows, radius 0 and no shadow. It opens at
+   once: Grid keeps still. The `.is-*` classes force a state for the preview. */
+.nav__menu { display: inline-flex; align-items: center; gap: var(--space-xs); padding: var(--space-sm) 0; border: 0; background: none; color: var(--color-muted); font: inherit; white-space: nowrap; cursor: pointer; }
+.nav__menu::after { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform var(--dur-short) var(--ease-out); }
+.nav__menu:hover, .nav__menu.is-hover { color: var(--color-mark); }
+.nav__menu:focus-visible, .nav__menu.is-focus { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.nav__menu:active, .nav__menu.is-active { color: var(--color-ink); }
+.nav:has(.case-menu:popover-open) .nav__links .nav__menu, .nav:has(.site-menu:popover-open) .nav__menu--site, .nav__menu.is-open { color: var(--color-ink); }
+.nav:has(.case-menu:popover-open) .nav__links .nav__menu::after, .nav:has(.site-menu:popover-open) .nav__menu--site::after, .nav__menu.is-open::after { transform: translateY(2px) rotate(-135deg); }
+
+/* Without anchor positioning the panel hangs from the container's right
+   gutter, under the pill: the nav's offset, the CV key's 44px and the pill's
+   padding, then a 4px gap. */
+.case-menu { position: fixed; inset: auto; top: calc(var(--space-sm) + 44px + 3 * var(--space-2xs)); right: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter))); width: 24rem; max-width: calc(100% - 2 * var(--gutter)); margin: 0; padding: 0; border: 0; background: var(--color-paper-2); color: var(--color-ink); overflow: visible; }
+@supports (anchor-name: --a) {
+  .nav__pill { anchor-name: --nav-pill; }
+  .case-menu { position-anchor: --nav-pill; top: calc(anchor(bottom) + var(--space-2xs)); right: anchor(right); width: anchor-size(width); max-width: none; }
+}
+.case-menu__list { display: grid; margin: 0; padding: 0; list-style: none; }
+.case-menu__list li + li { border-top: var(--rule-hair) solid var(--color-rule); }
+.case-menu__item { display: grid; gap: var(--space-3xs); padding: var(--space-md) var(--space-lg); color: var(--color-ink); text-decoration: none; }
+.case-menu__name { font: 500 var(--text-md)/1.25 var(--font-body); transition: color var(--dur-short) var(--ease-out); }
+.case-menu__meta { font: 400 var(--text-sm)/1.4 var(--font-body); color: var(--color-muted); }
+.case-menu__item:hover, .case-menu__item.is-hover { color: var(--color-ink); }
+.case-menu__item:hover .case-menu__name, .case-menu__item.is-hover .case-menu__name, .case-menu__item[aria-current="page"] .case-menu__name { color: var(--color-mark); }
+.case-menu__item:focus-visible, .case-menu__item.is-focus { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.case-menu__item:active .case-menu__name, .case-menu__item.is-active .case-menu__name { color: var(--color-ink-2); }
+
+/* The phone's menu: a sheet of paper under the bar, the bar's own surface
+   carried down, the sections set large enough to tap, then the case studies
+   in the same rows as the desktop menu. The key is shown under 60rem only. */
+.nav__menu--site { display: none; }
+.site-menu { position: fixed; inset: var(--bar) 0 auto 0; width: 100%; height: calc(100svh - var(--bar)); margin: 0; padding: var(--space-2xs) var(--gutter) var(--space-xl); border: 0; background: var(--color-paper); color: var(--color-ink); overflow-y: auto; overscroll-behavior: contain; }
+.site-menu__list { display: grid; margin: 0; padding: 0; list-style: none; }
+.site-menu__list a { display: flex; align-items: center; min-height: 56px; border-bottom: var(--rule-hair) solid var(--color-rule); font: 700 var(--text-xl)/1.1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--color-ink); text-decoration: none; }
+.site-menu__list a:hover, .site-menu__list a.is-hover { color: var(--color-mark); }
+.site-menu__list a:focus-visible, .site-menu__list a.is-focus { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.site-menu__label { margin: var(--space-xl) 0 var(--space-2xs); font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-muted); }
+.site-menu .case-menu__item { padding-inline: 0; }
+.site-menu .case-menu__list { border-top: var(--rule-hair) solid var(--color-rule); }
 
 /* ── Hero: an index on a sheet, its figure on a field ───────────── */
 
@@ -119,7 +165,6 @@ a:hover { color: var(--color-mark); }
 .q + .q { padding-top: var(--section-gap-s); }
 .q[data-tone] { margin-top: var(--section-gap); padding-block: var(--section-gap-s); }
 .q[data-tone] + .q { padding-top: var(--section-gap); }
-.q[data-tone="field"] { background: var(--color-field); color: var(--color-field-ink); --color-focus: var(--color-field-ink); }
 .q[data-tone="mark"] { background: var(--color-mark); color: var(--color-mark-ink); --color-focus: var(--color-ink); }
 .q[data-tone] .q__head, .q[data-tone] h3, .q[data-tone] .lede { color: inherit; }
 .q[data-tone] a:hover { color: inherit; text-decoration-thickness: 2px; }
@@ -180,26 +225,7 @@ a:hover { color: var(--color-mark); }
 .more__dl dt { font-weight: 500; }
 .more__dl dd { margin: 0; max-width: 36rem; }
 
-/* ── The case: a field that holds a control ─────────────────────── */
-
-.decide { width: 100%; display: grid; gap: var(--space-md); }
-.decide__label-group { font: 500 var(--text-sm)/1.4 var(--font-body); }
-.decide__choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-areas: ". . ." ". . ." ". . ." "result result result"; column-gap: var(--space-md); }
-.decide__pair { display: contents; }
-.decide__choice { position: relative; display: grid; gap: var(--space-3xs); align-content: start; min-height: 72px; padding: var(--space-sm) var(--space-xs); border-top: var(--rule-hair) solid color-mix(in oklab, var(--color-field-ink) 45%, transparent); cursor: pointer; transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out); }
-.decide__choice:hover { border-top-color: var(--color-field-ink); }
-.decide__choice input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
-.decide__choice:has(input:focus-visible) { outline: 2px solid var(--color-field-ink); outline-offset: 2px; }
-.decide__choice:has(input:checked) { background: var(--color-field-ink); color: var(--color-field); }
-.decide__last { font: 500 var(--text-sm)/1.3 var(--font-body); }
-.decide__today { font: 400 var(--text-md)/1.3 var(--font-body); }
-.decide__result { grid-area: result; display: none; align-items: baseline; gap: var(--space-xs) var(--space-lg); grid-template-columns: auto minmax(0, 1fr); padding-top: var(--space-lg); }
-.decide__choice:has(input:checked) + .decide__result { display: grid; }
-.decide__label { grid-column: 1 / -1; font: 500 var(--text-sm)/1.3 var(--font-body); }
-.decide__value { font: 700 clamp(4.5rem, 10.2vw, 10rem)/0.9 var(--font-display); letter-spacing: -0.045em; }
-.decide__why { font: 400 var(--text-xl)/1.3 var(--font-body); max-width: 22ch; }
-
-/* Code, folded under the case: the system's own record, in ink on paper-2. */
+/* Code in the case study: the system's own record, in ink on paper-2. */
 .cs-code-box { margin-top: var(--space-sm); background: var(--color-paper); color: var(--color-ink); }
 .cs-code-lang { display: block; padding: var(--space-xs) var(--space-md); background: var(--color-paper-2); font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-muted); }
 .cs-code { margin: 0; padding: var(--space-md); overflow-x: auto; font: 400 0.8125rem/1.6 ui-monospace, monospace; tab-size: 2; }
@@ -317,8 +343,20 @@ a:hover { color: var(--color-mark); }
    showed nothing move.
 
    The hero plays on load in CSS alone, so the first screen never waits for
-   script: the head, then the field, the line and the actions, then the five
-   names, 0.74s in all.
+   script, and it is set like a sheet coming off the press (redesigned with
+   Hallmark on 2026-11-06; it was one fade-up for every block). In 0.82s:
+     0ms      the ultramarine field is laid from the column-9 line to the
+              bleed: a paper overlay shrinks to the right (scaleX only);
+     40-220   the headline's words are set, each rising out of its own
+              baseline, 30ms apart in reading order;
+     160, 220 the line and the actions settle 8px;
+     240      the year and its caption rise out of the field's foot;
+     260-400  the five names are set left to right, 35ms apart;
+     700      the current name takes the mark red, the choice made last.
+   "Rising out of a baseline" is translate and clip-path moved together, so
+   the clip edge holds still while the type passes it; nothing fades and
+   nothing scales. The field rises as a block because its figures swap by
+   `display`, which would replay an animation on every hover.
 
    Every other block carries `data-reveal`. It is hidden only once the
    inline script in layout.tsx has marked <html data-js>, which happens
@@ -334,20 +372,28 @@ a:hover { color: var(--color-mark); }
    @supports, Turbopack drops the whole block without a word. */
 @keyframes rise { from { opacity: 0; transform: translateY(var(--rise, 24px)); } }
 @keyframes shown { to { opacity: 1; } }
+@keyframes set { from { transform: translateY(110%); clip-path: inset(-0.25em -0.25em 110% -0.25em); } to { transform: none; clip-path: inset(-0.25em); } }
+@keyframes lay { from { transform: scaleX(1); } }
+@keyframes mark { from { color: var(--color-ink); } }
 @media (prefers-reduced-motion: no-preference) {
-  .hero h1, .hero .lede, .hero .actions, .hero__field, .specimen__names li {
-    animation: rise var(--dur-long) var(--ease-out) backwards;
-    animation-delay: calc(var(--i, 0) * 80ms);
-  }
-  .hero h1 { --rise: 40px; }
-  .hero__field { --i: 1; --rise: 48px; }
-  .hero .lede { --i: 1; }
-  .hero .actions { --i: 2; }
-  .specimen__names li:nth-child(1) { --i: 2; }
-  .specimen__names li:nth-child(2) { --i: 2.5; }
-  .specimen__names li:nth-child(3) { --i: 3; }
-  .specimen__names li:nth-child(4) { --i: 3.5; }
-  .specimen__names li:nth-child(5) { --i: 4; }
+  .hero__word, .hero__field, .specimen__names li { animation: set var(--dur-long) var(--ease-out) backwards; animation-delay: var(--at, 0ms); }
+  .hero__word { display: inline-block; --at: calc(40ms + var(--i, 0) * 30ms); }
+  .hero .lede, .hero .actions { --rise: 8px; animation: rise var(--dur-long) var(--ease-out) backwards; }
+  .hero .lede { animation-delay: 160ms; }
+  .hero .actions { animation-delay: 220ms; }
+  .hero__field { --at: 240ms; }
+  .specimen__names li:nth-child(1) { --at: 260ms; }
+  .specimen__names li:nth-child(2) { --at: 295ms; }
+  .specimen__names li:nth-child(3) { --at: 330ms; }
+  .specimen__names li:nth-child(4) { --at: 365ms; }
+  .specimen__names li:nth-child(5) { --at: 400ms; }
+  .specimen__name[data-current] { animation: mark var(--dur-micro) var(--ease-out) 700ms backwards; }
+}
+/* The field is laid only where it is the hero's own background; under 60rem
+   it is a band of its own and rises with its figure. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 60.01rem) {
+  .hero { position: relative; isolation: isolate; }
+  .hero::before { content: ""; position: absolute; z-index: -1; inset-block: 0; left: var(--field-x); right: 0; background: var(--color-paper); transform: scaleX(0); transform-origin: right; animation: lay var(--dur-long) var(--ease-out) backwards; pointer-events: none; }
 }
 @media screen and (prefers-reduced-motion: no-preference) {
   html[data-js] [data-reveal]:not(.is-in, .is-seen) { opacity: 0; }
@@ -362,8 +408,13 @@ a:hover { color: var(--color-mark); }
 /* ── Narrower screens ───────────────────────────────────────────── */
 
 @media (max-width: 60rem) {
+  /* The nav becomes a solid bar of a fixed height, so the page scrolls under
+     it rather than past a floating plate, and the menu sheet knows where to
+     hang. */
+  .nav { --bar: calc(var(--space-3xl) * 3 / 4); top: 0; display: flex; align-items: center; height: var(--bar); margin-top: 0; background: var(--color-paper); border-bottom: var(--rule-hair) solid var(--color-rule); pointer-events: auto; }
   .nav__links { display: none; }
-  .nav__pill { padding-left: var(--space-2xs); }
+  .nav__pill { gap: var(--space-md); padding-left: var(--space-md); }
+  .nav__menu--site { display: inline-flex; }
   .hero { display: block; min-height: 0; background: var(--color-paper); }
   .hero__grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: var(--space-xl); padding-bottom: 0; }
   .hero__head, .specimen__names { grid-column: 1; grid-row: auto; }
@@ -377,8 +428,6 @@ a:hover { color: var(--color-mark); }
   .doc__grid { grid-template-columns: minmax(0, 1fr); }
   .doc__text { grid-column: 1; }
   .doc__field { grid-column: 1; margin-inline: calc(-1 * var(--gutter)); padding: var(--space-xl) var(--gutter); background: var(--color-field); }
-  .decide__choices { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: none; }
-  .decide__result { grid-area: auto; grid-column: 1 / -1; grid-row: 1; padding-top: 0; padding-bottom: var(--space-md); }
   .cs-doc { grid-template-columns: minmax(0, 1fr); row-gap: var(--space-2xl); }
   .cs-nav, .cs-body { grid-column: 1; position: static; }
 }

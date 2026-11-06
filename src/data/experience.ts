@@ -112,6 +112,7 @@ export const experiences = [
 			'Go',
 			'Node.js',
 			'NestJS',
+			'Prisma',
 			'PostgreSQL',
 			'BigQuery',
 			'MongoDB',

@@ -1,3 +1,4 @@
+import { Fragment, type CSSProperties } from 'react';
 import { profile } from '@/data/profile';
 import { experiences } from '@/data/experience';
 import { monthLong, monthShort } from '@/lib/dates';
@@ -22,7 +23,19 @@ export default function Hero() {
 		<section className='hero' aria-labelledby='hero-title'>
 			<div className='container hero__grid'>
 				<div className='hero__head'>
-					<h1 id='hero-title'>{profile.headline}</h1>
+					{/* Each word in its own span so the opening can set it from its
+					    baseline; the spaces stay between them, so the heading reads
+					    and wraps as one line of text. */}
+					<h1 id='hero-title'>
+						{profile.headline.split(' ').map((word, i, all) => (
+							<Fragment key={i}>
+								<span className='hero__word' style={{ '--i': i } as CSSProperties}>
+									{word}
+								</span>
+								{i < all.length - 1 && ' '}
+							</Fragment>
+						))}
+					</h1>
 					<p className='lede'>{lede}</p>
 					<div className='actions'>
 						<a

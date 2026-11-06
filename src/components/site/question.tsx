@@ -15,8 +15,9 @@ export default function Question({
 	question: string;
 	/** One or two short sentences, the answer as it would be said. */
 	answer?: React.ReactNode;
-	/** A field the section is printed on, if any. */
-	tone?: 'field' | 'mark';
+	/** The red field, if the section is printed on it. The ultramarine tone
+	    went with the case section on 2026-11-06. */
+	tone?: 'mark';
 	children?: React.ReactNode;
 }) {
 	return (

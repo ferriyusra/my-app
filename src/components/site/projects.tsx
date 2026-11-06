@@ -1,6 +1,8 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { projects, type Project } from '@/data/projects';
 import { caseStudy } from '@/data/case-study';
+import { satusehat } from '@/data/satusehat';
 import { countWord } from '@/lib/dates';
 import { prose } from '@/lib/text';
 import Question from './question';
@@ -86,6 +88,13 @@ export default function Projects() {
 						</figcaption>
 					</figure>
 				))}
+			</div>
+
+			{/* The two captures are the SATUSEHAT case study's subject. */}
+			<div className='q__links' data-reveal>
+				<Link className='btn btn--secondary' href={`/${satusehat.slug}`}>
+					Read the SATUSEHAT case study
+				</Link>
 			</div>
 
 			<div className='learnt'>

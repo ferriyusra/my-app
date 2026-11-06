@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { caseFor } from '@/data/cases';
 import { experiences, tenureLabel } from '@/data/experience';
 import { CAREER_START } from '@/data/profile';
 import { countWord, rangeLabel } from '@/lib/dates';
@@ -20,6 +22,7 @@ export default function Roles() {
 			<ol className='rows'>
 				{experiences.map((e) => {
 					const fig = e.stats[0];
+					const study = caseFor(e.short);
 					return (
 						<li key={e.company} id={`role-${slug(e.short)}`} className='row' data-reveal>
 							<details className='row__details'>
@@ -62,6 +65,13 @@ export default function Roles() {
 										))}
 									</ul>
 									<p className='row__stack'>Stack: {e.tech.join(', ')}</p>
+									{/* A role with a case study links to it, by the `at` join
+									    in cases.ts that data.test.ts pins. */}
+									{study && (
+										<p className='row__links'>
+											<Link href={study.href}>Read the case study</Link>
+										</p>
+									)}
 								</div>
 							</details>
 						</li>

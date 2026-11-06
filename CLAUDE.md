@@ -43,18 +43,21 @@ No other runtime dependencies. No environment variables.
 
 ## What this is
 
-A portfolio for a backend engineer: **one server-rendered page and one
-long-form case study**, both static.
+A portfolio for a backend engineer: **one server-rendered page and two case
+studies**, all static.
 
 - `/` ([src/app/page.tsx](src/app/page.tsx)), an interview: the five places
   worked as an index on the first sheet, then the questions a hiring manager
-  would ask (which tools and where, who have you built for since 2021, when
-  should an alert go out, what did you ship for
-  SATUSEHAT, how do I reach you in Jakarta), each answered in a line with the
+  would ask (which tools and where, who have you built for since 2021, what
+  did you ship for SATUSEHAT, how do I reach you in Jakarta), each answered in
+  a line with the
   depth folded beneath and the question pinned beside it.
 - `/deposit-alerting` ([src/app/deposit-alerting/page.tsx](src/app/deposit-alerting/page.tsx)):
   the case study as a long document, with the system diagram and the
   questions the write-up does not answer.
+- `/satusehat` ([src/app/satusehat/page.tsx](src/app/satusehat/page.tsx)):
+  a rough case study of the SATUSEHAT work across two roles (GovTech Health,
+  then INA Digital), written from the owner's memory, in the same document.
 
 **Until 2026-11-05 this was a Windows 11 desktop shell** (draggable windows, a
 taskbar, Start, a desktop cat, Career.exe). The owner had it deleted outright
@@ -108,11 +111,31 @@ Rules the page holds, from Hallmark's Floor:
 **Motion is one reveal.** At the owner's request (2026-11-05) the site runs
 Hallmark's one reveal (`craft.md` § 5, `patterns.md` "One reveal that
 survives no script"): everything rises once into place the first time it is
-seen, **on a hard refresh as well as on a scroll**. The hero plays on load in
-CSS alone. Every other block carries `data-reveal`, and
+seen, **on a hard refresh as well as on a scroll**. Every block outside the
+hero carries `data-reveal`, and
 [reveal.tsx](src/components/content/reveal.tsx) adds `.is-in` when it comes
 into view, staggering blocks that arrive together. A new block that should
 arrive needs only the attribute.
+
+**The hero's opening is CSS only, and set like a sheet off the press.** The
+owner had it redesigned with Hallmark on 2026-11-06; before that it was one
+fade-up for every block. It takes 0.82s:
+- the field is laid from the column-9 line by a `.hero::before` paper overlay
+  shrinking right;
+- the headline's words (one `.hero__word` span each, in `hero.tsx`) and the
+  five names rise out of their own baselines (`set`);
+- the line and the actions settle 8px;
+- the current name turns red last.
+
+Two traps:
+- `set` moves `translate` and `clip-path` together so the clip edge holds
+  still. Keep both in the keyframes.
+- **Never animate a `.specimen__fig` itself.** The hover swap toggles it with
+  `display`, which restarts any animation on it, so the field rises as one
+  block, `.hero__field`.
+
+Before and after filmstrips are in `.hallmark/opening-before/` and
+`.hallmark/opening-after/`.
 
 The order of operations is what keeps it safe. An inline script in
 `layout.tsx` ([reveal-gate.ts](src/components/content/reveal-gate.ts)) sets
@@ -140,7 +163,7 @@ block (Tailwind and Lightning CSS on their own keep it), and nothing errors.
 
 **Linting the design.** Install `puppeteer-core` somewhere outside the tree
 and point `HALLMARK_PUPPETEER` at that folder, start the dev server, and run
-`node ~/.claude/skills/hallmark/scripts/sloplint.mjs src --genre editorial --render --kept --url http://localhost:3000/ --url http://localhost:3000/deposit-alerting`.
+`node ~/.claude/skills/hallmark/scripts/sloplint.mjs src --genre editorial --render --kept --url http://localhost:3000/ --url http://localhost:3000/deposit-alerting --url http://localhost:3000/satusehat`.
 It reads 0 FAIL and 0 REFLEX. Waivers are global, so a waiver written for one
 route can hide a regression on the other: after changing the hero, check the
 home fold with the case page's `44c` waiver commented out. The `.hallmark/`
@@ -157,10 +180,11 @@ in `src/components/content/`:
   layout, runs the one reveal.
 
 Sections live in [src/components/site/](src/components/site/), one file each.
-Content renderers shared by both pages live in
+Content renderers shared across the pages live in
 [src/components/content/](src/components/content/): `prose.tsx` (paragraphs,
-lists, highlighted code, tables), `case-study-body.tsx`
-and `note-body.tsx`.
+lists, highlighted code, tables), `case-study-body.tsx` (takes a document
+and its closing "does not answer" section as props, so both case pages use
+it) and `note-body.tsx`.
 
 ### The first sheet
 
@@ -192,13 +216,84 @@ summary, headings, code or table rows drift. Where the write-up does not
 record something a reader would ask, the question sits in `openQuestions`,
 rendered rather than hidden. Keep that discipline.
 
-The home page shows its strongest part as a control on the ultramarine field:
-pick a client's last state and today's reading, and the decision from the
-write-up's own behaviour table is set at poster scale with its reason. Radios
-wrapped in their labels and `:has()`, no script. The `decide()` function folds
-beneath it. The **figure** (`caseStudy.figure`) is the write-up's own diagram
-redrawn as DOM and borders, on the case page only. Every label and detail is a
-phrase from the write-up, and the test fails if one is not.
+**The home page has no case section.** It used to show the write-up's
+behaviour table as a radio control on the ultramarine field ("When should an
+alert go out?"). On 2026-11-06 the owner had it removed: without the
+write-up's context, choices like "threshold 1 → below threshold 2" told a new
+reader nothing, and the home copy is meant to stay unspecific. The case study
+is reached from the nav's "Case studies" menu and from a link inside the
+Meditap row. Do not bring the control back without being asked.
+
+**Every case study is listed once, in
+[src/data/cases.ts](src/data/cases.ts)**, with the roles it belongs to by
+`short` and its name, where and when derived from those roles.
+`data.test.ts` fails when a name stops matching or a role belongs to two.
+Two surfaces read it:
+- the Work rows, which link a role to its case;
+- the nav's **"Case studies" menu** in
+  [masthead.tsx](src/components/site/masthead.tsx), redesigned with Hallmark
+  on 2026-11-06.
+
+The menu is a native popover (`popover` and `popoverTarget`): no script,
+light dismiss and Escape from the browser. It is anchored under the pill and
+exactly its width, with a fixed fallback where anchor positioning is
+missing. A case page passes `current` to the masthead so its row shows in red.
+A new case study needs only an entry in `cases.ts`. The state preview is
+`.hallmark/case-menu.preview.html`, which is not tracked.
+
+**The nav has a second form under 60rem**, redesigned with Hallmark on
+2026-11-06. Until then phones and tablets lost every section link and the
+floating name plate sat on top of headings.
+
+What it looks like:
+- `.nav` is a solid paper bar of `--bar` (72px), so the page scrolls under
+  it.
+- The pill holds "Menu" (`.nav__menu--site`) and the CV.
+- "Menu" opens `#site-menu`, a second native popover hung at `top: var(--bar)`
+  and as tall as the rest of the screen. It lists the three sections, then
+  the case studies, from the same `cases.ts`.
+
+How it works:
+- Popovers do not close when a link inside them is followed, so
+  [menu-close.ts](src/components/site/menu-close.ts) is a one-listener inline
+  script in `<head>` that hides the open popover on a link click.
+- Without script the sheet still opens, and closes on a tap outside.
+- The section hrefs are written out literally (`` `${base}#work` `` and so
+  on) in both the pill and the sheet, because sloplint's `--kept` record
+  matches href expressions in the source.
+
+**If a CSS edit does not show up in dev**, look at the served chunk before
+debugging the CSS. On 2026-11-06 Turbopack's persistent cache in
+`.next/dev` kept serving the stylesheet from one edit earlier, through
+restarts, with no error. Stop the dev server, delete `.next/dev`, and start
+it again.
+
+### The SATUSEHAT case study, rough on purpose
+
+[src/data/satusehat.ts](src/data/satusehat.ts) covers the SATUSEHAT work
+from Jul 2023 to Mar 2025: the Go APIs behind the Ministry of Health's
+native dashboards (replacing Tableau's data layer), and the SATUSEHAT Data
+API. **There is no write-up behind it.** The owner said they do not remember
+the detail, and on 2026-11-06 gave these facts, which are the page's only new
+ones:
+- the dashboards were built in Go over PostgreSQL, MongoDB and BigQuery;
+- the data team built the pipelines, and the owner consumed the data they
+  loaded;
+- the Data API was a previous team's NestJS, Prisma and PostgreSQL project,
+  which the owner continued.
+
+Everything else is taken from the two roles' bullets and the `ssd` and
+`native` projects. What nobody kept (volumes, latencies, licence costs, cache
+policy, which endpoints) sits in its `openQuestions`. Do not fill those with
+plausible figures; ask the owner. The dates, roles and live link on the page
+are derived from `experience.ts` and `projects.ts`. The section headings
+carry a "Dashboards:" or "The Data API:" prefix because the contents list
+shows only what follows the colon; longer labels wrap at 1024px and fail
+sloplint 49a.
+
+The **figure** (`caseStudy.figure`) is the write-up's own diagram redrawn as
+DOM and borders, on the case page. Every label and detail is a phrase from the
+write-up, and the test fails if one is not.
 
 ### Decisions reversed: removed
 
