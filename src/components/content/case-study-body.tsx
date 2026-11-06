@@ -1,16 +1,30 @@
-import { caseStudy, type CaseBlock } from '@/data/case-study';
+import type { CaseBlock, CaseSection, FigureRow } from '@/data/case-study';
 import CaseStudyNav from './case-study-nav';
 import ProseBlock from './prose';
 import { prose } from '@/lib/text';
 
 /**
- * The write-up's sections, rendered: the contents list, every section, the
- * figure, and the questions the write-up does not answer.
+ * A case study's sections, rendered: the contents list, every section, the
+ * figure where the document has one, and the questions it does not answer.
+ * Both case pages use it, `/deposit-alerting` and `/satusehat`.
  *
- * No 'use client': it renders into the response body of `/deposit-alerting`,
- * which is what a crawler, a printer and a phone all read. The page owns the
- * front matter (title, summary, role, stack); this owns the body.
+ * No 'use client': it renders into the response body, which is what a
+ * crawler, a printer and a phone all read. The page owns the front matter
+ * (title, summary, role, stack); this owns the body.
  */
+
+type Figure = { rows: readonly FigureRow[]; caption: string };
+
+/** What the closing section is called, and how it introduces its list. */
+export type OpenEdge = { nav: string; heading: string; intro: string };
+
+/** The deposit-alerting write-up's own closing section. */
+const WRITE_UP_EDGE: OpenEdge = {
+	nav: 'What it does not answer',
+	heading: 'What this write-up does not answer',
+	intro:
+		'These are the questions a reader with production experience would ask next. They are listed rather than glossed over, because a case study with no visible edges is a brochure.',
+};
 
 /** An id for a heading: "The problem" → "the-problem". */
 function slug(heading: string): string {
@@ -28,8 +42,8 @@ function slug(heading: string): string {
 const num = (i: number) => String(i + 1).padStart(2, '0');
 
 /**
- * The shape of the system as boxes, from `caseStudy.figure`: the write-up's
- * own diagram, redrawn.
+ * The shape of the system as boxes, from a document's `figure`: the
+ * write-up's own diagram, redrawn.
  *
  * DOM text and CSS, not an image: it renders with scripting off, recolours
  * with the theme, prints, and reflows from two columns to one in a narrow
@@ -38,8 +52,8 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
  * its boxes side by side. The arrow is an empty, hidden element rather than a
  * glyph so nothing is announced twice.
  */
-function CaseStudyFigure() {
-	const { rows, caption } = caseStudy.figure;
+function CaseStudyFigure({ figure }: { figure: Figure }) {
+	const { rows, caption } = figure;
 	return (
 		<figure className='cs-fig' data-rows={rows.length} aria-label='System diagram'>
 			{rows.map((row) => {
@@ -75,8 +89,10 @@ function CaseStudyFigure() {
 }
 
 /** One block: the figure is drawn here, everything else by ProseBlock. */
-function Block({ block }: { block: CaseBlock }) {
-	if (typeof block !== 'string' && block.kind === 'figure') return <CaseStudyFigure />;
+function Block({ block, figure }: { block: CaseBlock; figure?: Figure }) {
+	if (typeof block !== 'string' && block.kind === 'figure') {
+		return figure ? <CaseStudyFigure figure={figure} /> : null;
+	}
 	return <ProseBlock block={block} />;
 }
 
@@ -90,8 +106,18 @@ function navLabel(heading: string): string {
 	return tail.charAt(0).toUpperCase() + tail.slice(1);
 }
 
-export default function CaseStudyBody() {
-	const sections = caseStudy.sections.map((s) => ({ ...s, id: slug(s.heading) }));
+export default function CaseStudyBody({
+	doc,
+	edge = WRITE_UP_EDGE,
+}: {
+	doc: {
+		sections: readonly CaseSection[];
+		openQuestions: readonly string[];
+		figure?: Figure;
+	};
+	edge?: OpenEdge;
+}) {
+	const sections = doc.sections.map((s) => ({ ...s, id: slug(s.heading) }));
 	const openId = 'open-questions';
 
 	return (
@@ -99,9 +125,9 @@ export default function CaseStudyBody() {
 			<CaseStudyNav
 				items={[
 					...sections.map((s, i) => ({ id: s.id, num: num(i), label: navLabel(s.heading) })),
-					/* Unnumbered: the page counts the write-up's own sections, and the
+					/* Unnumbered: the page counts the document's own sections, and the
 					   questions it leaves open are not one of them. */
-					{ id: openId, num: '', label: 'What it does not answer' },
+					{ id: openId, num: '', label: edge.nav },
 				]}
 			/>
 
@@ -110,20 +136,16 @@ export default function CaseStudyBody() {
 					<section key={s.heading} id={s.id} className='cs-section'>
 						<h2>{s.heading}</h2>
 						{s.body.map((b, j) => (
-							<Block key={j} block={b} />
+							<Block key={j} block={b} figure={doc.figure} />
 						))}
 					</section>
 				))}
 
 				<section id={openId} className='cs-section cs-open'>
-					<h2>What this write-up does not answer</h2>
-					<p>
-						These are the questions a reader with production experience would ask
-						next. They are listed rather than glossed over, because a case study
-						with no visible edges is a brochure.
-					</p>
+					<h2>{edge.heading}</h2>
+					<p>{prose(edge.intro)}</p>
 					<ul className='cs-list'>
-						{caseStudy.openQuestions.map((q) => (
+						{doc.openQuestions.map((q) => (
 							<li key={q}>{prose(q)}</li>
 						))}
 					</ul>

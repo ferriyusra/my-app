@@ -70,7 +70,7 @@ export default function DepositAlerting() {
 				</header>
 
 				<div className='container'>
-					<CaseStudyBody />
+					<CaseStudyBody doc={caseStudy} />
 				</div>
 			</main>
 			<SiteFooter />

@@ -58,7 +58,9 @@ export const projects: Project[] = [
 		description:
 			'The SATUSEHAT Data Portal brings the distribution of Indonesia’s health data and its processed results into one place, as interactive dashboards on trusted sources, to support decision-making and transparency. It has four parts: Dashboard, Dataset, Metadata and Data Services.',
 		cover: '/projects/ssd/ssd-1.png',
-		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'NestJS'],
+		/* Prisma from the owner, 2026-11-06: the API is a previous team's NestJS,
+		   Prisma and PostgreSQL project, continued. */
+		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'NestJS', 'Prisma'],
 		github: null,
 		demo: 'https://satusehat.kemkes.go.id/data',
 		featured: true,
@@ -115,7 +117,9 @@ export const projects: Project[] = [
 		description:
 			'Migration of Tableau dashboards to native ones, to cut licence cost and improve load times and performance. I built the backend APIs that deliver the data from PostgreSQL, BigQuery and MongoDB.',
 		cover: '/projects/native/native-1.png',
-		tech: ['Go', 'Gin Framework', 'PostgreSQL', 'React', 'Next.js'],
+		/* The description already named BigQuery and MongoDB as sources; the
+		   stack now says so too. */
+		tech: ['Go', 'Gin Framework', 'PostgreSQL', 'BigQuery', 'MongoDB', 'React', 'Next.js'],
 		github: null,
 		demo: 'https://satusehat.kemkes.go.id/data/dashboard/3678097d-d11e-4b2c-8552-310d782a905b',
 		featured: true,

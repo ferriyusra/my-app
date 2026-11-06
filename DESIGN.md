@@ -4,7 +4,7 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 
 ## System
 - Genre: editorial
-- Shape of the first page: Conversational FAQ (draw fd59c5), its hero an Index; `/deposit-alerting` is a long document under a Banner head
+- Shape of the first page: Conversational FAQ (draw fd59c5), its hero an Index; `/deposit-alerting` and `/satusehat` are long documents under a Banner head
 - Theme: Grid (deal 1/3, seed portfolio-backend-engineer-few-d334·6287e448·2026-11-05·r0)
 - Axes: light/grotesk-sans/cool · posture: full-palette · one colourway (the white is the material; no dark mode)
 
@@ -47,7 +47,7 @@ The faces are loaded by `next/font` in `layout.tsx` and reach the tokens as `--f
 - **Every other block carries `data-reveal`:** each question and its answer line, the tool rows, the work rows, the two captures, the learning list and its head, every "more" disclosure, and the close's address, answer, actions and office. `reveal.tsx` adds `.is-in` the first time a block comes into view, and blocks that arrive together are staggered 60ms apart in page order, five steps at most.
 - **Why it replaced the scroll pattern.** The site first ran scroll-choreography pattern 4, a sticky diptych scrubbed by `view()`. On a hard refresh the hero held still and in-view sections were drawn at their end state, so the owner saw no section arrive. A reveal plays in time, so a refresh shows it.
 - **It survives no script.** Blocks are hidden only under `html[data-js]`, which an inline script in `layout.tsx` sets before the first paint, and only where IntersectionObserver exists and motion is allowed. Print, reduced motion and scripting off get the finished page. If the bundle never runs, a 3s failsafe shows every block. Blocks already scrolled past on a refresh get `.is-seen` and do not move.
-- `/deposit-alerting`'s long document does not move; only its close, which is the same footer as the home page's, arrives.
+- The case pages' long documents do not move; only its close, which is the same footer as the home page's, arrives.
 
 ## Exports
 `src/app/tokens.css` in this project (a Tailwind v4 `@theme static` block, so the tokens are also utilities). `src/lib/palette.ts` reads it for the share card and the theme-colour meta tag.

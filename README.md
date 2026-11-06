@@ -19,6 +19,7 @@ Open <http://localhost:3000>.
 |---|---|
 | `/` | An interview: the five places worked as one index on the first sheet, then a question per section (tools, roles, what shipped for SATUSEHAT, contact), each answered in a line with the depth folded; the case study is linked from the nav and the Meditap role |
 | `/deposit-alerting` | The case study as a long document: the problem, the architecture diagram, the state machine, the decisions, the outcome, and the questions the write-up does not answer |
+| `/satusehat` | A rough case study of the SATUSEHAT work (GovTech Health, then INA Digital): the Go APIs behind the native dashboards and the NestJS Data API, with what was not kept listed at the end |
 
 Every word is in the server response, so the pages read the same with
 scripting off, in print and to a crawler. The home page shows about 430 words;

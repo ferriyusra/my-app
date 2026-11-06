@@ -43,8 +43,8 @@ No other runtime dependencies. No environment variables.
 
 ## What this is
 
-A portfolio for a backend engineer: **one server-rendered page and one
-long-form case study**, both static.
+A portfolio for a backend engineer: **one server-rendered page and two case
+studies**, all static.
 
 - `/` ([src/app/page.tsx](src/app/page.tsx)), an interview: the five places
   worked as an index on the first sheet, then the questions a hiring manager
@@ -55,6 +55,9 @@ long-form case study**, both static.
 - `/deposit-alerting` ([src/app/deposit-alerting/page.tsx](src/app/deposit-alerting/page.tsx)):
   the case study as a long document, with the system diagram and the
   questions the write-up does not answer.
+- `/satusehat` ([src/app/satusehat/page.tsx](src/app/satusehat/page.tsx)):
+  a rough case study of the SATUSEHAT work across two roles (GovTech Health,
+  then INA Digital), written from the owner's memory, in the same document.
 
 **Until 2026-11-05 this was a Windows 11 desktop shell** (draggable windows, a
 taskbar, Start, a desktop cat, Career.exe). The owner had it deleted outright
@@ -140,7 +143,7 @@ block (Tailwind and Lightning CSS on their own keep it), and nothing errors.
 
 **Linting the design.** Install `puppeteer-core` somewhere outside the tree
 and point `HALLMARK_PUPPETEER` at that folder, start the dev server, and run
-`node ~/.claude/skills/hallmark/scripts/sloplint.mjs src --genre editorial --render --kept --url http://localhost:3000/ --url http://localhost:3000/deposit-alerting`.
+`node ~/.claude/skills/hallmark/scripts/sloplint.mjs src --genre editorial --render --kept --url http://localhost:3000/ --url http://localhost:3000/deposit-alerting --url http://localhost:3000/satusehat`.
 It reads 0 FAIL and 0 REFLEX. Waivers are global, so a waiver written for one
 route can hide a regression on the other: after changing the hero, check the
 home fold with the case page's `44c` waiver commented out. The `.hallmark/`
@@ -157,10 +160,11 @@ in `src/components/content/`:
   layout, runs the one reveal.
 
 Sections live in [src/components/site/](src/components/site/), one file each.
-Content renderers shared by both pages live in
+Content renderers shared across the pages live in
 [src/components/content/](src/components/content/): `prose.tsx` (paragraphs,
-lists, highlighted code, tables), `case-study-body.tsx`
-and `note-body.tsx`.
+lists, highlighted code, tables), `case-study-body.tsx` (takes a document
+and its closing "does not answer" section as props, so both case pages use
+it) and `note-body.tsx`.
 
 ### The first sheet
 
@@ -198,8 +202,35 @@ alert go out?"). On 2026-11-06 the owner had it removed: without the
 write-up's context, choices like "threshold 1 → below threshold 2" told a new
 reader nothing, and the home copy is meant to stay unspecific. The case study
 is reached from the nav's "Case study" and from a link inside the Meditap
-row, which `roles.tsx` renders for the role whose `short` matches
-`caseStudy.at`. Do not bring the control back without being asked.
+row. Do not bring the control back without being asked.
+
+**Rows link to their case studies through
+[src/data/cases.ts](src/data/cases.ts)**, which lists every case with the
+roles it belongs to by `short`; `data.test.ts` fails when a name stops
+matching or a role belongs to two.
+
+### The SATUSEHAT case study, rough on purpose
+
+[src/data/satusehat.ts](src/data/satusehat.ts) covers the SATUSEHAT work
+from Jul 2023 to Mar 2025: the Go APIs behind the Ministry of Health's
+native dashboards (replacing Tableau's data layer), and the SATUSEHAT Data
+API. **There is no write-up behind it.** The owner said they do not remember
+the detail, and on 2026-11-06 gave these facts, which are the page's only new
+ones:
+- the dashboards were built in Go over PostgreSQL, MongoDB and BigQuery;
+- the data team built the pipelines, and the owner consumed the data they
+  loaded;
+- the Data API was a previous team's NestJS, Prisma and PostgreSQL project,
+  which the owner continued.
+
+Everything else is taken from the two roles' bullets and the `ssd` and
+`native` projects. What nobody kept (volumes, latencies, licence costs, cache
+policy, which endpoints) sits in its `openQuestions`. Do not fill those with
+plausible figures; ask the owner. The dates, roles and live link on the page
+are derived from `experience.ts` and `projects.ts`. The section headings
+carry a "Dashboards:" or "The Data API:" prefix because the contents list
+shows only what follows the colon; longer labels wrap at 1024px and fail
+sloplint 49a.
 
 The **figure** (`caseStudy.figure`) is the write-up's own diagram redrawn as
 DOM and borders, on the case page. Every label and detail is a phrase from the

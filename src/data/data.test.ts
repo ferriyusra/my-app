@@ -5,6 +5,8 @@ import { projects } from './projects.ts';
 import { skills } from './skills.ts';
 import { experiences } from './experience.ts';
 import { caseStudy } from './case-study.ts';
+import { cases } from './cases.ts';
+import { satusehat } from './satusehat.ts';
 import { evidenceFor } from '../lib/skill-evidence.ts';
 
 /**
@@ -44,6 +46,8 @@ const NOT_A_LISTED_SKILL = new Set([
 	'MS SQL Server',
 	'GORM',
 	'Protobuf',
+	/* The SATUSEHAT Data API's ORM, from the owner on 2026-11-06. */
+	'Prisma',
 ]);
 
 test('every tool a project names is either a listed skill or a known exception', () => {
@@ -144,4 +148,36 @@ test('every stat tile carries a number; the words are highlights', () => {
 			`${e.short} leads with more than a card can carry`,
 		);
 	}
+});
+
+/**
+ * The Work rows find a role's case study through `cases.ts`, by `short`. A
+ * role renamed in experience.ts would quietly lose its link, and a case
+ * naming a role twice would hand two rows one link; both fail here instead.
+ */
+test('every case study names roles that exist, and no role has two', () => {
+	const shorts = experiences.map((e) => e.short);
+	const seen = new Set<string>();
+	for (const c of cases) {
+		assert.ok(c.at.length > 0, `${c.href} names no role`);
+		for (const short of c.at) {
+			assert.ok(shorts.includes(short), `${c.href} names "${short}", which is not a role. Known: ${shorts.join(', ')}.`);
+			assert.ok(!seen.has(short), `"${short}" belongs to two case studies`);
+			seen.add(short);
+		}
+	}
+});
+
+/**
+ * The SATUSEHAT page takes its live link and its subject from projects.ts,
+ * and its dates from the roles it names, oldest first.
+ */
+test('the SATUSEHAT case names real projects and its roles in order', () => {
+	for (const id of satusehat.projects) {
+		const p = projects.find((x) => x.id === id);
+		assert.ok(p, `satusehat.projects names "${id}", which is not in projects.ts`);
+		assert.equal(p.type, 'real', `${id} is a learning project, not SATUSEHAT work`);
+	}
+	const starts = satusehat.at.map((s) => experiences.find((e) => e.short === s)?.startISO ?? '');
+	assert.deepEqual([...starts].sort(), starts, 'satusehat.at must list its roles oldest first');
 });
