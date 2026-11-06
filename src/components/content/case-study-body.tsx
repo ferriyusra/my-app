@@ -1,4 +1,6 @@
+import Image from 'next/image';
 import type { CaseBlock, CaseSection, FigureRow } from '@/data/case-study';
+import { projects } from '@/data/projects';
 import CaseStudyNav from './case-study-nav';
 import ProseBlock from './prose';
 import { prose } from '@/lib/text';
@@ -88,11 +90,39 @@ function CaseStudyFigure({ figure }: { figure: Figure }) {
 	);
 }
 
-/** One block: the figure is drawn here, everything else by ProseBlock. */
+/**
+ * A project's capture from `projects.ts`, uncropped, in the same duotone
+ * slot as the home page's, its name beneath as the link to it live. A
+ * portrait capture is held narrower so it never runs a screen tall.
+ */
+function Capture({ id }: { id: string }) {
+	const p = projects.find((x) => x.id === id);
+	if (!p?.coverSize) return null;
+	const { w, h } = p.coverSize;
+	return (
+		<figure className='cs-shot' data-orient={h > w ? 'portrait' : 'landscape'}>
+			<div className='cs-shot__frame' data-slot={p.id} data-kind='product' style={{ aspectRatio: `${w} / ${h}` }}>
+				<Image src={p.cover} width={w} height={h} sizes='(min-width: 60rem) 40rem, 100vw' alt='' />
+			</div>
+			<figcaption className='cs-shot__cap'>
+				{p.demo ? (
+					<a href={p.demo} target='_blank' rel='noopener noreferrer'>
+						{p.name}
+					</a>
+				) : (
+					p.name
+				)}
+			</figcaption>
+		</figure>
+	);
+}
+
+/** One block: the figure and captures are drawn here, everything else by ProseBlock. */
 function Block({ block, figure }: { block: CaseBlock; figure?: Figure }) {
 	if (typeof block !== 'string' && block.kind === 'figure') {
 		return figure ? <CaseStudyFigure figure={figure} /> : null;
 	}
+	if (typeof block !== 'string' && block.kind === 'capture') return <Capture id={block.project} />;
 	return <ProseBlock block={block} />;
 }
 

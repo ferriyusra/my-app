@@ -291,6 +291,12 @@ carry a "Dashboards:" or "The Data API:" prefix because the contents list
 shows only what follows the colon; longer labels wrap at 1024px and fail
 sloplint 49a.
 
+The page shows the two SATUSEHAT captures, as a `{ kind: 'capture', project }`
+block that `case-study-body.tsx` draws from `projects.ts`. A capture's pixel
+size lives in the project's `coverSize`, the one source the home page's
+pair also reads. A portrait capture is held to 26rem so it never runs a
+screen tall.
+
 The **figure** (`caseStudy.figure`) is the write-up's own diagram redrawn as
 DOM and borders, on the case page. Every label and detail is a phrase from the
 write-up, and the test fails if one is not.

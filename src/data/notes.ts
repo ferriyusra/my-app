@@ -37,7 +37,7 @@ import type { CaseBlock } from './case-study.ts';
  */
 
 /** A note is built from the same blocks as the case study, minus its figure. */
-export type NoteBlock = Exclude<CaseBlock, { kind: 'figure' }>;
+export type NoteBlock = Exclude<CaseBlock, { kind: 'figure' } | { kind: 'capture' }>;
 
 export type NoteTopic = 'dsa' | 'system-design';
 

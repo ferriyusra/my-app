@@ -18,7 +18,7 @@ import { prose } from '@/lib/text';
  */
 
 /** Everything except the case study's own figure, which only it can draw. */
-export type ProseBlockKind = Exclude<CaseBlock, { kind: 'figure' }>;
+export type ProseBlockKind = Exclude<CaseBlock, { kind: 'figure' } | { kind: 'capture' }>;
 
 /** A paragraph that opens with a bold lead-in reads as a run-in heading. */
 const LEAD = /^\*\*[^*]+\*\*\s/;

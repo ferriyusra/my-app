@@ -307,6 +307,14 @@ a:hover { color: var(--color-mark); }
 
 /* The write-up's diagram, as boxes of paper-2 on white, no strokes. */
 .cs-fig { display: grid; gap: var(--space-xl); margin: var(--space-md) 0; }
+/* A capture in a case study: the home page's duotone slot, uncropped, wider
+   than the prose measure as an exhibit, a portrait one held narrower so it
+   never runs a screen tall; its name beneath links to it live. */
+.cs-shot { display: grid; gap: var(--space-xs); width: 100%; max-width: 44rem; margin: var(--space-md) 0; }
+.cs-shot[data-orient="portrait"] { max-width: 26rem; }
+.cs-shot__frame { width: 100%; }
+.cs-shot__frame > img { object-position: top center; }
+.cs-shot__cap { padding-bottom: var(--space-xs); border-bottom: var(--rule-hair) solid var(--color-rule); font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-muted); }
 .cs-fig-row { display: grid; align-content: start; gap: var(--space-sm); }
 .cs-fig-name { font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-muted); }
 .cs-fig-nodes { display: grid; gap: var(--space-xs); }
@@ -438,7 +446,12 @@ a:hover { color: var(--color-mark); }
   .learnt__list { grid-template-columns: minmax(0, 1fr); }
   .facts { grid-template-columns: minmax(0, 1fr); }
   .close__mail { font-size: var(--text-xl); }
-  .row__when { font-size: var(--text-lg); }
+  /* On a phone the dates cannot stand beside the meta line: they never wrap,
+     so they took half the row and folded the meta into five short lines.
+     They drop under the name and the meta takes the full width. */
+  .row__when { grid-column: 1 / -1; grid-row: 2; font-size: var(--text-lg); }
+  .row__meta { grid-column: 1 / -1; grid-row: 3; }
+  .row__sum::after { grid-row: 1; align-self: center; }
 }
 
 /* ── Print: every disclosure open ─────────────────────────────── */

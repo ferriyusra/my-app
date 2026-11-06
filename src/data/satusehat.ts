@@ -38,6 +38,8 @@ export const satusehat = {
 			body: [
 				"The Ministry of Health's dashboards for SATUSEHAT were built in Tableau. The work was to move them to native, in-house dashboards: less dependence on Tableau, lower licensing costs, and pages that load faster.",
 				'I joined that migration at its start, in the Health Technology Transformation and Digitalization Team in July 2023, and carried on with it at INA Digital from January 2024 to March 2025.',
+				/* One of the native dashboards, the capture the home page shows. */
+				{ kind: 'capture', project: 'native' },
 			],
 		},
 		{
@@ -85,6 +87,8 @@ export const satusehat = {
 			heading: 'The Data API, inherited',
 			body: [
 				"The SATUSEHAT Data portal brings Indonesia's health data and its processed results into one place, in four parts: Dashboard, Dataset, Metadata and Data Services.",
+				/* The portal the API serves, the capture the home page shows. */
+				{ kind: 'capture', project: 'ssd' },
 				'Its API was built by a previous team in NestJS, with Prisma over PostgreSQL. I picked it up at INA Digital in January 2024 and continued it.',
 			],
 		},

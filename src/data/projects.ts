@@ -4,6 +4,12 @@ export interface Project {
 	description: string;
 	/** Cover image shown in the card */
 	cover: string;
+	/**
+	 * The cover's pixel size, for a capture shown uncropped: the browser
+	 * reserves its space and a pair can share one height. Set only for the
+	 * captures the site shows, on the home page and on /satusehat.
+	 */
+	coverSize?: { w: number; h: number };
 	tech: string[];
 	/** Set to null to hide the button */
 	github: string | null;
@@ -58,6 +64,7 @@ export const projects: Project[] = [
 		description:
 			'The SATUSEHAT Data Portal brings the distribution of Indonesia’s health data and its processed results into one place, as interactive dashboards on trusted sources, to support decision-making and transparency. It has four parts: Dashboard, Dataset, Metadata and Data Services.',
 		cover: '/projects/ssd/ssd-1.png',
+		coverSize: { w: 1256, h: 1163 },
 		/* Prisma from the owner, 2026-11-06: the API is a previous team's NestJS,
 		   Prisma and PostgreSQL project, continued. */
 		tech: ['Next.js', 'TypeScript', 'PostgreSQL', 'NestJS', 'Prisma'],
@@ -117,6 +124,7 @@ export const projects: Project[] = [
 		description:
 			'Migration of Tableau dashboards to native ones, to cut licence cost and improve load times and performance. I built the backend APIs that deliver the data from PostgreSQL, BigQuery and MongoDB.',
 		cover: '/projects/native/native-1.png',
+		coverSize: { w: 825, h: 1197 },
 		/* The description already named BigQuery and MongoDB as sources; the
 		   stack now says so too. */
 		tech: ['Go', 'Gin Framework', 'PostgreSQL', 'BigQuery', 'MongoDB', 'React', 'Next.js'],
