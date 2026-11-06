@@ -61,8 +61,9 @@ it:
 
 **What it does.** Two routes, both static and server-rendered. `/` is the
 portfolio as an interview: the career as an index, then a question per
-section (tools, roles, the case as a control, the
-other projects, contact), each answered in a line with the depth folded.
+section (tools, roles, the other projects, contact), each answered in a line
+with the depth folded. The case study is linked from the nav and from the
+Meditap role, not previewed on the page.
 `/deposit-alerting` is the case study as a long document with its system
 diagram. Disclosures are native `<details>`, so nothing needs a script to
 open. The only client code opens them all before printing and runs the one

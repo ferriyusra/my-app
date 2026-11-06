@@ -19,7 +19,7 @@ export default function Masthead({ base = '' }: { base?: '' | '/' }) {
 				<div className='nav__pill'>
 					<nav className='nav__links' aria-label='Sections'>
 						<a href={`${base}#work`}>Work</a>
-						<a href={`${base}#case`}>Case study</a>
+						<Link href='/deposit-alerting'>Case study</Link>
 						<a href={`${base}#projects`}>Projects</a>
 						<a href={`${base}#contact`}>Contact</a>
 					</nav>

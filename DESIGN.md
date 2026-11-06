@@ -23,7 +23,7 @@ The locked system. Every Hallmark run reads this first and pages share it. Chang
 The faces are loaded by `next/font` in `layout.tsx` and reach the tokens as `--font-rcbig` and `--font-rc`. The spacing scale, the type scale, the easings and the durations are the scaffold's and live in `tokens.css`. `globals.css` restates `.container { max-width: var(--container) }` because Tailwind v4's own `.container` utility would otherwise cap it at 1280px.
 
 ## Roles of colour
-- Field, the ultramarine: a flood a sheet is printed on (the hero's figure, from the column-9 line to the bleed; the case question's control).
+- Field, the ultramarine: a flood a sheet is printed on (the hero's figure, from the column-9 line to the bleed; the case page's front matter). The home page's case section, a control on this field, was removed on 2026-11-06.
 - Mark, the Swiss red: what is chosen or current (the current employer, a hovered link, list marks) and the one red field (the contact question).
 - Ink: type on paper and the primary control. Red never sits on the ultramarine, and two fields never touch.
 
@@ -38,13 +38,13 @@ The faces are loaded by `next/font` in `layout.tsx` and reach the tokens as `--f
 - The nav's CV is a small ink block in the floating pill.
 
 ## Motion
-- Character: still, with one exception (below). A name or link turns red, a value at poster scale swaps in place (the hero's year, the case's decision), both in CSS alone. No parallax; under reduced motion every transition ends at once.
+- Character: still, with one exception (below). A name or link turns red, a value at poster scale swaps in place (the hero's year), both in CSS alone. No parallax; under reduced motion every transition ends at once.
 - Three primitives in all: the red hover, the in-place swap, and the one reveal. Never a fourth, and no scroll-scrubbed pattern beside the reveal (F8).
 
 ## Variants
 - **The one reveal, 2026-11-05, at the owner's request.** Grid keeps still; this site runs Hallmark's one reveal (`craft.md` § 5, `patterns.md` "One reveal that survives no script"). Everything rises once into place, `rise` keyframes, `--dur-long` (420ms) on `--ease-out`, from transparent and 24px below (40px for the question heads and the headline, 48px for the hero's field).
 - **The hero plays on load, in CSS alone,** so the first screen never waits for script: the headline, then the field and the line, then the actions, then the five names, 80ms apart and 0.74s in all.
-- **Every other block carries `data-reveal`:** each question and its answer line, the tool rows, the work rows, the decision control and its link, the two captures, the learning list and its head, every "more" disclosure, and the close's address, answer, actions and office. `reveal.tsx` adds `.is-in` the first time a block comes into view, and blocks that arrive together are staggered 60ms apart in page order, five steps at most.
+- **Every other block carries `data-reveal`:** each question and its answer line, the tool rows, the work rows, the two captures, the learning list and its head, every "more" disclosure, and the close's address, answer, actions and office. `reveal.tsx` adds `.is-in` the first time a block comes into view, and blocks that arrive together are staggered 60ms apart in page order, five steps at most.
 - **Why it replaced the scroll pattern.** The site first ran scroll-choreography pattern 4, a sticky diptych scrubbed by `view()`. On a hard refresh the hero held still and in-view sections were drawn at their end state, so the owner saw no section arrive. A reveal plays in time, so a refresh shows it.
 - **It survives no script.** Blocks are hidden only under `html[data-js]`, which an inline script in `layout.tsx` sets before the first paint, and only where IntersectionObserver exists and motion is allowed. Print, reduced motion and scripting off get the finished page. If the bundle never runs, a 3s failsafe shows every block. Blocks already scrolled past on a refresh get `.is-seen` and do not move.
 - `/deposit-alerting`'s long document does not move; only its close, which is the same footer as the home page's, arrives.

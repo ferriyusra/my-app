@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { caseStudy } from '@/data/case-study';
 import { experiences, tenureLabel } from '@/data/experience';
 import { CAREER_START } from '@/data/profile';
 import { countWord, rangeLabel } from '@/lib/dates';
@@ -62,6 +64,13 @@ export default function Roles() {
 										))}
 									</ul>
 									<p className='row__stack'>Stack: {e.tech.join(', ')}</p>
+									{/* The role the case study belongs to links to it, by the
+									    same `at` join data.test.ts pins. */}
+									{e.short === caseStudy.at && (
+										<p className='row__links'>
+											<Link href='/deposit-alerting'>Read the case study</Link>
+										</p>
+									)}
 								</div>
 							</details>
 						</li>

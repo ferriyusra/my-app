@@ -48,9 +48,9 @@ long-form case study**, both static.
 
 - `/` ([src/app/page.tsx](src/app/page.tsx)), an interview: the five places
   worked as an index on the first sheet, then the questions a hiring manager
-  would ask (which tools and where, who have you built for since 2021, when
-  should an alert go out, what did you ship for
-  SATUSEHAT, how do I reach you in Jakarta), each answered in a line with the
+  would ask (which tools and where, who have you built for since 2021, what
+  did you ship for SATUSEHAT, how do I reach you in Jakarta), each answered in
+  a line with the
   depth folded beneath and the question pinned beside it.
 - `/deposit-alerting` ([src/app/deposit-alerting/page.tsx](src/app/deposit-alerting/page.tsx)):
   the case study as a long document, with the system diagram and the
@@ -192,13 +192,18 @@ summary, headings, code or table rows drift. Where the write-up does not
 record something a reader would ask, the question sits in `openQuestions`,
 rendered rather than hidden. Keep that discipline.
 
-The home page shows its strongest part as a control on the ultramarine field:
-pick a client's last state and today's reading, and the decision from the
-write-up's own behaviour table is set at poster scale with its reason. Radios
-wrapped in their labels and `:has()`, no script. The `decide()` function folds
-beneath it. The **figure** (`caseStudy.figure`) is the write-up's own diagram
-redrawn as DOM and borders, on the case page only. Every label and detail is a
-phrase from the write-up, and the test fails if one is not.
+**The home page has no case section.** It used to show the write-up's
+behaviour table as a radio control on the ultramarine field ("When should an
+alert go out?"). On 2026-11-06 the owner had it removed: without the
+write-up's context, choices like "threshold 1 → below threshold 2" told a new
+reader nothing, and the home copy is meant to stay unspecific. The case study
+is reached from the nav's "Case study" and from a link inside the Meditap
+row, which `roles.tsx` renders for the role whose `short` matches
+`caseStudy.at`. Do not bring the control back without being asked.
+
+The **figure** (`caseStudy.figure`) is the write-up's own diagram redrawn as
+DOM and borders, on the case page. Every label and detail is a phrase from the
+write-up, and the test fails if one is not.
 
 ### Decisions reversed: removed
 

@@ -4,7 +4,6 @@ import Masthead from '@/components/site/masthead';
 import Hero from '@/components/site/hero';
 import Tools from '@/components/site/tools';
 import Roles from '@/components/site/roles';
-import CasePreview from '@/components/site/case-preview';
 import Notes from '@/components/site/notes';
 import Projects from '@/components/site/projects';
 import SiteFooter from '@/components/site/site-footer';
@@ -32,8 +31,14 @@ const jsonLd = {
  * in a line with the depth folded beneath, and a letter close on the red
  * field with the address to write to.
  *
- * Every word is in the response body, folded or not. The only script is
- * print-expander, which opens the disclosures before printing.
+ * Every word is in the response body, folded or not. The only scripts are
+ * print-expander, which opens the disclosures before printing, and the one
+ * reveal in the layout; the page is finished without either.
+ *
+ * The case study has no section here. Its home-page section, a decision
+ * control on the ultramarine field, was removed on 2026-11-06 at the owner's
+ * request: without the write-up's context the control told a new reader
+ * nothing. The nav and the Meditap row link to /deposit-alerting instead.
  */
 export default function Home() {
 	return (
@@ -48,7 +53,6 @@ export default function Home() {
 				<Hero />
 				<Tools />
 				<Roles />
-				<CasePreview />
 				{writtenNotes().length > 0 && <Notes />}
 				<Projects />
 			</main>

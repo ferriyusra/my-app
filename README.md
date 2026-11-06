@@ -17,7 +17,7 @@ Open <http://localhost:3000>.
 
 | Route | What it shows |
 |---|---|
-| `/` | An interview: the five places worked as one index on the first sheet, then a question per section (tools, roles, when an alert should go out, what shipped for SATUSEHAT, contact), each answered in a line with the depth folded |
+| `/` | An interview: the five places worked as one index on the first sheet, then a question per section (tools, roles, what shipped for SATUSEHAT, contact), each answered in a line with the depth folded; the case study is linked from the nav and the Meditap role |
 | `/deposit-alerting` | The case study as a long document: the problem, the architecture diagram, the state machine, the decisions, the outcome, and the questions the write-up does not answer |
 
 Every word is in the server response, so the pages read the same with
