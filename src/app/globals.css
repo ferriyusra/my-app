@@ -14,6 +14,7 @@
 /* Hallmark · dropped #decisions, decisions, youtube full-track playback, meter.tsx, glyph tiles, custom-cursor.tsx, smooth-scroll.tsx, mobile-shell.tsx, /articles, tech-globe.tsx · the owner removed the "What have you thrown away?" section on 2026-11-05 as not useful to a reader, and had src/data/discarded.ts deleted with it */
 /* Hallmark · waive 71 · the two capture captions in #projects are measured against the folded content of closed details rows, a Meditap bullet 3px above and the caption's own description 23px below, which Chrome lays out but never paints · on screen each caption head sits 20px under its capture and 48px over the list below; it is a caption and belongs to the image above it */
 /* Hallmark · dismissed kept · the words dropped are the decisions section the owner asked to remove and the Cobalt page's visible depth, now folded on purpose; every role, project, tool and the case study are still in the HTML */
+/* Hallmark · component: nav · redesign: full, 2026-11-06 · from 60rem the floating pill as it was; under 60rem a solid paper bar of 72px with the wordmark and a pill of Menu and the CV, Menu opening a full-height sheet of the sections and the case studies (a native popover; an inline script closes it when a link inside is followed) · states: 6 of 8, as the case menu · kept 63/63 links */
 /* Hallmark · component: menu (the nav's case studies) · redesign: full · states: 6 of 8, disabled, loading, error and success never occur on a menu of links · contrast: pass · a native popover anchored under the pill, its width, opening at once because Grid keeps still; preview in .hallmark/case-menu.preview.html */
 /* Hallmark · motion: one reveal (craft.md § 5), at the owner's request: the hero is set like a sheet on load in CSS (the field laid from the column-9 line, the words and names set from their baselines, the current name marked red last, 0.82s; redesigned 2026-11-06 from one fade-up), and every block marked data-reveal rises once as it is first seen (IntersectionObserver); no scroll-scrubbed pattern; visible without script, in print and under reduced motion; DESIGN.md records it as a variant */
 
@@ -86,8 +87,8 @@ a:hover { color: var(--color-mark); }
 .nav__menu:hover, .nav__menu.is-hover { color: var(--color-mark); }
 .nav__menu:focus-visible, .nav__menu.is-focus { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .nav__menu:active, .nav__menu.is-active { color: var(--color-ink); }
-.nav:has(.case-menu:popover-open) .nav__menu, .nav__menu.is-open { color: var(--color-ink); }
-.nav:has(.case-menu:popover-open) .nav__menu::after, .nav__menu.is-open::after { transform: translateY(2px) rotate(-135deg); }
+.nav:has(.case-menu:popover-open) .nav__links .nav__menu, .nav:has(.site-menu:popover-open) .nav__menu--site, .nav__menu.is-open { color: var(--color-ink); }
+.nav:has(.case-menu:popover-open) .nav__links .nav__menu::after, .nav:has(.site-menu:popover-open) .nav__menu--site::after, .nav__menu.is-open::after { transform: translateY(2px) rotate(-135deg); }
 
 /* Without anchor positioning the panel hangs from the container's right
    gutter, under the pill: the nav's offset, the CV key's 44px and the pill's
@@ -106,6 +107,19 @@ a:hover { color: var(--color-mark); }
 .case-menu__item:hover .case-menu__name, .case-menu__item.is-hover .case-menu__name, .case-menu__item[aria-current="page"] .case-menu__name { color: var(--color-mark); }
 .case-menu__item:focus-visible, .case-menu__item.is-focus { outline: 2px solid var(--color-focus); outline-offset: -2px; }
 .case-menu__item:active .case-menu__name, .case-menu__item.is-active .case-menu__name { color: var(--color-ink-2); }
+
+/* The phone's menu: a sheet of paper under the bar, the bar's own surface
+   carried down, the sections set large enough to tap, then the case studies
+   in the same rows as the desktop menu. The key is shown under 60rem only. */
+.nav__menu--site { display: none; }
+.site-menu { position: fixed; inset: var(--bar) 0 auto 0; width: 100%; height: calc(100svh - var(--bar)); margin: 0; padding: var(--space-2xs) var(--gutter) var(--space-xl); border: 0; background: var(--color-paper); color: var(--color-ink); overflow-y: auto; overscroll-behavior: contain; }
+.site-menu__list { display: grid; margin: 0; padding: 0; list-style: none; }
+.site-menu__list a { display: flex; align-items: center; min-height: 56px; border-bottom: var(--rule-hair) solid var(--color-rule); font: 700 var(--text-xl)/1.1 var(--font-display); letter-spacing: var(--tracking-display); color: var(--color-ink); text-decoration: none; }
+.site-menu__list a:hover, .site-menu__list a.is-hover { color: var(--color-mark); }
+.site-menu__list a:focus-visible, .site-menu__list a.is-focus { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.site-menu__label { margin: var(--space-xl) 0 var(--space-2xs); font: 500 var(--text-sm)/1.4 var(--font-body); color: var(--color-muted); }
+.site-menu .case-menu__item { padding-inline: 0; }
+.site-menu .case-menu__list { border-top: var(--rule-hair) solid var(--color-rule); }
 
 /* ── Hero: an index on a sheet, its figure on a field ───────────── */
 
@@ -394,8 +408,13 @@ a:hover { color: var(--color-mark); }
 /* ── Narrower screens ───────────────────────────────────────────── */
 
 @media (max-width: 60rem) {
+  /* The nav becomes a solid bar of a fixed height, so the page scrolls under
+     it rather than past a floating plate, and the menu sheet knows where to
+     hang. */
+  .nav { --bar: calc(var(--space-3xl) * 3 / 4); top: 0; display: flex; align-items: center; height: var(--bar); margin-top: 0; background: var(--color-paper); border-bottom: var(--rule-hair) solid var(--color-rule); pointer-events: auto; }
   .nav__links { display: none; }
-  .nav__pill { padding-left: var(--space-2xs); }
+  .nav__pill { gap: var(--space-md); padding-left: var(--space-md); }
+  .nav__menu--site { display: inline-flex; }
   .hero { display: block; min-height: 0; background: var(--color-paper); }
   .hero__grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: var(--space-xl); padding-bottom: 0; }
   .hero__head, .specimen__names { grid-column: 1; grid-row: auto; }

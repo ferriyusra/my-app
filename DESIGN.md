@@ -36,6 +36,7 @@ The faces are loaded by `next/font` in `layout.tsx` and reach the tokens as `--f
 - Primary: a square ink block with paper text, 52px tall, the same on paper and on either field; it opens the CV.
 - Secondary: a word underlined at 1px that turns mark red on hover (field-ink on a field).
 - The nav's CV is a small ink block in the floating pill.
+- **Under 60rem the nav is a bar, not a float** (redesigned with Hallmark on 2026-11-06; until then a phone or tablet got the name and the CV and nothing else, and the floating name plate sat on top of headings). It is solid paper, 72px tall, with a hairline under it, so the page scrolls beneath it. It holds the wordmark plate, then a small pill holding "Menu" (the same chevron key as "Case studies") and the CV block. "Menu" opens a sheet of paper from the bar to the foot of the screen, also a native popover. The sheet lists Work, Projects and Contact set in the display face at 56px a row, then "Case studies" with the same rows as the desktop menu. Following a link closes it.
 - The nav's "Case studies" is a key with a drawn chevron that opens a menu: a native popover (no script; light dismiss and Escape from the browser) anchored under the pill and exactly its width, paper-2 like the pill, one row per case in `src/data/cases.ts` (the name, then where and when), hairlines between rows. It opens at once. The case the reader is on is marked in the mark red. Without anchor positioning it hangs from the container's right gutter at 24rem.
 
 ## Motion

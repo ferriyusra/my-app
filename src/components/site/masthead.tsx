@@ -1,19 +1,37 @@
 import Link from 'next/link';
-import { cases } from '@/data/cases';
+import { cases, type CaseEntry } from '@/data/cases';
 import { profile } from '@/data/profile';
 
+/** One case study as a menu row: its name, then where and when. */
+function CaseRow({ c, current }: { c: CaseEntry; current?: string }) {
+	return (
+		<Link href={c.href} className='case-menu__item' aria-current={c.href === current ? 'page' : undefined}>
+			<span className='case-menu__name'>{c.name}</span>
+			<span className='case-menu__meta'>
+				{c.where}, {c.when}
+			</span>
+		</Link>
+	);
+}
+
 /**
- * A floating nav that stays with the reader: the wordmark (the name in two
- * lines beside a square of the mark red) at one edge, and at the other a pill
- * holding the page's questions and the CV as an ink block, so the one action
- * is never ten screens away.
+ * The nav, in two forms from one source.
  *
- * "Case studies" opens a menu of every case in `cases.ts`, one row each: the
- * name, then where and when. It is a native popover (`popover` and
- * `popoverTarget`), so it needs no script: the browser gives it light
- * dismiss, Escape, the top layer and the open state to assistive technology.
- * The panel sits right after its key in the source, so Tab walks from the
- * key into the rows. `current` marks the case the reader is on.
+ * From 60rem it floats: the wordmark (the name in two lines beside a square
+ * of the mark red) at one edge, and at the other a pill holding the page's
+ * questions and the CV as an ink block, so the one action is never ten
+ * screens away. "Case studies" opens a menu of every case in `cases.ts`.
+ *
+ * Under 60rem it is a solid paper bar, so nothing it carries sits on top of a
+ * heading: the wordmark, then a small pill with "Menu" and the CV. "Menu"
+ * opens a sheet under the bar with the same sections and the same cases.
+ * Until 2026-11-06 a phone got the name and the CV and nothing else.
+ *
+ * Both menus are native popovers (`popover` and `popoverTarget`), so they
+ * need no script: the browser gives them light dismiss, Escape, the top
+ * layer and their open state to assistive technology. Each sits right after
+ * its key in the source, so Tab walks from the key into it. `current` marks
+ * the case the reader is on.
  */
 export default function Masthead({
 	base = '',
@@ -24,6 +42,7 @@ export default function Masthead({
 	current?: string;
 }) {
 	const [first, ...rest] = profile.name.split(' ');
+
 	return (
 		<header className='nav'>
 			<div className='container nav__bar'>
@@ -41,15 +60,7 @@ export default function Masthead({
 							<ul className='case-menu__list'>
 								{cases.map((c) => (
 									<li key={c.href}>
-										<Link
-											href={c.href}
-											className='case-menu__item'
-											aria-current={c.href === current ? 'page' : undefined}>
-											<span className='case-menu__name'>{c.name}</span>
-											<span className='case-menu__meta'>
-												{c.where}, {c.when}
-											</span>
-										</Link>
+										<CaseRow c={c} current={current} />
 									</li>
 								))}
 							</ul>
@@ -57,6 +68,36 @@ export default function Masthead({
 						<a href={`${base}#projects`}>Projects</a>
 						<a href={`${base}#contact`}>Contact</a>
 					</nav>
+
+					<button type='button' className='nav__menu nav__menu--site' popoverTarget='site-menu'>
+						Menu
+					</button>
+					<div id='site-menu' popover='auto' className='site-menu'>
+						<nav aria-label='Menu'>
+							<ul className='site-menu__list'>
+								<li>
+									<a href={`${base}#work`}>Work</a>
+								</li>
+								<li>
+									<a href={`${base}#projects`}>Projects</a>
+								</li>
+								<li>
+									<a href={`${base}#contact`}>Contact</a>
+								</li>
+							</ul>
+							<p className='site-menu__label' id='site-menu-cases'>
+								Case studies
+							</p>
+							<ul className='case-menu__list' aria-labelledby='site-menu-cases'>
+								{cases.map((c) => (
+									<li key={c.href}>
+										<CaseRow c={c} current={current} />
+									</li>
+								))}
+							</ul>
+						</nav>
+					</div>
+
 					<a className='nav__cv' href={profile.cvView} target='_blank' rel='noopener noreferrer'>
 						CV
 					</a>

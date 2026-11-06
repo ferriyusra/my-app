@@ -241,6 +241,33 @@ missing. A case page passes `current` to the masthead so its row shows in red.
 A new case study needs only an entry in `cases.ts`. The state preview is
 `.hallmark/case-menu.preview.html`, which is not tracked.
 
+**The nav has a second form under 60rem**, redesigned with Hallmark on
+2026-11-06. Until then phones and tablets lost every section link and the
+floating name plate sat on top of headings.
+
+What it looks like:
+- `.nav` is a solid paper bar of `--bar` (72px), so the page scrolls under
+  it.
+- The pill holds "Menu" (`.nav__menu--site`) and the CV.
+- "Menu" opens `#site-menu`, a second native popover hung at `top: var(--bar)`
+  and as tall as the rest of the screen. It lists the three sections, then
+  the case studies, from the same `cases.ts`.
+
+How it works:
+- Popovers do not close when a link inside them is followed, so
+  [menu-close.ts](src/components/site/menu-close.ts) is a one-listener inline
+  script in `<head>` that hides the open popover on a link click.
+- Without script the sheet still opens, and closes on a tap outside.
+- The section hrefs are written out literally (`` `${base}#work` `` and so
+  on) in both the pill and the sheet, because sloplint's `--kept` record
+  matches href expressions in the source.
+
+**If a CSS edit does not show up in dev**, look at the served chunk before
+debugging the CSS. On 2026-11-06 Turbopack's persistent cache in
+`.next/dev` kept serving the stylesheet from one edit earlier, through
+restarts, with no error. Stop the dev server, delete `.next/dev`, and start
+it again.
+
 ### The SATUSEHAT case study, rough on purpose
 
 [src/data/satusehat.ts](src/data/satusehat.ts) covers the SATUSEHAT work
