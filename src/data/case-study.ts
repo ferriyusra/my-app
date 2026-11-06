@@ -19,13 +19,15 @@
  * prose keeps the document's own generic wording.
  */
 
-/** One block of a section: a paragraph, a list, a code block, a table, or the figure. */
+/** One block of a section: a paragraph, a list, a code block, a table, the figure, or a capture. */
 export type CaseBlock =
 	| string
 	| { kind: 'list'; items: string[] }
 	| { kind: 'code'; lang: string; text: string }
 	| { kind: 'table'; head: string[]; rows: string[][] }
-	| { kind: 'figure' };
+	| { kind: 'figure' }
+	/** A capture of a project in projects.ts, by id, shown uncropped. */
+	| { kind: 'capture'; project: string };
 
 export type CaseSection = {
 	heading: string;

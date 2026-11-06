@@ -181,3 +181,18 @@ test('the SATUSEHAT case names real projects and its roles in order', () => {
 	const starts = satusehat.at.map((s) => experiences.find((e) => e.short === s)?.startISO ?? '');
 	assert.deepEqual([...starts].sort(), starts, 'satusehat.at must list its roles oldest first');
 });
+
+/**
+ * A case study's capture is drawn from projects.ts by id. A capture naming a
+ * project with no cover size renders nothing at all, so it fails here.
+ */
+test('every capture in a case study names a project with a sized cover', () => {
+	for (const s of satusehat.sections) {
+		for (const b of s.body) {
+			if (typeof b === 'string' || b.kind !== 'capture') continue;
+			const p = projects.find((x) => x.id === b.project);
+			assert.ok(p, `a capture names "${b.project}", which is not in projects.ts`);
+			assert.ok(p.coverSize && p.cover, `${b.project} has no cover with a coverSize to show`);
+		}
+	}
+});

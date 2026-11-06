@@ -16,12 +16,9 @@ import Question from './question';
  * left out: it is the question above.
  */
 
-/* Pixel sizes of the captures, so the browser reserves their space and the
-   two frames can share one height. */
-const SHOTS: Record<string, { w: number; h: number }> = {
-	'/projects/ssd/ssd-1.png': { w: 1256, h: 1163 },
-	'/projects/native/native-1.png': { w: 825, h: 1197 },
-};
+/** A project with a capture to show: its `coverSize` lets the browser reserve
+    the space and the two frames share one height. */
+type Shot = Project & { coverSize: { w: number; h: number } };
 
 function Detail({ p }: { p: Project }) {
 	return (
@@ -48,7 +45,7 @@ function Detail({ p }: { p: Project }) {
 
 export default function Projects() {
 	const list = projects.filter((p) => p.id !== caseStudy.project);
-	const shots = list.filter((p) => p.type === 'real' && SHOTS[p.cover]);
+	const shots = list.filter((p): p is Shot => p.type === 'real' && !!p.coverSize);
 	const learning = list.filter((p) => p.type !== 'real');
 
 	return (
@@ -60,7 +57,7 @@ export default function Projects() {
 				className='shots'
 				style={{
 					gridTemplateColumns: shots
-						.map((p) => `minmax(0, ${(SHOTS[p.cover].w / SHOTS[p.cover].h).toFixed(3)}fr)`)
+						.map((p) => `minmax(0, ${(p.coverSize.w / p.coverSize.h).toFixed(3)}fr)`)
 						.join(' '),
 				}}>
 				{shots.map((p) => (
@@ -69,11 +66,11 @@ export default function Projects() {
 							className='shot__frame'
 							data-slot={p.id}
 							data-kind='product'
-							style={{ aspectRatio: `${SHOTS[p.cover].w} / ${SHOTS[p.cover].h}` }}>
+							style={{ aspectRatio: `${p.coverSize.w} / ${p.coverSize.h}` }}>
 							<Image
 								src={p.cover}
-								width={SHOTS[p.cover].w}
-								height={SHOTS[p.cover].h}
+								width={p.coverSize.w}
+								height={p.coverSize.h}
 								sizes='(min-width: 60rem) 30rem, 100vw'
 								alt=''
 							/>
