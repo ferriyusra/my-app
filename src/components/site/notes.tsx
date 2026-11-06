@@ -13,7 +13,7 @@ import Question from './question';
 export default function Notes() {
 	const written = writtenNotes();
 	return (
-		<Question id='notes' question='What are you studying?'>
+		<Question id='notes' question='Notes'>
 			<ol className='rows'>
 				{written.map((n) => (
 					<li key={n.slug} className='row'>

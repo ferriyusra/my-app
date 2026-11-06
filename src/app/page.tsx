@@ -2,6 +2,7 @@ import { profile } from '@/data/profile';
 import { writtenNotes } from '@/data/notes';
 import Masthead from '@/components/site/masthead';
 import Hero from '@/components/site/hero';
+import Where from '@/components/site/where';
 import Tools from '@/components/site/tools';
 import Roles from '@/components/site/roles';
 import Notes from '@/components/site/notes';
@@ -51,10 +52,11 @@ export default function Home() {
 			<main id='main'>
 				<PrintExpander />
 				<Hero />
-				<Tools />
+				<Where />
 				<Roles />
-				{writtenNotes().length > 0 && <Notes />}
 				<Projects />
+				<Tools />
+				{writtenNotes().length > 0 && <Notes />}
 			</main>
 			<SiteFooter />
 		</>

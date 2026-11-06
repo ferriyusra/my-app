@@ -1,8 +1,8 @@
 # Ferri Yusra, portfolio
 
-A backend engineer's portfolio: one server-rendered page and one long-form
-case study, designed with [Hallmark](https://github.com/Nutlope/hallmark)'s
-Grid theme.
+A backend engineer's portfolio: one server-rendered page and two case
+studies, designed with [Hallmark](https://github.com/Nutlope/hallmark)'s
+Blueprint theme, a Prussian-blue drafting sheet with white line ink.
 
 ## Getting started
 
@@ -17,12 +17,12 @@ Open <http://localhost:3000>.
 
 | Route | What it shows |
 |---|---|
-| `/` | An interview: the five places worked as one index on the first sheet, then a question per section (tools, roles, what shipped for SATUSEHAT, contact), each answered in a line with the depth folded; the case study is linked from the nav and the Meditap role |
+| `/` | A Workbench on a blueprint sheet: the deposit-alerting system drawn on the first sheet with the headline at its foot, then where and when, the five roles as a register, the SATUSEHAT captures and the builds, the tools and the contact with a title block |
 | `/deposit-alerting` | The case study as a long document: the problem, the architecture diagram, the state machine, the decisions, the outcome, and the questions the write-up does not answer |
 | `/satusehat` | A rough case study of the SATUSEHAT work (GovTech Health, then INA Digital): the Go APIs behind the native dashboards and the NestJS Data API, with what was not kept listed at the end |
 
 Every word is in the server response, so the pages read the same with
-scripting off, in print and to a crawler. The home page shows about 430 words;
+scripting off, in print and to a crawler. The home page shows about 420 words;
 the rest sits in native disclosures.
 
 All content is typed data in `src/data/`. The case study is transcribed from

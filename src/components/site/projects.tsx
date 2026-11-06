@@ -20,6 +20,13 @@ import Question from './question';
     the space and the two frames share one height. */
 type Shot = Project & { coverSize: { w: number; h: number } };
 
+/** The description's last sentence, the fact a capture's caption states. */
+function fact(description: string): string {
+	const parts = description.split('. ');
+	const last = parts[parts.length - 1];
+	return last.endsWith('.') ? last : last + '.';
+}
+
 function Detail({ p }: { p: Project }) {
 	return (
 		<div className='row__body'>
@@ -51,8 +58,8 @@ export default function Projects() {
 	return (
 		<Question
 			id='projects'
-			question='What did you ship for SATUSEHAT?'
-			answer={`${countWord(shots.length)} in production at SATUSEHAT, and ${countWord(learning.length).toLowerCase()} projects built to learn.`}>
+			question='In production at SATUSEHAT'
+			answer={`${countWord(shots.length)} live systems, and ${countWord(learning.length).toLowerCase()} projects built to learn.`}>
 			<div
 				className='shots'
 				style={{
@@ -79,6 +86,7 @@ export default function Projects() {
 							<details className='row__details'>
 								<summary className='row__sum'>
 									<h3 className='row__name'>{p.name}</h3>
+									<span className='row__meta'>{prose(fact(p.description))}</span>
 								</summary>
 								<Detail p={p} />
 							</details>

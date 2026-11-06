@@ -60,10 +60,11 @@ it:
 ## Capabilities and Constraints
 
 **What it does.** Three routes, all static and server-rendered. `/` is the
-portfolio as an interview: the career as an index, then a question per
-section (tools, roles, the other projects, contact), each answered in a line
-with the depth folded. The case study is linked from the nav and from the
-Meditap role, not previewed on the page.
+portfolio as a Workbench of real artefacts: the deposit-alerting system drawn
+on the first sheet, then where and when, the roles as a register, the
+SATUSEHAT captures, the tools and the contact, each section a plain head with
+its depth folded. The case studies are linked from the nav menu, from the
+hero's title block and from a key under the section each belongs to.
 `/deposit-alerting` is the case study as a long document with its system
 diagram. `/satusehat` is a rough case study of the SATUSEHAT dashboards and
 Data API, written from memory, with its gaps listed rather than guessed.
@@ -95,11 +96,13 @@ down.
 
 - **Name:** Ferri Yusra. Role as stated: Backend Engineer (Go, Node.js and
   PostgreSQL). Site: ferriyusra.com.
-- **The design system is Hallmark's Grid theme, locked in `DESIGN.md`.**
-  White poster stock, blue-black ink, Radio Canada Big in sentence case, an
-  ultramarine field and one Swiss red mark, no strokes. It is the third
-  Hallmark run of 2026-11-05: Cobalt, then Console, then Grid because the
-  owner found the page too wordy. Keep the home page near 430 visible words.
+- **The design system is Hallmark's Blueprint theme, locked in `DESIGN.md`.**
+  A Prussian-blue drafting sheet, white line ink, Chakra Petch capitals over
+  IBM Plex Sans with Plex Mono for dates and figures, keylines instead of
+  cards, captures as cyanotypes. It is the fourth Hallmark run: Cobalt,
+  Console and Grid on 2026-11-05, then Blueprint on 2026-11-06 when the owner
+  asked for a fresh design of every section. Keep the home page under 450
+  visible words.
 - **The Windows 11 desktop is retired.** Until 2026-11-05 this file called the
   desktop metaphor binding. The owner reversed that and had the shell deleted
   outright.
@@ -155,9 +158,9 @@ in every future change.
 
 - Every text pairing passes 4.5:1 in both modes; the dark tokens are derived,
   not inverted, and were checked numerically.
-- Focus rings appear instantly: ultramarine on paper, field-ink on the
-  ultramarine, ink on the red.
-- The hero's figure is drawn for the eye; each employer's link carries its
-  role and dates in its accessible name.
+- Focus rings appear instantly, 2px in the white ink on the blue sheet.
+- The first sheet's drawing is DOM text, so a screen reader reads every part
+  the write-up names; its plate is a focusable region that scrolls sideways
+  on a phone.
 - Disclosures are native and open with the keyboard; printing opens them all.
 - `prefers-reduced-motion` ends every transition at once.

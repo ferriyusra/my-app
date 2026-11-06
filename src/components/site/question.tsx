@@ -1,8 +1,9 @@
 /**
- * One question and its answer, the page's one composition: the question hung
- * from column 1 at the section size, the answer from column 6, so every
- * section of the interview reads the same way and the depth sits in
- * disclosures rather than on the page.
+ * One section of the sheet: a plain head at the section size over its body,
+ * in the specification voice Blueprint asks for (the noun, not a question).
+ * Until 2026-11-06 every section was a question hung beside its answer (the
+ * Grid run's Conversational FAQ); the component keeps its name and props so
+ * the sections that use it did not have to move.
  */
 export default function Question({
 	id,
@@ -12,32 +13,28 @@ export default function Question({
 	children,
 }: {
 	id: string;
+	/** The section's head, plain: "Work", "Tools". */
 	question: string;
-	/** One or two short sentences, the answer as it would be said. */
+	/** One short line under the head, if the section has one. */
 	answer?: React.ReactNode;
-	/** The red field, if the section is printed on it. The ultramarine tone
-	    went with the case section on 2026-11-06. */
-	tone?: 'mark';
+	/** A band of the darker sheet, if the section is printed on one. */
+	tone?: 'band';
 	children?: React.ReactNode;
 }) {
 	return (
-		<section
-			id={id}
-			className='q'
-			data-tone={tone}
-			aria-labelledby={`${id}-q`}>
+		<section id={id} className='q' data-tone={tone} aria-labelledby={`${id}-q`}>
 			<div className='container q__grid'>
-				<h2 id={`${id}-q`} className='q__head' data-reveal>
-					{question}
-				</h2>
-				<div className='q__body'>
+				<div className='q__top'>
+					<h2 id={`${id}-q`} className='q__head' data-reveal>
+						{question}
+					</h2>
 					{answer && (
 						<p className='q__answer' data-reveal>
 							{answer}
 						</p>
 					)}
-					{children}
 				</div>
+				<div className='q__body'>{children}</div>
 			</div>
 		</section>
 	);

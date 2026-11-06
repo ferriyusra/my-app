@@ -14,7 +14,7 @@ export default function Tools() {
 	}));
 
 	return (
-		<Question id='tools' question='Which tools, and where were they used?'>
+		<Question id='tools' question='Tools, by years of use'>
 			<dl className='shortlist'>
 				{byCategory.map((c) => (
 					<div key={c.key} data-reveal>

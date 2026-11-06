@@ -53,6 +53,7 @@ export default function Masthead({
 				<div className='nav__pill'>
 					<nav className='nav__links' aria-label='Sections'>
 						<a href={`${base}#work`}>Work</a>
+						<a href={`${base}#projects`}>In production</a>
 						<button type='button' className='nav__menu' popoverTarget='case-menu'>
 							Case studies
 						</button>
@@ -65,7 +66,6 @@ export default function Masthead({
 								))}
 							</ul>
 						</div>
-						<a href={`${base}#projects`}>Projects</a>
 						<a href={`${base}#contact`}>Contact</a>
 					</nav>
 
@@ -79,7 +79,7 @@ export default function Masthead({
 									<a href={`${base}#work`}>Work</a>
 								</li>
 								<li>
-									<a href={`${base}#projects`}>Projects</a>
+									<a href={`${base}#projects`}>In production</a>
 								</li>
 								<li>
 									<a href={`${base}#contact`}>Contact</a>

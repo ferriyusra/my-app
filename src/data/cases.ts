@@ -3,6 +3,7 @@ import { experiences } from './experience.ts';
 import { projects } from './projects.ts';
 import { satusehat } from './satusehat.ts';
 import { rangeLabel } from '../lib/dates.ts';
+import { label } from '../lib/text.ts';
 
 export type CaseEntry = {
 	href: string;
@@ -13,7 +14,7 @@ export type CaseEntry = {
 	at: readonly string[];
 	/** "Meditap", or "GovTech Health, then INA Digital". */
 	where: string;
-	/** "Jul 2025 to now", from the roles' ISO months. */
+	/** When the work was done, the same wherever the case is named. */
 	when: string;
 };
 
@@ -33,6 +34,11 @@ function span(at: readonly string[]): { where: string; when: string } {
  * and the nav's case-study menu both read from here, so a role finds its case
  * by its `short` name rather than by a second copy of the path;
  * `data.test.ts` fails when an `at` stops naming a role.
+ *
+ * A case's period is its own where its write-up states one: the
+ * deposit-alerting work is "2025 to 2026" in the hero's title block, on its
+ * page and here, so a reader never sees two periods for one piece of work.
+ * The SATUSEHAT case states none, so it takes its two roles' span.
  */
 export const cases: CaseEntry[] = [
 	{
@@ -41,6 +47,7 @@ export const cases: CaseEntry[] = [
 		title: caseStudy.title,
 		at: [caseStudy.at],
 		...span([caseStudy.at]),
+		when: label(caseStudy.year),
 	},
 	{
 		href: `/${satusehat.slug}`,

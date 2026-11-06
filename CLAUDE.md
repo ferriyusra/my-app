@@ -30,8 +30,9 @@ file and "Go" in the other simply drops out of the evidence.
 - **Tailwind CSS v4** via `@tailwindcss/postcss`, used for the reset and to
   emit the tokens (`tokens.css` is an `@theme static` block). All styling is
   hand-written CSS in [src/app/globals.css](src/app/globals.css).
-- **next/font** self-hosts one neo-grotesque in two optical cuts: Radio Canada
-  Big for heads, figures and the index, Radio Canada for the body.
+- **next/font** self-hosts Blueprint's three faces: Chakra Petch (600) for every
+  head, IBM Plex Sans (400, 500) for prose, labels and controls, IBM Plex Mono
+  (500) only for dates, figures and code.
 - **LineIcons**, vendored as generated components in
   [src/components/icons/line-icons.tsx](src/components/icons/line-icons.tsx).
   Neither npm package works here (`lineicons-react` bundles React 18,
@@ -46,12 +47,15 @@ No other runtime dependencies. No environment variables.
 A portfolio for a backend engineer: **one server-rendered page and two case
 studies**, all static.
 
-- `/` ([src/app/page.tsx](src/app/page.tsx)), an interview: the five places
-  worked as an index on the first sheet, then the questions a hiring manager
-  would ask (which tools and where, who have you built for since 2021, what
-  did you ship for SATUSEHAT, how do I reach you in Jakarta), each answered in
-  a line with the
-  depth folded beneath and the question pinned beside it.
+- `/` ([src/app/page.tsx](src/app/page.tsx)), a Workbench of real artefacts on
+  a blueprint sheet: the deposit-alerting system drawn on the first sheet with
+  the headline at its foot, then where and when, the five roles as a
+  register, the two SATUSEHAT captures and the builds, the tools, and the
+  contact with a title block. Each section's head is the nav's noun and a fact
+  from the data ("Work, five teams since 2021") over a heavy line, with the
+  depth folded into `<details>`. There is no case-studies section on purpose:
+  the finish review found it only repeated the Work rows, the tools and three
+  other links to the same pages.
 - `/deposit-alerting` ([src/app/deposit-alerting/page.tsx](src/app/deposit-alerting/page.tsx)):
   the case study as a long document, with the system diagram and the
   questions the write-up does not answer.
@@ -70,18 +74,22 @@ The site is designed with [Hallmark](https://github.com/Nutlope/hallmark),
 installed as a Claude Code skill (`npx skills add nutlope/hallmark -g`, so it
 lives in `~/.claude/skills/hallmark`, not in this repo). It ran three times on
 2026-11-05: Cobalt (light, Index-First), then Console (dark, Letter), then,
-because the owner found Console too wordy, the **Grid** theme (genre
-editorial, shape Conversational FAQ, hero Index). The system is locked in
-[DESIGN.md](DESIGN.md); read it before changing anything visual.
-`.hallmark/log.json` records the runs, so the next deal steers away from them.
+because the owner found Console too wordy, Grid (editorial, Conversational
+FAQ). On 2026-11-06 the owner asked for a fresh design of every section with
+a new theme, and the fourth run dealt **Blueprint** (genre modern-minimal,
+shape Workbench, hero Ledge): a Prussian-blue drafting sheet, white line ink,
+keylines instead of cards. The system is locked in [DESIGN.md](DESIGN.md);
+read it before changing anything visual. `.hallmark/log.json` records the
+runs, so the next deal steers away from them.
 
 **Keep the page short.** The owner's complaint that started the Grid run was
-"too much text". The home page shows about 430 words; everything else sits in
-native `<details>` rows. Add depth inside a disclosure, never onto the page.
+"too much text", and it holds under Blueprint: about 450 visible words on the
+home page at most, everything else in native `<details>` rows. Add depth
+inside a disclosure, never onto the page.
 
 - [src/app/tokens.css](src/app/tokens.css) is the only place a colour, a face,
-  a radius or a shadow is defined, in one light colourway (Grid's white is its
-  material; there is no dark mode). Components reference `var(--…)` and never
+  a radius or a shadow is defined, in one colourway (Blueprint's blue sheet is
+  its material; there is no light or dark mode). Components reference `var(--…)` and never
   a literal. Tailwind v4's own `.container` utility caps at 1280px and outranks
   `base.css`, so `globals.css` restates the scaffold's 1440px cap.
 - [src/app/base.css](src/app/base.css) is Hallmark's scaffold: the Floor's
@@ -97,8 +105,8 @@ native `<details>` rows. Add depth inside a disclosure, never onto the page.
 
 Rules the page holds, from Hallmark's Floor:
 
-- the ink block opens the CV: in the hero, in the floating nav on every page,
-  and in the close;
+- the ink key opens the CV: in the hero, in the nav bar on every page, and in
+  the close;
 - no eyebrow over a heading, no tracked capitals, no middle-dot meta strings,
   no em or en dash in visible copy: the data keeps the author's punctuation,
   and every renderer passes prose through `prose()` in `src/lib/text.ts`
@@ -117,25 +125,18 @@ hero carries `data-reveal`, and
 into view, staggering blocks that arrive together. A new block that should
 arrive needs only the attribute.
 
-**The hero's opening is CSS only, and set like a sheet off the press.** The
-owner had it redesigned with Hallmark on 2026-11-06; before that it was one
-fade-up for every block. It takes 0.82s:
-- the field is laid from the column-9 line by a `.hero::before` paper overlay
-  shrinking right;
-- the headline's words (one `.hero__word` span each, in `hero.tsx`) and the
-  five names rise out of their own baselines (`set`);
-- the line and the actions settle 8px;
-- the current name turns red last.
+**The first sheet draws itself, in CSS only, in about 0.8s.** Blueprint is a
+static theme; the opening is the owner's standing request, carried into it:
+- the system's boxes appear in the order the write-up reads them (`--n` on
+  each node, set by `CaseStudyFigure`), 25ms apart, each arrow drawn on from
+  its tail;
+- the joining lines and the title block follow;
+- the headline's words (one `.hero__word` span each, in `hero.tsx`) are set
+  from their own baselines (`set`) from 200ms;
+- the line and the keys settle 8px last.
 
-Two traps:
-- `set` moves `translate` and `clip-path` together so the clip edge holds
-  still. Keep both in the keyframes.
-- **Never animate a `.specimen__fig` itself.** The hover swap toggles it with
-  `display`, which restarts any animation on it, so the field rises as one
-  block, `.hero__field`.
-
-Before and after filmstrips are in `.hallmark/opening-before/` and
-`.hallmark/opening-after/`.
+`set` moves `translate` and `clip-path` together so the clip edge holds
+still. Keep both in the keyframes.
 
 The order of operations is what keeps it safe. An inline script in
 `layout.tsx` ([reveal-gate.ts](src/components/content/reveal-gate.ts)) sets
@@ -163,7 +164,7 @@ block (Tailwind and Lightning CSS on their own keep it), and nothing errors.
 
 **Linting the design.** Install `puppeteer-core` somewhere outside the tree
 and point `HALLMARK_PUPPETEER` at that folder, start the dev server, and run
-`node ~/.claude/skills/hallmark/scripts/sloplint.mjs src --genre editorial --render --kept --url http://localhost:3000/ --url http://localhost:3000/deposit-alerting --url http://localhost:3000/satusehat`.
+`node ~/.claude/skills/hallmark/scripts/sloplint.mjs src --genre modern-minimal --render --kept --url http://localhost:3000/ --url http://localhost:3000/deposit-alerting --url http://localhost:3000/satusehat`.
 It reads 0 FAIL and 0 REFLEX. Waivers are global, so a waiver written for one
 route can hide a regression on the other: after changing the hero, check the
 home fold with the case page's `44c` waiver commented out. The `.hallmark/`
@@ -192,13 +193,29 @@ The headline in `profile.ts` is **the owner's choice** (2026-11-05):
 "Backend systems for health and finance data." It names what is built, in the
 two domains the roles are in. Do not reword it without being asked.
 
-[hero.tsx](src/components/site/hero.tsx) sets the five places worked at
-display size along the foot, the current one in the mark red, and on an
-ultramarine field from the column-9 line its first year at poster scale with
-a caption ("Joined Meditap in July 2025. Still there."). Pointing at or
-focusing another name swaps the year and caption, in CSS alone (`:has()`).
-The field is the section's own background, a hard stop computed from the
-container, so it bleeds without measuring the viewport.
+[hero.tsx](src/components/site/hero.tsx) is a Ledge: a plate holding **the
+deposit-alerting system as a blueprint**, drawn by `CaseStudyFigure` from
+`caseStudy.figure` (every box and label a phrase from the owner's write-up),
+its title block beneath (Drawing, Built at, Write-up), and the headline
+resting at the base with the line and the two keys beside it.
+
+How the drawing is drawn:
+- The plate takes every pixel the head leaves, and the drawing's lines and
+  boxes grow with its height.
+- Drawn wide (a container of 60rem or more), the reads stand above the run
+  and the writes below it. Each is joined to the service by lines built from
+  the rows' own pseudo-elements: a drop from every source to a bus, the bus
+  into the service; the service to a bus, the bus down to every output.
+  `--join` is the service box's centre.
+- The hero's drawing is always at least 60rem wide, so on a phone the plate
+  pans sideways instead of stacking into bars.
+- On the case page the same component draws in two columns (path left, sets
+  right), with every detail line.
+
+Until 2026-11-06 the first sheet was Grid's specimen index (the five places
+worked, each linking to its row, and the chosen one's first year on an
+ultramarine field). Those `#role-*` links were dropped on the record; the rows
+keep their ids.
 
 Dates are rendered from the ISO months (`Jul 2025 to now`), never from the
 `period` strings, which keep their dashes because a test pins the case
@@ -221,8 +238,8 @@ behaviour table as a radio control on the ultramarine field ("When should an
 alert go out?"). On 2026-11-06 the owner had it removed: without the
 write-up's context, choices like "threshold 1 → below threshold 2" told a new
 reader nothing, and the home copy is meant to stay unspecific. The case study
-is reached from the nav's "Case studies" menu and from a link inside the
-Meditap row. Do not bring the control back without being asked.
+is reached from the nav's "Case studies" menu, the hero's title block, the
+key under the Work register and a link inside the Meditap row. Do not bring the control back without being asked.
 
 **Every case study is listed once, in
 [src/data/cases.ts](src/data/cases.ts)**, with the roles it belongs to by
@@ -235,23 +252,23 @@ Two surfaces read it:
   on 2026-11-06.
 
 The menu is a native popover (`popover` and `popoverTarget`): no script,
-light dismiss and Escape from the browser. It is anchored under the pill and
-exactly its width, with a fixed fallback where anchor positioning is
-missing. A case page passes `current` to the masthead so its row shows in red.
+light dismiss and Escape from the browser. It is anchored under the group
+of keys (`.nav__pill`, the name kept from the Grid nav) and at least 26rem
+wide, with a fixed fallback where anchor positioning is missing. A case page
+passes `current` to the masthead so its row carries a heavy line at its edge.
 A new case study needs only an entry in `cases.ts`. The state preview is
 `.hallmark/case-menu.preview.html`, which is not tracked.
 
-**The nav has a second form under 60rem**, redesigned with Hallmark on
-2026-11-06. Until then phones and tablets lost every section link and the
-floating name plate sat on top of headings.
+**The nav is one bar at every width**: Blueprint's edge-aligned bar of
+`--nav-h` (72px) with a hairline beneath, solid, so the page scrolls under it.
+Under 60rem the section links and the case menu give way to a "Menu" key
+(`.nav__menu--site`) beside the CV. Until 2026-11-06 phones and tablets lost
+every section link, and under Grid a floating name plate sat on top of
+headings.
 
-What it looks like:
-- `.nav` is a solid paper bar of `--bar` (72px), so the page scrolls under
-  it.
-- The pill holds "Menu" (`.nav__menu--site`) and the CV.
-- "Menu" opens `#site-menu`, a second native popover hung at `top: var(--bar)`
-  and as tall as the rest of the screen. It lists the three sections, then
-  the case studies, from the same `cases.ts`.
+- "Menu" opens `#site-menu`, a second native popover hung at
+  `top: var(--nav-h)` and as tall as the rest of the screen. It lists the
+  three sections, then the case studies, from the same `cases.ts`.
 
 How it works:
 - Popovers do not close when a link inside them is followed, so
@@ -259,7 +276,7 @@ How it works:
   script in `<head>` that hides the open popover on a link click.
 - Without script the sheet still opens, and closes on a tap outside.
 - The section hrefs are written out literally (`` `${base}#work` `` and so
-  on) in both the pill and the sheet, because sloplint's `--kept` record
+  on) in both the bar and the sheet, because sloplint's `--kept` record
   matches href expressions in the source.
 
 **If a CSS edit does not show up in dev**, look at the served chunk before

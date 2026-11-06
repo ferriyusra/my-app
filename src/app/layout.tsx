@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Radio_Canada, Radio_Canada_Big } from 'next/font/google';
+import { Chakra_Petch, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
 import { profile } from '@/data/profile';
 import { color } from '@/lib/palette';
@@ -8,23 +8,30 @@ import { REVEAL_GATE } from '@/components/content/reveal-gate';
 import { MENU_CLOSE } from '@/components/site/menu-close';
 
 /**
- * The Grid system's one neo-grotesque in its two optical cuts, self-hosted by
- * next/font so there is no request to Google at runtime and no layout shift.
- * Radio Canada Big sets heads, figures and the index; Radio Canada sets the
- * body and labels. Each exposes a CSS variable that `tokens.css` puts first in
- * --font-display and --font-body, so no component ever names a family.
+ * The Blueprint system's three faces, self-hosted by next/font so there is no
+ * request to Google at runtime and no layout shift: Chakra Petch, the drafted
+ * capitals, for every head; IBM Plex Sans for prose, labels and controls; IBM
+ * Plex Mono only for a measurement, a date on a dimension string or code.
+ * Each exposes a CSS variable that `tokens.css` puts first in --font-display,
+ * --font-body and --font-outlier, so no component ever names a family.
  */
-const rcBig = Radio_Canada_Big({
+const chakra = Chakra_Petch({
 	subsets: ['latin'],
 	display: 'swap',
-	variable: '--font-rcbig',
-	weight: ['400', '700'],
+	variable: '--font-chakra',
+	weight: ['600'],
 });
-const rc = Radio_Canada({
+const plex = IBM_Plex_Sans({
 	subsets: ['latin'],
 	display: 'swap',
-	variable: '--font-rc',
+	variable: '--font-plex',
 	weight: ['400', '500'],
+});
+const plexMono = IBM_Plex_Mono({
+	subsets: ['latin'],
+	display: 'swap',
+	variable: '--font-plexmono',
+	weight: ['500'],
 });
 
 const TITLE = `${profile.name}, ${profile.role}`;
@@ -61,7 +68,7 @@ export default function RootLayout({
 	return (
 		/* The gate script sets data-js on <html> before React hydrates it, so
 		   that one attribute is expected to differ. */
-		<html lang='en' className={`${rcBig.variable} ${rc.variable}`} suppressHydrationWarning>
+		<html lang='en' className={`${chakra.variable} ${plex.variable} ${plexMono.variable}`} suppressHydrationWarning>
 			<head>
 				<script dangerouslySetInnerHTML={{ __html: REVEAL_GATE }} />
 				<script dangerouslySetInnerHTML={{ __html: MENU_CLOSE }} />

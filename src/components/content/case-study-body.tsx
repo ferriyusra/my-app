@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import type { CaseBlock, CaseSection, FigureRow } from '@/data/case-study';
 import { projects } from '@/data/projects';
 import CaseStudyNav from './case-study-nav';
@@ -54,26 +55,34 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
  * its boxes side by side. The arrow is an empty, hidden element rather than a
  * glyph so nothing is announced twice.
  */
-function CaseStudyFigure({ figure }: { figure: Figure }) {
+export function CaseStudyFigure({ figure, caption: withCaption = true }: { figure: Figure; caption?: boolean }) {
 	const { rows, caption } = figure;
+	/* Every box takes its place in drawing order, so the opening can draw the
+	   sheet in the order the write-up reads it (`--n`, used only by CSS). */
+	let n = 0;
+	/* The write-up's figure lists what the service reads before what it
+	   writes. Drawn wide, the reads stand above the run and the writes below
+	   it, each joined to the service by a line (`data-flow`). */
+	let sets = 0;
 	return (
-		<figure className='cs-fig' data-rows={rows.length} aria-label='System diagram'>
+		<figure className='cs-fig sheet' data-rows={rows.length} aria-label='System diagram'>
 			{rows.map((row) => {
 				const List = row.kind === 'path' ? 'ol' : 'ul';
+				const flow = row.kind === 'set' ? (sets++ === 0 ? 'in' : 'out') : undefined;
 				return (
-					<div key={row.name} className='cs-fig-row' data-kind={row.kind}>
+					<div key={row.name} className='cs-fig-row' data-kind={row.kind} data-flow={flow}>
 						<p className='cs-fig-name'>{row.name}</p>
 						<List className='cs-fig-nodes'>
-							{row.nodes.map((n, i) => (
-								<li key={n.label} className='cs-fig-node'>
+							{row.nodes.map((node, i) => (
+								<li key={node.label} className='cs-fig-node' style={{ '--n': n++ } as CSSProperties}>
 									{row.kind === 'path' && i > 0 && (
 										<span className='cs-fig-arrow' aria-hidden='true' />
 									)}
 									<span className='cs-fig-box'>
-										<span className='cs-fig-label'>{n.label}</span>
+										<span className='cs-fig-label'>{node.label}</span>
 										{/* The data joins a box's phrases with a middle dot; drawn,
 										    each phrase takes its own line. */}
-										{n.detail?.split(' · ').map((d) => (
+										{node.detail?.split(' · ').map((d) => (
 											<span key={d} className='cs-fig-detail'>
 												{d}
 											</span>
@@ -85,7 +94,7 @@ function CaseStudyFigure({ figure }: { figure: Figure }) {
 					</div>
 				);
 			})}
-			<figcaption className='cs-fig-cap'>{prose(caption)}</figcaption>
+			{withCaption && <figcaption className='cs-fig-cap'>{prose(caption)}</figcaption>}
 		</figure>
 	);
 }

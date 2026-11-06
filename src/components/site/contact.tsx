@@ -4,29 +4,33 @@ import { monthLong } from '@/lib/dates';
 import { prose } from '@/lib/text';
 
 /**
- * The last question, on the page's one red field, closed as a letter: the
- * address to write to set large, the CV, the one office and its hours against
- * the reader's, and a sign-off. The hire job ends on contact details.
+ * The close, as a hire page ends (anatomy.md, hire): the address to write to
+ * set large, the CV, the places elsewhere, and what is being done this month.
+ * The head carries the two facts a remote reader needs before writing: the
+ * city and the time zone, both from `profile.ts`. Where the owner is and when
+ * they can talk in full sit in the register after the first sheet; the name
+ * and the role are in the title block beneath.
  */
 export default function Contact() {
 	const openTo = profile.now.find((n) => n.label === 'Open to');
 	const doing = profile.now.filter((n) => n.label !== 'Open to');
-	/* "…remote. GMT+7 overlaps most of the EU morning and all of APAC." */
-	const hours = openTo?.text.split('. ').slice(1).join('. ');
+	const city = profile.location.split(',')[0];
+	/* "GMT+7", from "…remote. GMT+7 overlaps most of the EU morning…" */
+	const zone = openTo?.text.match(/GMT[+-]\d+/)?.[0];
 
 	return (
-		<section id='contact' className='q' data-tone='mark' aria-labelledby='contact-q'>
+		<section id='contact' className='q q--close' aria-labelledby='contact-q'>
 			<div className='container q__grid'>
-				<h2 id='contact-q' className='q__head' data-reveal>
-					How do I reach you in Jakarta?
-				</h2>
+				<div className='q__top'>
+					<h2 id='contact-q' className='q__head' data-reveal>
+						Contact in {city}
+						{zone ? `, ${zone}` : ''}
+					</h2>
+				</div>
 				<div className='q__body'>
 					<a className='close__mail' href={`mailto:${profile.email}`} data-reveal>
 						{profile.email}
 					</a>
-					<p className='q__answer' data-reveal>
-						{profile.openTo}
-					</p>
 					<div className='actions' data-reveal>
 						<a
 							className='btn btn--primary'
@@ -44,34 +48,24 @@ export default function Contact() {
 							Download the PDF
 						</a>
 					</div>
-					<dl className='office' data-reveal>
-						<div>
-							<dt>Office</dt>
-							<dd>{profile.location}</dd>
-						</div>
-						{hours && (
-							<div>
-								<dt>Hours</dt>
-								<dd>{prose(hours)}</dd>
-							</div>
-						)}
-						<div>
-							<dt>Elsewhere</dt>
-							<dd>
-								<a href={profile.github} target='_blank' rel='noopener noreferrer'>
-									GitHub
-								</a>
-								{', '}
-								<a href={profile.linkedin} target='_blank' rel='noopener noreferrer'>
-									LinkedIn
-								</a>
-							</dd>
-						</div>
-					</dl>
+					<p className='close__elsewhere' data-reveal>
+						Elsewhere:{' '}
+						<a href={profile.github} target='_blank' rel='noopener noreferrer'>
+							GitHub
+						</a>
+						{', '}
+						<a href={profile.linkedin} target='_blank' rel='noopener noreferrer'>
+							LinkedIn
+						</a>
+					</p>
 					<details className='more' data-reveal>
+						{/* One span, so the line and its date wrap as one sentence
+						    beside the chevron rather than as two ragged columns. */}
 						<summary>
-							What I am doing now, as of{' '}
-							<time dateTime={profile.nowUpdated}>{monthLong(profile.nowUpdated)}</time>
+							<span>
+								What I am doing now, as of{' '}
+								<time dateTime={profile.nowUpdated}>{monthLong(profile.nowUpdated)}</time>
+							</span>
 						</summary>
 						<dl className='more__dl'>
 							{doing.map((n) => (
