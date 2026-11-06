@@ -201,13 +201,25 @@ behaviour table as a radio control on the ultramarine field ("When should an
 alert go out?"). On 2026-11-06 the owner had it removed: without the
 write-up's context, choices like "threshold 1 → below threshold 2" told a new
 reader nothing, and the home copy is meant to stay unspecific. The case study
-is reached from the nav's "Case study" and from a link inside the Meditap
-row. Do not bring the control back without being asked.
+is reached from the nav's "Case studies" menu and from a link inside the
+Meditap row. Do not bring the control back without being asked.
 
-**Rows link to their case studies through
-[src/data/cases.ts](src/data/cases.ts)**, which lists every case with the
-roles it belongs to by `short`; `data.test.ts` fails when a name stops
-matching or a role belongs to two.
+**Every case study is listed once, in
+[src/data/cases.ts](src/data/cases.ts)**, with the roles it belongs to by
+`short` and its name, where and when derived from those roles.
+`data.test.ts` fails when a name stops matching or a role belongs to two.
+Two surfaces read it:
+- the Work rows, which link a role to its case;
+- the nav's **"Case studies" menu** in
+  [masthead.tsx](src/components/site/masthead.tsx), redesigned with Hallmark
+  on 2026-11-06.
+
+The menu is a native popover (`popover` and `popoverTarget`): no script,
+light dismiss and Escape from the browser. It is anchored under the pill and
+exactly its width, with a fixed fallback where anchor positioning is
+missing. A case page passes `current` to the masthead so its row shows in red.
+A new case study needs only an entry in `cases.ts`. The state preview is
+`.hallmark/case-menu.preview.html`, which is not tracked.
 
 ### The SATUSEHAT case study, rough on purpose
 

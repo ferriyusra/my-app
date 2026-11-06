@@ -36,6 +36,7 @@ The faces are loaded by `next/font` in `layout.tsx` and reach the tokens as `--f
 - Primary: a square ink block with paper text, 52px tall, the same on paper and on either field; it opens the CV.
 - Secondary: a word underlined at 1px that turns mark red on hover (field-ink on a field).
 - The nav's CV is a small ink block in the floating pill.
+- The nav's "Case studies" is a key with a drawn chevron that opens a menu: a native popover (no script; light dismiss and Escape from the browser) anchored under the pill and exactly its width, paper-2 like the pill, one row per case in `src/data/cases.ts` (the name, then where and when), hairlines between rows. It opens at once. The case the reader is on is marked in the mark red. Without anchor positioning it hangs from the container's right gutter at 24rem.
 
 ## Motion
 - Character: still, with one exception (below). A name or link turns red, a value at poster scale swaps in place (the hero's year), both in CSS alone. No parallax; under reduced motion every transition ends at once.

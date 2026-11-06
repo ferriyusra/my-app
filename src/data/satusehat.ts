@@ -19,6 +19,8 @@ import type { CaseSection } from './case-study.ts';
  */
 export const satusehat = {
 	slug: 'satusehat',
+	/* What the nav's case-study menu calls it. */
+	name: 'SATUSEHAT Dashboards and Data API',
 	title: 'Backend for SATUSEHAT dashboards and the Data API',
 	summary:
 		"Two pieces of backend work for SATUSEHAT, Indonesia's national health data platform, from July 2023 to March 2025: Go APIs serving the Ministry of Health's native dashboards in place of Tableau's data layer, and continued work on the SATUSEHAT Data API in NestJS. It is written from memory, so it stays rough, and what is not remembered is listed at the end rather than guessed.",

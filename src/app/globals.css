@@ -14,6 +14,7 @@
 /* Hallmark · dropped #decisions, decisions, youtube full-track playback, meter.tsx, glyph tiles, custom-cursor.tsx, smooth-scroll.tsx, mobile-shell.tsx, /articles, tech-globe.tsx · the owner removed the "What have you thrown away?" section on 2026-11-05 as not useful to a reader, and had src/data/discarded.ts deleted with it */
 /* Hallmark · waive 71 · the two capture captions in #projects are measured against the folded content of closed details rows, a Meditap bullet 3px above and the caption's own description 23px below, which Chrome lays out but never paints · on screen each caption head sits 20px under its capture and 48px over the list below; it is a caption and belongs to the image above it */
 /* Hallmark · dismissed kept · the words dropped are the decisions section the owner asked to remove and the Cobalt page's visible depth, now folded on purpose; every role, project, tool and the case study are still in the HTML */
+/* Hallmark · component: menu (the nav's case studies) · redesign: full · states: 6 of 8, disabled, loading, error and success never occur on a menu of links · contrast: pass · a native popover anchored under the pill, its width, opening at once because Grid keeps still; preview in .hallmark/case-menu.preview.html */
 /* Hallmark · motion: one reveal (craft.md § 5), at the owner's request: the hero rises in on load in CSS, and every block marked data-reveal rises once as it is first seen (IntersectionObserver); no scroll-scrubbed pattern; visible without script, in print and under reduced motion; DESIGN.md records it as a variant */
 
 @import "tailwindcss";
@@ -70,11 +71,41 @@ a:hover { color: var(--color-mark); }
 .wordmark:hover { color: var(--color-ink); }
 .nav__pill { display: flex; align-items: center; gap: var(--space-lg); padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) var(--space-lg); background: var(--color-paper-2); }
 .nav__links { display: flex; gap: var(--space-lg); font: 500 var(--text-sm)/1 var(--font-body); }
-.nav__links a { padding-block: var(--space-sm); color: var(--color-muted); text-decoration: none; white-space: nowrap; }
-.nav__links a:hover { color: var(--color-mark); }
+.nav__links > a { padding-block: var(--space-sm); color: var(--color-muted); text-decoration: none; white-space: nowrap; }
+.nav__links > a:hover { color: var(--color-mark); }
 .nav__cv { display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-md); background: var(--color-ink); color: var(--color-paper); font: 500 var(--text-sm)/1 var(--font-body); text-decoration: none; transition: background-color var(--dur-short) var(--ease-out); }
 .nav__cv:hover { background: var(--color-ink-2); color: var(--color-paper); }
 .nav__cv:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* The case-study menu: a key in the pill that drops a native popover the
+   width of the pill, as if the pill unfolded. Paper-2 like the pill, rows
+   parted by hairlines like the Work rows, radius 0 and no shadow. It opens at
+   once: Grid keeps still. The `.is-*` classes force a state for the preview. */
+.nav__menu { display: inline-flex; align-items: center; gap: var(--space-xs); padding: var(--space-sm) 0; border: 0; background: none; color: var(--color-muted); font: inherit; white-space: nowrap; cursor: pointer; }
+.nav__menu::after { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform var(--dur-short) var(--ease-out); }
+.nav__menu:hover, .nav__menu.is-hover { color: var(--color-mark); }
+.nav__menu:focus-visible, .nav__menu.is-focus { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.nav__menu:active, .nav__menu.is-active { color: var(--color-ink); }
+.nav:has(.case-menu:popover-open) .nav__menu, .nav__menu.is-open { color: var(--color-ink); }
+.nav:has(.case-menu:popover-open) .nav__menu::after, .nav__menu.is-open::after { transform: translateY(2px) rotate(-135deg); }
+
+/* Without anchor positioning the panel hangs from the container's right
+   gutter, under the pill: the nav's offset, the CV key's 44px and the pill's
+   padding, then a 4px gap. */
+.case-menu { position: fixed; inset: auto; top: calc(var(--space-sm) + 44px + 3 * var(--space-2xs)); right: max(var(--gutter), calc((100% - var(--container)) / 2 + var(--gutter))); width: 24rem; max-width: calc(100% - 2 * var(--gutter)); margin: 0; padding: 0; border: 0; background: var(--color-paper-2); color: var(--color-ink); overflow: visible; }
+@supports (anchor-name: --a) {
+  .nav__pill { anchor-name: --nav-pill; }
+  .case-menu { position-anchor: --nav-pill; top: calc(anchor(bottom) + var(--space-2xs)); right: anchor(right); width: anchor-size(width); max-width: none; }
+}
+.case-menu__list { display: grid; margin: 0; padding: 0; list-style: none; }
+.case-menu__list li + li { border-top: var(--rule-hair) solid var(--color-rule); }
+.case-menu__item { display: grid; gap: var(--space-3xs); padding: var(--space-md) var(--space-lg); color: var(--color-ink); text-decoration: none; }
+.case-menu__name { font: 500 var(--text-md)/1.25 var(--font-body); transition: color var(--dur-short) var(--ease-out); }
+.case-menu__meta { font: 400 var(--text-sm)/1.4 var(--font-body); color: var(--color-muted); }
+.case-menu__item:hover, .case-menu__item.is-hover { color: var(--color-ink); }
+.case-menu__item:hover .case-menu__name, .case-menu__item.is-hover .case-menu__name, .case-menu__item[aria-current="page"] .case-menu__name { color: var(--color-mark); }
+.case-menu__item:focus-visible, .case-menu__item.is-focus { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.case-menu__item:active .case-menu__name, .case-menu__item.is-active .case-menu__name { color: var(--color-ink-2); }
 
 /* ── Hero: an index on a sheet, its figure on a field ───────────── */
 

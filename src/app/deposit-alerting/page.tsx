@@ -24,7 +24,7 @@ export default function DepositAlerting() {
 
 	return (
 		<>
-			<Masthead base='/' />
+			<Masthead base='/' current='/deposit-alerting' />
 			<main id='main'>
 				<header className='doc__head'>
 					<div className='container doc__grid'>

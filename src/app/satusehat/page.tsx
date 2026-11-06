@@ -38,7 +38,7 @@ export default function Satusehat() {
 
 	return (
 		<>
-			<Masthead base='/' />
+			<Masthead base='/' current={`/${satusehat.slug}`} />
 			<main id='main'>
 				<header className='doc__head'>
 					<div className='container doc__grid'>
